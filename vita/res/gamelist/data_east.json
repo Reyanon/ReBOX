@@ -1,0 +1,3518 @@
+{
+"name":"Data East",
+"order":2,
+"games":[
+{
+"rom":"cprogolf18",
+"title":"18 Challenge Pro Golf (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"progolf",
+"title":"18 Holes Pro Golf (set 1)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Sports"
+},
+{
+"rom":"actfancrj",
+"title":"Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"actfancr1",
+"title":"Act-Fancer Cybernetick Hyper Weapon (World revision 1)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"actfancr2",
+"title":"Act-Fancer Cybernetick Hyper Weapon (World revision 2)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"actfancr",
+"title":"Act-Fancer Cybernetick Hyper Weapon (World revision 3)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadanglr",
+"title":"Angler Dangler (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"asterion",
+"title":"Asterion",
+"board":"Classic",
+"publisher":"Bootleg?",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"abattle",
+"title":"Astro Battle (set 1)",
+"board":"Classic",
+"publisher":"Bootleg?",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"abattle2",
+"title":"Astro Battle (set 2)",
+"board":"Classic",
+"publisher":"Bootleg?",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"acombat4",
+"title":"Astro Combat (encrypted)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"acombat",
+"title":"Astro Combat (newer, CB)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"acombato",
+"title":"Astro Combat (older, PZ)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"acombat3",
+"title":"Astro Combat (unencrypted)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"castfant",
+"title":"Astro Fantasia (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"astroff",
+"title":"Astro Fighter (Famaresa bootleg, set 1)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"astroff2",
+"title":"Astro Fighter (Famaresa bootleg, set 2)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"astrof",
+"title":"Astro Fighter (set 1)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"astrof2",
+"title":"Astro Fighter (set 2)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"astrof3",
+"title":"Astro Fighter (set 3)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"astroft",
+"title":"Astro Fighter (Taito)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"afire",
+"title":"Astro Fire",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"chelnovj",
+"title":"Atomic Runner Chelnov (Japan)",
+"board":"DECO Karnov",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"chelnovu",
+"title":"Atomic Runner Chelnov (US)",
+"board":"DECO Karnov",
+"publisher":"Data East USA",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"chelnov",
+"title":"Atomic Runner Chelnov (World)",
+"board":"DECO Karnov",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"bwingsa",
+"title":"B-Wings (Alt Ver.?)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"bwings",
+"title":"B-Wings (Japan new Ver.)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"bwingso",
+"title":"B-Wings (Japan old Ver.)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"bcstry",
+"title":"B.C. Story (set 1)",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1997",
+"genre":"Multiplay"
+},
+{
+"rom":"bcstrya",
+"title":"B.C. Story (set 2)",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1997",
+"genre":"Multiplay"
+},
+{
+"rom":"backfire",
+"title":"Backfire! (Data East, Japan, set 1)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Driving"
+},
+{
+"rom":"backfirea",
+"title":"Backfire! (Data East, Japan, set 2)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Driving"
+},
+{
+"rom":"baddudes",
+"title":"Bad Dudes vs. Dragonninja (US, revision 1)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"bandit",
+"title":"Bandit (US prototype)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1989",
+"genre":"Driving"
+},
+{
+"rom":"battlera",
+"title":"Battle Rangers (World)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"birdtrya",
+"title":"Birdie Try (Japan, revision 2)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"birdtry",
+"title":"Birdie Try (Japan, revision 2, revision 1 MCU)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"birdtryb",
+"title":"Birdie Try (Japan, sample version)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"bldwolf",
+"title":"Bloody Wolf (US)",
+"board":"Standalone",
+"publisher":"Data East USA",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"boogwinga",
+"title":"Boogie Wings (Asia v1.5, 92.12.07)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"boogwing",
+"title":"Boogie Wings (Europe v1.5, 92.12.07)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"boogwingu",
+"title":"Boogie Wings (USA v1.7, 92.12.14)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"boomrang",
+"title":"Boomer Rang'r / Genesis (set 1)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"boomranga",
+"title":"Boomer Rang'r / Genesis (set 2)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"cbdash",
+"title":"Boulder Dash (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1985",
+"genre":"Maze"
+},
+{
+"rom":"bouldashj",
+"title":"Boulder Dash / Boulder Dash Part 2 (Japan)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Maze"
+},
+{
+"rom":"bouldash",
+"title":"Boulder Dash / Boulder Dash Part 2 (World)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Maze"
+},
+{
+"rom":"brkthrut",
+"title":"Break Thru (Tecfri license)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"brkthruu",
+"title":"Break Thru (US)",
+"board":"Standalone",
+"publisher":"Data East USA",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"brkthru",
+"title":"Break Thru (World)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"breywood",
+"title":"Breywood (Japan revision 2)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Maze"
+},
+{
+"rom":"bnj",
+"title":"Bump 'n' Jump",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1982",
+"genre":"Driving"
+},
+{
+"rom":"cbnj",
+"title":"Bump 'n' Jump (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Driving"
+},
+{
+"rom":"bnjm",
+"title":"Bump 'n' Jump (Midway)",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1982",
+"genre":"Driving"
+},
+{
+"rom":"btime",
+"title":"Burger Time (Data East set 1)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"btime2",
+"title":"Burger Time (Data East set 2)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"btime3",
+"title":"Burger Time (Data East USA)",
+"board":"Classic",
+"publisher":"Data East USA Inc.",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"cbtime",
+"title":"Burger Time (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"btimem",
+"title":"Burger Time (Midway)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"brubber",
+"title":"Burnin' Rubber",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1982",
+"genre":"Driving"
+},
+{
+"rom":"cburnrubj",
+"title":"Burnin' Rubber (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Driving"
+},
+{
+"rom":"cburnrub",
+"title":"Burnin' Rubber (DECO Cassette) (US) (set 1)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Driving"
+},
+{
+"rom":"cburnrub2",
+"title":"Burnin' Rubber (DECO Cassette) (US) (set 2)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Driving"
+},
+{
+"rom":"candance",
+"title":"Cannon Dancer (Japan)",
+"board":"DECO 156",
+"publisher":"Mitchell",
+"year":"1996",
+"genre":"Platform"
+},
+{
+"rom":"captavena",
+"title":"Captain America and The Avengers (Asia Version 1.0)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"captaven",
+"title":"Captain America and The Avengers (Asia Version 1.4)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"captavenj",
+"title":"Captain America and The Avengers (Japan Version 0.2)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"captavene",
+"title":"Captain America and The Avengers (UK Version 1.4)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"captavenua",
+"title":"Captain America and The Avengers (US Version 1.4)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"captavenuu",
+"title":"Captain America and The Avengers (US Version 1.6)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"captavenu",
+"title":"Captain America and The Avengers (US Version 1.9)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"csilverja",
+"title":"Captain Silver (Japan, revision 1)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"csilverj",
+"title":"Captain Silver (Japan, revision 2)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"csilver",
+"title":"Captain Silver (World)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"caractn",
+"title":"Car Action (set 1)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Driving"
+},
+{
+"rom":"caractn2",
+"title":"Car Action (set 2)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Driving"
+},
+{
+"rom":"carket",
+"title":"Carket Ball",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1996",
+"genre":"Sports"
+},
+{
+"rom":"cninjabl",
+"title":"Caveman Ninja (bootleg)",
+"board":"DECO 16",
+"publisher":"Bootleg",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"cninjau",
+"title":"Caveman Ninja (US ver 4)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"cninja1",
+"title":"Caveman Ninja (World ver 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"cninja",
+"title":"Caveman Ninja (World ver 4)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"chainrec",
+"title":"Chain Reaction (World, Master Version 2.2, 1995.09.25)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"chanbara",
+"title":"Chanbara (Japan)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"charlien",
+"title":"Charlie Ninja",
+"board":"DECO 156",
+"publisher":"Mitchell",
+"year":"1995",
+"genre":"Platform"
+},
+{
+"rom":"chinatwn",
+"title":"China Town (Japan)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Puzzle"
+},
+{
+"rom":"chokchok",
+"title":"Choky! Choky!",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"cgraplop",
+"title":"Cluster Buster (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"cobracomj",
+"title":"Cobra-Command (Japan)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"cobracomjb",
+"title":"Cobra-Command (Japan, bootleg)",
+"board":"DECO dec8",
+"publisher":"Bootleg",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"cobracoma",
+"title":"Cobra-Command (World/US revision 4)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"cobracom",
+"title":"Cobra-Command (World/US revision 5)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"cobracomb",
+"title":"Cobra-Command (World/US)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"compgolfo",
+"title":"Competition Golf Final Round (Japan, old version)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"compgolf",
+"title":"Competition Golf Final Round (World?, revision 3)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"cookrace",
+"title":"Cook Race",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"cookbib",
+"title":"Cookie & Bibi (set 1)",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"cookbiba",
+"title":"Cookie & Bibi (set 2)",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"cbusterj",
+"title":"Crude Buster (Japan FR revision 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"cbusterw",
+"title":"Crude Buster (World FU version)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"cbuster",
+"title":"Crude Buster (World FX version)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"darksealj",
+"title":"Dark Seal (Japan revision 4)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Maze"
+},
+{
+"rom":"darkseal1",
+"title":"Dark Seal (World revision 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Maze"
+},
+{
+"rom":"darkseal",
+"title":"Dark Seal (World revision 3)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Maze"
+},
+{
+"rom":"darkseal2",
+"title":"Dark Seal 2 (Japan v2.1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"darwin",
+"title":"Darwin 4078 (Japan)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"dquizgo",
+"title":"Date Quiz Go Go (Korea)",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1998",
+"genre":"Quiz"
+},
+{
+"rom":"deathbrd",
+"title":"Death Brade (Japan ver JM-3)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"decodark15",
+"title":"DECO Cassette System ROM Multigame (Darksoft, v15)",
+"board":"DECO Cassette",
+"publisher":"Bootleg",
+"year":"2022",
+"genre":"MultiGame"
+},
+{
+"rom":"decodark16",
+"title":"DECO Cassette System ROM Multigame (Darksoft, v16)",
+"board":"DECO Cassette",
+"publisher":"Bootleg",
+"year":"2022",
+"genre":"MultiGame"
+},
+{
+"rom":"decodark",
+"title":"DECO Cassette System ROM Multigame (Darksoft, v17)",
+"board":"DECO Cassette",
+"publisher":"Bootleg",
+"year":"2022",
+"genre":"MultiGame"
+},
+{
+"rom":"decomult",
+"title":"DECO Cassette System ROM Multigame (David Widel)",
+"board":"DECO Cassette",
+"publisher":"Bootleg",
+"year":"2008",
+"genre":"MultiGame"
+},
+{
+"rom":"dassault4",
+"title":"Desert Assault (US 4 Players)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"dassault",
+"title":"Desert Assault (US)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"dietgoeb",
+"title":"Diet Go Go (Europe v1.1 1992.08.04)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"dietgo",
+"title":"Diet Go Go (Europe v1.1 1992.09.26, set 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"dietgoe",
+"title":"Diet Go Go (Europe v1.1 1992.09.26, set 2)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"dietgoea",
+"title":"Diet Go Go (Europe v1.1 1992.09.26, set 3)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"dietgoj",
+"title":"Diet Go Go (Japan v1.1 1992.09.26)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"dietgou",
+"title":"Diet Go Go (USA v1.1 1992.09.26)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"disco",
+"title":"Disco No.1",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"cdiscon1",
+"title":"Disco No.1 (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Puzzle"
+},
+{
+"rom":"discof",
+"title":"Disco No.1 (Rev.F)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"dommy",
+"title":"Dommy",
+"board":"Classic",
+"publisher":"Technos Japan",
+"year":"1983",
+"genre":"Maze"
+},
+{
+"rom":"dblewingb",
+"title":"Double Wings (Asia)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"dblewing",
+"title":"Double Wings (set 1)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"dblewinga",
+"title":"Double Wings (set 2)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"dragngunj",
+"title":"Dragon Gun (Japan, Master Version 0.00, 1992-11-24)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"dragngun",
+"title":"Dragon Gun (US, LTEST-02 Version 0.00, 1992-12-08)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"drgninjab2",
+"title":"Dragonninja (bootleg with 68705)",
+"board":"DECO dec0",
+"publisher":"Bootleg",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"drgninjab",
+"title":"Dragonninja (bootleg)",
+"board":"DECO dec0",
+"publisher":"Bootleg",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"drgninja",
+"title":"Dragonninja (Japan, revision 1)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"dreambal",
+"title":"Dream Ball (Japan V2.4)",
+"board":"DECO 16",
+"publisher":"NDK",
+"year":"1993",
+"genre":"Gambling"
+},
+{
+"rom":"cdsteljn",
+"title":"DS Telejan (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Tabletop"
+},
+{
+"rom":"dualaslt",
+"title":"Dual Assault",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"ddream95",
+"title":"Dunk Dream '95 (Japan 1.4, EAM)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Sports"
+},
+{
+"rom":"eggs",
+"title":"Eggs (USA)",
+"board":"Classic",
+"publisher":"Technos Japan",
+"year":"1983",
+"genre":"Maze"
+},
+{
+"rom":"cexplore",
+"title":"Explorer (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"exprraidbl",
+"title":"Express Raider (bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"exprraidi",
+"title":"Express Raider (Italy)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"exprraidu",
+"title":"Express Raider (US, rev 5)",
+"board":"Standalone",
+"publisher":"Data East USA",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"exprraid",
+"title":"Express Raider (World, Rev 4)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"fncywld",
+"title":"Fancy World - Earth of Crisis (set 1)",
+"board":"DECO 16",
+"publisher":"Unico",
+"year":"1996",
+"genre":"Platform"
+},
+{
+"rom":"fncywlda",
+"title":"Fancy World - Earth of Crisis (set 2)",
+"board":"DECO 16",
+"publisher":"Unico",
+"year":"1996",
+"genre":"Platform"
+},
+{
+"rom":"fghthistjb",
+"title":"Fighter's History (Japan Version 41-04, DE-0380-1 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"fghthistja",
+"title":"Fighter's History (Japan Version 41-05, DE-0380-2 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"fghthistj",
+"title":"Fighter's History (Japan Version 41-07, DE-0395-1 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"fghthistuc",
+"title":"Fighter's History (US Version 42-03, DE-0380-2 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"fghthistub",
+"title":"Fighter's History (US Version 42-05, DE-0395-1 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"fghthistua",
+"title":"Fighter's History (US Version 42-06, DE-0395-1 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"fghthistu",
+"title":"Fighter's History (US Version 42-09, DE-0396-0 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"fghthistb",
+"title":"Fighter's History (World Version 43-05, DE-0380-2 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"fghthista",
+"title":"Fighter's History (World Version 43-07, DE-0380-2 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"fghthist",
+"title":"Fighter's History (World Version 43-09, DE-0395-1 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"ffantasyb",
+"title":"Fighting Fantasy (Japan revision ?)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"ffantasya",
+"title":"Fighting Fantasy (Japan)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"ffantasyj",
+"title":"Fighting Fantasy (Japan, revision 2)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"ffantasy",
+"title":"Fighting Fantasy (Japan, revision 3)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"cfghtice",
+"title":"Fighting Ice Hockey (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"firetrapbl",
+"title":"Fire Trap (Japan bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Climbing"
+},
+{
+"rom":"firetrapj",
+"title":"Fire Trap (Japan)",
+"board":"Standalone",
+"publisher":"Wood Place",
+"year":"1986",
+"genre":"Climbing"
+},
+{
+"rom":"firetrapa",
+"title":"Fire Trap (US)",
+"board":"Standalone",
+"publisher":"Wood Place",
+"year":"1986",
+"genre":"Climbing"
+},
+{
+"rom":"firetrap",
+"title":"Fire Trap (US, rev A)",
+"board":"Standalone",
+"publisher":"Wood Place",
+"year":"1986",
+"genre":"Climbing"
+},
+{
+"rom":"cfishing",
+"title":"Fishing (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"cfboy0a1",
+"title":"Flash Boy (vertical) (DECO Cassette MD) (No.12/Ver.0/Set.1,Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"cflyball",
+"title":"Flying Ball (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1985",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"forcebrk",
+"title":"Force Break (bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"funkyjetj",
+"title":"Funky Jet (Japan, rev 2)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"funkyjeta2",
+"title":"Funky Jet (Korea, prototype?)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"funkyjeta",
+"title":"Funky Jet (World)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"funkyjet",
+"title":"Funky Jet (World, rev 1)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"gangonta",
+"title":"Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)",
+"board":"DECO 156",
+"publisher":"Mitchell",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"garyoret",
+"title":"Garyo Retsuden (Japan)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"gatedoom1",
+"title":"Gate of Doom (US revision 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Maze"
+},
+{
+"rom":"gatedoom",
+"title":"Gate of Doom (US revision 4)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Maze"
+},
+{
+"rom":"gondou",
+"title":"Gondomania (US)",
+"board":"DECO dec8",
+"publisher":"Data East USA",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"gondo",
+"title":"Gondomania (World)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"cgraplopj",
+"title":"Graplop (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"cgraplop2",
+"title":"Graplop (DECO Cassette) (US) (Prototype?)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"gunball",
+"title":"Gun Ball (Japan)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"chamburger",
+"title":"Hamburger (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"hangzo",
+"title":"Hangzo (Japan, prototype)",
+"board":"DECO 16",
+"publisher":"Hot-B",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"htchctch",
+"title":"Hatch Catch",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"hbarrelua",
+"title":"Heavy Barrel (US, revision 1)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"hbarrelu",
+"title":"Heavy Barrel (US, revision 3)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"hbarrel",
+"title":"Heavy Barrel (World)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"hvysmsha",
+"title":"Heavy Smash (Asia version -4, 1993/09/06)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"hvysmsh",
+"title":"Heavy Smash (Europe version -2, 1993/06/30)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"hvysmshj",
+"title":"Heavy Smash (Japan version -2, 1993/06/30)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"mutantf1",
+"title":"Heroes (World ver EM-1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"chwy",
+"title":"Highway Chase (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"hippodrm",
+"title":"Hippodrome (US)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"hoops96",
+"title":"Hoops '96 (Europe/Asia 2.0)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1996",
+"genre":"Sports"
+},
+{
+"rom":"hoops95",
+"title":"Hoops (Europe/Asia 1.7)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Sports"
+},
+{
+"rom":"acchi",
+"title":"Janken Game Acchi Muite Hoi! (Japan 1.3)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Medal Game"
+},
+{
+"rom":"joemacrj",
+"title":"Joe & Mac Returns (Japan, Master Version 1.2, 1994.06.06)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"joemacra",
+"title":"Joe & Mac Returns (World, Master Version 1.0, 1994.05.19)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"joemacr",
+"title":"Joe & Mac Returns (World, Master Version 1.1, 1994.05.27)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"sotsugyok",
+"title":"Jor-eop Jeungmyeongseo (Korea)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1996",
+"genre":"Multiplay"
+},
+{
+"rom":"jumpkids",
+"title":"Jump Kids",
+"board":"DECO 16",
+"publisher":"Comad",
+"year":"1993",
+"genre":"Platform"
+},
+{
+"rom":"kamikcab",
+"title":"Kamikaze Cabbie",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Maze"
+},
+{
+"rom":"kchamptec",
+"title":"Karate Champ (Tecfri bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kchamp",
+"title":"Karate Champ (US)",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kchamp2p",
+"title":"Karate Champ (US, 2 players)",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kchampvs",
+"title":"Karate Champ: Player Vs Player (US, set 1)",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kchampvs2",
+"title":"Karate Champ: Player Vs Player (US, set 2)",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kchampvs3",
+"title":"Karate Champ: Player Vs Player (US, set 3)",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kchampvs4",
+"title":"Karate Champ: Player Vs Player (US, set 4)",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"karateda",
+"title":"Karate Dou (Arfyc bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"karatedo",
+"title":"Karate Dou (Japan)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"karnovj",
+"title":"Karnov (Japan)",
+"board":"DECO Karnov",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"karnova",
+"title":"Karnov (US, rev 5)",
+"board":"DECO Karnov",
+"publisher":"Data East USA",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"karnov",
+"title":"Karnov (US, rev 6)",
+"board":"DECO Karnov",
+"publisher":"Data East USA",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"kingofbj",
+"title":"King of Boxer (Japan)",
+"board":"Classic",
+"publisher":"Wood Place",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"kingofb",
+"title":"King of Boxer (World)",
+"board":"Classic",
+"publisher":"Wood Place",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"kuhga",
+"title":"Kuhga - Operation Code 'Vapor Trail' (Japan revision 3)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"brkthruj",
+"title":"Kyoukou Toppa (Japan)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"lastmisnj",
+"title":"Last Mission (Japan)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"lastmisnu5",
+"title":"Last Mission (US revision 5)",
+"board":"DECO dec8",
+"publisher":"Data East USA",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"lastmisnu6",
+"title":"Last Mission (US revision 6)",
+"board":"DECO dec8",
+"publisher":"Data East USA",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"lastmisn",
+"title":"Last Mission (World revision 8)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"lemmings",
+"title":"Lemmings (US prototype)",
+"board":"DECO 16",
+"publisher":"Data East USA",
+"year":"1991",
+"genre":"Puzzle"
+},
+{
+"rom":"liberate",
+"title":"Liberation",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"liberateb",
+"title":"Liberation (bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"lnc",
+"title":"Lock'n'Chase",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"clocknchj",
+"title":"Lock'n'Chase (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"clocknch",
+"title":"Lock'n'Chase (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"cluckypo",
+"title":"Lucky Poker (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Gambling"
+},
+{
+"rom":"miade",
+"title":"M.I.A. - Missing in Action (Data East, 12/22/88, US, prototype?)",
+"board":"Standalone",
+"publisher":"Data East USA",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"madalien",
+"title":"Mad Alien (set 1)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"madaliena",
+"title":"Mad Alien (set 2)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"madalienb",
+"title":"Mad Alien (set 2, alt gfx)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"madmotor",
+"title":"Mad Motor (prototype, set 1)",
+"board":"Standalone",
+"publisher":"Mitchell",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"madmotora",
+"title":"Mad Motor (prototype, set 2)",
+"board":"Standalone",
+"publisher":"Mitchell",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"magipur",
+"title":"Magic Purple",
+"board":"DECO 16",
+"publisher":"Unico",
+"year":"1996",
+"genre":"Platform"
+},
+{
+"rom":"magdrop",
+"title":"Magical Drop (Japan, Master Version 1.5, 1995.06.21)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"magdropp",
+"title":"Magical Drop Plus 1 (Japan, Master Version 2.1, 1995.09.12)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"magicbal",
+"title":"Magicball Fighting (Korea)",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"makyosen",
+"title":"Makyou Senshi (Japan)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"cmanhat",
+"title":"Manhattan (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Misc."
+},
+{
+"rom":"meikyuh",
+"title":"Meikyuu Hunter G (Japan)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"meikyuhbl",
+"title":"Meikyuu Hunter G (Japan, bootleg)",
+"board":"DECO dec8",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"metlclsh",
+"title":"Metal Clash (Japan)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"metlsavr",
+"title":"Metal Saver",
+"board":"DECO 16",
+"publisher":"First Amusement",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"midresb",
+"title":"Midnight Resistance (bootleg with 68705)",
+"board":"DECO dec0",
+"publisher":"Bootleg",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"midresj",
+"title":"Midnight Resistance (Japan)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"midresbj",
+"title":"Midnight Resistance (Joystick bootleg)",
+"board":"DECO dec0",
+"publisher":"Bootleg",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"midresu",
+"title":"Midnight Resistance (US)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"midres",
+"title":"Midnight Resistance (World, set 1)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"midres2",
+"title":"Midnight Resistance (World, set 2)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"mmonkey",
+"title":"Minky Monkey",
+"board":"Classic",
+"publisher":"Technos Japan",
+"year":"1982",
+"genre":"Puzzle"
+},
+{
+"rom":"mmonkeyj",
+"title":"Minky Monkey (Japan)",
+"board":"Classic",
+"publisher":"Technos Japan",
+"year":"1982",
+"genre":"Puzzle"
+},
+{
+"rom":"mirage",
+"title":"Mirage Youjuu Mahjongden (Japan)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1994",
+"genre":"Tabletop"
+},
+{
+"rom":"cmissnx",
+"title":"Mission-X (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"semibase",
+"title":"MuHanSeungBu (SemiCom Baseball) (Korea)",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1997",
+"genre":"Sports"
+},
+{
+"rom":"mutantf2",
+"title":"Mutant Fighter (World ver EM-2)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"mutantf3",
+"title":"Mutant Fighter (World ver EM-3)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"mutantf4",
+"title":"Mutant Fighter (World ver EM-4)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"mutantf",
+"title":"Mutant Fighter (World ver EM-5)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"bldwolfj",
+"title":"Narazumono Sentoubutai Bloody Wolf (Japan)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"cnebula",
+"title":"Nebula (DECO Cassette) (UK)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"nslasherj",
+"title":"Night Slashers (Japan Ver. 1.2, DE-0397-0 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"nslasher",
+"title":"Night Slashers (Korea Ver. 1.3, DE-0397-0 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"nslasheru",
+"title":"Night Slashers (US Ver. 1.2, DE-0395-1 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"nslashers",
+"title":"Night Slashers (World Ver. 1.2, DE-0397-0 PCB)",
+"board":"DECO 32",
+"publisher":"Data East Corporation",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"cnightst",
+"title":"Night Star (DECO Cassette) (US) (set 1)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"cnightst2",
+"title":"Night Star (DECO Cassette) (US) (set 2)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"nitrobal",
+"title":"Nitro Ball (World, set 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"nitrobala",
+"title":"Nitro Ball (World, set 2)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"nitrobalb",
+"title":"Nitro Ball (World, set 3)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"cocean1a",
+"title":"Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Gambling"
+},
+{
+"rom":"cocean6b",
+"title":"Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Gambling"
+},
+{
+"rom":"coozumou",
+"title":"Oozumou - The Grand Sumo (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"osman",
+"title":"Osman (World)",
+"board":"DECO 156",
+"publisher":"Mitchell",
+"year":"1996",
+"genre":"Platform"
+},
+{
+"rom":"pangpang",
+"title":"Pang Pang",
+"board":"DECO 16",
+"publisher":"Dong Gue La Mi Ltd.",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"prtytime",
+"title":"Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)",
+"board":"DECO 156",
+"publisher":"Mitchell",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"cppicf",
+"title":"Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 1)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"cppicf2",
+"title":"Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 2)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"pcktgal",
+"title":"Pocket Gal (Japan)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"pcktgalb",
+"title":"Pocket Gal (Yada East bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"pcktgalba",
+"title":"Pocket Gal / unknown card game",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"pcktgal2",
+"title":"Pocket Gal 2 (English)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"pcktgal2j",
+"title":"Pocket Gal 2 (Japanese)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"pktgaldxa",
+"title":"Pocket Gal Deluxe (Asia v3.00)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"pktgaldx",
+"title":"Pocket Gal Deluxe (Europe v3.00)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"pktgaldxj",
+"title":"Pocket Gal Deluxe (Japan v3.00)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"tryout",
+"title":"Pro Baseball Skill Tryout (Japan)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"cprobowl",
+"title":"Pro Bowling (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"prosoccr",
+"title":"Pro Soccer",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"cpsoccerj",
+"title":"Pro Soccer (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"cpsoccer",
+"title":"Pro Soccer (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"prosport",
+"title":"Pro Sports - Bowling, Tennis, and Golf",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"prosporta",
+"title":"Pro Sports - Bowling, Tennis, and Golf (USA)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"cptennisj",
+"title":"Pro Tennis (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"cptennis",
+"title":"Pro Tennis (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"protenn",
+"title":"Pro Tennis (Japan)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"oscarj1",
+"title":"Psycho-Nics Oscar (Japan revision 1)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"oscarj2",
+"title":"Psycho-Nics Oscar (Japan revision 2)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"oscaru",
+"title":"Psycho-Nics Oscar (US)",
+"board":"DECO dec8",
+"publisher":"Data East USA",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"oscar",
+"title":"Psycho-Nics Oscar (World revision 0)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"oscarbl",
+"title":"Psycho-Nics Oscar (World revision 0, bootleg)",
+"board":"DECO dec8",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"ringking",
+"title":"Ring King (US set 1)",
+"board":"Classic",
+"publisher":"Wood Place",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"ringking2",
+"title":"Ring King (US set 2)",
+"board":"Classic",
+"publisher":"Wood Place",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"ringking3",
+"title":"Ring King (US set 3)",
+"board":"Classic",
+"publisher":"Wood Place",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"ringkingw",
+"title":"Ring King (US, Woodplace Inc.)",
+"board":"Classic",
+"publisher":"Wood Place",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"robocopj",
+"title":"Robocop (Japan)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"robocopu0",
+"title":"Robocop (US, revision 0)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"robocopu",
+"title":"Robocop (US, revision 1)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"robocopb",
+"title":"Robocop (World bootleg)",
+"board":"DECO dec0",
+"publisher":"Bootleg",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"robocopw",
+"title":"Robocop (World, revision 3)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"robocop",
+"title":"Robocop (World, revision 4)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"robocop2",
+"title":"Robocop 2 (Euro/Asia v0.10)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"robocop2j",
+"title":"Robocop 2 (Japan v0.11)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"robocop2ua",
+"title":"Robocop 2 (US v0.05)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"robocop2u",
+"title":"Robocop 2 (US v0.10)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"rockduck",
+"title":"Rock Duck (prototype?)",
+"board":"Classic",
+"publisher":"Datel SAS",
+"year":"1983",
+"genre":"Maze"
+},
+{
+"rom":"rohga1",
+"title":"Rohga: Armor Force (Asia/Europe v3.0 set 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"rohga2",
+"title":"Rohga: Armor Force (Asia/Europe v3.0 set 2)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"rohga",
+"title":"Rohga: Armor Force (Asia/Europe v5.0)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"rohgah",
+"title":"Rohga: Armor Force (Hong Kong v3.0)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"rohgau",
+"title":"Rohga: Armor Force (US v1.0)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"clapapa2",
+"title":"Rootin' Tootin' (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Maze"
+},
+{
+"rom":"clapapa",
+"title":"Rootin' Tootin' / La-Pa-Pa (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Maze"
+},
+{
+"rom":"rundeep",
+"title":"Run Deep",
+"board":"Standalone",
+"publisher":"Cream",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"satsf3d",
+"title":"Saturn: Space Fighter 3D",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"schmeisr",
+"title":"Schmeiser Robo (Japan)",
+"board":"DECO 16",
+"publisher":"Hot-B",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"scregg",
+"title":"Scrambled Egg",
+"board":"Classic",
+"publisher":"Technos Japan",
+"year":"1983",
+"genre":"Maze"
+},
+{
+"rom":"cscrtry",
+"title":"Scrum Try (DECO Cassette) (US) (set 1)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"cscrtry2",
+"title":"Scrum Try (DECO Cassette) (US) (set 2)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"sdfight",
+"title":"SD Fighters (Korea)",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1996",
+"genre":"Fighter"
+},
+{
+"rom":"secretagj",
+"title":"Secret Agent (Japan, revision 2)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"secretag",
+"title":"Secret Agent (World, revision 3)",
+"board":"DECO dec0",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"shackled",
+"title":"Shackled (US)",
+"board":"DECO dec8",
+"publisher":"Data East USA",
+"year":"1986",
+"genre":"Maze"
+},
+{
+"rom":"shootoutj",
+"title":"Shoot Out (Japan)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"shootoutb",
+"title":"Shoot Out (Korean Bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"shootout",
+"title":"Shoot Out (US)",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"sidepcktb",
+"title":"Side Pocket (bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"sidepcktj",
+"title":"Side Pocket (Japan, Cocktail)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"sidepckt",
+"title":"Side Pocket (World)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"cskater",
+"title":"Skater (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"skullfng",
+"title":"Skull Fang (Europe 1.13)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1996",
+"genre":"Shooter"
+},
+{
+"rom":"skullfnga",
+"title":"Skull Fang - Kuhga Gaiden (Asia 1.13)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1996",
+"genre":"Shooter"
+},
+{
+"rom":"skullfngj",
+"title":"Skull Fang - Kuhga Gaiden (Japan 1.09)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1996",
+"genre":"Shooter"
+},
+{
+"rom":"slyspy2",
+"title":"Sly Spy (US, revision 2)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"slyspy3",
+"title":"Sly Spy (US, revision 3)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"slyspy",
+"title":"Sly Spy (US, revision 4)",
+"board":"DECO dec0",
+"publisher":"Data East USA",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"sotsugyo",
+"title":"Sotsugyo Shousho (Japan)",
+"board":"DECO 16",
+"publisher":"Mitchell",
+"year":"1995",
+"genre":"Multiplay"
+},
+{
+"rom":"spfghmk2",
+"title":"Space Fighter Mark II (set 1)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"spfghmk22",
+"title":"Space Fighter Mark II (set 2)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"srdarwinj",
+"title":"SRD: Super Real Darwin (Japan)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"srdarwinb",
+"title":"SRD: Super Real Darwin (Japan, bootleg)",
+"board":"DECO dec8",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"srdarwin",
+"title":"SRD: Super Real Darwin (World)",
+"board":"DECO dec8",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"stadhr96",
+"title":"Stadium Hero '96 (Europe, EAJ, Tuning license)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1996",
+"genre":"Sports"
+},
+{
+"rom":"stadhr96j",
+"title":"Stadium Hero '96 (Japan, EAD)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1996",
+"genre":"Sports"
+},
+{
+"rom":"stadhr96j2",
+"title":"Stadium Hero '96 (Japan?, EAE)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1996",
+"genre":"Sports"
+},
+{
+"rom":"stadhr96k",
+"title":"Stadium Hero '96 (Korea, Dream Island license)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1996",
+"genre":"Sports"
+},
+{
+"rom":"stadhr96u",
+"title":"Stadium Hero '96 (USA, EAH)",
+"board":"DECO MLC",
+"publisher":"Data East Corporation",
+"year":"1996",
+"genre":"Sports"
+},
+{
+"rom":"stadhero",
+"title":"Stadium Hero (Japan)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"strfight",
+"title":"Star Fighter (bootleg of Astro Fighter)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"stoneage",
+"title":"Stoneage (bootleg of Caveman Ninja)",
+"board":"DECO 16",
+"publisher":"Bootleg",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"csuperas",
+"title":"Super Astro Fighter (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"supbtimej",
+"title":"Super Burger Time (Japan)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"supbtime",
+"title":"Super Burger Time (World, set 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"supbtimea",
+"title":"Super Burger Time (World, set 2)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"sdtennis",
+"title":"Super Doubles Tennis",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"csdtenis",
+"title":"Super Doubles Tennis (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"spool3",
+"title":"Super Pool III (English)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"spool3i",
+"title":"Super Pool III (I-Vics)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"sshanghaj",
+"title":"Super Shanghai Dragon's Eye (Japan)",
+"board":"DECO 16",
+"publisher":"Hot-B",
+"year":"1992",
+"genre":"Tabletop"
+},
+{
+"rom":"sshanghak",
+"title":"Super Shanghai Dragon's Eye (Korea)",
+"board":"DECO 16",
+"publisher":"Hot-B",
+"year":"1992",
+"genre":"Tabletop"
+},
+{
+"rom":"sshangha",
+"title":"Super Shanghai Dragon's Eye (World)",
+"board":"DECO 16",
+"publisher":"Hot-B",
+"year":"1992",
+"genre":"Tabletop"
+},
+{
+"rom":"sshanghab",
+"title":"Super Shanghai Dragon's Eye (World, bootleg)",
+"board":"DECO 16",
+"publisher":"Bootleg",
+"year":"1992",
+"genre":"Tabletop"
+},
+{
+"rom":"sstarbtl",
+"title":"Super Star Battle",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"suprtrio",
+"title":"Super Trio",
+"board":"DECO 16",
+"publisher":"Gameace",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"csweetht",
+"title":"Sweet Heart (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"karatevs",
+"title":"Taisen Karate Dou (Japan)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"joemac",
+"title":"Tatakae Genshizin Joe & Mac (Japan ver 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"cninjabl2",
+"title":"Tatakae Genshizin Joe & Mac (Japan, bootleg)",
+"board":"DECO 16",
+"publisher":"Bootleg",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"tattassa",
+"title":"Tattoo Assassins (Asia prototype, Mar 14 1995)",
+"board":"DECO 32",
+"publisher":"Data East Pinball",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"tattass",
+"title":"Tattoo Assassins (US prototype, Mar 14 1995)",
+"board":"DECO 32",
+"publisher":"Data East Pinball",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"tattasso",
+"title":"Tattoo Assassins (US prototype, Mar 14 1995, older sound)",
+"board":"DECO 32",
+"publisher":"Data East Pinball",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"protennb",
+"title":"Tennis (bootleg of Pro Tennis)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"cterrani",
+"title":"Terranean (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"ctsttape",
+"title":"Test Tape (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Utilities"
+},
+{
+"rom":"edrandyj",
+"title":"The Cliffhanger - Edward Randy (Japan ver 3)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"edrandy1",
+"title":"The Cliffhanger - Edward Randy (World ver 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"edrandy2",
+"title":"The Cliffhanger - Edward Randy (World ver 2)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"edrandy",
+"title":"The Cliffhanger - Edward Randy (World ver 3)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"thedeep",
+"title":"The Deep (Japan)",
+"board":"Standalone",
+"publisher":"Wood Place",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"ragtimea",
+"title":"The Great Ragtime Show (Japan v1.3, 92.11.26)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"ragtime",
+"title":"The Great Ragtime Show (Japan v1.5, 92.12.07)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"ghostb2a",
+"title":"The Real Ghostbusters (US 2 Players)",
+"board":"DECO dec8",
+"publisher":"Data East USA",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"ghostb",
+"title":"The Real Ghostbusters (US 2 Players, revision 2)",
+"board":"DECO dec8",
+"publisher":"Data East USA",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"ghostb3a",
+"title":"The Real Ghostbusters (US 3 Players, revision 2)",
+"board":"DECO dec8",
+"publisher":"Data East USA",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"ghostb3",
+"title":"The Real Ghostbusters (US 3 Players, revision 3B?)",
+"board":"DECO dec8",
+"publisher":"Data East USA",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"ctower",
+"title":"The Tower (DECO Cassette) (Europe)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Climbing"
+},
+{
+"rom":"thndzonej",
+"title":"Thunder Zone (Japan)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"thndzone4",
+"title":"Thunder Zone (World 4 Players)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"thndzonea",
+"title":"Thunder Zone (World)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"thndzone",
+"title":"Thunder Zone (World, Rev 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"tomahawk1",
+"title":"Tomahawk 777 (rev 1)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"tomahawk",
+"title":"Tomahawk 777 (rev 5)",
+"board":"Classic",
+"publisher":"Data East",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"ctornado",
+"title":"Tornado (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"cprogolfj",
+"title":"Tournament Pro Golf (DECO Cassette) (Japan)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Sports"
+},
+{
+"rom":"cprogolf",
+"title":"Tournament Pro Golf (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Sports"
+},
+{
+"rom":"ctisland3",
+"title":"Treasure Island (DECO Cassette) (Europe?)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"ctisland",
+"title":"Treasure Island (DECO Cassette) (US) (set 1)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"ctisland2",
+"title":"Treasure Island (DECO Cassette) (US) (set 2)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"triothepj",
+"title":"Trio The Punch - Never Forget Me... (Japan)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"triothep",
+"title":"Trio The Punch - Never Forget Me... (World)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"tumbleb2",
+"title":"Tumble Pop (bootleg with PIC)",
+"board":"DECO 16",
+"publisher":"Bootleg",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"tumbleb",
+"title":"Tumble Pop (bootleg)",
+"board":"DECO 16",
+"publisher":"Bootleg",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"tumblepj",
+"title":"Tumble Pop (Japan)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"tumblep",
+"title":"Tumble Pop (World)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"twocrude",
+"title":"Two Crude (US FT revision 1)",
+"board":"DECO 16",
+"publisher":"Data East USA",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"twocrudea",
+"title":"Two Crude (US FT version)",
+"board":"DECO 16",
+"publisher":"Data East USA",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"vaportrau",
+"title":"Vapor Trail - Hyper Offence Formation (US)",
+"board":"DECO 16",
+"publisher":"Data East USA",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"vaportra",
+"title":"Vapor Trail - Hyper Offence Formation (World revision 1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"vaportra3",
+"title":"Vapor Trail - Hyper Offence Formation (World revision 3?)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"wexpressb1",
+"title":"Western Express (bootleg set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"wexpressb2",
+"title":"Western Express (bootleg set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"wexpressb3",
+"title":"Western Express (bootleg set 3)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"wexpress",
+"title":"Western Express (Japan, rev 4)",
+"board":"Standalone",
+"publisher":"Data East Corporation",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"wizdfirea",
+"title":"Wizard Fire (Over Sea v1.0)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"wizdfire",
+"title":"Wizard Fire (Over Sea v2.1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"wizdfireu",
+"title":"Wizard Fire (US v1.1)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"wolffang",
+"title":"Wolf Fang: Kuuga 2001 (Japan)",
+"board":"DECO 16",
+"publisher":"Data East Corporation",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"wondl96",
+"title":"Wonder League '96 (Korea)",
+"board":"DECO 16",
+"publisher":"SemiCom",
+"year":"1996",
+"genre":"Sports"
+},
+{
+"rom":"wlstar",
+"title":"Wonder League Star - Sok-Magicball Fighting (Korea)",
+"board":"DECO 16",
+"publisher":"Mijin",
+"year":"1995",
+"genre":"Sports"
+},
+{
+"rom":"wndrplnt",
+"title":"Wonder Planet (Japan)",
+"board":"DECO Karnov",
+"publisher":"Data East Corporation",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"wcvol95",
+"title":"World Cup Volleyball '95 (Asia Ver. 1.0)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Sports"
+},
+{
+"rom":"wcvol95j",
+"title":"World Cup Volleyball '95 (Japan Ver. 1.0)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Sports"
+},
+{
+"rom":"wcvol95x",
+"title":"World Cup Volleyball '95 Extra Version (Asia Ver. 2.0B)",
+"board":"DECO 156",
+"publisher":"Data East Corporation",
+"year":"1995",
+"genre":"Sports"
+},
+{
+"rom":"wtennis",
+"title":"World Tennis",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"yellowcbb",
+"title":"Yellow Cab (bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Maze"
+},
+{
+"rom":"yellowcbj",
+"title":"Yellow Cab (Japan)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Maze"
+},
+{
+"rom":"zaviga",
+"title":"Zaviga",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"zavigaj",
+"title":"Zaviga (Japan)",
+"board":"Classic",
+"publisher":"Data East Corporation",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"czeroize",
+"title":"Zeroize (DECO Cassette) (US)",
+"board":"DECO Cassette",
+"publisher":"Data East Corporation",
+"year":"1983",
+"genre":"Maze"
+},
+{
+"rom":"zoar",
+"title":"Zoar",
+"board":"Classic",
+"publisher":"Data East USA",
+"year":"1982",
+"genre":"Shooter"
+}
+]
+}

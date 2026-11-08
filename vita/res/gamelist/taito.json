@@ -1,0 +1,5582 @@
+{
+"name":"Taito",
+"order":1,
+"games":[
+{
+"rom":"adcanoe",
+"title":"Adventure Canoe",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"koshien",
+"title":"Ah Eikou no Koshien (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"akkanvdr",
+"title":"Akkanvader (Ver 2.5J 1995/06/14)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"alpine",
+"title":"Alpine Ski (set 1)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"alpinea",
+"title":"Alpine Ski (set 2)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"horshoes",
+"title":"American Horseshoes (US)",
+"board":"L System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"aquajackj",
+"title":"Aqua Jack (Japan)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"aquajacku",
+"title":"Aqua Jack (US)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"aquajack",
+"title":"Aqua Jack (World)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"arabianmu",
+"title":"Arabian Magic (Ver 1.0A 1992/07/06)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"arabianmj",
+"title":"Arabian Magic (Ver 1.0J 1992/07/06)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"arabianm",
+"title":"Arabian Magic (Ver 1.0O 1992/07/06)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"arkaboot",
+"title":"Arkanoid (bootleg of version Japan, older)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkgcbl",
+"title":"Arkanoid (bootleg on Block hardware, set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkgcbla",
+"title":"Arkanoid (bootleg on Block hardware, set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"ark1ball",
+"title":"Arkanoid (bootleg with MCU, harder)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkanoidjbl",
+"title":"Arkanoid (bootleg with MCU, set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkanoidjbl2",
+"title":"Arkanoid (bootleg with MCU, set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkangc",
+"title":"Arkanoid (Game Corporation bootleg, set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkangc2",
+"title":"Arkanoid (Game Corporation bootleg, set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkanoidja",
+"title":"Arkanoid (Japan, newer w/level select)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkanoidj",
+"title":"Arkanoid (Japan, newer)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkanoidjb",
+"title":"Arkanoid (Japan, older)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkanoidpe",
+"title":"Arkanoid (Phoenix Electronics license)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkatayt",
+"title":"Arkanoid (Tayto bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arktayt2",
+"title":"Arkanoid (Tayto bootleg, harder)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkanoidu",
+"title":"Arkanoid (US, newer)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkanoiduo",
+"title":"Arkanoid (US, older)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkanoid",
+"title":"Arkanoid (World, older)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkretrnu",
+"title":"Arkanoid Returns (Ver 2.02A 1997/02/10)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkretrnj",
+"title":"Arkanoid Returns (Ver 2.02J 1997/02/10)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkretrn",
+"title":"Arkanoid Returns (Ver 2.02O 1997/02/10)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arknoid2b",
+"title":"Arkanoid: Revenge of DOH (Japan bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arknoid2j",
+"title":"Arkanoid: Revenge of DOH (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arknoid2u",
+"title":"Arkanoid: Revenge of DOH (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arknoid2",
+"title":"Arkanoid: Revenge of DOH (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"ashuraj",
+"title":"Ashura Blaster (Japan)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"ashurau",
+"title":"Ashura Blaster (US)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"ashura",
+"title":"Ashura Blaster (World)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"asukaja",
+"title":"Asuka & Asuka (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"asukaj",
+"title":"Asuka & Asuka (Japan, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"asuka",
+"title":"Asuka & Asuka (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"ballbomb",
+"title":"Balloon Bomber",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"ballbros",
+"title":"Balloon Brothers",
+"board":"X System",
+"publisher":"East Technology",
+"year":"1992",
+"genre":"Puzzle"
+},
+{
+"rom":"bsharkj",
+"title":"Battle Shark (Japan)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"bsharkjjs",
+"title":"Battle Shark (Japan, Joystick)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"bsharku",
+"title":"Battle Shark (US)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"bsharkuo",
+"title":"Battle Shark (US, older)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"bshark",
+"title":"Battle Shark (World)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"benberob",
+"title":"Ben Bero Beh (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"bigevglfj",
+"title":"Big Event Golf (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"bigevglf",
+"title":"Big Event Golf (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"bioatack",
+"title":"Bio Attack",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"bking",
+"title":"Birdie King",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"bking2",
+"title":"Birdie King 2",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"bking3",
+"title":"Birdie King 3",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"arkblock",
+"title":"Block (Game Corporation bootleg, set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkbloc2",
+"title":"Block (Game Corporation bootleg, set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkbloc3",
+"title":"Block (Game Corporation bootleg, set 3)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"block2",
+"title":"Block 2 (S.P.A. bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"boblbobl",
+"title":"Bobble Bobble (bootleg of Bubble Bobble)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"bonzeadvu",
+"title":"Bonze Adventure (US, rev 1)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"bonzeadvo",
+"title":"Bonze Adventure (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"bonzeadvp",
+"title":"Bonze Adventure (World, prototype, newer)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"bonzeadvp2",
+"title":"Bonze Adventure (World, prototype, older)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"bonzeadv",
+"title":"Bonze Adventure (World, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"brixian",
+"title":"Brixian",
+"board":"Standalone",
+"publisher":"Cheil Computer System",
+"year":"1993",
+"genre":"Maze"
+},
+{
+"rom":"bronx",
+"title":"Bronx (bootleg of Cycle Shooting)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"bbredux",
+"title":"Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"2013",
+"genre":"Platform"
+},
+{
+"rom":"bub68705",
+"title":"Bubble Bobble (bootleg with 68705)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"bublboblb",
+"title":"Bubble Bobble (for Bobble Bobble PCB)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"2013",
+"genre":"Platform"
+},
+{
+"rom":"bublbobl1",
+"title":"Bubble Bobble (Japan, Ver 0.0)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"bublbobl",
+"title":"Bubble Bobble (Japan, Ver 0.1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"bublboblp",
+"title":"Bubble Bobble (prototype on Tokio hardware)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"bublboblr1",
+"title":"Bubble Bobble (US, Ver 1.0)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"bublboblr",
+"title":"Bubble Bobble (US, Ver 5.1)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"bublbob2p",
+"title":"Bubble Bobble II (Ver 0.0J 1993/12/13, prototype)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"bublbob2o",
+"title":"Bubble Bobble II (Ver 2.5O 1994/10/05)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"bublbob2",
+"title":"Bubble Bobble II (Ver 2.6O 1994/12/16)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"bublcave10",
+"title":"Bubble Bobble: Lost Cave V1.0",
+"board":"Standalone",
+"publisher":"Hack",
+"year":"2012",
+"genre":"Platform"
+},
+{
+"rom":"bublcave11",
+"title":"Bubble Bobble: Lost Cave V1.1",
+"board":"Standalone",
+"publisher":"Hack",
+"year":"2012",
+"genre":"Platform"
+},
+{
+"rom":"bublcave",
+"title":"Bubble Bobble: Lost Cave V1.2",
+"board":"Standalone",
+"publisher":"Hack",
+"year":"2013",
+"genre":"Platform"
+},
+{
+"rom":"boblcave",
+"title":"Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)",
+"board":"Standalone",
+"publisher":"Hack",
+"year":"2013",
+"genre":"Platform"
+},
+{
+"rom":"bublbust",
+"title":"Bubble Buster (USA, B-System)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1994",
+"genre":"Puzzle"
+},
+{
+"rom":"bubblemj",
+"title":"Bubble Memories: The Story Of Bubble Bobble III (Ver 2.3J 1996/02/07)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Platform"
+},
+{
+"rom":"bubblem",
+"title":"Bubble Memories: The Story Of Bubble Bobble III (Ver 2.4O 1996/02/15)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Platform"
+},
+{
+"rom":"bubblemu",
+"title":"Bubble Memories: The Story Of Bubble Bobble III (Ver 2.5A 1996/02/21)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1995",
+"genre":"Platform"
+},
+{
+"rom":"bubsymphu",
+"title":"Bubble Symphony (Ver 2.5A 1994/10/05)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"bubsymphj",
+"title":"Bubble Symphony (Ver 2.5J 1994/10/05)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"bubsymphe",
+"title":"Bubble Symphony (Ver 2.5O 1994/10/05)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"buggychl",
+"title":"Buggy Challenge",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"buggychlt",
+"title":"Buggy Challenge (Tecfri)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"pbobble2u",
+"title":"Bust-A-Move Again (Ver 2.3A 1995/07/31)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"bygone",
+"title":"Bygone (prototype)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"cachat",
+"title":"Cachat (Japan)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Puzzle"
+},
+{
+"rom":"cadashf",
+"title":"Cadash (France)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashgo",
+"title":"Cadash (Germany)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashg",
+"title":"Cadash (Germany, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashi",
+"title":"Cadash (Italy)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashjo",
+"title":"Cadash (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashj1",
+"title":"Cadash (Japan, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashj",
+"title":"Cadash (Japan, rev 2)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashso",
+"title":"Cadash (Spain)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashs",
+"title":"Cadash (Spain, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashu1",
+"title":"Cadash (US, rev 1?)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashu",
+"title":"Cadash (US, rev 2)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadash",
+"title":"Cadash (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cadashp",
+"title":"Cadash (World, prototype)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cameltryj",
+"title":"Cameltry (Japan, YM2610)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"cameltryau",
+"title":"Cameltry (US, YM2203 + M6295)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"cameltryu",
+"title":"Cameltry (US, YM2610)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"cameltrya",
+"title":"Cameltry (World, YM2203 + M6295)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"cameltry",
+"title":"Cameltry (World, YM2610)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"chaknpop",
+"title":"Chack'n Pop",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"champwrj",
+"title":"Champion Wrestler (Japan)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"champwru",
+"title":"Champion Wrestler (US)",
+"board":"L System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"champwr",
+"title":"Champion Wrestler (World)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"changela",
+"title":"Change Lanes",
+"board":"Classic",
+"publisher":"Taito America",
+"year":"1983",
+"genre":"Driving"
+},
+{
+"rom":"chasehqj",
+"title":"Chase H.Q. (Japan)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Driving"
+},
+{
+"rom":"chasehqju",
+"title":"Chase H.Q. (Japan, upright?)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Driving"
+},
+{
+"rom":"chasehqu",
+"title":"Chase H.Q. (US)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Driving"
+},
+{
+"rom":"chasehq",
+"title":"Chase H.Q. (World)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Driving"
+},
+{
+"rom":"chukataija",
+"title":"Chuka Taisen (Japan) (P0-025-A PCB)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"chukataij",
+"title":"Chuka Taisen (Japan) (P0-028-A PCB)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"chukataiu",
+"title":"Chuka Taisen (US) (P0-028-A PCB)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"chukatai",
+"title":"Chuka Taisen (World) (P0-028-A PCB)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"cleopatr",
+"title":"Cleopatra Fortune (Ver 2.1J 1996/09/05)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1996",
+"genre":"Puzzle"
+},
+{
+"rom":"cleopatro",
+"title":"Cleopatra Fortune (Ver 2.1O 1996/09/05, bootleg)",
+"board":"F3 System",
+"publisher":"Bootleg",
+"year":"1996",
+"genre":"Puzzle"
+},
+{
+"rom":"colt",
+"title":"Colt (bootleg of N.Y. Captor)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"commandw",
+"title":"Command War - Super Special Battle & War Game (Ver 0.0J, prototype)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"complexx",
+"title":"Complex X",
+"board":"Classic",
+"publisher":"Taito America",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"contcircj",
+"title":"Continental Circus (Japan)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Driving"
+},
+{
+"rom":"contcircu",
+"title":"Continental Circus (US set 1)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Driving"
+},
+{
+"rom":"contcircua",
+"title":"Continental Circus (US set 2)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Driving"
+},
+{
+"rom":"contcirc",
+"title":"Continental Circus (World)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Driving"
+},
+{
+"rom":"crashrd",
+"title":"Crash Road (bootleg of Space Chaser)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"qcrayon2",
+"title":"Crayon Shinchan Orato Asobo (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Multiplay"
+},
+{
+"rom":"crbaloon",
+"title":"Crazy Balloon (set 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Maze"
+},
+{
+"rom":"crbaloon2",
+"title":"Crazy Balloon (set 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Maze"
+},
+{
+"rom":"crimecj",
+"title":"Crime City (Japan)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"crimecu",
+"title":"Crime City (US)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"crimec",
+"title":"Crime City (World)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"cruisin5",
+"title":"Cruisin 5: Cruise Back",
+"board":"Standalone",
+"publisher":"Abyss",
+"year":"2023",
+"genre":"Misc."
+},
+{
+"rom":"cubybop",
+"title":"Cuby Bop (Japan, location test)",
+"board":"L System",
+"publisher":"Hot-B",
+"year":"199?",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"cyclemb",
+"title":"Cycle Maabou (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"daikaiju",
+"title":"Daikaiju no Gyakushu (rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"daisenpu",
+"title":"Daisenpu (Japan)",
+"board":"X System",
+"publisher":"Toaplan",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"dankuga",
+"title":"Dan-Ku-Ga (Ver 0.0J 1994/12/13, prototype)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"dariuso",
+"title":"Darius (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"dariusj",
+"title":"Darius (Japan, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"dariusu",
+"title":"Darius (US, rev 2)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"darius",
+"title":"Darius (World, rev 2)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"dariuse",
+"title":"Darius Extra Version (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"dariusgu",
+"title":"Darius Gaiden - Silver Hawk (Ver 2.5A 1994/09/19)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"dariusgj",
+"title":"Darius Gaiden - Silver Hawk (Ver 2.5J 1994/09/19)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"dariusg",
+"title":"Darius Gaiden - Silver Hawk (Ver 2.5O 1994/09/19)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"dariusgx",
+"title":"Darius Gaiden - Silver Hawk Extra Version (Ver 2.7J 1995/03/06) (Official Hack)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"darius2do",
+"title":"Darius II (dual screen) (Japan, Rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"darius2d",
+"title":"Darius II (dual screen) (Japan, Rev 2)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"darius2",
+"title":"Darius II (triple screen) (Japan, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"deadconxj",
+"title":"Dead Connection (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"deadconx",
+"title":"Dead Connection (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"desterth",
+"title":"Destination Earth (bootleg of Lunar Rescue)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"dinorexj",
+"title":"Dino Rex (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"dinorexu",
+"title":"Dino Rex (US)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"dinorex",
+"title":"Dino Rex (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"dockman",
+"title":"Dock Man (set 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"dockmanb",
+"title":"Dock Man (set 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"dockmanc",
+"title":"Dock Man (set 3)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"dondokodj",
+"title":"Don Doko Don (Japan, rev 1)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"dondokodu",
+"title":"Don Doko Don (US, rev 1)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"dondokod",
+"title":"Don Doko Don (World, rev 1)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"dblaxleu",
+"title":"Double Axle (US)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"dblaxleul",
+"title":"Double Axle (US, Rev 1, Linkable)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"dblaxle",
+"title":"Double Axle (US, Rev 1, set 1)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"dblaxleua",
+"title":"Double Axle (US, Rev 1, set 2)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"drtoppelu",
+"title":"Dr. Toppel's Adventure (US)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"drtoppel",
+"title":"Dr. Toppel's Adventure (World)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"drtoppelj",
+"title":"Dr. Toppel's Tankentai (Japan)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"dland",
+"title":"Dream Land / Super Dream Land (bootleg of Bubble Bobble)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"driftout",
+"title":"Drift Out (Europe)",
+"board":"F2 System",
+"publisher":"Visco",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"driftoutct",
+"title":"Drift Out (Europe, Cameltry conversion)",
+"board":"F2 System",
+"publisher":"Visco",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"driftoutj",
+"title":"Drift Out (Japan)",
+"board":"F2 System",
+"publisher":"Visco",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"driveout",
+"title":"Drive Out (bootleg of Drift Out)",
+"board":"F2 System",
+"publisher":"Bootleg",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"dungeonmu",
+"title":"Dungeon Magic (Ver 2.1A 1994/02/18)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1993",
+"genre":"Maze"
+},
+{
+"rom":"dungeonm",
+"title":"Dungeon Magic (Ver 2.1O 1994/02/18)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Maze"
+},
+{
+"rom":"dleaguej",
+"title":"Dynamite League (Japan)",
+"board":"H System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"dleague",
+"title":"Dynamite League (US)",
+"board":"H System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"eibise",
+"title":"Eibise (Japan)",
+"board":"O System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Slot Machine"
+},
+{
+"rom":"elevator",
+"title":"Elevator Action (BA3, 4 PCB version, 1.1)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"elevatorb",
+"title":"Elevator Action (bootleg)",
+"board":"SJ System",
+"publisher":"Bootleg",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"elevatora",
+"title":"Elevator Action (EA, 5 PCB version, 1.1)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"elvact2u",
+"title":"Elevator Action II (Ver 2.2A 1995/02/20)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"elvactrj",
+"title":"Elevator Action Returns (Ver 2.2J 1995/02/20)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"elvactr",
+"title":"Elevator Action Returns (Ver 2.2O 1995/02/20)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"enforcej",
+"title":"Enforce (Japan)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"enforceja",
+"title":"Enforce (Japan, Analog Controls)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"enforce",
+"title":"Enforce (World)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"escmars",
+"title":"Escape from Mars (bootleg of Lunar Rescue)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1980",
+"genre":"Maze"
+},
+{
+"rom":"euroch92j",
+"title":"Euro Champ '92 (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"euroch92",
+"title":"Euro Champ '92 (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"evilston",
+"title":"Evil Stone",
+"board":"L System",
+"publisher":"Spacy Industrial",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"extrmatnj",
+"title":"Extermination (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"extrmatnur",
+"title":"Extermination (US, Romstar)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"extrmatnu",
+"title":"Extermination (US, World Games)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"extrmatn",
+"title":"Extermination (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"exzisusa",
+"title":"Exzisus (Japan, conversion)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"exzisus",
+"title":"Exzisus (Japan, dedicated)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"exzisust",
+"title":"Exzisus (TAD license)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"fieldday",
+"title":"Field Day",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"fgoal",
+"title":"Field Goal (set 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"fgoala",
+"title":"Field Goal (set 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"fhawkj",
+"title":"Fighting Hawk (Japan)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"fhawk",
+"title":"Fighting Hawk (World)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"fightrol",
+"title":"Fighting Roller",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1983",
+"genre":"Fighter"
+},
+{
+"rom":"finalbj",
+"title":"Final Blow (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"finalbu",
+"title":"Final Blow (US, rev 1)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"finalb",
+"title":"Final Blow (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"fitter",
+"title":"Fitter",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"fitterbl",
+"title":"Fitter (bootleg of Round-Up)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"flipull",
+"title":"Flipull (Japan)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"footchmp",
+"title":"Football Champ / Euro Football Champ (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"40lovebl",
+"title":"Forty-Love (bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"40lovej",
+"title":"Forty-Love (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"40love",
+"title":"Forty-Love (World)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"fspiderb",
+"title":"Frog & Spiders (bootleg?)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"frontlin",
+"title":"Front Line (AA1, 4 PCB version)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"frontlina",
+"title":"Front Line (FL, 5 PCB version)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"fullthrl",
+"title":"Full Throttle (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Driving"
+},
+{
+"rom":"funnymou",
+"title":"Funny Mouse (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"galactic",
+"title":"Galactica - Batalha Espacial",
+"board":"Classic",
+"publisher":"Taito do Brasil",
+"year":"1980?",
+"genre":"Shooter"
+},
+{
+"rom":"grescue",
+"title":"Galaxy Rescue",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"galxwarst2",
+"title":"Galaxy Wars (Taito)",
+"board":"Classic",
+"publisher":"Universal",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"galxwarst",
+"title":"Galaxy Wars (Taito?)",
+"board":"Classic",
+"publisher":"Universal",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"galmedes",
+"title":"Galmedes (Japan)",
+"board":"Standalone",
+"publisher":"Visco",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gekiridnj",
+"title":"Gekirindan (Ver 2.3J 1995/09/21)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"gekiridn",
+"title":"Gekirindan (Ver 2.3O 1995/09/21)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"gigandes",
+"title":"Gigandes",
+"board":"X System",
+"publisher":"East Technology",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"gigandesa",
+"title":"Gigandes (earlier)",
+"board":"X System",
+"publisher":"East Technology",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"gladiatr",
+"title":"Gladiator (US)",
+"board":"Standalone",
+"publisher":"Allumer",
+"year":"1986",
+"genre":"Fighter"
+},
+{
+"rom":"gblchmp",
+"title":"Global Champion (Ver 2.1A 1994/07/29)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"gogold",
+"title":"Go For The Gold (Japan)",
+"board":"H System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"yamagchi",
+"title":"Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"gcastle",
+"title":"Golden Castle (prototype?)",
+"board":"Standalone",
+"publisher":"Allumer",
+"year":"1986",
+"genre":"Fighter"
+},
+{
+"rom":"grchamp",
+"title":"Grand Champion (set 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Driving"
+},
+{
+"rom":"grchampa",
+"title":"Grand Champion (set 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Driving"
+},
+{
+"rom":"grchampb",
+"title":"Grand Champion (set 3)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Driving"
+},
+{
+"rom":"greatgur",
+"title":"Great Gurianos (bootleg?)",
+"board":"Standalone",
+"publisher":"Allumer",
+"year":"1986",
+"genre":"Fighter"
+},
+{
+"rom":"gsword2",
+"title":"Great Swordsman (Japan?)",
+"board":"Classic",
+"publisher":"Allumer",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"gsword",
+"title":"Great Swordsman (World?)",
+"board":"Classic",
+"publisher":"Allumer",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"gseekeru",
+"title":"Grid Seeker: Project Storm Hammer (Ver 1.3A)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gseekerj",
+"title":"Grid Seeker: Project Storm Hammer (Ver 1.3J)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gseeker",
+"title":"Grid Seeker: Project Storm Hammer (Ver 1.3O)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"growlu",
+"title":"Growl (US)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"growla",
+"title":"Growl (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"growlp",
+"title":"Growl (World, prototype)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"growl",
+"title":"Growl (World, Rev 1)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"gunfront",
+"title":"Gun & Frontier (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"gunfrontj",
+"title":"Gun Frontier (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"gunlocko",
+"title":"Gunlock (Ver 2.0O 1993/12/15)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"gunlock",
+"title":"Gunlock (Ver 2.3O 1994/01/20)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"halleysc87",
+"title":"Halley's Comet '87",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"halleyscja",
+"title":"Halley's Comet (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"halleyscjp",
+"title":"Halley's Comet (Japan, prototype)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"halleyscj",
+"title":"Halley's Comet (Japan, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"halleysc",
+"title":"Halley's Comet (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"hthero93u",
+"title":"Hat Trick Hero '93 (Ver 1.0A 1993/02/28)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"hthero93",
+"title":"Hat Trick Hero '93 (Ver 1.0J 1993/02/28)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"hthero94",
+"title":"Hat Trick Hero '94 (Ver 2.2A 1994/05/26)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"hthero95u",
+"title":"Hat Trick Hero '95 (Ver 2.5A 1994/11/03)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"hthero95",
+"title":"Hat Trick Hero '95 (Ver 2.5J 1994/11/03)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"hthero95a",
+"title":"Hat Trick Hero '95 (Ver 2.6Asia 1994/11/17)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"htheroj",
+"title":"Hat Trick Hero (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"htherou",
+"title":"Hat Trick Hero (US)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"hexa",
+"title":"Hexa",
+"board":"Standalone",
+"publisher":"D.R. Korea",
+"year":"1990",
+"genre":"Puzzle"
+},
+{
+"rom":"hwrace",
+"title":"High Way Race",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Driving"
+},
+{
+"rom":"hiticej",
+"title":"Hit the Ice (Japan)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"hitice",
+"title":"Hit the Ice (US)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"hiticerb",
+"title":"Hit the Ice (US, with riser board)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"indianbt",
+"title":"Indian Battle",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"indianbtbr",
+"title":"Indian Battle (Brazil)",
+"board":"Classic",
+"publisher":"Taito do Brasil",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"insectxbl",
+"title":"Insector X (bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"insectxj",
+"title":"Insector X (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"insectx",
+"title":"Insector X (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"intcup94",
+"title":"International Cup '94 (Ver 2.2O 1994/05/26)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"jspecter",
+"title":"Jatre Specter (set 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"jspecter2",
+"title":"Jatre Specter (set 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"jigkmgria",
+"title":"Jigoku Meguri (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"jigkmgri",
+"title":"Jigoku Meguri (Japan, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"jollyjgr",
+"title":"Jolly Jogger",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"jumping",
+"title":"Jumping (set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"jumpinga",
+"title":"Jumping (set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"jumpingi",
+"title":"Jumping (set 3, Imnoe PCB)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"jpopnics",
+"title":"Jumping Pop (Nics, Korean hack of Plump Pop)",
+"board":"Standalone",
+"publisher":"Nics",
+"year":"1992",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"jungleby",
+"title":"Jungle Boy (bootleg)",
+"board":"SJ System",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"junglehbr",
+"title":"Jungle Hunt (Brazil)",
+"board":"SJ System",
+"publisher":"Taito do Brasil",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"jungleh",
+"title":"Jungle Hunt (US)",
+"board":"SJ System",
+"publisher":"Taito America",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"junglekas",
+"title":"Jungle King (alternate sound)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"junglek",
+"title":"Jungle King (Japan)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"junglekj2",
+"title":"Jungle King (Japan, earlier)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"junglekj2a",
+"title":"Jungle King (Japan, earlier, alt)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"kabukizj",
+"title":"Kabuki-Z (Japan)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"kabukiz",
+"title":"Kabuki-Z (World)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"kagekih",
+"title":"Kageki (hack)",
+"board":"Standalone",
+"publisher":"Hack",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"kagekij",
+"title":"Kageki (Japan)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"kagekiu",
+"title":"Kageki (US)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"kageki",
+"title":"Kageki (World)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"kaiserknj",
+"title":"Kaiser Knuckle (Ver 2.1J 1994/07/29)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"kaiserkn",
+"title":"Kaiser Knuckle (Ver 2.1O 1994/07/29)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"kicknrunu",
+"title":"Kick and Run (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"kicknrun",
+"title":"Kick and Run (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"kikstart",
+"title":"Kick Start: Wheelie King",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"kikikai",
+"title":"KiKi KaiKai",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"kirameki",
+"title":"Kirameki Star Road (Ver 2.10J 1997/08/29)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Quiz"
+},
+{
+"rom":"knightb",
+"title":"Knight Boy (bootleg of KiKi KaiKai, set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"knightba",
+"title":"Knight Boy (bootleg of KiKi KaiKai, set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"eto",
+"title":"Kokontouzai Eto Monogatari (Japan)",
+"board":"Standalone",
+"publisher":"Visco",
+"year":"1994",
+"genre":"Puzzle"
+},
+{
+"rom":"etoa",
+"title":"Kokontouzai Eto Monogatari (Japan, prototype?)",
+"board":"Standalone",
+"publisher":"Visco",
+"year":"1994",
+"genre":"Puzzle"
+},
+{
+"rom":"krame",
+"title":"Kram (encrypted)",
+"board":"Classic",
+"publisher":"Taito America",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"kurikintj",
+"title":"Kuri Kinton (Japan)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"kurikintu",
+"title":"Kuri Kinton (US)",
+"board":"L System",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"kurikintw",
+"title":"Kuri Kinton (US, World Games license)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"kurikint",
+"title":"Kuri Kinton (World)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"kurikinta",
+"title":"Kuri Kinton (World, prototype)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"ksayakyu",
+"title":"Kusayakyuu",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"ktiger2",
+"title":"Kyukyoku Tiger II (Ver 2.1J 1995/11/30)",
+"board":"F3 System",
+"publisher":"Takumi",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"lagirl",
+"title":"LA Girl",
+"board":"L System",
+"publisher":"Bootleg",
+"year":"1992",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"ladymstra",
+"title":"Lady Master of Kung Fu",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"ladymstr",
+"title":"Lady Master of Kung Fu (rev 1)",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"landmakrj",
+"title":"Land Maker (Ver 2.01J 1998/06/01)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1998",
+"genre":"Puzzle"
+},
+{
+"rom":"landmakr",
+"title":"Land Maker (Ver 2.02O 1998/06/02)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1998",
+"genre":"Puzzle"
+},
+{
+"rom":"landmakrp",
+"title":"Land Maker (Ver 2.02O 1998/06/02, prototype)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1998",
+"genre":"Puzzle"
+},
+{
+"rom":"lsasquad",
+"title":"Land Sea Air Squad / Riku Kai Kuu Saizensen",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"kyustrkr",
+"title":"Last Striker / Kyuukyoku no Striker",
+"board":"X System",
+"publisher":"East Technology",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"lightbrj",
+"title":"Light Bringer (Ver 2.1J 1994/02/18)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Maze"
+},
+{
+"rom":"lightbr",
+"title":"Light Bringer (Ver 2.2O 1994/04/08)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Maze"
+},
+{
+"rom":"liquidku",
+"title":"Liquid Kids (US)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"liquidk",
+"title":"Liquid Kids (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"lrescue",
+"title":"Lunar Rescue",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"lrescueabl",
+"title":"Lunar Rescue (Artic bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"lrescuem",
+"title":"Lunar Rescue (Model Racing bootleg, set 1)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"lrescuem2",
+"title":"Lunar Rescue (Model Racing bootleg, set 2)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"lupin3",
+"title":"Lupin III (set 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Maze"
+},
+{
+"rom":"lupin3a",
+"title":"Lupin III (set 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Maze"
+},
+{
+"rom":"majest12j",
+"title":"Majestic Twelve - The Space Invaders Part IV (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"majest12ub",
+"title":"Majestic Twelve - The Space Invaders Part IV (US, earlier code base)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"majest12ua",
+"title":"Majestic Twelve - The Space Invaders Part IV (US, revised code)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"majest12u",
+"title":"Majestic Twelve - The Space Invaders Part IV (US, revised code, Rev 1)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"marinedt",
+"title":"Marine Date",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"masterwj",
+"title":"Master of Weapon (Japan)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"masterwu",
+"title":"Master of Weapon (US)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"masterw",
+"title":"Master of Weapon (World)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"mofflott",
+"title":"Maze of Flott (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Maze"
+},
+{
+"rom":"megablstj",
+"title":"Mega Blast (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"megablstu",
+"title":"Mega Blast (US)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"megablst",
+"title":"Mega Blast (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"metalbj",
+"title":"Metal Black (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"metalb",
+"title":"Metal Black (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"metalba",
+"title":"Metal Black (World, single PCB)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"msisaac",
+"title":"Metal Soldier Isaac II",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"mexico86",
+"title":"Mexico 86 (bootleg of Kick and Run, set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"mexico86a",
+"title":"Mexico 86 (bootleg of Kick and Run, set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"minivadr",
+"title":"Mini Vaders",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"m660b",
+"title":"Mission 660 (bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"m660j",
+"title":"Mission 660 (Japan)",
+"board":"Standalone",
+"publisher":"Wood Place",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"m660",
+"title":"Mission 660 (US)",
+"board":"Standalone",
+"publisher":"Wood Place",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"mizubaku",
+"title":"Mizubaku Daibouken (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"moonbase",
+"title":"Moon Base Zeta (set 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"moonbasea",
+"title":"Moon Base Zeta (set 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"mlander",
+"title":"Moon Lander (bootleg of Lunar Rescue, set 1)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1980",
+"genre":"Maze"
+},
+{
+"rom":"mlandera",
+"title":"Moon Lander (bootleg of Lunar Rescue, set 2)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1980",
+"genre":"Maze"
+},
+{
+"rom":"quizhuhu",
+"title":"Moriguchi Hiroko no Quiz de Hyuu!Hyuu! (Ver 2.2J 1995/05/25)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Quiz"
+},
+{
+"rom":"nycaptor",
+"title":"N.Y. Captor (rev 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"nastar",
+"title":"Nastar (World)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"nastarw",
+"title":"Nastar Warrior (US)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"nightstrj",
+"title":"Night Striker (Japan)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"nightstru",
+"title":"Night Striker (US)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"nightstr",
+"title":"Night Striker (World)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"nunchaku",
+"title":"Nunchackun",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"onna34roa",
+"title":"Onna Sanshirou - Typhoon Gal (bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"onna34ro",
+"title":"Onna Sanshirou - Typhoon Gal (rev 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"opwolfb",
+"title":"Operation Bear (bootleg of Operation Wolf)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"othunderj",
+"title":"Operation Thunderbolt (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"othunderjsc",
+"title":"Operation Thunderbolt (Japan, SC)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"othunderua",
+"title":"Operation Thunderbolt (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"othunderu",
+"title":"Operation Thunderbolt (US, rev 1)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"othundero",
+"title":"Operation Thunderbolt (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"othunder",
+"title":"Operation Thunderbolt (World, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"opwolfp",
+"title":"Operation Wolf (Japan, prototype)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"opwolfj",
+"title":"Operation Wolf (Japan, rev 2)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"opwolfjsc",
+"title":"Operation Wolf (Japan, SC)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"opwolfu",
+"title":"Operation Wolf (US, rev 2)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"opwolf",
+"title":"Operation Wolf (World, rev 2, set 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"opwolfa",
+"title":"Operation Wolf (World, rev 2, set 2)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"opwolf3j",
+"title":"Operation Wolf 3 (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"opwolf3u",
+"title":"Operation Wolf 3 (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"opwolf3",
+"title":"Operation Wolf 3 (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"ogonsiro",
+"title":"Ougon no Shiro (Japan)",
+"board":"Standalone",
+"publisher":"Allumer",
+"year":"1986",
+"genre":"Fighter"
+},
+{
+"rom":"paddle2",
+"title":"Paddle 2 (bootleg on Block hardware)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1988",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"palamedj",
+"title":"Palamedes (Japan)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Puzzle"
+},
+{
+"rom":"palamed",
+"title":"Palamedes (US)",
+"board":"L System",
+"publisher":"Hot-B",
+"year":"1990",
+"genre":"Puzzle"
+},
+{
+"rom":"parentj",
+"title":"Parent Jack (Japan)",
+"board":"O System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Gambling"
+},
+{
+"rom":"ppking",
+"title":"Ping-Pong King",
+"board":"Classic",
+"publisher":"Taito America",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"piratpet",
+"title":"Pirate Pete",
+"board":"SJ System",
+"publisher":"Taito America",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"pitnruna",
+"title":"Pit & Run - F-1 Race",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"pitnrunb",
+"title":"Pit & Run - F-1 Race (location test?)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"pitnrun",
+"title":"Pit & Run - F-1 Race (rev 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"plgirls",
+"title":"Play Girls",
+"board":"L System",
+"publisher":"Hot-B",
+"year":"1992",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"plgirls2b",
+"title":"Play Girls 2 (bootleg)",
+"board":"L System",
+"publisher":"Bootleg",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"plgirls2",
+"title":"Play Girls 2 (Europe)",
+"board":"L System",
+"publisher":"Hot-B",
+"year":"1993",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"plgirls2j",
+"title":"Play Girls 2 (Japan)",
+"board":"L System",
+"publisher":"Hot-B",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"plottingu",
+"title":"Plotting (US)",
+"board":"L System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"plotting",
+"title":"Plotting (World set 1)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"plottinga",
+"title":"Plotting (World set 2, protected)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"plottingb",
+"title":"Plotting (World set 3, earliest version)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"plumppop",
+"title":"Plump Pop (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"polarisbr",
+"title":"Polaris (Brazil)",
+"board":"Classic",
+"publisher":"Taito do Brasil",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"polarisb",
+"title":"Polaris (first revision)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"polaris",
+"title":"Polaris (latest version)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"polariso",
+"title":"Polaris (original version)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"polarisa",
+"title":"Polaris (second revision)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"popnpopu",
+"title":"Pop'n Pop (Ver 2.07A 1998/02/09)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Puzzle"
+},
+{
+"rom":"popnpopj",
+"title":"Pop'n Pop (Ver 2.07J 1998/02/09)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Puzzle"
+},
+{
+"rom":"popnpop",
+"title":"Pop'n Pop (Ver 2.07O 1998/02/09)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Puzzle"
+},
+{
+"rom":"portman",
+"title":"Port Man",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"portmanj",
+"title":"Port Man (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"pwheelsj",
+"title":"Power Wheels (Japan, Rev 2, Linkable)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"pbillian",
+"title":"Prebillian",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"pbillianb",
+"title":"Prebillian (bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"prmtmfgt",
+"title":"Prime Time Fighter (Ver 2.1A 1993/05/21) (New Version)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"prmtmfgto",
+"title":"Prime Time Fighter (Ver 2.1A 1993/05/21) (Old Version)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"puchicarj",
+"title":"Puchi Carat (Ver 2.02J 1997/10/29)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"puchicar",
+"title":"Puchi Carat (Ver 2.02O 1997/10/29)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"puchicaru",
+"title":"Puchi Carat (Ver 2.04A 1997/11/08)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1997",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"pulirulaj",
+"title":"PuLiRuLa (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"pulirula",
+"title":"PuLiRuLa (World, dual PCB)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"pulirulaa",
+"title":"PuLiRuLa (World, single PCB)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"pbobble",
+"title":"Puzzle Bobble (Japan, B-System)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble2j",
+"title":"Puzzle Bobble 2 (Ver 2.2J 1995/07/20)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble2o",
+"title":"Puzzle Bobble 2 (Ver 2.2O 1995/07/20)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble2",
+"title":"Puzzle Bobble 2 (Ver 2.3O 1995/07/31)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble2x",
+"title":"Puzzle Bobble 2X (Ver 2.2J 1995/11/11)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble3u",
+"title":"Puzzle Bobble 3 (Ver 2.1A 1996/09/27)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1996",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble3j",
+"title":"Puzzle Bobble 3 (Ver 2.1J 1996/09/27)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1996",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble3",
+"title":"Puzzle Bobble 3 (Ver 2.1O 1996/09/27)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1996",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble4u",
+"title":"Puzzle Bobble 4 (Ver 2.04A 1997/12/19)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble4j",
+"title":"Puzzle Bobble 4 (Ver 2.04J 1997/12/19)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Puzzle"
+},
+{
+"rom":"pbobble4",
+"title":"Puzzle Bobble 4 (Ver 2.04O 1997/12/19)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1997",
+"genre":"Puzzle"
+},
+{
+"rom":"puzznicb",
+"title":"Puzznic (bootleg, set 1)",
+"board":"L System",
+"publisher":"Bootleg",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"puzznicba",
+"title":"Puzznic (bootleg, set 2)",
+"board":"L System",
+"publisher":"Bootleg",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"puzznici",
+"title":"Puzznic (Italian bootleg)",
+"board":"L System",
+"publisher":"Bootleg",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"qix",
+"title":"Qix (Rev 2)",
+"board":"Classic",
+"publisher":"Taito America",
+"year":"1981",
+"genre":"Puzzle"
+},
+{
+"rom":"qixb",
+"title":"Qix (set 2, larger roms)",
+"board":"Classic",
+"publisher":"Taito America",
+"year":"1981",
+"genre":"Puzzle"
+},
+{
+"rom":"qixa",
+"title":"Qix (set 2, smaller roms)",
+"board":"Classic",
+"publisher":"Taito America",
+"year":"1981",
+"genre":"Puzzle"
+},
+{
+"rom":"qixo",
+"title":"Qix (set 3, earlier)",
+"board":"Classic",
+"publisher":"Taito America",
+"year":"1981",
+"genre":"Puzzle"
+},
+{
+"rom":"qix2",
+"title":"Qix II (Tournament)",
+"board":"Classic",
+"publisher":"Taito America",
+"year":"1981",
+"genre":"Puzzle"
+},
+{
+"rom":"qzchikyu",
+"title":"Quiz Chikyu Bouei Gun (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Quiz"
+},
+{
+"rom":"qcrayon",
+"title":"Quiz Crayon Shinchan (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Quiz"
+},
+{
+"rom":"quizhq",
+"title":"Quiz H.Q. (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Quiz"
+},
+{
+"rom":"qjinsei",
+"title":"Quiz Jinsei Gekijoh (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Quiz"
+},
+{
+"rom":"qzquest",
+"title":"Quiz Quest - Hime to Yuusha no Monogatari (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Quiz"
+},
+{
+"rom":"qzshowby",
+"title":"Quiz Sekai wa SHOW by shobai (Japan)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Quiz"
+},
+{
+"rom":"qtheater",
+"title":"Quiz Theater - 3tsu no Monogatari (Ver 2.3J 1994/11/10)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Quiz"
+},
+{
+"rom":"qtorimon",
+"title":"Quiz Torimonochou (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Quiz"
+},
+{
+"rom":"racingbj",
+"title":"Racing Beat (Japan)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"racingb",
+"title":"Racing Beat (World)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Driving"
+},
+{
+"rom":"raimaisjo",
+"title":"Raimais (Japan)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Maze"
+},
+{
+"rom":"raimaisj",
+"title":"Raimais (Japan, rev 1)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Maze"
+},
+{
+"rom":"raimais",
+"title":"Raimais (World, rev 1)",
+"board":"L System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Maze"
+},
+{
+"rom":"rbislando",
+"title":"Rainbow Islands",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rbisland",
+"title":"Rainbow Islands (rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rbislande",
+"title":"Rainbow Islands - Extra Version",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"rambo3",
+"title":"Rambo III (Europe)",
+"board":"B System",
+"publisher":"Taito Europe",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"rambo3p",
+"title":"Rambo III (Europe, Proto?)",
+"board":"B System",
+"publisher":"Taito Europe",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"rambo3u",
+"title":"Rambo III (US)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"rastanu",
+"title":"Rastan (US Rev 1)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastanua",
+"title":"Rastan (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastanub",
+"title":"Rastan (US, earlier code base)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastan",
+"title":"Rastan (World Rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastana",
+"title":"Rastan (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastanb",
+"title":"Rastan (World, earlier code base)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastsagaabl",
+"title":"Rastan Saga (bootleg, Japan Rev 1, earlier code base)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastsaga",
+"title":"Rastan Saga (Japan Rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastsagaa",
+"title":"Rastan Saga (Japan Rev 1, earlier code base)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastsagab",
+"title":"Rastan Saga (Japan, earlier code base)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"rastsag2",
+"title":"Rastan Saga 2 (Japan)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"rayforce",
+"title":"RayForce (Ver 2.3A 1994/01/20)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"rayforcej",
+"title":"RayForce (Ver 2.3J 1994/01/20)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"recalh",
+"title":"Recalhorn (Ver 1.42J 1994/5/11, prototype)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"recordbr",
+"title":"Recordbreaker (World)",
+"board":"H System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"resclunar",
+"title":"Rescate Lunar (Spanish bootleg of Lunar Rescue)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1980",
+"genre":"Maze"
+},
+{
+"rom":"retofinv",
+"title":"Return of the Invaders",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"retofinvb",
+"title":"Return of the Invaders (bootleg, with MCU)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"retofinvb1",
+"title":"Return of the Invaders (bootleg, without MCU, set 1)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"retofinvb2",
+"title":"Return of the Invaders (bootleg, without MCU, set 2)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"retofinvb3",
+"title":"Return of the Invaders (bootleg, without MCU, set 3)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"retofinvbv",
+"title":"Return of the Invaders (Video Dens bootleg, without MCU)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"ridingfu",
+"title":"Riding Fight (Ver 1.0A)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"ridingfj",
+"title":"Riding Fight (Ver 1.0J)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"ridingf",
+"title":"Riding Fight (Ver 1.0O)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"ringfgta",
+"title":"Ring Fighter",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"ringfgt",
+"title":"Ring Fighter (rev 1)",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"ringrageu",
+"title":"Ring Rage (Ver 2.3A 1992/08/09)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"ringragej",
+"title":"Ring Rage (Ver 2.3J 1992/08/09)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"ringrage",
+"title":"Ring Rage (Ver 2.3O 1992/08/09)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"rollace",
+"title":"Roller Aces (set 1)",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1983",
+"genre":"Fighter"
+},
+{
+"rom":"rollace2",
+"title":"Roller Aces (set 2)",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1983",
+"genre":"Fighter"
+},
+{
+"rom":"roundup",
+"title":"Round-Up",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"rumba",
+"title":"Rumba Lumber (rev 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Maze"
+},
+{
+"rom":"runark",
+"title":"Runark (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"ryujina",
+"title":"Ryu Jin (Japan, ET910000A PCB)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"ryujin",
+"title":"Ryu Jin (Japan, ET910000B PCB)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"sagaia",
+"title":"Sagaia (dual screen) (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"tsamuraia",
+"title":"Samurai Nihon-Ichi",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"tsamuraih",
+"title":"Samurai Nihon-Ichi (bootleg, harder)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"tsamurai",
+"title":"Samurai Nihon-Ichi (rev 1)",
+"board":"Classic",
+"publisher":"Kaneko",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"sfposeid",
+"title":"Sea Fighter Poseidon",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"selfeena",
+"title":"Sel Feena",
+"board":"B System",
+"publisher":"East Technology",
+"year":"1991",
+"genre":"Maze"
+},
+{
+"rom":"silentdj",
+"title":"Silent Dragon (Japan)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"silentdu",
+"title":"Silent Dragon (US)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"silentd",
+"title":"Silent Dragon (World)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"skydest",
+"title":"Sky Destroyer (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"slapshotj",
+"title":"Slap Shot (Ver 2.2 J)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"slapshot",
+"title":"Slap Shot (Ver 3.0 O)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"solfigtr",
+"title":"Solitary Fighter (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"sbmj",
+"title":"Sonic Blast Man (Japan)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Electromechanical"
+},
+{
+"rom":"sbm",
+"title":"Sonic Blast Man (US)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Electromechanical"
+},
+{
+"rom":"schasercv",
+"title":"Space Chaser (CV version - set 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"schaserm",
+"title":"Space Chaser (Model Racing bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"schaser",
+"title":"Space Chaser (set 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"schasera",
+"title":"Space Chaser (set 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"schaserb",
+"title":"Space Chaser (set 3)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"schaserc",
+"title":"Space Chaser (set 4)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"spacecr",
+"title":"Space Cruiser",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"spacegunj",
+"title":"Space Gun (Japan)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"spacegunu",
+"title":"Space Gun (US)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"spacegun",
+"title":"Space Gun (World)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"spcinv95u",
+"title":"Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5A 1995/06/14)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"spcinv95",
+"title":"Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5O 1995/06/14)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"sicv",
+"title":"Space Invaders (CV Version, larger roms)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"sicv1",
+"title":"Space Invaders (CV Version, smaller roms)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"invaderl",
+"title":"Space Invaders (Logitec)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"invadrmr",
+"title":"Space Invaders (Model Racing)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"sisv1",
+"title":"Space Invaders (SV Version rev 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"sisv2",
+"title":"Space Invaders (SV Version rev 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"sisv3",
+"title":"Space Invaders (SV Version rev 3)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"sisv",
+"title":"Space Invaders (SV Version rev 4)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"sitv1",
+"title":"Space Invaders (TV Version rev 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"sitv",
+"title":"Space Invaders (TV Version rev 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"invaddlx",
+"title":"Space Invaders Deluxe",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"spacedxo",
+"title":"Space Invaders DX (Japan, v2.0)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"spacedxj",
+"title":"Space Invaders DX (Japan, v2.1)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"spacedx",
+"title":"Space Invaders DX (US, v2.1)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"spcinvdj",
+"title":"Space Invaders DX (Ver 2.6J 1994/09/14) (F3 Version)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"invadpt2br",
+"title":"Space Invaders Part II (Brazil)",
+"board":"Classic",
+"publisher":"Taito do Brasil",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"invadpt2",
+"title":"Space Invaders Part II (Taito, bigger ROMs)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"invadpt2a",
+"title":"Space Invaders Part II (Taito, smaller ROMs)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"spceking",
+"title":"Space King",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"spclaser",
+"title":"Space Laser",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"spacmiss",
+"title":"Space Missile - Space Fighting Game",
+"board":"Classic",
+"publisher":"Bootleg?",
+"year":"1980?",
+"genre":"Shooter"
+},
+{
+"rom":"spaceskr",
+"title":"Space Seeker",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"spcewars",
+"title":"Space War (Sanritsu)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1978",
+"genre":"Shooter"
+},
+{
+"rom":"scij",
+"title":"Special Criminal Investigation (Japan)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"sciu",
+"title":"Special Criminal Investigation (US)",
+"board":"Z System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"sci",
+"title":"Special Criminal Investigation (World set 1)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"scia",
+"title":"Special Criminal Investigation (World set 2)",
+"board":"Z System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"steelwkr",
+"title":"Steel Worker",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Puzzle"
+},
+{
+"rom":"storming",
+"title":"Storming Party / Riku Kai Kuu Saizensen (set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"storminga",
+"title":"Storming Party / Riku Kai Kuu Saizensen (set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"sbowling",
+"title":"Strike Bowling",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"sboblbobl",
+"title":"Super Bobble Bobble (bootleg, set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"sboblbobla",
+"title":"Super Bobble Bobble (bootleg, set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"sboblboblb",
+"title":"Super Bobble Bobble (bootleg, set 3)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"sboblbobld",
+"title":"Super Bobble Bobble (bootleg, set 4)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"sboblboble",
+"title":"Super Bobble Bobble (bootleg, set 5)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"sboblboblf",
+"title":"Super Bobble Bobble (bootleg, set 6)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"sboblboblc",
+"title":"Super Bubble Bobble (bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"scfinalsoc",
+"title":"Super Cup Finals (Ver 2.1O 1993/11/19, F3 Cartridge)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"scfinalso",
+"title":"Super Cup Finals (Ver 2.1O 1993/11/19, single PCB)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"scfinals",
+"title":"Super Cup Finals (Ver 2.2O 1994/01/13, single PCB)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"spdheatj",
+"title":"Super Dead Heat (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Driving"
+},
+{
+"rom":"spdheat",
+"title":"Super Dead Heat (World)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Driving"
+},
+{
+"rom":"sinvzen",
+"title":"Super Invaders (Zenitone-Microsec)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980?",
+"genre":"Shooter"
+},
+{
+"rom":"suprmous",
+"title":"Super Mouse",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"sqixb1",
+"title":"Super Qix (bootleg of V1.0, 8031 MCU)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Puzzle"
+},
+{
+"rom":"sqixb2",
+"title":"Super Qix (bootleg, No MCU)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Puzzle"
+},
+{
+"rom":"sqixu",
+"title":"Super Qix (US)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1987",
+"genre":"Puzzle"
+},
+{
+"rom":"sqixr0",
+"title":"Super Qix (World/Japan, V1.0)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1987",
+"genre":"Puzzle"
+},
+{
+"rom":"sqixr1",
+"title":"Super Qix (World/Japan, V1.1)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1987",
+"genre":"Puzzle"
+},
+{
+"rom":"sqix",
+"title":"Super Qix (World/Japan, V1.2)",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1987",
+"genre":"Puzzle"
+},
+{
+"rom":"suprridr",
+"title":"Super Rider",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"ssib",
+"title":"Super Space Invaders '91 (World, earlier code base)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"ssia",
+"title":"Super Space Invaders '91 (World, revised code)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"ssi",
+"title":"Super Space Invaders '91 (World, revised code, Rev 1)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"scin",
+"title":"Super Special Criminal Investigation (Negro Torino hack)",
+"board":"Z System",
+"publisher":"Hack",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"sspeedr",
+"title":"Super Speed Race",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1979",
+"genre":"Driving"
+},
+{
+"rom":"ssrj",
+"title":"Super Speed Race Junior (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Driving"
+},
+{
+"rom":"supermanj",
+"title":"Superman (Japan)",
+"board":"X System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"supermanu",
+"title":"Superman (US)",
+"board":"X System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"superman",
+"title":"Superman (World)",
+"board":"X System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"syvalion",
+"title":"Syvalion (Japan)",
+"board":"H System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"syvalionu",
+"title":"Syvalion (US, PS2 Taito Legends 2)",
+"board":"H System",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"syvalionp",
+"title":"Syvalion (World, prototype)",
+"board":"H System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"syvalionw",
+"title":"Syvalion (World, PS2 Taito Legends 2)",
+"board":"H System",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"ttfitter",
+"title":"T.T Fitter (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"cupfinal",
+"title":"Taito Cup Finals (Ver 1.0O 1993/02/28)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"pwrgoal",
+"title":"Taito Power Goal (Ver 2.5O 1994/11/03)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"tetrsark",
+"title":"Tetris (D.R. Korea, set 1, encrypted)",
+"board":"Classic",
+"publisher":"D.R. Korea",
+"year":"19??",
+"genre":"Puzzle"
+},
+{
+"rom":"tetrsark2",
+"title":"Tetris (D.R. Korea, set 2)",
+"board":"Classic",
+"publisher":"D.R. Korea",
+"year":"19??",
+"genre":"Puzzle"
+},
+{
+"rom":"tetristh",
+"title":"Tetris (Japan, rev 1, Taito H-System)",
+"board":"H System",
+"publisher":"Sega",
+"year":"1988",
+"genre":"Puzzle"
+},
+{
+"rom":"tetrista",
+"title":"Tetris (Japan, Taito B-System, Master of Weapon Conversion Kit)",
+"board":"B System",
+"publisher":"Sega",
+"year":"1988",
+"genre":"Puzzle"
+},
+{
+"rom":"tetrist",
+"title":"Tetris (Japan, Taito B-System, Nastar Conversion Kit)",
+"board":"B System",
+"publisher":"Sega",
+"year":"1988",
+"genre":"Puzzle"
+},
+{
+"rom":"the26thz",
+"title":"The 26th Z (Japan, location test)",
+"board":"Standalone",
+"publisher":"Ed Co.",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"flstory",
+"title":"The FairyLand Story",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"flstoryo",
+"title":"The FairyLand Story (earlier)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"lkageb",
+"title":"The Legend of Kage",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"lkagebl1",
+"title":"The Legend of Kage (bootleg set 1)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"lkagebl2",
+"title":"The Legend of Kage (bootleg set 2)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"lkagebl3",
+"title":"The Legend of Kage (bootleg set 3)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"lkagebl4",
+"title":"The Legend of Kage (bootleg set 4)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"lkagea",
+"title":"The Legend of Kage (rev 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"lkage",
+"title":"The Legend of Kage (rev 2)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"lkagem",
+"title":"The Legend of Kage (rev 2, MSM5232 sound)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"tnzsj",
+"title":"The NewZealand Story (Japan, new version) (P0-043A PCB)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"tnzsjo",
+"title":"The NewZealand Story (Japan, old version) (P0-041A PCB)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"tnzsuo",
+"title":"The NewZealand Story (US, old version) (P0-041A PCB)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"tnzs",
+"title":"The NewZealand Story (World, new version) (P0-043A PCB)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"tnzso",
+"title":"The NewZealand Story (World, old version) (P0-041A PCB)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"tnzsop",
+"title":"The NewZealand Story (World, prototype) (P0-041-1 PCB)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"tnzsoa",
+"title":"The NewZealand Story (World, unknown version) (P0-041A PCB)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"ninjakj",
+"title":"The Ninja Kids (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"ninjaku",
+"title":"The Ninja Kids (US)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"ninjak",
+"title":"The Ninja Kids (World)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"ninjawj",
+"title":"The Ninja Warriors (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Fighter"
+},
+{
+"rom":"ninjawu",
+"title":"The Ninja Warriors (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Fighter"
+},
+{
+"rom":"ninjaw1",
+"title":"The Ninja Warriors (World, earlier version)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Fighter"
+},
+{
+"rom":"ninjaw",
+"title":"The Ninja Warriors (World, later version)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Fighter"
+},
+{
+"rom":"thepitj",
+"title":"The Pit (Japan)",
+"board":"Classic",
+"publisher":"Zilec Electronics",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"theportr",
+"title":"The Porter (bootleg of Port Man)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Platform"
+},
+{
+"rom":"tinstar",
+"title":"The Tin Star (A10, 4 PCB version)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"tinstara",
+"title":"The Tin Star (TS, 5 PCB version)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"undoukai",
+"title":"The Undoukai (Japan)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"thundfoxj",
+"title":"Thunder Fox (Japan, rev 1)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"thundfoxu",
+"title":"Thunder Fox (US, rev 1)",
+"board":"F2 System",
+"publisher":"Taito America",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"thundfox",
+"title":"Thunder Fox (World, rev 1)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"timetunl",
+"title":"Time Tunnel",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"tokiob",
+"title":"Tokio / Scramble Formation (bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"tokio",
+"title":"Tokio / Scramble Formation (newer)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"tokioo",
+"title":"Tokio / Scramble Formation (older)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"tokiou",
+"title":"Tokio / Scramble Formation (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"trstarj",
+"title":"Top Ranking Stars (Ver 2.1J 1993/05/21) (New Version)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"trstaroj",
+"title":"Top Ranking Stars (Ver 2.1J 1993/05/21) (Old Version)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"trstar",
+"title":"Top Ranking Stars (Ver 2.1O 1993/05/21) (New Version)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"trstaro",
+"title":"Top Ranking Stars (Ver 2.1O 1993/05/21) (Old Version)",
+"board":"F3 System",
+"publisher":"Taito",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"topspeedu",
+"title":"Top Speed (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Driving"
+},
+{
+"rom":"topspeed",
+"title":"Top Speed (World, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1987",
+"genre":"Driving"
+},
+{
+"rom":"arkatour2",
+"title":"Tournament Arkanoid (US, newer)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"arkatour",
+"title":"Tournament Arkanoid (US, older)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1987",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"tubeit",
+"title":"Tube-It",
+"board":"L System",
+"publisher":"Bootleg",
+"year":"1993",
+"genre":"Puzzle"
+},
+{
+"rom":"tcobra2u",
+"title":"Twin Cobra II (Ver 2.1A 1995/11/30)",
+"board":"F3 System",
+"publisher":"Takumi",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"tcobra2",
+"title":"Twin Cobra II (Ver 2.1O 1995/11/30)",
+"board":"F3 System",
+"publisher":"Takumi",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"twinhawku",
+"title":"Twin Hawk (US)",
+"board":"X System",
+"publisher":"Toaplan",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"twinhawk",
+"title":"Twin Hawk (World)",
+"board":"X System",
+"publisher":"Toaplan",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"twinqix",
+"title":"Twin Qix (Ver 1.0A 1995/01/17, prototype)",
+"board":"F3 System",
+"publisher":"Taito America",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"earthjkrp",
+"title":"U.N. Defense Force: Earth Joker (Japan, prototype?)",
+"board":"Standalone",
+"publisher":"Visco",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"earthjkr",
+"title":"U.N. Defense Force: Earth Joker (US / Japan, set 1)",
+"board":"Standalone",
+"publisher":"Visco",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"earthjkra",
+"title":"U.N. Defense Force: Earth Joker (US / Japan, set 2)",
+"board":"Standalone",
+"publisher":"Visco",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"earthjkrb",
+"title":"U.N. Defense Force: Earth Joker (US / Japan, set 3)",
+"board":"Standalone",
+"publisher":"Visco",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"ultrainv",
+"title":"Ultra Invaders",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"victnine",
+"title":"Victorious Nine",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"viofightj",
+"title":"Violence Fight (Japan)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"viofightu",
+"title":"Violence Fight (US)",
+"board":"B System",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"viofight",
+"title":"Violence Fight (World)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"volfiedjo",
+"title":"Volfied (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"volfiedj",
+"title":"Volfied (Japan, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"volfieduo",
+"title":"Volfied (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"volfiedu",
+"title":"Volfied (US, rev 1)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"volfiedo",
+"title":"Volfied (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"volfied",
+"title":"Volfied (World, rev 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"hotsmash",
+"title":"Vs. Hot Smash",
+"board":"Standalone",
+"publisher":"Kaneko",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"warriorb",
+"title":"Warrior Blade - Rastan Saga Episode III (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"waterski",
+"title":"Water Ski",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"wgp2j",
+"title":"WGP 2: Real Race Feeling (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Driving"
+},
+{
+"rom":"wgp2",
+"title":"WGP 2: Real Race Feeling (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Driving"
+},
+{
+"rom":"wgpj",
+"title":"WGP: Real Race Feeling (Japan)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Driving"
+},
+{
+"rom":"wgpjoy",
+"title":"WGP: Real Race Feeling (joystick version) (Japan, set 1)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Driving"
+},
+{
+"rom":"wgpjoya",
+"title":"WGP: Real Race Feeling (joystick version) (Japan, set 2)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Driving"
+},
+{
+"rom":"wgpu",
+"title":"WGP: Real Race Feeling (US)",
+"board":"Standalone",
+"publisher":"Taito America",
+"year":"1989",
+"genre":"Driving"
+},
+{
+"rom":"wgp",
+"title":"WGP: Real Race Feeling (World)",
+"board":"Standalone",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Driving"
+},
+{
+"rom":"wwestern",
+"title":"Wild Western (set 1)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"wwestern1",
+"title":"Wild Western (set 2)",
+"board":"SJ System",
+"publisher":"Taito",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"wyvernf0a",
+"title":"Wyvern F-0",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"wyvernf0",
+"title":"Wyvern F-0 (Rev 1)",
+"board":"Classic",
+"publisher":"Taito",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"yesnoj",
+"title":"Yes/No Sinri Tokimeki Chart",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1992",
+"genre":"Quiz"
+},
+{
+"rom":"yukiwo",
+"title":"Yukiwo (World, prototype)",
+"board":"B System",
+"publisher":"Taito",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"yuyugogo",
+"title":"Yuuyu no Quiz de GO!GO! (Japan)",
+"board":"F2 System",
+"publisher":"Taito",
+"year":"1990",
+"genre":"Quiz"
+},
+{
+"rom":"zookeepbl",
+"title":"Zoo Keeper (bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Platform"
+}
+]
+}

@@ -1,0 +1,252 @@
+/*  ReBOX core internals: game tables, ROM regions, input ports, video and audio services
+    shared by the board drivers. The tables follow the MAME driver model (regions, ioports,
+    DIP switches) so that drivers can be carried over from MAME with their structure intact.
+    This file is part of ReBOX. GPL-2.0-or-later.
+*/
+#ifndef RBX_H
+#define RBX_H
+
+#include <stdint.h>
+#include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// ---- ROM layout (generated from MAME ROM_START blocks by tools/gen_games.py) ----
+enum { RBX_ROM_END, RBX_ROM_LOAD, RBX_ROM_CONTINUE, RBX_ROM_RELOAD, RBX_ROM_FILL, RBX_ROM_COPY };
+typedef struct {
+	uint8_t op, region;
+	const char *file;
+	uint32_t offset, length, crc;
+	uint8_t group, skip, reverse;   // ROMX_LOAD layout: bytes per group, bytes skipped after a group, byte order reversed
+	uint32_t value;                 // FILL value, COPY (source region << 24 | source offset)
+} rbx_rom_load;
+typedef struct { const char *name; uint32_t size; uint8_t fill; } rbx_rom_region;
+
+// ---- input ports (MAME ioport model) ----
+enum {
+	RBX_IPT_UNUSED, RBX_IPT_UNKNOWN, RBX_IPT_OTHER, RBX_IPT_CUSTOM, RBX_IPT_OUTPUT,
+	RBX_IPT_DIPSWITCH, RBX_IPT_CONFIG,
+	RBX_IPT_SERVICE, RBX_IPT_SERVICE1, RBX_IPT_SERVICE2, RBX_IPT_SERVICE3, RBX_IPT_SERVICE4, RBX_IPT_TILT,
+	RBX_IPT_COIN1, RBX_IPT_COIN2, RBX_IPT_COIN3, RBX_IPT_COIN4,
+	RBX_IPT_START1, RBX_IPT_START2, RBX_IPT_START3, RBX_IPT_START4,
+	RBX_IPT_JOYSTICK_UP, RBX_IPT_JOYSTICK_DOWN, RBX_IPT_JOYSTICK_LEFT, RBX_IPT_JOYSTICK_RIGHT,
+	RBX_IPT_BUTTON1, RBX_IPT_BUTTON2, RBX_IPT_BUTTON3, RBX_IPT_BUTTON4, RBX_IPT_BUTTON5, RBX_IPT_BUTTON6,
+	RBX_IPT_TRACKBALL_X, RBX_IPT_TRACKBALL_Y, RBX_IPT_DIAL, RBX_IPT_PADDLE, RBX_IPT_AD_STICK_X, RBX_IPT_AD_STICK_Y,
+	RBX_IPT_AD_STICK_Z, RBX_IPT_PEDAL, RBX_IPT_PEDAL2, RBX_IPT_PEDAL3, RBX_IPT_LIGHTGUN_X, RBX_IPT_LIGHTGUN_Y,
+	RBX_IPT_POSITIONAL, RBX_IPT_POSITIONAL_V, RBX_IPT_BUTTON7, RBX_IPT_BUTTON8,
+	RBX_IPT_JOYSTICKRIGHT_UP, RBX_IPT_JOYSTICKRIGHT_DOWN, RBX_IPT_JOYSTICKRIGHT_LEFT, RBX_IPT_JOYSTICKRIGHT_RIGHT,
+	// (added for the Konami module's tables: listed games of boards not ported yet use them; appended, the values above
+	// unchanged)
+	RBX_IPT_BUTTON9, RBX_IPT_BUTTON10, RBX_IPT_BUTTON11, RBX_IPT_BUTTON12, RBX_IPT_BUTTON13, RBX_IPT_BUTTON14,
+	RBX_IPT_BUTTON15, RBX_IPT_BUTTON16, RBX_IPT_START5, RBX_IPT_START6, RBX_IPT_START7, RBX_IPT_START8,
+	RBX_IPT_COIN5, RBX_IPT_COIN6, RBX_IPT_COIN7, RBX_IPT_COIN8, RBX_IPT_DOOR,
+	RBX_IPT_GAMBLE_HALF, RBX_IPT_GAMBLE_HIGH, RBX_IPT_GAMBLE_LOW, RBX_IPT_GAMBLE_KEYIN, RBX_IPT_GAMBLE_KEYOUT,
+	RBX_IPT_MOUSE_X, RBX_IPT_MOUSE_Y, RBX_IPT_PADDLE_V,
+	RBX_IPT_COUNT
+};
+typedef struct { uint32_t value; const char *name; } rbx_ipt_setting;
+typedef struct {
+	uint32_t mask, def;
+	uint16_t type;
+	uint8_t player, impulse, toggle;
+	const char *name;               // DIP / config name
+	uint16_t set_first, set_count;  // settings (rbx_ipt_setting) of a DIP field
+	uint8_t cond_port, cond_type;   // PORT_CONDITION: port index (255 = none), 1 = equals, 2 = not equals
+	uint32_t cond_mask, cond_value;
+} rbx_ipt_field;
+typedef struct { const char *tag; uint16_t first, count; } rbx_ipt_port;
+
+#define RBX_GF_NOT_WORKING   1
+#define RBX_GF_MECHANICAL    2
+#define RBX_GF_IMPERFECT_GFX 4
+#define RBX_GF_IMPERFECT_SND 8
+#define RBX_GF_UNSUPPORTED   16   // machine configuration not emulated (set by the core)
+
+typedef struct {
+	const char *set, *parent, *title, *year, *maker, *board, *machine;
+	int rot;
+	int flags;
+	const rbx_rom_region *regions;
+	const rbx_rom_load *loads;
+	const rbx_ipt_port *ports;
+	const rbx_ipt_field *fields;
+	const rbx_ipt_setting *settings;
+} rbx_game;
+
+// ---- board driver ----
+typedef struct {
+	const char *board;                    // rbx_game.board
+	int (*init)(const rbx_game *g);       // ROM regions are loaded; 0 = ok
+	void (*exit)(void);
+	void (*reset)(void);
+	void (*run_frame)(void);              // one video frame: renders rbx_video, produces sound into rbx_audio
+	int (*state_save)(void *ctx);         // through rbx_state_* (may be NULL)
+	int (*state_load)(void *ctx);
+	int (*supported)(const char *machine);   // machine configuration emulated
+	void (*render)(void);                    // draw the last captured frame into rbx_video (any thread, see rbx_video_frame_done)
+	// optional: called by a thread waiting for render (rbx_video_wait_idle) to do part of it; 0 = nothing to do now
+	int (*render_help)(int helper);   // helper 1: the emulation thread, 2: a frontend thread (rbx_render_help)
+} rbx_driver;
+
+// ---- services for drivers ----
+void rbx_log(const char *fmt, ...);
+uint64_t rbx_clock_us(void);   // the frontend's clock (0 without one): profiling logs only
+// executable memory from the frontend (rbx_config jit_*), `size` bytes of one block for the app's life, given out once
+// (only appended to, never rewritten): NULL = none (the driver interprets); the emulation thread
+void *rbx_jit_alloc(unsigned size);
+void rbx_jit_write_begin(void);
+void rbx_jit_write_end(void *code, unsigned size);
+void rbx_fail(const char *fmt, ...);      // set the error text returned by rbx_error()
+
+// ROM folders of the running configuration (ending with a separator), NULL past the last; for sample sets next to them
+const char *rbx_rom_dir(int i);
+
+// ROM region by MAME name ("maincpu", "audiocpu", "ymsnd:adpcma" ...). NULL if the set has none
+uint8_t *rbx_region(const char *name, uint32_t *size);
+
+// input ports: index by tag (-1 = none), current value (inputs, DIPs and defaults combined)
+int rbx_port_find(const char *tag);
+uint32_t rbx_port_read(int port);
+// set the IPT_CUSTOM bits of a port as line levels, 1 = asserted (EEPROM data line, sensors); active-low fields are inverted
+void rbx_port_custom(int port, uint32_t mask, uint32_t value);
+// analog input of a player (trackball delta per frame etc.), type RBX_IPT_TRACKBALL_X ...
+int rbx_analog(int player, int type);
+// rbx_analog, or without that device moving the d-pad's: step counts a frame (left / right for x axes and dials, up /
+// down for y axes), as MAME's key delta x sensitivity / 100 (games with only a dial / trackball play on the d-pad)
+int rbx_analog_dpad(int player, int type, int step);
+// raw control bits of a player (RBX_IN_* of rbx_core.h), for digital fallbacks of analog controls (steering, pedals)
+uint32_t rbx_player_input(int player);
+// raw controls of a player (1-4) as RBX_IN_* bits of rbx_core.h (pedals and other inputs the ioport model lacks);
+// rbx_input is the same (analog-only boards steer with the d-pad without a device)
+uint32_t rbx_input_bits(int player);
+uint32_t rbx_input(int player);
+
+// video: the driver draws palette indices into a 16-bit bitmap and keeps the palette in RGB888
+typedef struct {
+	uint16_t *bitmap;     // indexed pixels, width x height, pitch in pixels
+	int pitch;
+	int width, height;    // visible area
+	uint32_t *palette;    // 0x00RRGGBB
+	int palette_size;
+	int blank;            // 1 = draw nothing (screen off)
+	int palette_used;     // entries the frame uses (0 = palette_size); set by render()
+	// the frontend's frame while render() runs (NULL when there is none): a driver may write it itself, line by line in
+	// its color format (out_color: 0x00RRGGBB to a pixel of out_bpp bytes), and set out_done; else the core converts
+	// the bitmap afterwards
+	void *out;
+	int out_pitch, out_bpp;   // bytes
+	uint32_t (*out_color)(int r, int g, int b);
+	int out_done;
+} rbx_video_t;
+extern rbx_video_t rbx_video;
+int rbx_video_setup(int width, int height, int palette_size);
+// frame drawing in two halves: at vblank the driver waits for the previous drawing (rbx_video_wait_idle), copies what
+// drawing needs (its snapshot) and calls rbx_video_frame_done; driver.render then draws from the snapshot, right away or
+// on the render thread. The driver also waits before touching state the drawing side writes (sprite frame buffer)
+void rbx_video_wait_idle(void);
+void rbx_video_frame_done(void);
+// a driver job that may run on a worker thread (the F3 ES5510 effects DSP): the job does the work queued so far.
+// rbx_aux_kick() after queuing (the worker starts on it), rbx_aux_sync() waits until the job has done all that was
+// queued before the call. Without a worker thread both run the job themselves: the results are the same.
+// The job only touches its own queue and the state the driver gives it; the driver syncs before touching that state
+void rbx_aux_set_job(void (*job)(void));   // NULL = none (at exit; syncs first)
+void rbx_aux_kick(void);
+void rbx_aux_sync(void);
+// a second job on its own worker thread, the same way (the F3 ES5505 voices), and a third (the F3 sound board)
+void rbx_aux2_set_job(void (*job)(void));
+void rbx_aux2_kick(void);
+void rbx_aux2_sync(void);
+// the second job's thread on a core of its own (CPU3 on the Vita: a board without a drawing helper; set before the
+// game starts, cleared with the job)
+void rbx_aux2_set_alone(int on);
+void rbx_aux3_set_job(void (*job)(void));
+void rbx_aux3_kick(void);
+void rbx_aux3_nudge(void);   // rbx_aux3_kick with its thread only (without, nothing)
+void rbx_aux3_sync(void);
+// a short wait (the frontend's: a sleep) while another thread works
+void rbx_wait(void);
+// one piece of the frame being drawn by a board that splits its drawing (helper 1: the emulation thread, 2: the
+// frontend's helper core); 0 = nothing to draw now (render_help with 0x100: F3V_HELP_ONE)
+int rbx_render_help_one(int helper);
+// the first worker draws bands (render_help(helper | 0x100)) while it has no job; 0 = off
+void rbx_aux_set_idle_help(int helper);
+
+// audio: the driver mixes its chips into a mono stream at its own rate (rbx_audio_setup), the core resamples
+typedef struct {
+	int16_t *buf;          // samples of the current frame at the driver rate
+	int count, cap;
+	uint32_t rate;
+	int stereo;            // rbx_audio_setup_stereo: buf = left, buf_r = right
+	uint32_t frame_mhz;    // the board's frame rate in milli-Hz (0 = 60 Hz): a frame's sound is played in a 60 Hz frame
+	int16_t *buf_r;
+} rbx_audio_t;
+extern rbx_audio_t rbx_audio;
+int rbx_audio_setup(uint32_t rate);
+int rbx_audio_setup_stereo(uint32_t rate);
+static inline void rbx_audio_put(int32_t s)
+{
+	if (rbx_audio.count < rbx_audio.cap) {
+		if (s > 32767) s = 32767;
+		if (s < -32768) s = -32768;
+		rbx_audio.buf[rbx_audio.count++] = (int16_t)s;
+	}
+}
+static inline void rbx_audio_put_stereo(int32_t l, int32_t r)
+{
+	if (rbx_audio.count < rbx_audio.cap) {
+		if (l > 32767) l = 32767;
+		if (l < -32768) l = -32768;
+		if (r > 32767) r = 32767;
+		if (r < -32768) r = -32768;
+		rbx_audio.buf[rbx_audio.count] = (int16_t)l;
+		rbx_audio.buf_r[rbx_audio.count++] = (int16_t)r;
+	}
+}
+
+// save state helpers: a flat buffer of tagged blocks
+int rbx_state_io(void *ctx, const char *tag, void *data, uint32_t size);
+
+// clocks of a CPU for the next scanline at a frame rate in milli-Hz (fractions carried in *frac)
+// floor(num / den) without a 64-bit division (a libgcc call of a few hundred cycles on ARM): a double estimate
+// corrected to the exact quotient. Same result as num / den for den > 0 and a quotient below 2^32.
+static inline uint32_t rbx_div64_small(uint64_t num, uint64_t den)
+{
+	// (32-bit halves: the conversions are single VFP instructions on ARM, not libgcc calls)
+	const double fn = (double)(uint32_t)(num >> 32) * 4294967296.0 + (double)(uint32_t)num;
+	const double fd = (double)(uint32_t)(den >> 32) * 4294967296.0 + (double)(uint32_t)den;
+	const double q = fn / fd;
+	uint64_t n = q < 4294967295.0 ? (uint32_t)q : 0xffffffffu;
+	while (n && n * den > num)
+		n--;
+	while ((n + 1) * den <= num)
+		n++;
+	return (uint32_t)n;
+}
+
+// (a * b) / c with a 32-bit division when the product fits (exactly (uint64_t)a * b / c)
+// v % n (0 when n is 0) with the division only past the end: a tile code against a decoded set's count
+static inline uint32_t rbx_wrap(uint32_t v, uint32_t n) { return v < n ? v : n ? v % n : 0; }
+static inline uint32_t rbx_muldiv(uint32_t a, uint32_t b, uint32_t c)
+{
+	uint64_t p = (uint64_t)a * b;
+	return (p >> 32) ? (uint32_t)(p / c) : (uint32_t)p / c;
+}
+
+static inline int rbx_line_cycles(uint64_t *frac, uint32_t clock, uint32_t rate_mhz, int lines)
+{
+	uint64_t den = (uint64_t)rate_mhz * (uint64_t)lines;
+	*frac += (uint64_t)clock * 1000;
+	uint64_t n = rbx_div64_small(*frac, den);
+	*frac -= n * den;
+	return (int)n;
+}
+
+static inline uint16_t rbx_be16(const uint8_t *p) { return (uint16_t)(p[0] << 8 | p[1]); }
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

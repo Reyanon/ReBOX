@@ -1,0 +1,1526 @@
+{
+"name":"Irem",
+"order":5,
+"games":[
+{
+"rom":"10yard85",
+"title":"10-Yard Fight '85 (US, Taito license)",
+"board":"M58",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"10yardj",
+"title":"10-Yard Fight (Japan)",
+"board":"M58",
+"publisher":"Irem",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"10yard",
+"title":"10-Yard Fight (World, set 1)",
+"board":"M58",
+"publisher":"Irem",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"airass",
+"title":"Air Assault (World)",
+"board":"M107",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"airdueljm72",
+"title":"Air Duel (Japan, M72 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"airduelu",
+"title":"Air Duel (US location test, M82 hardware)",
+"board":"M72",
+"publisher":"Irem America",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"airduelm72",
+"title":"Air Duel (World, M72 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"airduel",
+"title":"Air Duel (World, M82 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"alpha1v",
+"title":"Alpha One (Vision Electronics)",
+"board":"M52",
+"publisher":"Vision Electronics",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"andromed",
+"title":"Andromeda SS (Japan?)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"gallopm72",
+"title":"Armed Police Unit Gallop (Japan, M72 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"gallop",
+"title":"Armed Police Unit Gallop (Japan, M84 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"atomboya",
+"title":"Atomic Boy (revision A)",
+"board":"M63",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"atomboy",
+"title":"Atomic Boy (revision B)",
+"board":"M63",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"atompunk",
+"title":"Atomic Punk (US)",
+"board":"M90",
+"publisher":"Irem America",
+"year":"1991",
+"genre":"Maze"
+},
+{
+"rom":"bchopper",
+"title":"Battle Chopper (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"bmaster",
+"title":"Blade Master (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"bomblord",
+"title":"Bomber Lord (bootleg)",
+"board":"M90",
+"publisher":"Bootleg",
+"year":"1992",
+"genre":"Maze"
+},
+{
+"rom":"bombrman",
+"title":"Bomber Man (Japan)",
+"board":"M90",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Maze"
+},
+{
+"rom":"bbmanwj",
+"title":"Bomber Man World (Japan)",
+"board":"M90",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Maze"
+},
+{
+"rom":"bbmanwja",
+"title":"Bomber Man World (Japan, revised sound hardware)",
+"board":"M90",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Maze"
+},
+{
+"rom":"bbmanw",
+"title":"Bomber Man World / New Dyna Blaster - Global Quest",
+"board":"M90",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Maze"
+},
+{
+"rom":"bowmen",
+"title":"Bowmen",
+"board":"Classic",
+"publisher":"Ten-Level",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"buccanrs",
+"title":"Buccaneers (set 1)",
+"board":"Classic",
+"publisher":"Duintronic",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"buccanrsa",
+"title":"Buccaneers (set 2)",
+"board":"Classic",
+"publisher":"Duintronic",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"buccanrsb",
+"title":"Buccaneers (set 3, harder)",
+"board":"Classic",
+"publisher":"Duintronic",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"cosmccop",
+"title":"Cosmic Cop (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"crossbld",
+"title":"Cross Blades! (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"dkgensanm72",
+"title":"Daiku no Gensan (Japan, M72 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"dkgensanm82",
+"title":"Daiku no Gensan (Japan, M82 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"dkgensan",
+"title":"Daiku no Gensan (Japan, M84 hardware, set 1)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"dkgensana",
+"title":"Daiku no Gensan (Japan, M84 hardware, set 2)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"demoneye",
+"title":"Demoneye-X",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"dicegame",
+"title":"Dice - The Dice Game!",
+"board":"M90",
+"publisher":"Bootleg",
+"year":"1991",
+"genre":"Maze"
+},
+{
+"rom":"dbreedjm72",
+"title":"Dragon Breed (Japan, M72 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"dbreedm72",
+"title":"Dragon Breed (World, M72 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"dbreed",
+"title":"Dragon Breed (World, M81 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"dsoccr94j",
+"title":"Dream Soccer '94 (Japan, M92 hardware)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"dsoccr94k",
+"title":"Dream Soccer '94 (Korea, M107 hardware)",
+"board":"M107",
+"publisher":"Irem",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"dsoccr94",
+"title":"Dream Soccer '94 (World, M107 hardware)",
+"board":"M107",
+"publisher":"Irem",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"dynablst",
+"title":"Dynablaster / Bomber Man",
+"board":"M90",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Maze"
+},
+{
+"rom":"dynablstb",
+"title":"Dynablaster / Bomber Man (bootleg, set 1)",
+"board":"M90",
+"publisher":"Bootleg",
+"year":"1992",
+"genre":"Maze"
+},
+{
+"rom":"dynablstb2",
+"title":"Dynablaster / Bomber Man (bootleg, set 2)",
+"board":"M90",
+"publisher":"Bootleg",
+"year":"1992",
+"genre":"Maze"
+},
+{
+"rom":"dynablstb3",
+"title":"Dynablaster / Bomber Man (bootleg, set 3)",
+"board":"M90",
+"publisher":"Bootleg",
+"year":"1992",
+"genre":"Maze"
+},
+{
+"rom":"dynablstb4",
+"title":"Dynablaster / Bomber Man (bootleg, set 4)",
+"board":"M90",
+"publisher":"Bootleg",
+"year":"1992",
+"genre":"Maze"
+},
+{
+"rom":"fghtbskt",
+"title":"Fighting Basketball",
+"board":"M63",
+"publisher":"Paradise Co. Ltd.",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"firebarr",
+"title":"Fire Barrel (Japan)",
+"board":"M107",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"geostorm",
+"title":"Geo Storm (Japan, 014 sound CPU)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"geostorma",
+"title":"Geo Storm (Japan, 026 sound CPU)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"greenber",
+"title":"Green Beret (Irem)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1980",
+"genre":"Platform"
+},
+{
+"rom":"gunforc2",
+"title":"Gun Force II (US)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1994",
+"genre":"Platform"
+},
+{
+"rom":"gunforcej",
+"title":"Gunforce: Battle Fire Engulfed Terror Island (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"gunforceu",
+"title":"Gunforce: Battle Fire Engulfed Terror Island (US)",
+"board":"M92",
+"publisher":"Irem America",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"gunforce",
+"title":"Gunforce: Battle Fire Engulfed Terror Island (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"gussun",
+"title":"Gussun Oyoyo (Japan)",
+"board":"M90",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Puzzle"
+},
+{
+"rom":"hharryb2",
+"title":"Hammerin' Harry (Playmark bootleg)",
+"board":"M72",
+"publisher":"Bootleg",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"hharryu",
+"title":"Hammerin' Harry (US, M84 hardware)",
+"board":"M72",
+"publisher":"Irem America",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"hharry",
+"title":"Hammerin' Harry (World, M81 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"hharryb",
+"title":"Hammerin' Harry (World, M84 hardware bootleg)",
+"board":"M72",
+"publisher":"Bootleg",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"hasamu",
+"title":"Hasamu (Japan)",
+"board":"M90",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Tabletop"
+},
+{
+"rom":"headoni",
+"title":"Head On (Irem, M-15 Hardware)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1979",
+"genre":"Maze"
+},
+{
+"rom":"hookj",
+"title":"Hook (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"hooku",
+"title":"Hook (US)",
+"board":"M92",
+"publisher":"Irem America",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"hook",
+"title":"Hook (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"horizon",
+"title":"Horizon (Irem)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"imgfightj",
+"title":"Image Fight (Japan)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"imgfight",
+"title":"Image Fight (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"inthuntk",
+"title":"In The Hunt (Korea?)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"inthuntu",
+"title":"In The Hunt (US)",
+"board":"M92",
+"publisher":"Irem America",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"inthunt",
+"title":"In The Hunt (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"ipminvad",
+"title":"IPM Invader (M10, set 1)",
+"board":"Classic",
+"publisher":"IPM",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"ipminvad1",
+"title":"IPM Invader (M10, set 2)",
+"board":"Classic",
+"publisher":"IPM",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"ipminvad2",
+"title":"IPM Invader (M11)",
+"board":"Classic",
+"publisher":"IPM",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"yanchamr",
+"title":"Kaiketsu Yanchamaru (Japan)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"kaiteids",
+"title":"Kaitei Daisensou (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"kengoj",
+"title":"Ken-Go (Japan)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"kengo",
+"title":"Ken-Go (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"kftgoal",
+"title":"Kick for the Goal",
+"board":"M107",
+"publisher":"Jaleco",
+"year":"1994",
+"genre":"Electromechanical"
+},
+{
+"rom":"kikcubicb",
+"title":"Kickle Cubele",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1988",
+"genre":"Puzzle"
+},
+{
+"rom":"kidnikib",
+"title":"Kid Niki (bootleg)",
+"board":"M62",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"kidnikiu",
+"title":"Kid Niki - Radical Ninja (US)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"kidniki",
+"title":"Kid Niki - Radical Ninja (World)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"kungfub",
+"title":"Kung-Fu Master (bootleg set 1)",
+"board":"M62",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kungfub2",
+"title":"Kung-Fu Master (bootleg set 2)",
+"board":"M62",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kungfumd",
+"title":"Kung-Fu Master (US)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kungfum",
+"title":"Kung-Fu Master (World)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"kungfub3s",
+"title":"Kung-Fu Senjyo (bootleg, Spanish)",
+"board":"M62",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"lohtj",
+"title":"Legend of Hero Tonma (Japan)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"lohtb2",
+"title":"Legend of Hero Tonma (Japan, bootleg with i8751)",
+"board":"M72",
+"publisher":"Bootleg",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"loht",
+"title":"Legend of Hero Tonma (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"lohtb3",
+"title":"Legend of Hero Tonma (World, bootleg with i8751)",
+"board":"M72",
+"publisher":"Bootleg",
+"year":"1997",
+"genre":"Fighter"
+},
+{
+"rom":"lethalth",
+"title":"Lethal Thunder (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"ltswords",
+"title":"Lightning Swords (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"lithero",
+"title":"Little Hero",
+"board":"M62",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"ldrun",
+"title":"Lode Runner (set 1)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"ldruna",
+"title":"Lode Runner (set 2)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"ldrun2",
+"title":"Lode Runner II - The Bungeling Strikes Back",
+"board":"M62",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"ldrun3j",
+"title":"Lode Runner III - Majin no Fukkatsu (Japan, rev. A)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"ldrun3jc",
+"title":"Lode Runner III - Majin no Fukkatsu (Japan, rev. C)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"ldrun3",
+"title":"Lode Runner III - The Golden Labyrinth",
+"board":"M62",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"ldrun4",
+"title":"Lode Runner IV - Teikoku Karano Dasshutsu (Japan)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"lotlot",
+"title":"Lot Lot",
+"board":"M62",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Puzzle"
+},
+{
+"rom":"gunhohki",
+"title":"Mahou Keibitai Gun Hohki (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"majtitlej",
+"title":"Major Title (Japan)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"majtitle",
+"title":"Major Title (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"majtitl2j",
+"title":"Major Title 2 (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"majtitl2",
+"title":"Major Title 2 (World, set 1, 017 sound CPU)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"majtitl2a",
+"title":"Major Title 2 (World, set 2, 016 sound CPU)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"majtitl2b",
+"title":"Major Title 2 (World, set 3)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"matchit2",
+"title":"Match It II",
+"board":"M90",
+"publisher":"Tamtex",
+"year":"1993",
+"genre":"Tabletop"
+},
+{
+"rom":"kikcubic",
+"title":"Meikyu Jima (Japan)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Puzzle"
+},
+{
+"rom":"mpatrol",
+"title":"Moon Patrol",
+"board":"M52",
+"publisher":"Irem",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"mpatrolw",
+"title":"Moon Patrol (Williams)",
+"board":"M52",
+"publisher":"Irem",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"mranger",
+"title":"Moon Ranger (bootleg of Moon Patrol)",
+"board":"M52",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"motorace",
+"title":"MotoRace USA",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1983",
+"genre":"Driving"
+},
+{
+"rom":"mototour",
+"title":"MotoTour / Zippy Race (Tecfri license)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1983",
+"genre":"Driving"
+},
+{
+"rom":"mrheli",
+"title":"Mr. HELI no Daibouken (Japan)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"mysticrib",
+"title":"Mystic Riders (bootleg?)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"mysticri",
+"title":"Mystic Riders (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"newapunk",
+"title":"New Atomic Punk - Global Quest (US)",
+"board":"M90",
+"publisher":"Irem America",
+"year":"1992",
+"genre":"Maze"
+},
+{
+"rom":"newtangl",
+"title":"New Tropical Angel",
+"board":"M57",
+"publisher":"Irem",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"nbbatmanu",
+"title":"Ninja Baseball Bat Man (US)",
+"board":"M92",
+"publisher":"Irem America",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"nbbatman",
+"title":"Ninja Baseball Bat Man (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"nspirit",
+"title":"Ninja Spirit (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"olibochu",
+"title":"Oli-Boo-Chu (USA)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"panther",
+"title":"Panther (bootleg?)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"psoldier",
+"title":"Perfect Soldiers (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"ptrmj",
+"title":"PT Reach Mahjong (Japan)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1979",
+"genre":"Tabletop"
+},
+{
+"rom":"punchkid",
+"title":"Punching Kid (Japan)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1981",
+"genre":"Maze"
+},
+{
+"rom":"quizf1",
+"title":"Quiz F1 1-2 Finish (Japan)",
+"board":"M90",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Quiz"
+},
+{
+"rom":"rtypejp",
+"title":"R-Type (Japan prototype)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"rtypej",
+"title":"R-Type (Japan)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"rtypem82b",
+"title":"R-Type (Japan, bootleg M82 conversion)",
+"board":"M72",
+"publisher":"Bootleg",
+"year":"2009",
+"genre":"Shooter"
+},
+{
+"rom":"rtypeu",
+"title":"R-Type (US)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"rtypeb",
+"title":"R-Type (World bootleg)",
+"board":"M72",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"rtype",
+"title":"R-Type (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"rtype2j",
+"title":"R-Type II (Japan)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"rtype2m82b",
+"title":"R-Type II (Japan, bootleg M82 conversion)",
+"board":"M72",
+"publisher":"Bootleg",
+"year":"1997",
+"genre":"Shooter"
+},
+{
+"rom":"rtype2jc",
+"title":"R-Type II (Japan, revision C)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"rtype2",
+"title":"R-Type II (World)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"rtypeleoj",
+"title":"R-Type Leo (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"rtypeleo",
+"title":"R-Type Leo (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"redalert",
+"title":"Red Alert",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"riskchal",
+"title":"Risky Challenge",
+"board":"M90",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Puzzle"
+},
+{
+"rom":"nspiritj",
+"title":"Saigo no Nindou (Japan)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Fighter"
+},
+{
+"rom":"shisen2",
+"title":"Shisensho II",
+"board":"M90",
+"publisher":"Tamtex",
+"year":"1993",
+"genre":"Tabletop"
+},
+{
+"rom":"shtrider",
+"title":"Shot Rider",
+"board":"Classic",
+"publisher":"Seibu Kaihatsu",
+"year":"1985",
+"genre":"Driving"
+},
+{
+"rom":"shtriderb",
+"title":"Shot Rider (bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1985",
+"genre":"Driving"
+},
+{
+"rom":"shtridera",
+"title":"Shot Rider (Sigma license)",
+"board":"Classic",
+"publisher":"Seibu Kaihatsu",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"skychut",
+"title":"Sky Chuter",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1980",
+"genre":"Shooter"
+},
+{
+"rom":"spacbeam",
+"title":"Space Beam",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1979",
+"genre":"Shooter"
+},
+{
+"rom":"spartanx",
+"title":"Spartan X (Japan)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Fighter"
+},
+{
+"rom":"spartanxtec",
+"title":"Spartan X (Tecfri hardware bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Fighter"
+},
+{
+"rom":"spelunkr",
+"title":"Spelunker",
+"board":"M62",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"spelunkrj",
+"title":"Spelunker (Japan)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"spelunk2",
+"title":"Spelunker II - 23 no Kagi (Japan)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"ssoldier",
+"title":"Superior Soldiers (US)",
+"board":"M92",
+"publisher":"Irem America",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"battroad",
+"title":"The Battle-Road",
+"board":"M62",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"skingame",
+"title":"The Irem Skins Game (US set 1)",
+"board":"M92",
+"publisher":"Irem America",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"skingame2",
+"title":"The Irem Skins Game (US set 2)",
+"board":"M92",
+"publisher":"Irem America",
+"year":"1992",
+"genre":"Sports"
+},
+{
+"rom":"thndblst",
+"title":"Thunder Blaster (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"travrusab",
+"title":"Traverse USA (bootleg, set 1)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1983",
+"genre":"Driving"
+},
+{
+"rom":"travrusab2",
+"title":"Traverse USA (bootleg, set 2)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1983",
+"genre":"Driving"
+},
+{
+"rom":"travrusa",
+"title":"Traverse USA / Zippy Race",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1983",
+"genre":"Driving"
+},
+{
+"rom":"troangel",
+"title":"Tropical Angel",
+"board":"M57",
+"publisher":"Irem",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"uccopsj",
+"title":"Undercover Cops (Japan)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"uccopsu",
+"title":"Undercover Cops (US)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"uccops",
+"title":"Undercover Cops (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"uccopsaru",
+"title":"Undercover Cops Alpha: Renewal Version (US)",
+"board":"M92",
+"publisher":"Irem America",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"uccopsar",
+"title":"Undercover Cops Alpha: Renewal Version (World)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"vigilantbl",
+"title":"Vigilante (bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"vigilantd",
+"title":"Vigilante (Japan, Rev D)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"vigilanto",
+"title":"Vigilante (US)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"vigilantb",
+"title":"Vigilante (US, Rev B)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"vigilantg",
+"title":"Vigilante (US, Rev G)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"vigilanta",
+"title":"Vigilante (World, Rev A)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"vigilantc",
+"title":"Vigilante (World, Rev C)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"vigilant",
+"title":"Vigilante (World, Rev E)",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"vs10yardj",
+"title":"Vs 10-Yard Fight (Japan)",
+"board":"M58",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"vs10yardu",
+"title":"Vs 10-Yard Fight (US, Taito license)",
+"board":"M58",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"vs10yard",
+"title":"Vs 10-Yard Fight (World, 11/05/84)",
+"board":"M58",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"wilytowr",
+"title":"Wily Tower",
+"board":"M63",
+"publisher":"Irem",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"wpksoc",
+"title":"World PK Soccer",
+"board":"M107",
+"publisher":"Jaleco",
+"year":"1995",
+"genre":"Electromechanical"
+},
+{
+"rom":"ww3",
+"title":"WW III",
+"board":"Classic",
+"publisher":"Irem",
+"year":"1981",
+"genre":"Shooter"
+},
+{
+"rom":"xmultiplm72",
+"title":"X Multiply (Japan, M72 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"xmultipl",
+"title":"X Multiply (World, M81 hardware)",
+"board":"M72",
+"publisher":"Irem",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"leaguemn",
+"title":"Yakyuu Kakutou League-Man (Japan, set 1)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"leaguemna",
+"title":"Yakyuu Kakutou League-Man (Japan, set 2)",
+"board":"M92",
+"publisher":"Irem",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"yanjamar",
+"title":"Yanjamaru",
+"board":"M62",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"youjyudn",
+"title":"Youjyuden (Japan)",
+"board":"M62",
+"publisher":"Irem",
+"year":"1986",
+"genre":"Shooter"
+}
+]
+}

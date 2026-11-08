@@ -1,0 +1,166 @@
+#include "frontend/input.h"
+#include "frontend/medal.h"
+
+#include <psp2/ctrl.h>
+
+#include "common/re_pad.h"
+#include "frontend/settings.h"
+#include "frontend/testpad.h"
+#include "frontend/touch.h"
+#include "frontend/video.h"
+#include "frontend/core_api.h"
+
+#define STICK_DEAD 48 // distance from center (128) required to count as a direction
+#define ANALOG_DEAD 24 // the same for the analog controls
+
+void rbx_input_init(void)
+{
+	re_pad_init();
+}
+
+// game inputs of each player, in RBX_ACT_* order
+static const int s_act_input[2][RBX_ACT_COUNT] = {
+	{ RBX_IN_P1_B1, RBX_IN_P1_B2, RBX_IN_P1_COIN, RBX_IN_P1_START, RBX_IN_P1_B3, RBX_IN_P1_B4, RBX_IN_P1_B5, RBX_IN_P1_B6 },
+	{ RBX_IN_P2_B1, RBX_IN_P2_B2, RBX_IN_P2_COIN, RBX_IN_P2_START, RBX_IN_P2_B3, RBX_IN_P2_B4, RBX_IN_P2_B5, RBX_IN_P2_B6 },
+};
+static const int s_dir_input[2][4] = {
+	{ RBX_IN_P1_UP, RBX_IN_P1_DOWN, RBX_IN_P1_LEFT, RBX_IN_P1_RIGHT },
+	{ RBX_IN_P2_UP, RBX_IN_P2_DOWN, RBX_IN_P2_LEFT, RBX_IN_P2_RIGHT },
+};
+
+// one player: its controller (re_pad) with its own port settings (keys, stick, turbo, combo keys). raw = the
+// controller's buttons (system combos), b = with the touch buttons (1P)
+static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b)
+{
+	// the sticks' directions count as keys
+	b = (b & ~RBX_STICK_BITS) | rbx_stick_bits(pad->lx, pad->ly, pad->rx, pad->ry);
+	// this player's buttons, stick, turbo and combo keys: those of the device it reads (they go with the device)
+	const rbx_port *pr = &g_settings.port[re_pad_player_profile(pl)];
+	int up = (b & SCE_CTRL_UP) != 0, down = (b & SCE_CTRL_DOWN) != 0;
+	int left = (b & SCE_CTRL_LEFT) != 0, right = (b & SCE_CTRL_RIGHT) != 0;
+	// analog sticks, each on its own: tilting past STICK_DEAD gives that direction (diagonals included) and each direction
+	// presses what the port says (a direction set as a key is that key, not what the stick page says)
+	static const int s_btn_act[RBX_TURBO_BUTTONS] = { RBX_ACT_ATTACK, RBX_ACT_JUMP, RBX_ACT_B3, RBX_ACT_B4, RBX_ACT_B5, RBX_ACT_B6 };
+	int stick_act[RBX_ACT_COUNT] = { 0 };
+	uint32_t keyed = rbx_key_mask(pr->turbo_key);
+	for (int a = 0; a < RBX_ACT_COUNT; a++)
+		keyed |= rbx_act_bits(pr, a);
+	for (int st = 0; st < 2; st++) {
+		const int x = st ? pad->rx : pad->lx, y = st ? pad->ry : pad->ly;
+		const int on[RBX_SDIR_COUNT] = { y < 128 - STICK_DEAD, y > 128 + STICK_DEAD, x < 128 - STICK_DEAD, x > 128 + STICK_DEAD };
+		for (int d = 0; d < RBX_SDIR_COUNT; d++) {
+			const int t = on[d] && !(keyed & rbx_key_mask(RBX_KEY_LUP + st * RBX_SDIR_COUNT + d)) ? pr->smap[st][d] : RBX_STGT_NONE;
+			if (t == RBX_STGT_UP) up = 1;
+			else if (t == RBX_STGT_DOWN) down = 1;
+			else if (t == RBX_STGT_LEFT) left = 1;
+			else if (t == RBX_STGT_RIGHT) right = 1;
+			else if (t >= RBX_STGT_B1 && t <= RBX_STGT_B6) stick_act[s_btn_act[t - RBX_STGT_B1]] = 1;
+			else if (t == RBX_STGT_COIN) stick_act[RBX_ACT_COIN] = 1;
+			else if (t == RBX_STGT_START) stick_act[RBX_ACT_START] = 1;
+		}
+	}
+	if (rbx_input_rot && re_pad_port(pl) == 0 && !re_pad_is_tv()) {
+		// the Vita is held turned (Rotate Vertical L / R): screen directions back to the game's
+		// (90: screen right = game up; 270: screen left = game up). Its own controls only, not a controller
+		const int u = up, d = down, l = left, r = right;
+		if (rbx_input_rot == 90) {
+			up = r; down = l; left = u; right = d;
+		} else {
+			up = l; down = r; left = d; right = u;
+		}
+	}
+	// analog controls (dial, paddle, steering, trackball, light gun, pedal): the left stick as counts per frame
+	// (up to +-8; the drivers fall back to the d-pad while it is centred)
+	int ax = pad->lx - 128, ay = pad->ly - 128;
+	ax = ax > ANALOG_DEAD ? (ax - ANALOG_DEAD) / 12 + 1 : ax < -ANALOG_DEAD ? (ax + ANALOG_DEAD) / 12 - 1 : 0;
+	ay = ay > ANALOG_DEAD ? (ay - ANALOG_DEAD) / 12 + 1 : ay < -ANALOG_DEAD ? (ay + ANALOG_DEAD) / 12 - 1 : 0;
+	rbx_set_analog(pl, 0, ax);
+	rbx_set_analog(pl, 1, ay);
+	rbx_core_set_input(s_dir_input[pl][0], up);
+	rbx_core_set_input(s_dir_input[pl][1], down);
+	rbx_core_set_input(s_dir_input[pl][2], left);
+	rbx_core_set_input(s_dir_input[pl][3], right);
+
+	// system combos are not passed to the game: SELECT+START options, SELECT+L quick save, SELECT+R quick load
+	uint32_t blocked = 0;
+	if ((raw & SCE_CTRL_SELECT) && (raw & SCE_CTRL_START))
+		blocked |= SCE_CTRL_SELECT | SCE_CTRL_START;
+	if ((raw & SCE_CTRL_SELECT) && (raw & SCE_CTRL_LTRIGGER))
+		blocked |= SCE_CTRL_SELECT | SCE_CTRL_LTRIGGER;
+	if ((raw & SCE_CTRL_SELECT) && (raw & SCE_CTRL_RTRIGGER))
+		blocked |= SCE_CTRL_SELECT | SCE_CTRL_RTRIGGER;
+	uint32_t game = b & ~blocked;
+
+	// combo keys: a key with a combo acts as its two keys pressed together (instead of its own mapping)
+	uint32_t add = 0;
+	for (int k = 0; k < RBX_KEY_COUNT; k++)
+		if (pr->combo[k] && (game & rbx_key_mask(k))) {
+			game &= ~rbx_key_mask(k);
+			for (int j = 0; j < RBX_KEY_COUNT; j++)
+				if (pr->combo[k] & (1 << j))
+					add |= rbx_key_mask(j);
+		}
+	game |= add;
+
+	// turbo: while the turbo key is held, the chosen game button is pressed only during the first half of each period.
+	// counting starts at the press frame, so the first press registers immediately
+	static int turbo_t[2];
+	int turbo_on = 0;
+	const uint32_t tm = rbx_key_mask(pr->turbo_key);
+	if (tm && (game & tm)) {
+		const int period = rbx_turbo_period(pl);
+		turbo_on = turbo_t[pl] < period / 2;
+		turbo_t[pl] = (turbo_t[pl] + 1) % period;
+	} else
+		turbo_t[pl] = 0;
+	const int turbo_act = rbx_turbo_act(pl);
+
+	const int medal = rbx_medal_game();
+	for (int a = 0; a < RBX_ACT_COUNT; a++) {
+		// if the turbo key is also mapped as a normal key, turbo wins (its normal mapping is ignored)
+		int on = ((game & ~tm) & rbx_act_bits(pr, a)) != 0 || stick_act[a];
+		if (a == turbo_act)
+			on |= turbo_on;
+		if (a == RBX_ACT_COIN && medal) {   // (medal cabinets: one medal a press; held, the opto sensor saw a jam
+			static int coin_t[2];            // and the game showed COIN ERROR)
+			coin_t[pl] = on ? coin_t[pl] + 1 : 0;
+			on = on && coin_t[pl] <= 6;
+		}
+		rbx_core_set_input(s_act_input[pl][a], on);
+	}
+}
+
+uint32_t rbx_input_poll(void)
+{
+	// the players' controllers from the settings (loaded, or changed in the menu)
+	static int src[2] = { -1, -1 };
+	for (int p = 0; p < 2; p++)
+		if (src[p] != g_settings.pad_src[p]) {
+			src[p] = g_settings.pad_src[p];
+			re_pad_set_source(p, src[p]);
+		}
+	re_pad_poll();
+	SceCtrlData p1, p2, all;
+	re_pad_read(0, &p1);
+	re_pad_read(1, &p2);
+	re_pad_read_all(&all);
+	const uint32_t test = rbx_testpad_step(); // (log builds: the test input script)
+	p1.buttons |= test;
+	all.buttons |= test;
+	uint32_t b = p1.buttons;
+	if (g_settings.touch_keys) // touch buttons press their Vita keys (in the game only: the value returned is the pads alone)
+		b |= rbx_touch_buttons();
+	map_player(0, &p1, p1.buttons, b);
+	map_player(1, &p2, p2.buttons, p2.buttons);
+	return all.buttons;
+}
+
+void rbx_input_release(void)
+{
+	for (int i = 0; i < RBX_IN_DIGITAL_COUNT; i++)
+		rbx_core_set_input(i, 0);
+	for (int p = 0; p < 2; p++) {
+		rbx_set_analog(p, 0, 0);
+		rbx_set_analog(p, 1, 0);
+	}
+}

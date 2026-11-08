@@ -1,0 +1,3438 @@
+{
+"name":"Konami",
+"order":3,
+"games":[
+{
+"rom":"88games",
+"title":"'88 Games",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"ajax",
+"title":"Ajax",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"ajaxj",
+"title":"Ajax (Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"akumajoun",
+"title":"Akuma-Jou Dracula (Japan version N)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"akumajou",
+"title":"Akuma-Jou Dracula (Japan version P)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"aliensa",
+"title":"Aliens (Asia)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"aliensj",
+"title":"Aliens (Japan set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"aliensj2",
+"title":"Aliens (Japan set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"aliensu",
+"title":"Aliens (US)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"aliens",
+"title":"Aliens (World set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"aliens2",
+"title":"Aliens (World set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"aliens3",
+"title":"Aliens (World set 3)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"aliens4",
+"title":"Aliens (World set 4)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"asterixaad",
+"title":"Asterix (ver AAD)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"asterixeaa",
+"title":"Asterix (ver EAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"asterixeac",
+"title":"Asterix (ver EAC)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"asterix",
+"title":"Asterix (ver EAD)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"asterixj",
+"title":"Asterix (ver JAD)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"battlntsj",
+"title":"Battlantis (Japan, version E)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"battlntsa",
+"title":"Battlantis (version F)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"battlnts",
+"title":"Battlantis (version G)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"blswhstla",
+"title":"Bells & Whistles (Asia, version M)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"blswhstl",
+"title":"Bells & Whistles (World, version L)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"bishi",
+"title":"Bishi Bashi Champ Mini Game Senshuken (ver JAA, 3 Players)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1996",
+"genre":"MultiGame"
+},
+{
+"rom":"blkpnthr",
+"title":"Black Panther",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"bladestle",
+"title":"Blades of Steel (version E, Trackball)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"bladestll",
+"title":"Blades of Steel (version L, Trackball)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"bladestl",
+"title":"Blades of Steel (version T, Joystick)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"blockhl",
+"title":"Block Hole",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"bootcamp",
+"title":"Boot Camp (set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"bootcampa",
+"title":"Boot Camp (set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"bottom9n",
+"title":"Bottom of the Ninth (version N)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"bottom9",
+"title":"Bottom of the Ninth (version T)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"buckyaa",
+"title":"Bucky O'Hare (ver AA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"buckyaab",
+"title":"Bucky O'Hare (ver AAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"buckyea",
+"title":"Bucky O'Hare (ver EA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"bucky",
+"title":"Bucky O'Hare (ver EAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"buckyjaa",
+"title":"Bucky O'Hare (ver JAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"buckyuab",
+"title":"Bucky O'Hare (ver UAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"buttobi",
+"title":"Buttobi Striker",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Medal Game"
+},
+{
+"rom":"chqflag",
+"title":"Chequered Flag",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Driving"
+},
+{
+"rom":"chqflagj",
+"title":"Chequered Flag (Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Driving"
+},
+{
+"rom":"circuscc",
+"title":"Circus Charlie (Centuri)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"circusce",
+"title":"Circus Charlie (Centuri, earlier)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"circusc",
+"title":"Circus Charlie (level select, set 1)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"circusc2",
+"title":"Circus Charlie (level select, set 2)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"circusc3",
+"title":"Circus Charlie (level select, set 3)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"circusc4",
+"title":"Circus Charlie (no level select)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"citybombj",
+"title":"City Bomber (Japan)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"citybomb",
+"title":"City Bomber (World)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"combatscj",
+"title":"Combat School (Japan trackball)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"combatsc",
+"title":"Combat School (joystick)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"combatsct",
+"title":"Combat School (trackball)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"contrab",
+"title":"Contra (bootleg)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"contrabj",
+"title":"Contra (Japan bootleg, set 1)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"contrabj1",
+"title":"Contra (Japan bootleg, set 2)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"contraj",
+"title":"Contra (Japan, set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"contraj1",
+"title":"Contra (Japan, set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"contra",
+"title":"Contra (US / Asia, set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"contra1",
+"title":"Contra (US / Asia, set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"contrae",
+"title":"Contra (US / Asia, set 3)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"crazycop",
+"title":"Crazy Cop (Japan)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"crzcross",
+"title":"Crazy Cross (ver EAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Puzzle"
+},
+{
+"rom":"crimfghtj",
+"title":"Crime Fighters (Japan 2 Players)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"crimfghtu",
+"title":"Crime Fighters (US 4 Players)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"crimfght",
+"title":"Crime Fighters (World 2 players)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"vendetta2pp",
+"title":"Crime Fighters 2 (Japan, 2 Players, ver. P)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"vendettan",
+"title":"Crime Fighters 2 (Japan, 4 Players, ver. N)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"crossmg2",
+"title":"Cross Magic Mark 2",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Medal Game"
+},
+{
+"rom":"cuebrickj",
+"title":"Cue Brick (Japan)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"cuebrick",
+"title":"Cue Brick (World, version D)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"dairesya",
+"title":"Dai Ressya Goutou (Japan, version K)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"daiskiss",
+"title":"Daisu-Kiss (ver JAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Multiplay"
+},
+{
+"rom":"ddboy",
+"title":"Dam Dam Boy (on dedicated PCB)",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"ddboya",
+"title":"Dam Dam Boy (on Tsukande Toru Chicchi PCB)",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"darkadv",
+"title":"Dark Adventure",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"detatwin",
+"title":"Detana!! Twin Bee (Japan, version J)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"devstors2",
+"title":"Devastators (ver. 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"devstorsv",
+"title":"Devastators (ver. V)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"devstorsx",
+"title":"Devastators (ver. X)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"devstors",
+"title":"Devastators (ver. Z)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"devilw",
+"title":"Devil World",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"dobouchn",
+"title":"Dobou-Chan (ver JAA)",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Medal Game"
+},
+{
+"rom":"ddribble",
+"title":"Double Dribble",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"ddribblep",
+"title":"Double Dribble (prototype?)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Sports"
+},
+{
+"rom":"dbza",
+"title":"Dragon Ball Z (rev A)",
+"board":"Standalone",
+"publisher":"Banpresto",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"dbz",
+"title":"Dragon Ball Z (rev B)",
+"board":"Standalone",
+"publisher":"Banpresto",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"dbz2",
+"title":"Dragon Ball Z 2 - Super Battle",
+"board":"Standalone",
+"publisher":"Banpresto",
+"year":"1994",
+"genre":"Fighter"
+},
+{
+"rom":"dragoona",
+"title":"Dragoon Might (ver AAB)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1995",
+"genre":"Fighter"
+},
+{
+"rom":"dragoonj",
+"title":"Dragoon Might (ver JAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1995",
+"genre":"Fighter"
+},
+{
+"rom":"esckids",
+"title":"Escape Kids (Asia, 4 Players)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Sports"
+},
+{
+"rom":"esckidsj",
+"title":"Escape Kids (Japan, 2 Players)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Sports"
+},
+{
+"rom":"fantjoura",
+"title":"Fantastic Journey (ver AAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"fantjour",
+"title":"Fantastic Journey (ver EAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"fastlane",
+"title":"Fast Lane",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Maze"
+},
+{
+"rom":"finalizr",
+"title":"Finalizer: Super Transformation (set 1)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"finalizra",
+"title":"Finalizer: Super Transformation (set 2)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"flkatck",
+"title":"Flak Attack (Japan, version P)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"flkatcka",
+"title":"Flak Attack (Japan, version P, PWB 450593 sub-board)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"fruitsmg",
+"title":"Fruits Magic - The Magic Party",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Medal Game"
+},
+{
+"rom":"fuusenpn",
+"title":"Fuusen Pentai",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Medal Game"
+},
+{
+"rom":"gijoeaa",
+"title":"G.I. Joe (Asia, AA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gijoea",
+"title":"G.I. Joe (Asia, AAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gijoej",
+"title":"G.I. Joe (Japan, JAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gijoeua",
+"title":"G.I. Joe (US, UAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gijoeu",
+"title":"G.I. Joe (US, UAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gijoe",
+"title":"G.I. Joe (World, EAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gijoeea",
+"title":"G.I. Joe (World, EB8, prototype?)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"gaiapols",
+"title":"Gaiapolis (ver EAF)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"gaiapolsj",
+"title":"Gaiapolis (ver JAF)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"gaiapolsu",
+"title":"Gaiapolis (ver UAF)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"gwarrior",
+"title":"Galactic Warriors",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"ggoemon",
+"title":"Ganbare Goemon",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1997",
+"genre":"Medal Game"
+},
+{
+"rom":"gbusters",
+"title":"Gang Busters (set 1)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"gbustersa",
+"title":"Gang Busters (set 2)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"garuka",
+"title":"Garuka (Japan ver. W)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"gokuparo",
+"title":"Gokujou Parodius: Kako no Eikou o Motomete (ver JAD)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"gradius",
+"title":"Gradius (Japan, ROM version)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"gradius2",
+"title":"Gradius II: GOFER no Yabou (Japan, new)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"gradius2a",
+"title":"Gradius II: GOFER no Yabou (Japan, old)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"gradius2b",
+"title":"Gradius II: GOFER no Yabou (Japan, older)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"gradius3a",
+"title":"Gradius III (Asia)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"gradius3",
+"title":"Gradius III (World, version R)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"gradius3j",
+"title":"Gradius III: Densetsu kara Shinwa e (Japan, version 3, newer)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"gradius3ja",
+"title":"Gradius III: Densetsu kara Shinwa e (Japan, version S)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"gradius3jas",
+"title":"Gradius III: Densetsu kara Shinwa e (Japan, version S, split)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Shooter"
+},
+{
+"rom":"gberet",
+"title":"Green Beret",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"gryzor",
+"title":"Gryzor (set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"gryzor1",
+"title":"Gryzor (set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Platform"
+},
+{
+"rom":"gyruss",
+"title":"Gyruss",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"gyrussb",
+"title":"Gyruss (bootleg?)",
+"board":"Classic",
+"publisher":"Bootleg?",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"gyrussce",
+"title":"Gyruss (Centuri)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"hpuncher",
+"title":"Hard Puncher (Japan)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"hcastlee",
+"title":"Haunted Castle (version E)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"hcastlek",
+"title":"Haunted Castle (version K)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"hcastle",
+"title":"Haunted Castle (version M)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"hotchase",
+"title":"Hot Chase (set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Driving"
+},
+{
+"rom":"hotchasea",
+"title":"Hot Chase (set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Driving"
+},
+{
+"rom":"hcrashc",
+"title":"Hyper Crash (version C)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Driving"
+},
+{
+"rom":"hcrash",
+"title":"Hyper Crash (version D)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Driving"
+},
+{
+"rom":"hyprolym",
+"title":"Hyper Olympic",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"hpolym84",
+"title":"Hyper Olympic '84",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"hyprolyma",
+"title":"Hyper Olympic (bugfixed)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"hyperspt",
+"title":"Hyper Sports",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"hypsptsp",
+"title":"Hyper Sports Special (Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"ironhorsh",
+"title":"Iron Horse (version H)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"ironhors",
+"title":"Iron Horse (version K)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"jackalbl",
+"title":"Jackal (bootleg, Rotary Joystick)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"jackal",
+"title":"Jackal (World, 8-way Joystick)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"jackalr",
+"title":"Jackal (World, Rotary Joystick)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"jailbrek",
+"title":"Jail Break",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"jailbrekb",
+"title":"Jail Break (bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"junofrst",
+"title":"Juno First",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"junofrstg",
+"title":"Juno First (Gottlieb)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"kattobas",
+"title":"Kattobase Power Pro Kun",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1998",
+"genre":"Medal Game"
+},
+{
+"rom":"kicker",
+"title":"Kicker",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"kittenk",
+"title":"Kitten Kaboodle",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Maze"
+},
+{
+"rom":"rockragej",
+"title":"Koi no Hotrock (Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Maze"
+},
+{
+"rom":"konami88",
+"title":"Konami '88",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"konamigt",
+"title":"Konami GT",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Driving"
+},
+{
+"rom":"rf2",
+"title":"Konami RF2: Red Fighter",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Driving"
+},
+{
+"rom":"kontest",
+"title":"Konami Test Board (GX800, Japan)",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1987?",
+"genre":"Utilities"
+},
+{
+"rom":"pingpong",
+"title":"Konami's Ping-Pong",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Sports"
+},
+{
+"rom":"koropens",
+"title":"Korokoro Pensuke",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1997",
+"genre":"Medal Game"
+},
+{
+"rom":"dadandrn",
+"title":"Kyukyoku Sentai Dadandarn (ver JAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"labyrunr",
+"title":"Labyrinth Runner (Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"labyrunrf",
+"title":"Labyrinth Runner (World Ver. F)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"labyrunrk",
+"title":"Labyrinth Runner (World Ver. K)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"le2",
+"title":"Lethal Enforcers II: Gun Fighters (ver EAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"le2u",
+"title":"Lethal Enforcers II: Gun Fighters (ver UAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"le2j",
+"title":"Lethal Enforcers II: The Western (ver JAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"lifefrcej",
+"title":"Lifeforce (Japan)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"lifefrce",
+"title":"Lifeforce (US)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"lgtnfghta",
+"title":"Lightning Fighters (Asia)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"lgtnfghtu",
+"title":"Lightning Fighters (US)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"lgtnfght",
+"title":"Lightning Fighters (World)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"mia2",
+"title":"M.I.A. - Missing in Action (version S)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"mia",
+"title":"M.I.A. - Missing in Action (version T)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"miaj",
+"title":"M.I.A.: Missing in Action (Japan, version R)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"mtwinbee",
+"title":"Magical Twin Bee (ver EAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"mstadium",
+"title":"Main Stadium (Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Sports"
+},
+{
+"rom":"majuu",
+"title":"Majuu no Ohkoku (Japan)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"manhatan",
+"title":"Manhattan 24 Bunsyo (Japan)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"mariorou",
+"title":"Mario Roulette",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Medal Game"
+},
+{
+"rom":"mtlchampa",
+"title":"Martial Champion (ver AAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mtlchamp1",
+"title":"Martial Champion (ver EAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mtlchamp",
+"title":"Martial Champion (ver EAB)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mtlchampj",
+"title":"Martial Champion (ver JAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mtlchampu1",
+"title":"Martial Champion (ver UAD)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mtlchampu",
+"title":"Martial Champion (ver UAE)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"megazonea",
+"title":"Mega Zone (unknown version 1)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"megazoneb",
+"title":"Mega Zone (unknown version 2)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"megazoneh",
+"title":"Mega Zone (version H)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"megazonei",
+"title":"Mega Zone (version I)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"megazonej",
+"title":"Mega Zone (version J)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"megazone",
+"title":"Mega Zone (version L)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"metamrpha",
+"title":"Metamorphic Force (ver AAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"metamrphe",
+"title":"Metamorphic Force (ver EAA - alternate)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"metamrph",
+"title":"Metamorphic Force (ver EAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"metamrphj",
+"title":"Metamorphic Force (ver JAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"metamrphu",
+"title":"Metamorphic Force (ver UAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mikie",
+"title":"Mikie",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Maze"
+},
+{
+"rom":"mikiehs",
+"title":"Mikie (High School Graffiti)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Maze"
+},
+{
+"rom":"mogura",
+"title":"Mogura Desse (Japan)",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Whac-A-Mole"
+},
+{
+"rom":"mmaulers",
+"title":"Monster Maulers (ver EAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mmaulersu",
+"title":"Monster Maulers (ver UAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mrgoemon",
+"title":"Mr. Goemon (Japan)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Platform"
+},
+{
+"rom":"mx5000r",
+"title":"MX5000 (version R)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"mx5000",
+"title":"MX5000 (version U)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"mystwarraa",
+"title":"Mystic Warriors (ver AAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mystwarra",
+"title":"Mystic Warriors (ver AAB)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mystwarr",
+"title":"Mystic Warriors (ver EAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mystwarrj",
+"title":"Mystic Warriors (ver JAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"mystwarru",
+"title":"Mystic Warriors (ver UAA)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"nemesis",
+"title":"Nemesis (ROM version)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"nemesisuk",
+"title":"Nemesis (World?, ROM version)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"nyanpani",
+"title":"Nyan Nyan Panic (Japan)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Puzzle"
+},
+{
+"rom":"orius",
+"title":"Orius (ver UAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"pandoras",
+"title":"Pandora's Palace",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Platform"
+},
+{
+"rom":"parodiusa",
+"title":"Parodius Da!: Shinwa kara Owarai e (Asia)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"parodiusj",
+"title":"Parodius Da!: Shinwa kara Owarai e (Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"parodius",
+"title":"Parodius Da!: Shinwa kara Owarai e (World, set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"parodiuse",
+"title":"Parodius Da!: Shinwa kara Owarai e (World, set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"pikkaric",
+"title":"Pikkari Chance",
+"board":"Medal",
+"publisher":"Konami",
+"year":"2000",
+"genre":"Medal Game"
+},
+{
+"rom":"kzaurus",
+"title":"Pittanko Zaurus",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1995",
+"genre":"Medal Game"
+},
+{
+"rom":"pootan",
+"title":"Pootan",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"pooyan",
+"title":"Pooyan",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"pooyans",
+"title":"Pooyan (Stern Electronics)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"psurge",
+"title":"Power Surge",
+"board":"Classic",
+"publisher":"Vision Electronics",
+"year":"1988",
+"genre":"Maze"
+},
+{
+"rom":"pwrchanc",
+"title":"Powerful Chance",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1999",
+"genre":"Medal Game"
+},
+{
+"rom":"prmrsocr",
+"title":"Premier Soccer (ver EAB)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"prmrsocrj",
+"title":"Premier Soccer (ver JAB)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"punkshot2a",
+"title":"Punk Shot (Asia 2 Players, hacked?)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"punkshotj",
+"title":"Punk Shot (Japan 2 Players)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"punkshot2",
+"title":"Punk Shot (US 2 Players)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"punkshot",
+"title":"Punk Shot (US 4 Players)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"punkshot2e",
+"title":"Punk Shot (World 2 Players)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Sports"
+},
+{
+"rom":"quarth",
+"title":"Quarth (Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Puzzle"
+},
+{
+"rom":"quickp5",
+"title":"Quick Pick 5",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Slot Machine"
+},
+{
+"rom":"qgakumon",
+"title":"Quiz Gakumon no Susume (Japan ver. JA1 Type H)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Quiz"
+},
+{
+"rom":"rackemup",
+"title":"Rack 'em Up (version L)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"ringohja",
+"title":"Ring no Ohja (Japan 2 Players ver. N)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"roadfh",
+"title":"Road Fighter (bootleg GX330 conversion)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"roadf",
+"title":"Road Fighter (set 1)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"roadf2",
+"title":"Road Fighter (set 2)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"roadfu",
+"title":"Road Fighter (set 3, unencrypted)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Driving"
+},
+{
+"rom":"rocnrope",
+"title":"Roc'n Rope",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"rocnropek",
+"title":"Roc'n Rope (Kosuka)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"rockragea",
+"title":"Rock'n Rage (prototype?)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Maze"
+},
+{
+"rom":"rockrage",
+"title":"Rock'n Rage (World)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Maze"
+},
+{
+"rom":"rollerga",
+"title":"Rollergames (Asia)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Sports"
+},
+{
+"rom":"rollergj",
+"title":"Rollergames (Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Sports"
+},
+{
+"rom":"rollerg",
+"title":"Rollergames (US)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Sports"
+},
+{
+"rom":"ropeman",
+"title":"Ropeman (bootleg of Roc'n Rope)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1983",
+"genre":"Platform"
+},
+{
+"rom":"runguna",
+"title":"Run and Gun (ver EAA 1993 10.4)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"rungun",
+"title":"Run and Gun (ver EAA 1993 10.8)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"rungunb",
+"title":"Run and Gun (ver EAA 1993 9.10, prototype?)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"rungunuba",
+"title":"Run and Gun (ver UBA 1993 10.8)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"rushatck",
+"title":"Rush'n Attack (US)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"spyu",
+"title":"S.P.Y.: Special Project Y. (US ver. M)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"spy",
+"title":"S.P.Y.: Special Project Y. (World ver. N)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"salamandt",
+"title":"Salamander (Tecfri license)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"salamand",
+"title":"Salamander (version D)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"salamandj",
+"title":"Salamander (version J)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"salmndr2a",
+"title":"Salamander 2 (ver AAB)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Shooter"
+},
+{
+"rom":"salmndr2",
+"title":"Salamander 2 (ver JAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Shooter"
+},
+{
+"rom":"scotrsht",
+"title":"Scooter Shooter",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"sexyparoa",
+"title":"Sexy Parodius (ver AAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Shooter"
+},
+{
+"rom":"sexyparo",
+"title":"Sexy Parodius (ver JAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Shooter"
+},
+{
+"rom":"shaolins",
+"title":"Shao-lin's Road (set 1)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"shaolinb",
+"title":"Shao-lin's Road (set 2)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Platform"
+},
+{
+"rom":"mikiek",
+"title":"Shin-ip Sawon - Seok Dol-i (Korea)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1984",
+"genre":"Maze"
+},
+{
+"rom":"mikiej",
+"title":"Shinnyuu Shain Tooru-kun (Japan)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Maze"
+},
+{
+"rom":"shuriboy",
+"title":"Shuriken Boy",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Medal Game"
+},
+{
+"rom":"slmdunkj",
+"title":"Slam Dunk (ver JAA 1993 10.8)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Sports"
+},
+{
+"rom":"slimekun",
+"title":"Slime Kun",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Medal Game"
+},
+{
+"rom":"spaceplt",
+"title":"Space Pilot (set 1)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"spaceplta",
+"title":"Space Pilot (set 2)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"spcpokan",
+"title":"Space Pokan",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1999",
+"genre":"Medal Game"
+},
+{
+"rom":"ssridersabd",
+"title":"Sunset Riders (2 Players ver ABD)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersebc",
+"title":"Sunset Riders (2 Players ver EBC)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersebd",
+"title":"Sunset Riders (2 Players ver EBD)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersjbd",
+"title":"Sunset Riders (2 Players ver JBD)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersubc",
+"title":"Sunset Riders (2 Players ver UBC)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersadd",
+"title":"Sunset Riders (4 Players ver ADD)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssriderseaa",
+"title":"Sunset Riders (4 Players ver EAA)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssriders",
+"title":"Sunset Riders (4 Players ver EAC)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersjac",
+"title":"Sunset Riders (4 Players ver JAC)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersjad",
+"title":"Sunset Riders (4 Players ver JAD)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersuab",
+"title":"Sunset Riders (4 Players ver UAB)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersuac",
+"title":"Sunset Riders (4 Players ver UAC)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"ssridersuda",
+"title":"Sunset Riders (4 Players ver UDA)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Platform"
+},
+{
+"rom":"sbaskete",
+"title":"Super Basketball (version E, encrypted)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"sbasketg",
+"title":"Super Basketball (version G, encrypted)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"sbasketh",
+"title":"Super Basketball (version H, unprotected)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"sbasketb",
+"title":"Super Basketball (version I, encrypted)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Sports"
+},
+{
+"rom":"sbishi",
+"title":"Super Bishi Bashi Champ (ver JAA, 2 Players)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1998",
+"genre":"Multiplay"
+},
+{
+"rom":"sbishika",
+"title":"Super Bishi Bashi Champ (ver KAA, 3 Players)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1998",
+"genre":"Multiplay"
+},
+{
+"rom":"sbishik",
+"title":"Super Bishi Bashi Champ (ver KAB, 3 Players)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1998",
+"genre":"Multiplay"
+},
+{
+"rom":"scontra",
+"title":"Super Contra (set 1)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"scontraa",
+"title":"Super Contra (set 2)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"scontraj",
+"title":"Super Contra: Alien no Gyakushuu (Japan)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Platform"
+},
+{
+"rom":"suratka",
+"title":"Surprise Attack (Asia ver. L)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"suratkj",
+"title":"Surprise Attack (Japan ver. M)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"suratk",
+"title":"Surprise Attack (World ver. K)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Platform"
+},
+{
+"rom":"puzldama",
+"title":"Taisen Puzzle-dama (ver JAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1994",
+"genre":"Puzzle"
+},
+{
+"rom":"tokkae",
+"title":"Taisen Tokkae-dama (ver JAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Puzzle"
+},
+{
+"rom":"tgtpanic",
+"title":"Target Panic",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1996",
+"genre":"Shooter"
+},
+{
+"rom":"tmht2pa",
+"title":"Teenage Mutant Hero Turtles (UK 2 Players, version ?)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmht2p",
+"title":"Teenage Mutant Hero Turtles (UK 2 Players, version U)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmhtb",
+"title":"Teenage Mutant Hero Turtles (UK 4 Players, version ?)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmht",
+"title":"Teenage Mutant Hero Turtles (UK 4 Players, version F)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmhta",
+"title":"Teenage Mutant Hero Turtles (UK 4 Players, version S)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmht22pe",
+"title":"Teenage Mutant Hero Turtles: Turtles in Time (2 Players ver EBA)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"tmht24pe",
+"title":"Teenage Mutant Hero Turtles: Turtles in Time (4 Players ver EAA)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"tmnta",
+"title":"Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmnt2pj",
+"title":"Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"tmntj",
+"title":"Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Fighter"
+},
+{
+"rom":"tmnt2po",
+"title":"Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmntuc",
+"title":"Teenage Mutant Ninja Turtles (US 4 Players, version H)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmntub",
+"title":"Teenage Mutant Ninja Turtles (US 4 Players, version J)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmntua",
+"title":"Teenage Mutant Ninja Turtles (US 4 Players, version N)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmntu",
+"title":"Teenage Mutant Ninja Turtles (US 4 Players, version R)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmnt",
+"title":"Teenage Mutant Ninja Turtles (World 4 Players, version X)",
+"board":"TMNT",
+"publisher":"Konami",
+"year":"1989",
+"genre":"Fighter"
+},
+{
+"rom":"tmnt22pu",
+"title":"Teenage Mutant Ninja Turtles: Turtles in Time (2 Players ver UDA)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"tmnt2a",
+"title":"Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver ADA)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"tmnt2o",
+"title":"Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver OAA)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"tmnt2",
+"title":"Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver UAA)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"tmnt24pu",
+"title":"Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver UEA)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"froundl",
+"title":"The Final Round (version L)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"fround",
+"title":"The Final Round (version M)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"thehustlj",
+"title":"The Hustler (Japan, version J)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"thehustl",
+"title":"The Hustler (Japan, version M)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Sports"
+},
+{
+"rom":"mainevt2p",
+"title":"The Main Event (2 Players ver. X)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"mainevto",
+"title":"The Main Event (4 Players ver. F)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"mainevt",
+"title":"The Main Event (4 Players ver. Y)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Sports"
+},
+{
+"rom":"simpsons2pa",
+"title":"The Simpsons (2 Players Asia)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"simpsons2pj",
+"title":"The Simpsons (2 Players Japan)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"simpsons2p",
+"title":"The Simpsons (2 Players World, set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"simpsons2p2",
+"title":"The Simpsons (2 Players World, set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"simpsons2p3",
+"title":"The Simpsons (2 Players World, set 3)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"simpsons4pa",
+"title":"The Simpsons (4 Players Asia)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"simpsons",
+"title":"The Simpsons (4 Players World, set 1)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"simpsons4pe",
+"title":"The Simpsons (4 Players World, set 2)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"simpsons4pe2",
+"title":"The Simpsons (4 Players World, set 3)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"thunderxj",
+"title":"Thunder Cross (Japan)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"thunderx",
+"title":"Thunder Cross (set 1)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"thunderxa",
+"title":"Thunder Cross (set 2)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"thunderxb",
+"title":"Thunder Cross (set 3)",
+"board":"Super Contra",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"thndrx2a",
+"title":"Thunder Cross II (Asia)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"thndrx2j",
+"title":"Thunder Cross II (Japan)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"thndrx2",
+"title":"Thunder Cross II (World)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"timeplt",
+"title":"Time Pilot",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"tp84",
+"title":"Time Pilot '84 (set 1)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"tp84a",
+"title":"Time Pilot '84 (set 2)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"tp84b",
+"title":"Time Pilot '84 (set 3)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1984",
+"genre":"Shooter"
+},
+{
+"rom":"timeplta",
+"title":"Time Pilot (Atari)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"timepltc",
+"title":"Time Pilot (Centuri)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1982",
+"genre":"Shooter"
+},
+{
+"rom":"tkmmpzdm",
+"title":"Tokimeki Memorial Taisen Puzzle-dama (ver JAB)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1995",
+"genre":"Puzzle"
+},
+{
+"rom":"jackalj",
+"title":"Tokushu Butai Jackal (Japan, 8-way Joystick)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"topgunbl",
+"title":"Top Gunner (bootleg, Rotary Joystick)",
+"board":"Standalone",
+"publisher":"Bootleg",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"topgunr",
+"title":"Top Gunner (US, 8-way Joystick)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Shooter"
+},
+{
+"rom":"trackfld",
+"title":"Track & Field",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"trackfldc",
+"title":"Track & Field (Centuri)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"trackfldu",
+"title":"Track & Field (Centuri, unencrypted)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1983",
+"genre":"Sports"
+},
+{
+"rom":"trackfldnz",
+"title":"Track & Field (NZ bootleg?)",
+"board":"Classic",
+"publisher":"Bootleg?",
+"year":"1982",
+"genre":"Sports"
+},
+{
+"rom":"tricktrp",
+"title":"Trick Trap (World?)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"trigon",
+"title":"Trigon (Japan)",
+"board":"TMNT 2",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Shooter"
+},
+{
+"rom":"tsukande",
+"title":"Tsukande Toru Chicchi",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1995",
+"genre":"Medal Game"
+},
+{
+"rom":"tsupenta",
+"title":"Tsurikko Penta",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Medal Game"
+},
+{
+"rom":"tsururin",
+"title":"Tsururin Kun",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1990",
+"genre":"Medal Game"
+},
+{
+"rom":"tutankhm",
+"title":"Tutankham",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"tutankhmb",
+"title":"Tutankham (bootleg)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"tutankhms",
+"title":"Tutankham (Stern Electronics)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1982",
+"genre":"Maze"
+},
+{
+"rom":"tbyahhoo",
+"title":"Twin Bee Yahhoo! (ver JAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"twinbee",
+"title":"TwinBee (ROM version)",
+"board":"Nemesis",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Shooter"
+},
+{
+"rom":"typhoon",
+"title":"Typhoon",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1987",
+"genre":"Shooter"
+},
+{
+"rom":"ultraman",
+"title":"Ultraman (Japan)",
+"board":"Standalone",
+"publisher":"Banpresto",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"unkkonmd",
+"title":"unknown Konami medal game (game code GS662)",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1997",
+"genre":"Medal Game"
+},
+{
+"rom":"vendetta2pd",
+"title":"Vendetta (Asia, 2 Players, ver. D)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"vendetta2pu",
+"title":"Vendetta (Asia, 2 Players, ver. U)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"vendettaz",
+"title":"Vendetta (Asia, 4 Players, ver. Z)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"vendettar",
+"title":"Vendetta (US, 4 Players, ver. R)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"vendetta2pun",
+"title":"Vendetta (World, 2 Players, ver. ?)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"vendetta2peba",
+"title":"Vendetta (World, 2 Players, ver. EB-A?)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"vendetta2pw",
+"title":"Vendetta (World, 2 Players, ver. W)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"vendettaun",
+"title":"Vendetta (World, 4 Players, ver. ?)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"vendetta",
+"title":"Vendetta (World, 4 Players, ver. T)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Fighter"
+},
+{
+"rom":"venus",
+"title":"Venus (bootleg of Gyruss)",
+"board":"Classic",
+"publisher":"Bootleg",
+"year":"1983",
+"genre":"Shooter"
+},
+{
+"rom":"viostormab",
+"title":"Violent Storm (ver AAB)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"viostorma",
+"title":"Violent Storm (ver AAC)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"viostormeb",
+"title":"Violent Storm (ver EAB)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"viostorm",
+"title":"Violent Storm (ver EAC)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"viostormj",
+"title":"Violent Storm (ver JAC)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"viostormub",
+"title":"Violent Storm (ver UAB)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"viostormubbl",
+"title":"Violent Storm (ver UAB, bootleg)",
+"board":"Mystic Warriors",
+"publisher":"Bootleg",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"viostormu",
+"title":"Violent Storm (ver UAC)",
+"board":"Mystic Warriors",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"vulcan",
+"title":"Vulcan Venture (new)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"vulcana",
+"title":"Vulcan Venture (old)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"vulcanb",
+"title":"Vulcan Venture (older)",
+"board":"Twin 16",
+"publisher":"Konami",
+"year":"1988",
+"genre":"Shooter"
+},
+{
+"rom":"waijockey",
+"title":"Wai Wai Jockey",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1993",
+"genre":"Medal Game"
+},
+{
+"rom":"weclemanc",
+"title":"WEC Le Mans 24 (v1.26)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Driving"
+},
+{
+"rom":"weclemana",
+"title":"WEC Le Mans 24 (v2.00)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Driving"
+},
+{
+"rom":"weclemanb",
+"title":"WEC Le Mans 24 (v2.00, hack)",
+"board":"Standalone",
+"publisher":"Hack",
+"year":"1988",
+"genre":"Driving"
+},
+{
+"rom":"wecleman",
+"title":"WEC Le Mans 24 (v2.01)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1986",
+"genre":"Driving"
+},
+{
+"rom":"moomesaaab",
+"title":"Wild West C.O.W.-Boys of Moo Mesa (ver AAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"moomesa",
+"title":"Wild West C.O.W.-Boys of Moo Mesa (ver EAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"moomesauab",
+"title":"Wild West C.O.W.-Boys of Moo Mesa (ver UAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"moomesauac",
+"title":"Wild West C.O.W.-Boys of Moo Mesa (ver UAC)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Platform"
+},
+{
+"rom":"winspikea",
+"title":"Winning Spike (ver AAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1997",
+"genre":"Sports"
+},
+{
+"rom":"winspike",
+"title":"Winning Spike (ver EAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1997",
+"genre":"Sports"
+},
+{
+"rom":"winspikej",
+"title":"Winning Spike (ver JAA)",
+"board":"GX",
+"publisher":"Konami",
+"year":"1997",
+"genre":"Sports"
+},
+{
+"rom":"xmen2pa",
+"title":"X-Men (2 Players ver AAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmen2pe",
+"title":"X-Men (2 Players ver EAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmen2pj",
+"title":"X-Men (2 Players ver JAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmen2pu",
+"title":"X-Men (2 Players ver UAB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmenaa",
+"title":"X-Men (4 Players ver ADA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmena",
+"title":"X-Men (4 Players ver AEA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmen",
+"title":"X-Men (4 Players ver EBA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmenj",
+"title":"X-Men (4 Players ver JBA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmenja",
+"title":"X-Men (4 Players ver JEA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmenu",
+"title":"X-Men (4 Players ver UBB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xmenua",
+"title":"X-Men (4 Players ver UEB)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"xexexa",
+"title":"Xexex (ver AAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"xexex",
+"title":"Xexex (ver EAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"xexexj",
+"title":"Xexex (ver JAA)",
+"board":"Standalone",
+"publisher":"Konami",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"yiear2",
+"title":"Yie Ar Kung-Fu (version G)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"yiear",
+"title":"Yie Ar Kung-Fu (version I)",
+"board":"Classic",
+"publisher":"Konami",
+"year":"1985",
+"genre":"Fighter"
+},
+{
+"rom":"ymcapsul",
+"title":"Yu-Gi-Oh Monster Capsule",
+"board":"Medal",
+"publisher":"Konami",
+"year":"1999",
+"genre":"Medal Game"
+}
+]
+}

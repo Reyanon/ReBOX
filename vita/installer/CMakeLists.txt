@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.16)
+# ReBOX first-install helper (eboot run once in a borrowed app slot, see vita/tools/vita.py install)
+project(rbx_inst C)
+include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
+add_executable(rbx_inst main.c)
+target_link_libraries(rbx_inst ScePromoterUtil_stub SceSysmodule_stub)
+vita_create_self(rbx_inst.bin rbx_inst UNSAFE)

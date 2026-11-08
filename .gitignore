@@ -1,0 +1,10 @@
+.cache/
+build*/
+roms/
+out/
+artifacts/
+*.zip
+*.nv
+__pycache__/
+*.psd
+docs/publish/.work/

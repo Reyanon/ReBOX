@@ -1,0 +1,542 @@
+{
+"name":"Seta",
+"order":4,
+"games":[
+{
+"rom":"atehate",
+"title":"Athena no Hatena?",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1993",
+"genre":"Quiz"
+},
+{
+"rom":"blandia",
+"title":"Blandia",
+"board":"Seta Hardware",
+"publisher":"Allumer",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"blandiap",
+"title":"Blandia (prototype)",
+"board":"Seta Hardware",
+"publisher":"Allumer",
+"year":"1992",
+"genre":"Fighter"
+},
+{
+"rom":"blockcar",
+"title":"Block Carnival / Thunder & Lightning 2",
+"board":"Seta Hardware",
+"publisher":"Visco",
+"year":"1992",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"blockcarb",
+"title":"Block Carnival / Thunder & Lightning 2 (bootleg)",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1992",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"crazyfgt",
+"title":"Crazy Fight",
+"board":"Seta Hardware",
+"publisher":"Subsino",
+"year":"1996",
+"genre":"Platform"
+},
+{
+"rom":"daioh",
+"title":"Daioh",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"daiohc",
+"title":"Daioh (93111A PCB conversion)",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"daioha",
+"title":"Daioh (earlier)",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"daiohp",
+"title":"Daioh (prototype)",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"daiohp2",
+"title":"Daioh (prototype, earlier)",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"daiohp3",
+"title":"Daioh (prototype, earliest)",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"drgnunit",
+"title":"Dragon Unit / Castle of Dragon",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1989",
+"genre":"Platform"
+},
+{
+"rom":"eightfrc",
+"title":"Eight Forces",
+"board":"Seta Hardware",
+"publisher":"Tecmo",
+"year":"1994",
+"genre":"Shooter"
+},
+{
+"rom":"extdwnhl",
+"title":"Extreme Downhill (v1.5)",
+"board":"Seta Hardware",
+"publisher":"Sammy Industries Japan",
+"year":"1995",
+"genre":"Sports"
+},
+{
+"rom":"gderby",
+"title":"Gran Derby (Spanish hack of Jockey Club)",
+"board":"Seta Hardware",
+"publisher":"Hack",
+"year":"1990",
+"genre":"Gambling"
+},
+{
+"rom":"gundhara",
+"title":"Gundhara",
+"board":"Seta Hardware",
+"publisher":"Banpresto",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"gundharac",
+"title":"Gundhara (Chinese, bootleg?)",
+"board":"Seta Hardware",
+"publisher":"Banpresto",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"inttoote",
+"title":"International Toote (Germany, P523.V01)",
+"board":"Seta Hardware",
+"publisher":"Hack",
+"year":"1998",
+"genre":"Gambling"
+},
+{
+"rom":"inttoote2",
+"title":"International Toote II (v1.24, P387.V01)",
+"board":"Seta Hardware",
+"publisher":"Hack",
+"year":"1993",
+"genre":"Gambling"
+},
+{
+"rom":"jjsquawk",
+"title":"J. J. Squawkers",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1993",
+"genre":"Platform"
+},
+{
+"rom":"jjsquawkb",
+"title":"J. J. Squawkers (bootleg)",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1999",
+"genre":"Platform"
+},
+{
+"rom":"jjsquawkb2",
+"title":"J. J. Squawkers (bootleg, Blandia Conversion)",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1999",
+"genre":"Platform"
+},
+{
+"rom":"jjsquawko",
+"title":"J. J. Squawkers (older)",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1993",
+"genre":"Platform"
+},
+{
+"rom":"jockeyc",
+"title":"Jockey Club (v1.18)",
+"board":"Seta Hardware",
+"publisher":"Seta",
+"year":"1990",
+"genre":"Gambling"
+},
+{
+"rom":"keroppij",
+"title":"Kero Kero Keroppi no Isshoni Asobou (Japan)",
+"board":"Seta Hardware",
+"publisher":"Sammy Industries",
+"year":"1993",
+"genre":"Platform"
+},
+{
+"rom":"keroppi",
+"title":"Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)",
+"board":"Seta Hardware",
+"publisher":"American Sammy",
+"year":"1995",
+"genre":"Platform"
+},
+{
+"rom":"krzybowl",
+"title":"Krazy Bowl",
+"board":"Seta Hardware",
+"publisher":"American Sammy",
+"year":"1994",
+"genre":"Sports"
+},
+{
+"rom":"madshark",
+"title":"Mad Shark",
+"board":"Seta Hardware",
+"publisher":"Allumer",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"madsharkbl",
+"title":"Mad Shark (bootleg)",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"magspeed",
+"title":"Magical Speed",
+"board":"Seta Hardware",
+"publisher":"Allumer",
+"year":"1994",
+"genre":"Tabletop"
+},
+{
+"rom":"kamenrid",
+"title":"Masked Riders Club Battle Race / Kamen Rider Club Battle Racer",
+"board":"Seta Hardware",
+"publisher":"Banpresto",
+"year":"1993",
+"genre":"Driving"
+},
+{
+"rom":"msgundam",
+"title":"Mobile Suit Gundam",
+"board":"Seta Hardware",
+"publisher":"Banpresto",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"msgundamb",
+"title":"Mobile Suit Gundam (bootleg)",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"msgundam1",
+"title":"Mobile Suit Gundam (Japan)",
+"board":"Seta Hardware",
+"publisher":"Banpresto",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"oisipuzl",
+"title":"Oishii Puzzle Ha Irimasenka",
+"board":"Seta Hardware",
+"publisher":"Sunsoft",
+"year":"1993",
+"genre":"Puzzle"
+},
+{
+"rom":"orbs",
+"title":"Orbs (10/7/94 prototype?)",
+"board":"Seta Hardware",
+"publisher":"American Sammy",
+"year":"1994",
+"genre":"Puzzle"
+},
+{
+"rom":"pairlove",
+"title":"Pairs Love",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1991",
+"genre":"Puzzle"
+},
+{
+"rom":"qzkklogy",
+"title":"Quiz Kokology",
+"board":"Seta Hardware",
+"publisher":"Tecmo",
+"year":"1992",
+"genre":"Quiz"
+},
+{
+"rom":"qzkklgy2",
+"title":"Quiz Kokology 2",
+"board":"Seta Hardware",
+"publisher":"Tecmo",
+"year":"1993",
+"genre":"Quiz"
+},
+{
+"rom":"rezon",
+"title":"Rezon",
+"board":"Seta Hardware",
+"publisher":"Allumer",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"rezono",
+"title":"Rezon (earlier)",
+"board":"Seta Hardware",
+"publisher":"Allumer",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"neobattl",
+"title":"SD Gundam Neo Battling (Japan)",
+"board":"Seta Hardware",
+"publisher":"Banpresto",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"simpsonjr",
+"title":"Simpson Junior (bootleg of J. J. Squawkers)",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"2003",
+"genre":"Platform"
+},
+{
+"rom":"sokonuke",
+"title":"Sokonuke Taisen Game (Japan)",
+"board":"Seta Hardware",
+"publisher":"Sammy Industries",
+"year":"1995",
+"genre":"Platform"
+},
+{
+"rom":"spkings",
+"title":"Sport of Kings (France, P436.08)",
+"board":"Seta Hardware",
+"publisher":"Hack",
+"year":"1994",
+"genre":"Gambling"
+},
+{
+"rom":"stg",
+"title":"Strike Gunner S.T.G",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1991",
+"genre":"Shooter"
+},
+{
+"rom":"triplfunk",
+"title":"Sum-eoitneun Deongdalireul Chat-ara!",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1993",
+"genre":"Puzzle"
+},
+{
+"rom":"superbar",
+"title":"Super Bar",
+"board":"Seta Hardware",
+"publisher":"Promat",
+"year":"1994",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"setaroula",
+"title":"Super Ruleta 36 (Spanish hack of The Roulette)",
+"board":"Seta Hardware",
+"publisher":"Hack",
+"year":"1989?",
+"genre":"Gambling"
+},
+{
+"rom":"setaroul",
+"title":"The Roulette (Visco)",
+"board":"Seta Hardware",
+"publisher":"Visco",
+"year":"1989?",
+"genre":"Gambling"
+},
+{
+"rom":"setaroulm",
+"title":"The Roulette (Visco, medal)",
+"board":"Seta Hardware",
+"publisher":"Visco",
+"year":"1989?",
+"genre":"Gambling"
+},
+{
+"rom":"thunderlbl",
+"title":"Thunder & Lightning (bootleg with Tetris sound, set 1)",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1991",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"thunderlbl2",
+"title":"Thunder & Lightning (bootleg with Tetris sound, set 2)",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1990",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"thunderl",
+"title":"Thunder & Lightning (set 1)",
+"board":"Seta Hardware",
+"publisher":"Seta",
+"year":"1990",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"thunderla",
+"title":"Thunder & Lightning (set 2)",
+"board":"Seta Hardware",
+"publisher":"Seta",
+"year":"1990",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"triplfun",
+"title":"Triple Fun",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1993",
+"genre":"Puzzle"
+},
+{
+"rom":"utoukond",
+"title":"Ultra Toukon Densetsu (Japan)",
+"board":"Seta Hardware",
+"publisher":"Banpresto",
+"year":"1993",
+"genre":"Fighter"
+},
+{
+"rom":"umanclub",
+"title":"Ultraman Club - Tatakae! Ultraman Kyoudai!!",
+"board":"Seta Hardware",
+"publisher":"Banpresto",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"wrofaero",
+"title":"War of Aero - Project MEIOU",
+"board":"Seta Hardware",
+"publisher":"Yang Cheng",
+"year":"1993",
+"genre":"Shooter"
+},
+{
+"rom":"wiggie",
+"title":"Wiggie Waggie",
+"board":"Seta Hardware",
+"publisher":"Promat",
+"year":"1994",
+"genre":"Ball & Paddle"
+},
+{
+"rom":"wits",
+"title":"Wit's (Japan)",
+"board":"Seta Hardware",
+"publisher":"Athena",
+"year":"1989",
+"genre":"Maze"
+},
+{
+"rom":"zingzipbl",
+"title":"Zing Zing Zip (bootleg)",
+"board":"Seta Hardware",
+"publisher":"Bootleg",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"zingzip",
+"title":"Zing Zing Zip (World) / Zhen Zhen Ji Pao (China?)",
+"board":"Seta Hardware",
+"publisher":"Allumer",
+"year":"1992",
+"genre":"Shooter"
+},
+{
+"rom":"zombraidpj",
+"title":"Zombie Raid (9/28/95, Japan, prototype PCB)",
+"board":"Seta Hardware",
+"publisher":"Sammy Industries",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"zombraid",
+"title":"Zombie Raid (9/28/95, US)",
+"board":"Seta Hardware",
+"publisher":"American Sammy",
+"year":"1995",
+"genre":"Shooter"
+},
+{
+"rom":"zombraidp",
+"title":"Zombie Raid (9/28/95, US, prototype PCB)",
+"board":"Seta Hardware",
+"publisher":"American Sammy",
+"year":"1995",
+"genre":"Shooter"
+}
+]
+}
