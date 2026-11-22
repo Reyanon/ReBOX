@@ -882,6 +882,8 @@ void ten_exit(void)
 	free(s.rom);
 	es5510_exit(&s.esp);
 	s.rom = NULL;
+	m68k_bus_select(NULL);   // (the instance's own bus again: the next user (Konami GX sound) maps m68k_bus)
+	rbx_m68k_int_hook = NULL;
 }
 
 void ten_reset(int hard)

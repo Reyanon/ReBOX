@@ -93,63 +93,86 @@ static void mem_free(void *arg, void *p)
 	}
 	free(p);
 }
-// memory the GPU reads
-static void *gpu_alloc(uint32_t size)
+// memory the GPU reads: CDRAM, else physically contiguous main memory (user 11-23: with the list's layers in CDRAM
+// the decoder's frames did not fit, no frame came; the contiguous memory was unused). *uid: its block
+static void *gpu_alloc(uint32_t size, SceUID *uid_out)
 {
-	size = (size + 0x3ffff) & ~0x3ffffu;
-	const SceUID uid = sceKernelAllocMemBlock("rbx_avsnap", SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW, size, NULL);
+	*uid_out = -1;
+	SceUID uid = sceKernelAllocMemBlock("rbx_avsnap", SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW, (size + 0x3ffff) & ~0x3ffffu, NULL);
+	uint32_t got = (size + 0x3ffff) & ~0x3ffffu;
+	if (uid < 0) {
+		got = (size + 0xfffff) & ~0xfffffu;
+		uid = sceKernelAllocMemBlock("rbx_avsnap_pc", SCE_KERNEL_MEMBLOCK_TYPE_USER_MAIN_PHYCONT_NC_RW, got, NULL);
+	}
 	void *p = NULL;
-	if (uid < 0 || sceKernelGetMemBlockBase(uid, &p) < 0)
+	if (uid < 0)
 		return NULL;
-	if (sceGxmMapMemory(p, size, SCE_GXM_MEMORY_ATTRIB_READ) < 0) {
+	if (sceKernelGetMemBlockBase(uid, &p) < 0 || sceGxmMapMemory(p, got, SCE_GXM_MEMORY_ATTRIB_READ) < 0) {
 		sceKernelFreeMemBlock(uid);
 		return NULL;
 	}
+	*uid_out = uid;
 	return p;
 }
 // the player's frame blocks, kept so that those it does not give back are freed after its close: a video the
 // decoder cannot play (no frame ever) left its blocks, and after a few the next videos found no memory (user 11-15)
 #define FRAME_BLOCKS 32
 static void *s_fb[FRAME_BLOCKS];
+static SceUID s_fb_uid[FRAME_BLOCKS];   // (each block freed by its own handle: looked up by its address, the blocks
+                                         // left by a player that gave no frame stayed taken, 5 MB of CDRAM each, user 11-23)
 static SceKernelLwMutexWork s_fb_lock;
 static int s_fb_lock_ok;
 static void fb_lock(void) { if (s_fb_lock_ok) sceKernelLockLwMutex(&s_fb_lock, 1, NULL); }
 static void fb_unlock(void) { if (s_fb_lock_ok) sceKernelUnlockLwMutex(&s_fb_lock, 1); }
-static void gpu_free(void *p)
+static void gpu_free(void *p, SceUID uid)
 {
-	const SceUID uid = sceKernelFindMemBlockByAddr(p, 0);
-	if (uid >= 0) {
-		sceGxmUnmapMemory(p);
-		sceKernelFreeMemBlock(uid);
+	if (uid < 0)
+		uid = sceKernelFindMemBlockByAddr(p, 0);
+	if (uid < 0) {
+		RBX_LOG("avsnap: frame block %p not found", p);
+		return;
 	}
+	sceGxmUnmapMemory(p);
+	const int rc = sceKernelFreeMemBlock(uid);
+	if (rc < 0)
+		RBX_LOG("avsnap: frame block %p free %08x", p, (unsigned)rc);
 }
 static void *frame_alloc(void *arg, uint32_t alignment, uint32_t size)
 {
 	(void)arg;
 	(void)alignment;
-	void *p = gpu_alloc(size);
+	SceUID uid;
+	void *p = gpu_alloc(size, &uid);
 	if (!p) {
 		RBX_LOG("avsnap: frame memory %u failed", (unsigned)size);
 		return NULL;
 	}
 	fb_lock();
+	int kept = 0;
 	for (int i = 0; i < FRAME_BLOCKS; i++)
 		if (!s_fb[i]) {
 			s_fb[i] = p;
+			s_fb_uid[i] = uid;
+			kept = 1;
 			break;
 		}
 	fb_unlock();
+	if (!kept)
+		RBX_LOG("avsnap: more than %d frame blocks", FRAME_BLOCKS);
 	return p;
 }
 static void frame_free(void *arg, void *p)
 {
 	(void)arg;
+	SceUID uid = -1;
 	fb_lock();
 	for (int i = 0; i < FRAME_BLOCKS; i++)
-		if (s_fb[i] == p)
+		if (s_fb[i] == p) {
+			uid = s_fb_uid[i];
 			s_fb[i] = NULL;
+		}
 	fb_unlock();
-	gpu_free(p);
+	gpu_free(p, uid);
 }
 
 static void mem_note(const char *what);
@@ -231,7 +254,7 @@ static void close_all(void)
 		int left = 0;
 		for (int i = 0; i < FRAME_BLOCKS; i++)
 			if (s_fb[i]) {
-				gpu_free(s_fb[i]);
+				gpu_free(s_fb[i], s_fb_uid[i]);
 				s_fb[i] = NULL;
 				left++;
 			}
@@ -404,8 +427,10 @@ vita2d_texture *rbx_snap_frame(void)
 			}
 			if (size <= FRAME_BLOCK) {
 				const int next = !s_cur;
-				if (!s_buf[next])
-					s_buf[next] = gpu_alloc(FRAME_BLOCK);
+				if (!s_buf[next]) {
+					SceUID uid;   // (kept for the run)
+					s_buf[next] = gpu_alloc(FRAME_BLOCK, &uid);
+				}
 				if (s_buf[next]) {
 					memcpy(s_buf[next], f.pData, size);
 					sceGxmTextureInitLinear(&s_tex.gxm_tex, s_buf[next], SCE_GXM_TEXTURE_FORMAT_YVU420P2_CSC1, w, h, 0);

@@ -430,6 +430,7 @@ static int run_game(const rbx_game_found *game)
 	int sw = RBX_SCREEN_W, sh = RBX_SCREEN_H, sflags = 0;
 	rbx_core_screen(&sw, &sh, &sflags);
 	RBX_LOG("core: board %s, screen %dx%d flags %d", rbx_game_board(rbx_running_game()), sw, sh, sflags);
+	RBX_LOG("core: fresh copy %u of %u bytes", (unsigned)rbx_fresh_size(), (unsigned)rbx_fresh_range());
 	rbx_present_set_board(rbx_game_board(rbx_running_game()));   // (the frame buffer's Auto: on for the CV1000)
 	rbx_video_set_screen(sw, sh, sflags);
 	rbx_fps_reset_frames();

@@ -37,6 +37,9 @@ set(RBX_ARM_MHZ 444 CACHE STRING "ARM clock requested at startup")
 
 include(${RBX_ROOT}/src/core/core.cmake)
 target_link_libraries(rbx_core PUBLIC z)
+# every game from a fresh core (core.c fresh_core): the link gathers the core's static data by its library, which
+# link-time optimization would hide (its objects are made at the link), so the core is compiled without it
+target_compile_options(rbx_core PRIVATE -fno-lto)
 
 add_executable(${PROJECT_NAME}
   src/frontend/main.c
@@ -130,6 +133,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/kmod)
 # room after the code segment for the SCE module data vita-elf-create appends (the data segment starts at the next
 # 64 KB; when the code ended within ~3.6 KB of it, vita-elf-create failed: "segment 1 overlaps")
 target_link_options(${PROJECT_NAME} PRIVATE "-Wl,--defsym,__sce_headroom=0x2000")
+target_link_options(${PROJECT_NAME} PRIVATE "-Wl,-T,${RBX_ROOT}/tools/rbx_state.ld")
+target_link_options(${PROJECT_NAME} PRIVATE "-Wl,-T,${RBX_ROOT}/tools/vita_room.ld")
 
 target_link_libraries(${PROJECT_NAME}
   "${RBX_KSTUB}"

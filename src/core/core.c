@@ -1852,8 +1852,85 @@ static void release(void)
 	memset(&rbx_audio, 0, sizeof(rbx_audio));
 }
 
+// ---- every game from a fresh core (user 11-23: "always as if just started") ----
+// The link (tools/rbx_state.ld) gathers the core library's writable static data (.data, .bss) into two ranges. The
+// first rbx_init copies them; every later rbx_init puts that copy back first, so no static state of the last game (a
+// driver's, a chip's, a CPU core's) is left for the next: what a driver's init or exit forgets cannot leak into the
+// next game. (Heap memory a driver did not free stays lost; the frontend logs the heap after each game.)
+// Without the link script the symbols are missing (weak: NULL) and nothing is copied.
+extern char __rbx_data_start[] __attribute__((weak)), __rbx_data_end[] __attribute__((weak));
+extern char __rbx_bss_start[] __attribute__((weak)), __rbx_bss_end[] __attribute__((weak));
+// The copy: .data whole, then of .bss (mostly zero) only its chunks that are not zero, each as {offset, bytes}
+#define FRESH_CHUNK 1024
+static unsigned char *s_fresh;   // (itself in the copied range: the copy holds this same pointer)
+static size_t s_fresh_size;
+
+static int chunk_zero(const unsigned char *p, size_t n)
+{
+	for (size_t i = 0; i < n; i++)
+		if (p[i])
+			return 0;
+	return 1;
+}
+
+static void fresh_core(void)
+{
+	if (!__rbx_data_start || !__rbx_bss_start)
+		return;
+	const size_t nd = (size_t)(__rbx_data_end - __rbx_data_start), nb = (size_t)(__rbx_bss_end - __rbx_bss_start);
+	if (!s_fresh) {   // (the first game: the state the app started with)
+		size_t nz = 0;
+		for (size_t o = 0; o < nb; o += FRESH_CHUNK)
+			nz += !chunk_zero((const unsigned char *)__rbx_bss_start + o, nb - o < FRESH_CHUNK ? nb - o : FRESH_CHUNK);
+		const size_t size = nd + nz * (sizeof(uint32_t) + FRESH_CHUNK) + sizeof(uint32_t);
+		unsigned char *b = (unsigned char *)malloc(size);
+		if (!b)
+			return;
+		memcpy(b, __rbx_data_start, nd);
+		unsigned char *w = b + nd;
+		for (size_t o = 0; o < nb; o += FRESH_CHUNK) {
+			const size_t n = nb - o < FRESH_CHUNK ? nb - o : FRESH_CHUNK;
+			if (chunk_zero((const unsigned char *)__rbx_bss_start + o, n))
+				continue;
+			const uint32_t off = (uint32_t)o;
+			memcpy(w, &off, sizeof(off));
+			memcpy(w + sizeof(off), __rbx_bss_start + o, n);
+			w += sizeof(off) + FRESH_CHUNK;
+		}
+		const uint32_t end = 0xffffffffu;
+		memcpy(w, &end, sizeof(end));
+		s_fresh = b;   // (after the copy: set before, their chunk was counted zero and then copied)
+		s_fresh_size = size;
+		return;
+	}
+	unsigned char *const b = s_fresh;
+	const size_t size = s_fresh_size;
+	memcpy(__rbx_data_start, b, nd);
+	memset(__rbx_bss_start, 0, nb);
+	for (const unsigned char *r = b + nd;; r += sizeof(uint32_t) + FRESH_CHUNK) {
+		uint32_t off;
+		memcpy(&off, r, sizeof(off));
+		if (off == 0xffffffffu)
+			break;
+		memcpy(__rbx_bss_start + off, r + sizeof(off), nb - off < FRESH_CHUNK ? nb - off : FRESH_CHUNK);
+	}
+	// (the compiler takes the copies for writes to other objects than s_fresh: without this it kept s_fresh in a
+	// register and dropped the stores below, s_fresh was 0 after the second game)
+	__asm__ __volatile__("" ::: "memory");
+	s_fresh = b;   // (themselves in the ranges: their values at the copy were not yet set)
+	s_fresh_size = size;
+}
+
+// the copy's bytes, the ranges' bytes
+size_t rbx_fresh_size(void) { return s_fresh_size; }
+size_t rbx_fresh_range(void)
+{
+	return __rbx_data_start && __rbx_bss_start ? (size_t)(__rbx_data_end - __rbx_data_start) + (size_t)(__rbx_bss_end - __rbx_bss_start) : 0;
+}
+
 int rbx_init(const rbx_config *cfg)
 {
+	fresh_core();
 	s_cfg = *cfg;
 	for (unsigned i = RBX_PA_CPU; i < RBX_PROF_IDS; i++)   // (the last game's CPU and driver names gone)
 		s_prof_names[i] = NULL;
@@ -1891,6 +1968,12 @@ int rbx_init(const rbx_config *cfg)
 	update_ports();
 	const uint64_t tl1 = rbx_clock_us();
 	s_rt_depth = 1;
+	if (!drv->init) {   // (a board without its init (scumimon, bkungfu): an error, not a crash)
+		rbx_fail("%s: board not emulated", g->set);
+		release();
+		s_game = NULL;
+		return -1;
+	}
 	const int drv_rc = drv->init(g);
 	rbx_log("load: roms %u ms, driver init %u ms", (unsigned)((tl1 - tl0) / 1000), (unsigned)((rbx_clock_us() - tl1) / 1000));
 	if (drv_rc) {

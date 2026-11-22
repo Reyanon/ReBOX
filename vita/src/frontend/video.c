@@ -557,7 +557,18 @@ uint32_t rbx_video_color(int r, int g, int b)
 // --- overlay layers ---
 ReiTex *rbx_video_tex(int w, int h)
 {
-	vita2d_texture *t = vita2d_create_empty_texture(w, h);
+	// (user 11-23, snap videos gave no frame: CDRAM is given out in 256 KB blocks, so each small layer (the list's
+	// rows, bars, the 8-pixel edges) took 256 KB of it, about 15 MB in the list, and the video decoder found too little.
+	// The small ones in uncached main memory, as CPU-written CDRAM is uncached too)
+	vita2d_texture *t = NULL;
+	if ((size_t)((w + 7) & ~7) * h * 4 < 192 * 1024) {
+		const SceKernelMemBlockType prev = vita2d_texture_get_alloc_memblock_type();
+		vita2d_texture_set_alloc_memblock_type(SCE_KERNEL_MEMBLOCK_TYPE_USER_RW_UNCACHE);
+		t = vita2d_create_empty_texture(w, h);
+		vita2d_texture_set_alloc_memblock_type(prev);
+	}
+	if (!t)
+		t = vita2d_create_empty_texture(w, h);
 	if (!t)
 		return NULL;
 	vita2d_texture_set_filters(t, SCE_GXM_TEXTURE_FILTER_POINT, SCE_GXM_TEXTURE_FILTER_POINT);

@@ -4,6 +4,7 @@
 #ifndef RBX_CORE_H
 #define RBX_CORE_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include "rbx_prof.h"   // (the sampled activity, ADR-155: rbx_prof_cur, rbx_prof_get_name for the sampler)
 
@@ -60,7 +61,10 @@ typedef struct {
 	void (*jit_write_end)(void *code, unsigned size);
 } rbx_config;
 
-int rbx_init(const rbx_config *cfg);   // 0 = ok, else see rbx_error()
+int rbx_init(const rbx_config *cfg);   // 0 = ok, else see rbx_error(). Every call after the first starts from the
+                                       // core's static state of the first (tools/rbx_state.ld): a fresh core per game
+size_t rbx_fresh_size(void);           // bytes kept of that state (0 = none: the link has no rbx_state.ld)
+size_t rbx_fresh_range(void);          // bytes of the core's static data
 void rbx_exit(void);
 const char *rbx_error(void);
 int rbx_running_game(void);            // index of the running game (-1 = none)

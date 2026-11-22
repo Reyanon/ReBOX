@@ -209,6 +209,8 @@ int gxs_init(uint8_t *rom, uint32_t rom_size, const uint8_t *pcm, uint32_t pcm_s
 	}
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
+	m68k_bus_select(NULL);   // (this instance's m68k_bus: Taito EN selected a bus of its own; after F3 the reads went to
+	                         // its handlers, sexyparo's RAM check BAD / a crash)
 	m68k_bus_reset_map();
 	m68k_bus_map(0x000000, 0x03ffff, rom, rom_size < 0x40000 ? rom_size : 0x40000, 1, 0);
 	m68k_bus_map(0x100000, 0x10ffff, s.ram, sizeof(s.ram), 1, 1);
