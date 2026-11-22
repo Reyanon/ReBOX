@@ -1,0 +1,10 @@
+{
+ "code": "deu",
+ "name": "Deutsch",
+ "english": "German",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9 (zwischen 4:3 und Vollbild), Vollbild oder die größte ganzzahlige Skalierung",
+  "14:9": "14:9",
+  "Integer": "Ganzzahlig"
+ }
+}

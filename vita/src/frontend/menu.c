@@ -534,13 +534,19 @@ enum { S_SLOT, S_SAVE, S_LOAD, S_BACK, S_COUNT };
 #define D_NEON_N 7   // (user 11-22: the list's corridor knobs, in the list's options for now; the games' stay fixed)
 enum { D_FPS, D_FRAMEBUF, D_ASPECT, D_ROTATE, D_FILTER, D_SCAN, D_SCAN_STR, D_BORDER, D_BORDER_COL, D_THEME, D_NEON,
 	D_NEONGAP = D_NEON + D_NEON_N, D_BACK, D_COUNT };   // (D_NEONGAP: the list corridor's walls apart, user 11-22)
-// the rows shown: Border color only with a border that shows it (Color, Marquee)
+// the rows shown: Border color only with a border that shows it (Color, Marquee); the list's neon only in builds with
+// the logger (user 11-23: fixed, debug only)
+#ifdef RBX_ENABLE_LOG
+#define NEON_ROWS s_list_mode
+#else
+#define NEON_ROWS 0
+#endif
 static int disp_list(int *k)
 {
 	int n = 0;
 	for (int d = 0; d < D_COUNT; d++)
 		if ((d != D_BORDER_COL || g_settings.border == RBX_BORDER_COLOR || g_settings.border == RBX_BORDER_MARQUEE) &&
-			(d < D_NEON || d > D_NEONGAP || s_list_mode))
+			(d < D_NEON || d > D_NEONGAP || NEON_ROWS))
 			k[n++] = d;
 	return n;
 }
@@ -900,7 +906,7 @@ static const char *page_row_help(void)
 		switch (disp_kind(s_sel)) {
 		case D_FPS: return "Frames per second in a corner of the game picture";
 		case D_FRAMEBUF: return "1 frame: the game may run a frame ahead to even out slow frames (input about 17 ms later). Auto: on for the games that need it";
-		case D_ASPECT: return "4:3, the full screen, or the largest whole-number scale";
+		case D_ASPECT: return "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale";
 		case D_ROTATE: return "Auto: vertical games upright. Vertical L / R: hold the Vita turned, the controls turn with it";
 		case D_FILTER: return "Smooth or sharp pixels";
 		case D_SCAN: return "Scanlines over the game picture, as on an arcade monitor";
@@ -1324,7 +1330,15 @@ static int wrap(int v, int n)
 }
 
 // value names (items and the choice window)
-static const char *const aspect[] = { "4:3", "Full screen", "Integer 2x" };
+static const char *const aspect[] = { "4:3", "14:9", "Full screen", "Integer" };   // (in s_aspect_order, as ReST-V)
+static const int s_aspect_order[RBX_ASPECT_COUNT] = { RBX_ASPECT_4_3, RBX_ASPECT_WIDE, RBX_ASPECT_FULL, RBX_ASPECT_INT2X };
+static int aspect_pos(int a)
+{
+	for (int i = 0; i < RBX_ASPECT_COUNT; i++)
+		if (s_aspect_order[i] == a)
+			return i;
+	return 0;
+}
 static const char *const filter[] = { "Smooth", "Sharp" };
 static const char *const rotate[] = { "Auto", "Off", "Vertical L", "Vertical R" };
 static const char *const framebuf[] = { "Auto", "Off", "1 frame" };
@@ -1403,7 +1417,7 @@ static int item_choices(const char **out, int *cur, const char **title)
 	if (s_page == PAGE_DISPLAY) {
 		const char *const *v = NULL;
 		switch (disp_kind(s_sel)) {
-		case D_ASPECT: v = aspect; n = RBX_ASPECT_COUNT; *cur = g_settings.aspect; *title = "Screen"; break;
+		case D_ASPECT: v = aspect; n = RBX_ASPECT_COUNT; *cur = aspect_pos(g_settings.aspect); *title = "Screen"; break;
 		case D_ROTATE: v = rotate; n = RBX_ROT_COUNT; *cur = g_settings.rotate; *title = "Rotate"; break;
 		case D_FRAMEBUF: v = framebuf; n = RBX_FRAMEBUF_COUNT; *cur = g_settings.frame_buffer; *title = "Frame buffer"; break;
 		case D_FILTER: v = filter; n = RBX_FILTER_COUNT; *cur = g_settings.filter; *title = "Filter"; break;
@@ -1477,6 +1491,14 @@ static int item_choices(const char **out, int *cur, const char **title)
 		}
 		*cur = s_state_slot;
 		*title = "Save slot";
+	} else if (s_page == PAGE_SETTINGS && s_sel == SET_LANG && rbx_lang_count() > 0) {
+		// the languages by their own names (user 11-23: the row's choice window, as the other rows)
+		n = rbx_lang_count() < MAX_CHOICES ? rbx_lang_count() : MAX_CHOICES;
+		for (int i = 0; i < n; i++)
+			out[i] = rbx_lang_at(i)->name;
+		const int li = rbx_lang_index(g_settings.language);
+		*cur = li >= 0 && li < n ? li : 0;
+		*title = "Language";
 	} else if (s_page == PAGE_COMBO && s_sel < RBX_COMBO_SRC) {
 		// two steps (the pairs are too many for one list): None or the first key, then the second key
 		const int v = prt()->combo[s_combo_order[s_sel]];
@@ -1549,6 +1571,17 @@ static void set_choice(int idx)
 			engine_pick(e[idx]);
 		return;
 	}
+	if (s_page == PAGE_SETTINGS && s_sel == SET_LANG) {
+		// the language directly (stepping would load each language on the way)
+		if (idx >= 0 && idx < n && idx != cur) {
+			snprintf(g_settings.language, sizeof(g_settings.language), "%s", rbx_lang_at(idx)->code);
+			rbx_lang_use(g_settings.language);
+			s_theme_gen++;   // (the rows kept as textures: made again)
+			s_drawn_h = 0;
+			s_changed = 1;
+		}
+		return;
+	}
 	s_quiet = 1; // (the steps between pass other values: warn once at the end)
 	for (int guard = 0; n && cur != idx && guard < MAX_CHOICES + 2; guard++) {
 		change(+1); // the same steps as the right button (wraps, applies)
@@ -1595,7 +1628,7 @@ static void change(int dir)
 	case PAGE_DISPLAY:
 		switch (disp_kind(s_sel)) {
 		case D_FPS: g_settings.show_fps = !g_settings.show_fps; break;
-		case D_ASPECT: g_settings.aspect = wrap(g_settings.aspect + dir, RBX_ASPECT_COUNT); break;
+		case D_ASPECT: g_settings.aspect = s_aspect_order[wrap(aspect_pos(g_settings.aspect) + dir, RBX_ASPECT_COUNT)]; break;
 		case D_ROTATE: g_settings.rotate = wrap(g_settings.rotate + dir, RBX_ROT_COUNT); break;
 		case D_FRAMEBUF: g_settings.frame_buffer = wrap(g_settings.frame_buffer + dir, RBX_FRAMEBUF_COUNT); break;
 		case D_FILTER: g_settings.filter = wrap(g_settings.filter + dir, RBX_FILTER_COUNT); break;
@@ -3229,7 +3262,7 @@ static void menu_paint(UiCanvas *c, int overlay)
 			}
 			switch (d) {
 			case D_FPS: v = g_settings.show_fps ? VAL_ON : VAL_OFF; break;
-			case D_ASPECT: v = aspect[g_settings.aspect]; break;
+			case D_ASPECT: v = aspect[aspect_pos(g_settings.aspect)]; break;
 			case D_ROTATE: v = rotate[g_settings.rotate]; break;
 			case D_FRAMEBUF: v = framebuf_text(); break;
 			case D_FILTER: v = filter[g_settings.filter]; break;

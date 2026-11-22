@@ -100,13 +100,13 @@ int rbx_video_init(void)
 static vita2d_texture *s_scan;
 static int s_scan_h, s_scan_type = -1, s_scan_strength = -1, s_scan_dest_h;
 
-// Integer 2x: if 2x does not fit (vertical games), the largest integer scale that fits
+// Integer: the largest whole-number scale that fits (as ReST-V; usually 2x, 3x for the small screens)
 static int int_scale(void)
 {
-	int k = 2;
-	while (k > 1 && (DISP_W * k > SCREEN_W || DISP_H * k > SCREEN_H))
-		k--;
-	return k;
+	if (DISP_W <= 0 || DISP_H <= 0)
+		return 1;
+	const int kw = SCREEN_W / DISP_W, kh = SCREEN_H / DISP_H, k = kw < kh ? kw : kh;
+	return k < 1 ? 1 : k;
 }
 
 static int dest_height(void)
@@ -354,6 +354,8 @@ static void draw_scaled(vita2d_texture *tex)
 	default: // fit height 544 and keep 4:3 (3:4 when turned a quarter) -> 725x544 / 408x544
 		h = SCREEN_H;
 		w = h * ((s_rot & 1) ? 3.0f / 4.0f : 4.0f / 3.0f);
+		if (g_settings.aspect == RBX_ASPECT_WIDE)   // 14:9 (as ReST-V): half of 4:3's side bars filled
+			w = (w + SCREEN_W) * 0.5f;
 		break;
 	}
 	const float x = (SCREEN_W - w) * 0.5f, y = (SCREEN_H - h) * 0.5f;

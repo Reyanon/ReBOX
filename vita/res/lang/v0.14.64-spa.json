@@ -1,0 +1,10 @@
+{
+ "code": "spa",
+ "name": "Español",
+ "english": "Spanish",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9 (entre 4:3 y pantalla completa), pantalla completa o la mayor escala entera",
+  "14:9": "14:9",
+  "Integer": "Entero"
+ }
+}

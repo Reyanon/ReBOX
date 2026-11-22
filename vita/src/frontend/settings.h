@@ -8,7 +8,9 @@
 enum {
 	RBX_ASPECT_4_3,      // 4:3 fitted to 544 height (default)
 	RBX_ASPECT_FULL,     // stretched to 960x544
-	RBX_ASPECT_INT2X,    // integer 2x (640x480)
+	RBX_ASPECT_INT2X,    // integer: the largest whole-number scale that fits (usually 2x, 640x480)
+	RBX_ASPECT_WIDE,     // 14:9 (as ReST-V, user 11-23): half of 4:3's side bars filled; last so saved values keep
+	                     // their meaning, shown second (menu.c s_aspect_order)
 	RBX_ASPECT_COUNT
 };
 

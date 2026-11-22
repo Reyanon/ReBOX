@@ -1,0 +1,10 @@
+{
+ "code": "swe",
+ "name": "Svenska",
+ "english": "Swedish",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9 (mellan 4:3 och helskärm), helskärm eller den största heltalsskalan",
+  "14:9": "14:9",
+  "Integer": "Heltal"
+ }
+}

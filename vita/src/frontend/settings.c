@@ -42,10 +42,12 @@ rbx_settings g_settings = {
 	.rotate = RBX_ROT_AUTO,
 	.touch_keys = 1,
 	.touch_show = 1,
-	.theme = RBX_THEME_PINK,
+	.theme = RBX_THEME_GRAPHITE,   // (the owner's choice, 2026-11-23)
 	.neon = { 10, 2, -10, 10, 5, 60, 200 },   // (fixed: the owner's choice, 2026-11-07; not in the settings file nor the menu)
-	.neon_list = { 10, 2, -10, 10, 5, 60, 200 },   // (in the list's options for now: the owner sets them, then fixed)
-	.neon_list_gap = 320,
+	// (the game list's corridor: the owner's values, 2026-11-23; fixed: its rows and settings-file keys only in builds
+	// with the logger)
+	.neon_list = { 6, 4, -10, 10, 2, 60, 260 },
+	.neon_list_gap = 180,
 	.language = "eng",
 	.input_engine = RE_PAD_ENGINE_NATIVE,
 };
@@ -481,10 +483,12 @@ void rbx_settings_load(void)
 		else if (!strcmp(key, "last_game")) snprintf(g_settings.last_game, sizeof(g_settings.last_game), "%s", sval);
 		else if (!strcmp(key, "language")) snprintf(g_settings.language, sizeof(g_settings.language), "%s", sval);
 		else if (!strcmp(key, "show_list")) g_settings.show_list = val != 0;
+#ifdef RBX_ENABLE_LOG
 		else if (!strcmp(key, "neon_list_gap"))
 			g_settings.neon_list_gap = val < 40 ? 40 : val > 520 ? 520 : val;
 		else if (!strncmp(key, "neon_list", 9) && key[9] >= '0' && key[9] <= '6' && !key[10])
 			g_settings.neon_list[key[9] - '0'] = val;
+#endif
 		else if (!strcmp(key, "list_filter")) g_settings.list_filter = clampi(val, 0, RBX_LIST_FILTER_COUNT - 1);
 		else if (!strcmp(key, "list_group")) g_settings.list_group = clampi(val, 0, RBX_GROUP_COUNT - 1);
 		else if (!strcmp(key, "list_all")) g_settings.list_filter = val ? RBX_LIST_ALL : RBX_LIST_PLAYABLE; // (old two-state filter)
@@ -574,9 +578,11 @@ void rbx_settings_save(void)
 	if (g_settings.show_list)
 		fprintf(f, "show_list=1\n");
 	fprintf(f, "list_filter=%d\nlist_group=%d\ntheme=%d\n", g_settings.list_filter, g_settings.list_group, g_settings.theme);
+#ifdef RBX_ENABLE_LOG
 	for (int k = 0; k < 7; k++)
 		fprintf(f, "neon_list%d=%d\n", k, g_settings.neon_list[k]);
 	fprintf(f, "neon_list_gap=%d\n", g_settings.neon_list_gap);
+#endif
 	fprintf(f, "language=%s\n", g_settings.language);
 	fprintf(f, "pad_p1=%d\npad_p2=%d\ninput_engine=%d\n", g_settings.pad_src[0], g_settings.pad_src[1], g_settings.input_engine);
 	fprintf(f, "pad_p2_added=%d\n", g_settings.p2_added);

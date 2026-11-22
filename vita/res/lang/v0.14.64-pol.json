@@ -1,0 +1,10 @@
+{
+ "code": "pol",
+ "name": "Polski",
+ "english": "Polish",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9 (między 4:3 a pełnym ekranem), pełny ekran lub największa skala całkowita",
+  "14:9": "14:9",
+  "Integer": "Całkowita"
+ }
+}

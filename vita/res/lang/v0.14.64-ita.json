@@ -1,0 +1,10 @@
+{
+ "code": "ita",
+ "name": "Italiano",
+ "english": "Italian",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9 (tra 4:3 e schermo intero), schermo intero o la scala intera più grande",
+  "14:9": "14:9",
+  "Integer": "Intero"
+ }
+}

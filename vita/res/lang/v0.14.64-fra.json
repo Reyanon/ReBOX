@@ -1,0 +1,10 @@
+{
+ "code": "fra",
+ "name": "Français",
+ "english": "French",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9 (entre 4:3 et plein écran), plein écran ou la plus grande échelle entière",
+  "14:9": "14:9",
+  "Integer": "Entier"
+ }
+}

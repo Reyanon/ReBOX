@@ -1,0 +1,10 @@
+{
+ "code": "dan",
+ "name": "Dansk",
+ "english": "Danish",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9 (mellem 4:3 og fuld), fuld skærm eller den største hele skalering",
+  "14:9": "14:9",
+  "Integer": "Heltal"
+ }
+}

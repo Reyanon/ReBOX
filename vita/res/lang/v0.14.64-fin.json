@@ -1,0 +1,10 @@
+{
+ "code": "fin",
+ "name": "Suomi",
+ "english": "Finnish",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9 (4:3:n ja koko näytön välissä), koko näyttö tai suurin kokonaislukuskaala",
+  "14:9": "14:9",
+  "Integer": "Kokonaisluku"
+ }
+}

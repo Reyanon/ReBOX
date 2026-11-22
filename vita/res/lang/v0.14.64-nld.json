@@ -1,0 +1,10 @@
+{
+ "code": "nld",
+ "name": "Nederlands",
+ "english": "Dutch",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9 (tussen 4:3 en volledig), volledig scherm of de grootste gehele schaal",
+  "14:9": "14:9",
+  "Integer": "Geheel"
+ }
+}

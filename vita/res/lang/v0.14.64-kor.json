@@ -1,0 +1,10 @@
+{
+ "code": "kor",
+ "name": "한국어",
+ "english": "Korean",
+ "strings": {
+  "4:3, 14:9 (between 4:3 and full), the full screen, or the largest whole-number scale": "4:3, 14:9(4:3 과 전체 화면의 중간), 전체 화면, 또는 가장 큰 정수 배율",
+  "14:9": "14:9",
+  "Integer": "정수 배율"
+ }
+}
