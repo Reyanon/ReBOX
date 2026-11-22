@@ -29,7 +29,8 @@ static cpu_t s_cpu[3];   // a, b, c
 static uint8_t *s_rom[3];
 static uint32_t s_rom_size[3];
 static int s_bank[2];
-static uint8_t s_vram[2][0x2000];   // per layer: objectram 0000-05ff, videoram 0600-1fff
+static uint8_t (*s_vram_hp)[2][0x2000];   // per layer: objectram 0000-05ff, videoram 0600-1fff
+#define s_vram (*s_vram_hp)
 static uint8_t s_ram_ac[0x1000], s_ram_ab[0x800], s_ram_b[0x1000], s_ram_c[0x1000];
 static int s_flip;
 static uint64_t s_frac;
@@ -38,7 +39,8 @@ static int s_cpuc_reset;
 static uint8_t *s_tiles[2];   // 16384 8x8 tiles per layer, 1 byte per pixel
 static uint8_t *s_tile_used[2];
 static uint32_t s_pal[1024];
-static uint8_t s_snap[2][0x2000];
+static uint8_t (*s_snap_hp)[2][0x2000];
+#define s_snap (*s_snap_hp)
 static int s_snap_flip;
 static int s_port[5];   // P1, P2, SYSTEM, DSWA, DSWB
 
@@ -286,10 +288,22 @@ static void ex_exit(void)
 		s_tiles[j] = s_tile_used[j] = NULL;
 	}
 	tsnd_exit();
+	free(s_snap_hp);
+	s_snap_hp = NULL;
+	free(s_vram_hp);
+	s_vram_hp = NULL;
 }
 
 static int ex_init(const rbx_game *g)
 {
+	if (!s_snap_hp && !(s_snap_hp = calloc(1, sizeof(*s_snap_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_vram_hp && !(s_vram_hp = calloc(1, sizeof(*s_vram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	static const char *const cpus[3] = { "cpua", "cpub", "cpuc" };
 	for (int i = 0; i < 3; i++)
 		s_rom[i] = rbx_region(cpus[i], &s_rom_size[i]);

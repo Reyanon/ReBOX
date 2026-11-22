@@ -27,11 +27,13 @@
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint16_t s_ram[0x2000];            // 0xffc000 (16 KB)
+static uint16_t (*s_ram_hp)[0x2000];            // 0xffc000 (16 KB)
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[0x800], s_spriteram_buf[0x400];
 static uint16_t s_palram[0x800], s_palext[0x800];   // (1280 entries)
 static uint16_t s_priority[2];
-static deco16ic_t s_tile[2];
+static deco16ic_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static decmxc06_t s_spr;
 static rbx_gfx s_gfx8a, s_gfx16a, s_gfx8b, s_gfx16b, s_gfxspr;
 static int s_port_in, s_port_dsw, s_port_sys;
@@ -97,7 +99,8 @@ static void colpri_cb(void *u, uint32_t *colour, uint32_t *pri_mask)
 	if (*colour >= s_snap->priority[1])
 		*pri_mask |= 0xf0f0;   // GFX_PMASK_4: behind the front one
 }
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 
 static void vt_render(void)
 {
@@ -176,6 +179,18 @@ static void ds_exit(void);
 
 static int ds_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t snd_size, t1s, t2s, ssize, o1s, o2s;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *snd = rbx_region("audiocpu", &snd_size), *t1 = rbx_region("tiles1", &t1s), *t2 = rbx_region("tiles2", &t2s),
@@ -294,6 +309,12 @@ static void ds_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void ds_frame(void)

@@ -34,7 +34,8 @@ static m6809_t s_cpu;
 static int s_irq;
 static rbx_gfx s_gfx8, s_gfxt[8], s_gfxspr;
 static uint32_t s_palette[256];
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 static int s_port_p[2], s_port_dsw1, s_port_dsw2, s_port_flip;
 static int s_line;
 static uint64_t s_cpu_frac, s_snd_frac, s_ym1_frac, s_ym2_frac;
@@ -288,6 +289,10 @@ static void bk_exit(void);
 
 static int bk_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_darwin = !strcmp(g->machine, "darwin");
 	uint32_t csize, tsize, ssize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -416,6 +421,8 @@ static void bk_exit(void)
 		rbx_gfx_free(&s_gfxt[k]);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
 }
 
 static void bk_frame(void)

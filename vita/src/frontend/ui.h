@@ -43,6 +43,8 @@ void ui_circle(UiCanvas *c, float cx, float cy, float r, uint32_t col);
 // text: y = baseline (same as vita2d_pgf_draw_text). Returns the drawn width
 int ui_text(UiCanvas *c, int x, int y, uint32_t col, float scale, const char *s);
 int ui_text_width(float scale, const char *s);
+// the text as the menus show it in the language chosen (lang.c; the text itself when there is no translation)
+const char *ui_tr(const char *s);
 // draw text only within horizontal [cx0, cx1) (scrolling title)
 int ui_text_clip(UiCanvas *c, int x, int y, uint32_t col, float scale, const char *s, int cx0, int cx1);
 // test: composite the canvas over background color bg and write a PPM

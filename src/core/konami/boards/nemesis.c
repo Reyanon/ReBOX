@@ -89,7 +89,8 @@ static uint8_t *s_rom, *s_zrom, *s_maindata;
 static uint32_t s_rom_size, s_zrom_size, s_maindata_size;
 static const uint8_t *s_vlmrom;
 static uint32_t s_vlmrom_size;
-static uint8_t s_charnib[0x20000];   // (the character RAM, a nibble a byte: every gfx layout is its linear pixels)
+static uint8_t (*s_charnib_hp)[0x20000];   // (the character RAM, a nibble a byte: every gfx layout is its linear pixels)
+#define s_charnib (*s_charnib_hp)
 static uint8_t s_chdirty[0x200];     // (64-word blocks written since the last decoding)
 static int s_any_dirty;
 static z80 s_z;
@@ -124,8 +125,10 @@ static struct {
 	uint16_t palw[0x800];
 	uint8_t pal8[0x1000], flip;
 } s_vs;
-static uint8_t s_pri[VIS_H][VIS_W];
-static int32_t s_snd[2][2048];
+static uint8_t (*s_pri_hp)[VIS_H][VIS_W];
+#define s_pri (*s_pri_hp)
+static int32_t (*s_snd_hp)[2][2048];
+#define s_snd (*s_snd_hp)
 static int s_snd_n;
 
 static void decode_chars(void)
@@ -838,6 +841,18 @@ static void nm_reset(void);
 
 static int nm_init(const rbx_game *g)
 {
+	if (!s_charnib_hp && !(s_charnib_hp = calloc(1, sizeof(*s_charnib_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_snd_hp && !(s_snd_hp = calloc(1, sizeof(*s_snd_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_mach = -1;
 	for (int i = 0; i < (int)(sizeof(s_machs) / sizeof(s_machs[0])); i++)
 		if (!strcmp(s_machs[i].name, g->machine))
@@ -931,6 +946,12 @@ static void nm_exit(void)
 {
 	if (s_m && s_m->sound >= SND_SALAMAND)
 		rbx_ym_exit(0);
+	free(s_charnib_hp);
+	s_charnib_hp = NULL;
+	free(s_pri_hp);
+	s_pri_hp = NULL;
+	free(s_snd_hp);
+	s_snd_hp = NULL;
 }
 
 static void nm_reset(void)

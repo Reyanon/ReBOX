@@ -27,7 +27,8 @@
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint16_t s_ram[0x2000];             // 0x120000 .. 0x123fff
+static uint16_t (*s_ram_hp)[0x2000];             // 0x120000 .. 0x123fff
+#define s_ram (*s_ram_hp)
 static uint16_t s_vram_ext[2][0x800];      // 0x101000 .. 0x101fff, 0x103000 .. 0x103fff
 static uint16_t s_pal[0x200];              // xBGR_444
 static deco16ic_t s_tile;
@@ -153,6 +154,10 @@ static void db_exit(void);
 
 static int db_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t tsize, osize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *tiles = rbx_region("tiles", &tsize), *oki = rbx_region("oki", &osize);
@@ -246,6 +251,8 @@ static void db_exit(void)
 	rbx_gfx_free(&s_gfx16);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void db_frame(void)

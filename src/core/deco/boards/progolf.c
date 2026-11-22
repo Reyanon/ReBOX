@@ -138,7 +138,8 @@ static void coins(void)
 }
 
 // ---- video ----
-static uint16_t s_scr[256 * 256];
+static uint16_t (*s_scr_hp)[256 * 256];
+#define s_scr (*s_scr_hp)
 
 static void pg_render(void)
 {
@@ -221,6 +222,10 @@ static void pg_exit(void);
 
 static int pg_init(const rbx_game *g)
 {
+	if (!s_scr_hp && !(s_scr_hp = calloc(1, sizeof(*s_scr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t ps;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_srom = rbx_region("audiocpu", &s_srom_size);
@@ -290,6 +295,8 @@ static void pg_exit(void)
 	s_snap = NULL;
 	free(s_mix);
 	s_mix = NULL;
+	free(s_scr_hp);
+	s_scr_hp = NULL;
 }
 
 static void pg_frame(void)

@@ -33,8 +33,10 @@ static int s_wgp2;
 static uint8_t *s_rom, *s_sub_rom;
 static uint32_t s_rom_size, s_sub_rom_size;
 static uint8_t s_ram[0x10000], s_sub_ram[0x4000], s_shared[0x4000];
-static uint16_t s_spr[0x8000];            // 0x400000-0x40ffff: sprite map (0x0000-0x5fff), sprite RAM (0x6000-)
-static uint16_t s_piv[0xc000];            // 0x500000-0x517fff (pivram = s_piv + 0x1000)
+static uint16_t (*s_spr_hp)[0x8000];            // 0x400000-0x40ffff: sprite map (0x0000-0x5fff), sprite RAM (0x6000-)
+#define s_spr (*s_spr_hp)
+static uint16_t (*s_piv_hp)[0xc000];            // 0x500000-0x517fff (pivram = s_piv + 0x1000)
+#define s_piv (*s_piv_hp)
 static uint16_t s_pal[0x1000];
 static uint16_t s_piv_ctrl[0x10];
 static tc0100scn_t *s_scn, *s_snap_scn;
@@ -547,6 +549,14 @@ static void wgp_exit(void);
 
 static int wgp_init(const rbx_game *g)
 {
+	if (!s_piv_hp && !(s_piv_hp = calloc(1, sizeof(*s_piv_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_spr_hp && !(s_spr_hp = calloc(1, sizeof(*s_spr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_wgp2 = !strcmp(g->machine, "wgp2");
 	uint32_t scn_size, spr_size, piv_size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -655,6 +665,10 @@ static void wgp_exit(void)
 	zoomgfx_free(&s_spr_gfx);
 	zoomgfx_free(&s_piv_gfx);
 	tsnd_exit();
+	free(s_piv_hp);
+	s_piv_hp = NULL;
+	free(s_spr_hp);
+	s_spr_hp = NULL;
 }
 
 static void run_b(int cycles)

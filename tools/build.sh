@@ -18,7 +18,7 @@ vita)
 	# a failed build must not leave the previous eboot.bin to be deployed
 	[ -f "$DIR/eboot.bin" ] && mv -f "$DIR/eboot.bin" "$DIR/eboot.bin.prev"
 	cmake -S vita -B "$DIR" "${GEN[@]}" -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" -DCMAKE_BUILD_TYPE="$TYPE" "$@"
-	if ! cmake --build "$DIR" -j 2>&1 | tee "$DIR/build.log"; then
+	if ! cmake --build "$DIR" -j6 2>&1 | tee "$DIR/build.log"; then
 		# vita-elf-create needs ~4KB free after the code segment, which ends anywhere in the 64KB before the data
 		# segment: move its end by 8KB (or back) and build again (as ReSys12)
 		grep -q "segment 1 overlaps" "$DIR/build.log" || exit 1
@@ -26,16 +26,16 @@ vita)
 		[ "${PAD:-0}" = 0 ] && PAD=8192 || PAD=0
 		echo "build.sh: no room for the SCE data after the code segment, padding $PAD"
 		cmake -S vita -B "$DIR" -DRBX_TEXT_PAD="$PAD"
-		cmake --build "$DIR" -j
+		cmake --build "$DIR" -j6
 	fi
 	;;
 inst)
 	cmake -S vita/installer -B build-inst "${GEN[@]}" -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake"
-	cmake --build build-inst -j
+	cmake --build build-inst -j6
 	;;
 pc)
 	cmake -S tools/harness -B build-pc "${GEN[@]}"
-	cmake --build build-pc -j
+	cmake --build build-pc -j6
 	;;
 *)
 	sed -n '2,6p' "$0" >&2

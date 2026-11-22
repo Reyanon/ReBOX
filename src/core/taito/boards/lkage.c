@@ -6,7 +6,7 @@
 */
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
-#include "../machine/taito68705.h"
+#include "../../machine/taito68705.h"
 #include "../../sound/rbx_ym.h"
 #include "../../sound/ay8910.h"
 #include "../../sound/msm5232.h"
@@ -325,7 +325,8 @@ static void decode_gfx(void)
 			}
 }
 
-static uint8_t s_pri[SCREEN_W * (VIS_Y1 - VIS_Y0 + 1)];
+static uint8_t (*s_pri_hp)[SCREEN_W * (VIS_Y1 - VIS_Y0 + 1)];
+#define s_pri (*s_pri_hp)
 
 // a tilemap: dx / dxf = MAME set_scrolldx(dx, dx_flipped); opaque = draw pen 0 too; pcode ORed into the priority buffer
 static void draw_tilemap(const uint8_t *vram, int bank_add, int pal, int sx, int sy, int dx, int dxf, int opaque, int pcode,
@@ -493,10 +494,16 @@ static void lk_exit(void)
 	s_mix = s_tmp = NULL;
 	rbx_ym_exit(0);
 	rbx_ym_exit(1);
+	free(s_pri_hp);
+	s_pri_hp = NULL;
 }
 
 static int lk_init(const rbx_game *g)
 {
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_kind = kind_of(g->machine);
 	if (s_kind < 0) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);

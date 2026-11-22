@@ -1,6 +1,8 @@
 /*  Motorola MC68705 (HMOS M6805 family) microcontroller, ported from MAME
     src/devices/cpu/m6805/m6805.cpp, 6805ops.hxx, m6805defs.h (BSD-3-Clause, copyright-holders: Aaron Giles, Vas Crabb)
     and src/devices/cpu/m6805/m68705.cpp (BSD-3-Clause, copyright-holders: Vas Crabb).
+    HD63705Z0: src/devices/cpu/m6805/hd6305.cpp / m6805.cpp s_hd63705_cycles (MAME 0.289, BSD-3-Clause,
+    copyright-holders: Aaron Giles, Vas Crabb, Olivier Galibert).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "m68705.h"
@@ -14,8 +16,8 @@ enum { TIMER_PGM = 0x01, TIMER_MOR = 0x02, TIMER_NPC = 0x04 };
 enum { TCR_PS = 0x07, TCR_PSC = 0x08, TCR_TIE = 0x10, TCR_TIN = 0x20, TCR_TIM = 0x40, TCR_TIR = 0x80 };
 enum { MOR_PS = 0x07, MOR_TIE = 0x10, MOR_CLS = 0x20, MOR_TOPT = 0x40 };
 
-#define SP_MASK 0x007f
-#define SP_LOW  0x0060
+#define SP_MASK (c->sp_mask)
+#define SP_LOW  (c->sp_low)
 
 #define VECTOR_BOOTSTRAP 0xfff6
 #define VECTOR_TIMER     0xfff8
@@ -42,6 +44,26 @@ static const uint8_t s_hmos_cycles[256] = {
 	   6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 5, 9, 6, 7,
 	   5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
 	   4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5
+};
+// MAME m6805_base_device::s_hd63705_cycles
+static const uint8_t s_hd63705_cycles[256] = {
+	/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+	   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+	   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+	   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	   5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	   2,XX,11, 2, 2,XX, 2, 2, 2, 2, 2,XX, 2, 2,XX, 2,
+	   2,XX,XX, 2, 2,XX, 2, 2, 2, 2, 2,XX, 2, 2,XX, 2,
+	   6,XX,XX, 6, 6,XX, 6, 6, 6, 6, 6,XX, 6, 5,XX, 6,
+	   5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	   9, 6,XX,11,XX,XX,XX,XX,XX,XX,XX,XX,XX, 2, 4, 4,
+	  XX,XX,XX,XX,XX,XX,XX, 2, 1, 1, 2, 2, 2, 1,XX, 2,
+	   2, 2, 2, 2, 2, 2, 2,XX, 2, 2, 2, 2,XX, 6, 2,XX,
+	   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 6, 3, 3,
+	   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 7, 4, 4,
+	   5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 7, 5, 5,
+	   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 6, 4, 4,
+	   3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 6, 3, 4
 };
 #undef XX
 
@@ -207,8 +229,30 @@ static inline int eprom_range(const m68705_t *c, uint16_t a)
 	return !(c->variant == M68705_R3 && a >= 0xf39 && a < 0xf80);
 }
 
+// HD63705Z0 (MAME hd63705z0_device::internal_map; the rest is the external bus)
+static uint8_t z_rm(m68705_t *c, uint16_t a)
+{
+	if (a >= 0x0040 && a < 0x01c0)
+		return c->zst.ram[a - 0x40];
+	if (a >= 0x01c0 && a < 0x2000)
+		return c->rom[a];
+	return c->ext_r ? c->ext_r(c->user, a) : 0xff;
+}
+
+static void z_wm(m68705_t *c, uint16_t a, uint8_t v)
+{
+	if (a >= 0x0040 && a < 0x01c0)
+		c->zst.ram[a - 0x40] = v;
+	else if (a >= 0x2000 || a < 0x0040) {
+		if (c->ext_w)
+			c->ext_w(c->user, a, v);
+	}
+}
+
 static inline uint8_t rm(m68705_t *c, uint16_t a)
 {
+	if (c->variant == M68705_HD63705Z0)
+		return z_rm(c, a);
 	a &= c->amask;
 	if (a >= 0x80) {
 		if (!eprom_range(c, a))
@@ -223,6 +267,10 @@ static inline uint8_t rm(m68705_t *c, uint16_t a)
 
 static inline void wm(m68705_t *c, uint16_t a, uint8_t v)
 {
+	if (c->variant == M68705_HD63705Z0) {
+		z_wm(c, a, v);
+		return;
+	}
 	a &= c->amask;
 	if (a >= 0x80) {
 		if (eprom_range(c, a) && !(c->variant != M68705_R3 ? (a >= 0x785 && a < 0x7f8) : (a >= 0xf80 && a < 0xff8)))
@@ -314,7 +362,13 @@ void m68705_set_input(m68705_t *c, int line, int state)
 	}
 }
 
-void m68705_set_irq_line(m68705_t *c, int state) { set_input(c, M68705_IRQ_LINE, state); }
+void m68705_set_irq_line(m68705_t *c, int state)
+{
+	if (c->variant == M68705_HD63705Z0)
+		m68705_hd63705_set_input(c, HD63705_INT_IRQ1, state);
+	else
+		set_input(c, M68705_IRQ_LINE, state);
+}
 
 static void interrupt(m68705_t *c)
 {
@@ -332,6 +386,64 @@ static void interrupt(m68705_t *c)
 		}
 		S_.icount -= 11;
 		timer_update(c, 11);
+	}
+}
+
+// ---- HD63705Z0 interrupts (MAME hd63705z0_device::execute_set_input / interrupt / interrupt_vector) ----
+void m68705_hd63705_set_input(m68705_t *c, int line, int state)
+{
+	m68705_zstate *z = &c->zst;
+	if (line == HD63705_INT_NMI) {
+		if (z->nmi_state != state) {
+			z->nmi_state = (uint8_t)state;
+			if (state != M68705_CLEAR_LINE)
+				z->pending |= 1u << HD63705_INT_NMI;
+		}
+	} else if (line >= 0 && line <= HD63705_INT_ADCONV) {
+		if (z->irq_state[line] != state) {
+			z->irq_state[line] = (uint8_t)state;
+			if (state != M68705_CLEAR_LINE)
+				z->pending |= (uint16_t)(1u << line);
+		}
+	}
+}
+
+static void z_push_all(m68705_t *c)
+{
+	pushword(c, PC);
+	pushbyte(c, X);
+	pushbyte(c, A);
+	pushbyte(c, CC);
+	CC |= IFLAG;
+	// standard_irq_callback(0): a HOLD_LINE on line 0 clears itself
+	if (c->zst.irq_state[0] == M68705_HOLD_LINE)
+		c->zst.irq_state[0] = M68705_CLEAR_LINE;
+}
+
+static void z_interrupt(m68705_t *c)
+{
+	static const struct { uint8_t line; uint16_t vec; } order[] = {
+		{ HD63705_INT_IRQ1, 0x1ff8 }, { HD63705_INT_IRQ2, 0x1fec }, { HD63705_INT_ADCONV, 0x1fea },
+		{ HD63705_INT_TIMER1, 0x1ff6 }, { HD63705_INT_TIMER2, 0x1ff4 }, { HD63705_INT_TIMER3, 0x1ff2 },
+		{ HD63705_INT_PCI, 0x1ff0 }, { HD63705_INT_SCI, 0x1fee }
+	};
+	m68705_zstate *z = &c->zst;
+	if (z->pending & (1u << HD63705_INT_NMI)) {
+		z_push_all(c);
+		PC = rm16(c, 0x1ffc);
+		z->pending &= (uint16_t)~(1u << HD63705_INT_NMI);
+		S_.icount -= 11;
+	} else if ((z->pending & 0x1ff) && !(CC & IFLAG)) {
+		z_push_all(c);
+		for (unsigned i = 0; i < sizeof(order) / sizeof(order[0]); i++) {
+			if (z->pending & (1u << order[i].line)) {
+				z->pending &= (uint16_t)~(1u << order[i].line);
+				PC = rm16(c, order[i].vec);
+				break;
+			}
+		}
+		z->pending &= (uint16_t)~1u;   // M6805_IRQ_LINE
+		S_.icount -= 11;
 	}
 }
 
@@ -414,7 +526,9 @@ static void branch(m68705_t *c, uint8_t op)
 	case 4: f = !(CC & HFLAG); break;                       // BHCC / BHCS
 	case 5: f = !(CC & NFLAG); break;                       // BPL / BMI
 	case 6: f = !(CC & IFLAG); break;                       // BMC / BMS
-	default: f = S_.irq_state[M68705_IRQ_LINE] != 0; break; // BIL / BIH
+	default:                                                // BIL / BIH (HD6305: the NMI line)
+		f = c->variant == M68705_HD63705Z0 ? c->zst.nmi_state != 0 : S_.irq_state[M68705_IRQ_LINE] != 0;
+		break;
 	}
 	uint8_t t = imm(c);
 	if (f == !(op & 1))
@@ -449,7 +563,7 @@ static void exec_op(m68705_t *c, uint8_t op)
 		case 0x83:                                                                              // SWI
 			pushword(c, PC); pushbyte(c, X); pushbyte(c, A); pushbyte(c, CC);
 			CC |= IFLAG;
-			PC = rm16(c, VECTOR_SWI & c->amask);
+			PC = rm16(c, c->variant == M68705_HD63705Z0 ? 0x1ffa : (VECTOR_SWI & c->amask));
 			break;
 		}
 		break;
@@ -474,6 +588,18 @@ int m68705_init(m68705_t *c, int variant, uint8_t *rom, uint32_t size)
 	memset(c, 0, sizeof(*c));
 	c->variant = variant;
 	c->rom = rom;
+	c->sp_mask = 0x007f;
+	c->sp_low = 0x0060;
+	if (variant == M68705_HD63705Z0) {
+		// configuration_params { s_hmos_b_ops, s_hd63705_cycles, 16, 0x017f, 0x0100, 0x1fff, 0x1ffa }
+		c->sp_mask = 0x017f;
+		c->sp_low = 0x0100;
+		c->amask = 0xffff;
+		if (!rom || size < 0x2000)
+			return -1;
+		c->st.t_source = M68705_TSRC_DISABLED;   // no internal timer (MAME TODO)
+		return 0;
+	}
 	if (variant == M68705_R3) {
 		c->amask = 0x0fff;
 		c->open_drain[0] = 1;
@@ -521,6 +647,13 @@ void m68705_reset(m68705_t *c)
 	s->a = s->x = 0;
 	s->cc = IFLAG;
 	s->pending = 0;
+	if (c->variant == M68705_HD63705Z0) {
+		// m6805_base_device::device_reset (irq_state is only cleared at device_start in MAME)
+		c->zst.pending = 0;
+		c->zst.nmi_state = 0;
+		s->pc = rm16(c, 0x1ffe);
+		return;
+	}
 	// m6805_hmos_device::device_reset
 	for (int i = 0; i < 4; i++)
 		port_ddr_w(c, i, 0x00);
@@ -553,6 +686,16 @@ int m68705_execute(m68705_t *c, int cycles)
 	if (s->icount <= 0)
 		return 0;
 	SP = (uint16_t)((SP & SP_MASK) | SP_LOW);
+	if (c->variant == M68705_HD63705Z0) {
+		do {
+			if (c->zst.pending)
+				z_interrupt(c);
+			uint8_t op = rm(c, PC++);
+			exec_op(c, op);
+			s->icount -= (int32_t)s_hd63705_cycles[op];
+		} while (s->icount > 0);
+		return start - s->icount;
+	}
 	do {
 		if (s->pending)
 			interrupt(c);

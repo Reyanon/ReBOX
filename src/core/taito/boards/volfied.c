@@ -22,9 +22,11 @@
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x4000];
+static uint8_t (*s_ram_hp)[0x4000];
+#define s_ram (*s_ram_hp)
 static uint16_t *s_vram;            // 0x40000 words: two screens of 256 x 512
-static uint16_t s_pal[0x2000];
+static uint16_t (*s_pal_hp)[0x2000];
+#define s_pal (*s_pal_hp)
 static uint16_t s_video_ctrl, s_video_mask;
 static pc090oj_t *s_oj;
 static struct {
@@ -32,7 +34,8 @@ static struct {
 	uint16_t pal[0x2000];
 	uint16_t pix[VIS_H * ROW_WORDS];
 } *s_snap;
-static uint8_t s_pri[SCREEN_W * VIS_H];
+static uint8_t (*s_pri_hp)[SCREEN_W * VIS_H];
+#define s_pri (*s_pri_hp)
 static int s_port_cc[4], s_port_dsw[2];
 static uint64_t s_cpu_frac, s_cc_frac;
 
@@ -159,6 +162,18 @@ static void volfied_exit(void);
 
 static int volfied_init(const rbx_game *g)
 {
+	if (!s_pal_hp && !(s_pal_hp = calloc(1, sizeof(*s_pal_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t oj_size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *oj_gfx = rbx_region("pc090oj", &oj_size);
@@ -243,6 +258,12 @@ static void volfied_exit(void)
 	s_snap = NULL;
 	s_vram = NULL;
 	tsnd_exit();
+	free(s_pal_hp);
+	s_pal_hp = NULL;
+	free(s_pri_hp);
+	s_pri_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void volfied_frame(void)

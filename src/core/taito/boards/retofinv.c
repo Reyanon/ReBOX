@@ -7,7 +7,7 @@
 */
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
-#include "../machine/taito68705.h"
+#include "../../machine/taito68705.h"
 #include "../../sound/sn76496.h"
 
 #include <stdlib.h>

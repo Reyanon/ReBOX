@@ -5,9 +5,11 @@
 
 #include <psp2/kernel/cpu.h>
 #include <psp2/kernel/threadmgr.h>
+#include <psp2/io/stat.h>
 
 #include "frontend/audio.h"
 #include "frontend/core_api.h"
+#include "frontend/settings.h"
 #include "frontend/video.h"
 #include "platform/log.h"
 #include "platform/perf.h"
@@ -43,6 +45,13 @@ int rbx_cpu3_usable(void)
 	if (s_ok >= 0)
 		return s_ok;
 	s_ok = 0;
+	// (a test switch: RBX_DATA_DIR "cpu3off" plans for three cores although a plugin opened CPU3, as on a stock system;
+	// the measuring Vita has CoreUnlocker80000H on)
+	SceIoStat st_off;
+	if (sceIoGetstat(RBX_DATA_DIR "cpu3off", &st_off) >= 0) {
+		RBX_LOG("threads: CPU3 taken as closed (cpu3off)");
+		return s_ok;
+	}
 	const SceUID t = sceKernelCreateThread("rbx_cpu3", cpu3_probe, 0x60, 0x1000, 0, 0x00080000, NULL);
 	if (t < 0) {
 		RBX_LOG("threads: CPU3 closed (a thread on it refused: 0x%08x)", t);
@@ -133,22 +142,27 @@ static void start_aux2(void)
 	// (with the third job on CPU1: on CPU3 above the drawing helper; it may lag, the ESP waits for it. A board without
 	// the helper may ask for CPU3: spdheat's YM2149s, with the YM2203s' worker and the sound thread on CPU1)
 	// (CPU3 closed: on CPU1 with the others)
-	const int cpu3 = rbx_aux2_alone() && rbx_cpu3_usable();
-	s_aux2 = sceKernelCreateThread("rbx_aux2", aux2_thread, SOUND_PRIORITY, 64 * 1024, 0,
-		cpu3 ? 0x00080000 : SCE_KERNEL_CPU_MASK_USER_1, NULL);
+	// (RBX_AUX2_BY_RENDER: on CPU2 below the render thread and the first worker there (90), a whole core: the CV1000
+	// blitter, which on CPU3's half core fell a frame behind (ADR-105). RBX_DATA_DIR "aux2cpu3": on CPU3 as before)
+	SceIoStat st_c3;
+	const int alone = rbx_aux2_alone();
+	const int cpu2 = alone == RBX_AUX2_BY_RENDER && sceIoGetstat(RBX_DATA_DIR "aux2cpu3", &st_c3) < 0;
+	const int cpu3 = !cpu2 && alone && rbx_cpu3_usable();
+	s_aux2 = sceKernelCreateThread("rbx_aux2", aux2_thread, cpu2 ? SOUND_PRIORITY + 20 : SOUND_PRIORITY, 64 * 1024, 0,
+		cpu2 ? SCE_KERNEL_CPU_MASK_USER_2 : cpu3 ? 0x00080000 : SCE_KERNEL_CPU_MASK_USER_1, NULL);
 	if (s_aux2 < 0) {
 		RBX_LOG("threads: second worker create failed 0x%08x", s_aux2);
 		rbx_set_aux2_thread(0);
 		return;
 	}
 	sceKernelStartThread(s_aux2, 0, NULL);
-	RBX_LOG("threads: second worker started on CPU%d", cpu3 ? 3 : 1);
+	RBX_LOG("threads: second worker started on CPU%d", cpu2 ? 2 : cpu3 ? 3 : 1);
 }
 
 // The driver's third job (rbx_aux3: the F3 sound board, 68000 and the ES5505 control copy), until rbx_aux3_stop: on
 // CPU3 above the drawing helper (it runs a scanline at a time right behind the main CPU and sleeps between)
 static SceUID s_aux3 = -1, s_aux3_sema = -1;
-static int s_aux3_on;
+static int s_aux3_on, s_aux3_alone;
 static volatile int s_aux3_quit, s_aux3_asleep;
 static void aux3_wake(void)
 {
@@ -186,17 +200,36 @@ static void start_aux3(void)
 		RBX_LOG("threads: third worker off (CPU3 closed: the sound board on the emulation thread)");
 		return;
 	}
+	// (rbx_aux3_set_alone: alone on CPU3 below everything else of ours (110), on from the start: the CV1000 blitter's
+	// second lane, whose work the others take over when it falls behind (ADR-120). RBX_DATA_DIR "e12nocpu3": not
+	// started, the lane drawn by the second worker and the emulation thread)
+	const int alone = rbx_aux3_alone();
+	if (alone) {
+		SceIoStat st_n3;
+		if (sceIoGetstat(RBX_DATA_DIR "e12nocpu3", &st_n3) >= 0) {
+			RBX_LOG("threads: third worker off (e12nocpu3)");
+			return;
+		}
+	}
 	s_aux3_sema = sceKernelCreateSema("rbx_aux3", 0, 0, 1000, NULL);
 	s_aux3_quit = 0;
 	s_aux3_on = 0;
 	rbx_set_aux3_wake(aux3_wake);
-	s_aux3 = sceKernelCreateThread("rbx_aux3", aux3_thread, SOUND_PRIORITY - 10, 256 * 1024, 0, 0x000c0000 /* CPU2-3 */, NULL);
+	s_aux3 = sceKernelCreateThread("rbx_aux3", aux3_thread, alone ? SOUND_PRIORITY + 30 : SOUND_PRIORITY - 10, 256 * 1024,
+		0, alone ? 0x00080000 /* CPU3 */ : 0x000c0000 /* CPU2-3 */, NULL);
 	if (s_aux3 < 0) {
 		RBX_LOG("threads: third worker create failed 0x%08x", s_aux3);
 		rbx_set_aux3_thread(0);
 		return;
 	}
 	sceKernelStartThread(s_aux3, 0, NULL);
+	if (alone) {
+		rbx_set_aux3_thread(1);
+		s_aux3_on = 1;
+		s_aux3_alone = 1;
+		RBX_LOG("threads: third worker started on CPU3 (alone)");
+		return;
+	}
 	RBX_LOG("threads: third worker started (CPU2-3, on by the drawing load)");
 }
 
@@ -226,20 +259,101 @@ int rbx_threads_start_ym(void)
 		return 0;
 	}
 	s_ym_is_z80 = 0;
-	if (!rbx_core_ym_worker())
-		return -1;
+	if (!rbx_core_ym_worker()) {   // (no first job: the second and third ones still on their threads, the CV1000 blitter)
+		start_aux2();
+		start_aux3();
+		return s_aux2 >= 0 || s_aux3 >= 0 ? 0 : -1;
+	}
 	rbx_core_ym_worker_enable(1);
-	s_ym = sceKernelCreateThread("rbx_ym", ym_thread, SOUND_PRIORITY, 64 * 1024, 0, SCE_KERNEL_CPU_MASK_USER_1, NULL);
+	// (a board asking for it: on CPU2 under the render thread, whose drawing is light there: the CV1000's YMZ770, with
+	// CPU1 busy with the sound output and the blitter when CPU3 is closed. RBX_DATA_DIR "auxcpu1": on CPU1 as before)
+	SceIoStat st_c1;
+	const int cpu2 = rbx_aux_by_render() && sceIoGetstat(RBX_DATA_DIR "auxcpu1", &st_c1) < 0;
+	// (testing, ADR-176: RBX_DATA_DIR "ymzhigh" = on CPU2 above the render thread (78 < 80), so that the render thread
+	// waking at the frame end never takes the core from the worker in an entry)
+	const int high = cpu2 && sceIoGetstat(RBX_DATA_DIR "ymzhigh", &st_c1) >= 0;
+	s_ym = sceKernelCreateThread("rbx_ym", ym_thread, high ? SOUND_PRIORITY - 2 : cpu2 ? SOUND_PRIORITY + 10 : SOUND_PRIORITY,
+		64 * 1024, 0, cpu2 ? SCE_KERNEL_CPU_MASK_USER_2 : SCE_KERNEL_CPU_MASK_USER_1, NULL);
 	if (s_ym < 0) {
 		RBX_LOG("threads: worker thread create failed 0x%08x", s_ym);
 		rbx_core_ym_worker_enable(0);
 		return -1;
 	}
 	sceKernelStartThread(s_ym, 0, NULL);
-	RBX_LOG("threads: worker started on CPU1");
+	RBX_LOG("threads: worker started on CPU%d%s", cpu2 ? 2 : 1, high ? " above the render thread (ymzhigh)" : "");
 	start_aux2();
 	start_aux3();
 	return 0;
+}
+
+// The io worker (ADR-160: the CV1000 NAND read ahead, rbx_io_run): it mostly waits in the card reads, so it takes
+// little of its core. CPU1 at 72: above the sound thread (80) so a queued read starts at once, below the audio output
+// (64); its own priority there. RBX_DATA_DIR "nandcpu3": on CPU3 (at 72, between the sampler's 64 and the second
+// blitter lane's 110), "nandsync" / "nandold": no worker (the reads on the emulation thread as before; main.c sets
+// RBX_NAND_AHEAD=0 / RBX_NAND_OLD=1 for the driver)
+#define IO_PRIORITY 72
+static SceUID s_io = -1, s_io_sema = -1;
+static volatile int s_io_quit;
+static void io_wake(void)
+{
+	sceKernelSignalSema(s_io_sema, 1);   // (once a chunk or so: about one a frame; a wake too many only loops once more)
+}
+static int io_thread(SceSize args, void *argp)
+{
+	(void)args;
+	(void)argp;
+	while (!__atomic_load_n(&s_io_quit, __ATOMIC_ACQUIRE)) {
+		if (rbx_io_run())
+			continue;
+		SceUInt timeout = 20000;   // (us: a wake missed costs at most this, the emulation thread reads it itself)
+		sceKernelWaitSema(s_io_sema, 1, &timeout);
+	}
+	return sceKernelExitDeleteThread(0);
+}
+
+void rbx_threads_start_io(void)
+{
+	if (s_io >= 0 || !rbx_io_wanted())
+		return;
+	SceIoStat st;
+	if (sceIoGetstat(RBX_DATA_DIR "nandsync", &st) >= 0 || sceIoGetstat(RBX_DATA_DIR "nandold", &st) >= 0) {
+		RBX_LOG("threads: io worker off (nandsync / nandold)");
+		return;
+	}
+	const int cpu3 = sceIoGetstat(RBX_DATA_DIR "nandcpu3", &st) >= 0 && rbx_cpu3_usable();
+	s_io_sema = sceKernelCreateSema("rbx_io", 0, 0, 1 << 20, NULL);
+	if (s_io_sema < 0) {
+		RBX_LOG("threads: io worker sema failed 0x%08x", s_io_sema);
+		return;
+	}
+	s_io_quit = 0;
+	rbx_set_io_wake(io_wake);
+	s_io = sceKernelCreateThread("rbx_io", io_thread, IO_PRIORITY, 64 * 1024, 0,
+		cpu3 ? 0x00080000 : SCE_KERNEL_CPU_MASK_USER_1, NULL);
+	if (s_io < 0) {
+		RBX_LOG("threads: io worker create failed 0x%08x", s_io);
+		rbx_set_io_wake(NULL);
+		sceKernelDeleteSema(s_io_sema);
+		s_io_sema = -1;
+		return;
+	}
+	sceKernelStartThread(s_io, 0, NULL);
+	rbx_set_io_thread(1);
+	RBX_LOG("threads: io worker started on CPU%d, priority %d", cpu3 ? 3 : 1, IO_PRIORITY);
+}
+
+void rbx_threads_stop_io(void)
+{
+	if (s_io < 0)
+		return;
+	rbx_set_io_thread(0);   // (first: nothing more queued; what is still queued the emulation thread reads or drops)
+	__atomic_store_n(&s_io_quit, 1, __ATOMIC_RELEASE);
+	sceKernelSignalSema(s_io_sema, 1);
+	sceKernelWaitThreadEnd(s_io, NULL, NULL);
+	s_io = -1;
+	rbx_set_io_wake(NULL);
+	sceKernelDeleteSema(s_io_sema);
+	s_io_sema = -1;
 }
 
 // once a frame: the sound board thread on while the render thread has room (its busy time under 13.5 ms a frame), off
@@ -247,7 +361,7 @@ int rbx_threads_start_ym(void)
 void rbx_threads_tick(void)
 {
 	static int n;
-	if (s_aux3 < 0 || ++n < 60)
+	if (s_aux3 < 0 || s_aux3_alone || ++n < 60)
 		return;
 	n = 0;
 	rbx_perf_stats st, se, sf;
@@ -280,6 +394,7 @@ void rbx_threads_stop(void)
 		sceKernelSignalSema(s_aux3_sema, 1);
 		sceKernelWaitThreadEnd(s_aux3, NULL, NULL);
 		s_aux3 = -1;
+		s_aux3_alone = 0;
 		rbx_set_aux3_wake(NULL);
 		sceKernelDeleteSema(s_aux3_sema);
 		s_aux3_sema = -1;

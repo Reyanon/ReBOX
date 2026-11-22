@@ -35,7 +35,8 @@
 static uint8_t *s_rom, *s_zrom;
 static uint32_t s_rom_size, s_zrom_size;
 static uint16_t *s_opcodes;
-static uint16_t s_ram[0x2000];             // 0xff0000 .. 0xff3fff (mirrored to 0xffffff)
+static uint16_t (*s_ram_hp)[0x2000];             // 0xff0000 .. 0xff3fff (mirrored to 0xffffff)
+#define s_ram (*s_ram_hp)
 static uint16_t s_misc[0x10];              // 0x284000, 0x288000, 0x28c000 .. 0x28c00f
 static uint16_t s_spriteram[0x400];
 static uint16_t s_pal[0x400];              // xBGR_444
@@ -48,7 +49,8 @@ static int s_port_in, s_port_sys, s_port_dsw;
 static int s_line;
 static uint32_t s_frame;
 static uint64_t s_cpu_frac, s_z80_frac, s_ym_frac;
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 static struct {
 	deco16ic_t tile;
 	uint16_t rowscroll[2][0x800], spriteram[0x400], pal[0x400];
@@ -245,6 +247,14 @@ static void dw_exit(void);
 
 static int dw_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t tsize, ssize, osize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("audiocpu", &s_zrom_size);
@@ -366,6 +376,10 @@ static void dw_exit(void)
 	m68k_bus.op_size = 0;
 	free(s_opcodes);
 	s_opcodes = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void dw_frame(void)

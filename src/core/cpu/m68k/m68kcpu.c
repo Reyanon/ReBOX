@@ -38,6 +38,7 @@
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
+#include <stddef.h>
 #include <string.h>
 #include "m68kops.h"
 #include "m68kcpu.h"
@@ -637,8 +638,16 @@ void m68k_set_cpu_type(unsigned int cpu_type)
 
 /* Execute some instructions until we use up num_cycles clock cycles */
 /* ASG: removed per-instruction interrupt checks */
+/* ReBOX: the cycles a caller ran in its slice before this m68k_execute (m68k_spin), set just before the call: counted
+   by m68k_cycles_run as one m68k_execute over the whole slice would count them (0 = none) */
+int rbx_m68k_next_base;
+static int m68ki_cycles_base;
+
 int m68k_execute(int num_cycles)
 {
+	m68ki_cycles_base = rbx_m68k_next_base;
+	rbx_m68k_next_base = 0;
+
 	/* Make sure we're not stopped */
 	if(!CPU_STOPPED)
 	{
@@ -669,9 +678,13 @@ int m68k_execute(int num_cycles)
 			REG_PPC = REG_PC;
 
 			/* Read an instruction and call its handler */
-			REG_IR = m68ki_read_imm_16();
-			m68ki_instruction_jump_table[REG_IR]();
-			USE_CYCLES(CYC_INSTRUCTION[REG_IR]);
+			/* ReBOX: the opcode kept in a local (no handler changes REG_IR): not read back after the call */
+			{
+				const uint ir = m68ki_read_imm_16();
+				REG_IR = ir;
+				m68ki_instruction_jump_table[ir]();
+				USE_CYCLES(CYC_INSTRUCTION[ir]);
+			}
 
 			/* Trace m68k_exception, if necessary */
 			m68ki_exception_if_trace(); /* auto-disable (see m68kcpu.h) */
@@ -698,7 +711,7 @@ int m68k_execute(int num_cycles)
 
 int m68k_cycles_run(void)
 {
-	return m68ki_initial_cycles - GET_CYCLES();
+	return m68ki_cycles_base + m68ki_initial_cycles - GET_CYCLES();
 }
 
 int m68k_cycles_remaining(void)
@@ -713,6 +726,18 @@ void m68k_modify_timeslice(int cycles)
 	ADD_CYCLES(cycles);
 }
 
+
+/* ReBOX: clocks added to the interrupt being taken (from rbx_m68k_irqack_hook: MAME's autovector E-clock sync) */
+void m68k_add_int_cycles(int cycles)
+{
+	CPU_INT_CYCLES += cycles;
+}
+
+int m68ki_mame_timing;
+void m68k_set_mame_timing(int on)
+{
+	m68ki_mame_timing = on;
+}
 
 void m68k_end_timeslice(void)
 {
@@ -819,6 +844,12 @@ unsigned int m68k_get_context(void* dst)
 {
 	if(dst) *(m68ki_cpu_core*)dst = m68ki_cpu;
 	return sizeof(m68ki_cpu_core);
+}
+
+void m68k_switch_context(void* save, const void* load)
+{
+	memcpy(save, &m68ki_cpu, offsetof(m68ki_cpu_core, cyc_bcc_notake_b));
+	memcpy(&m68ki_cpu, load, offsetof(m68ki_cpu_core, cyc_bcc_notake_b));
 }
 
 void m68k_set_context(void* src)

@@ -473,6 +473,8 @@ static void execute(m6809_t *c)
 	uint8_t op;
 	uint16_t ea, t;
 fetch:
+	if (c->idle_hook && (c->pc == c->idle_pc[0] || c->pc == c->idle_pc[1]))
+		c->idle_hook(c);
 	if (c->read_op) {   // LIC asserted during the first opcode byte
 		c->cycles++;
 		op = c->read_op(c->ctx, c->pc);
@@ -764,6 +766,10 @@ int m6809_step(m6809_t *c)
 void m6809_run_until(m6809_t *c, int64_t target)
 {
 	while (c->cycles < target) {
+		if (!c->wait && !pending(c)) {   // (the usual case: one instruction, as m6809_step does it)
+			execute(c);
+			continue;
+		}
 		if (c->wait) {
 			int wake = c->wait == W_CWAI ? pending(c) != 0
 			         : c->wait == W_SYNC ? (c->nmi_asserted || c->firq_line || c->irq_line) : 0;

@@ -45,11 +45,14 @@ static uint32_t s_palram[0x800], s_pal[0x800];   // 0x130000 (xBGR_888), the col
 static uint8_t s_pal_dirty[0x800];
 static uint32_t s_spriteram[0x800], s_spriteram_buf[0x800];
 static uint32_t s_format[2][0x400], s_spritetile[2][0x2000], s_clip[0x200], s_index[0x100];
-static uint32_t s_rowscroll32[4][0x1000];
-static uint16_t s_rowscroll[4][0x1000];
+static uint32_t (*s_rowscroll32_hp)[4][0x1000];
+#define s_rowscroll32 (*s_rowscroll32_hp)
+static uint16_t (*s_rowscroll_hp)[4][0x1000];
+#define s_rowscroll (*s_rowscroll_hp)
 static uint32_t s_sprite_ctrl, s_lightgun_port, s_gun_speaker_off, s_rand;
 static int s_gun[2][2];
-static deco16ic_t s_tile[2];
+static deco16ic_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static deco146_t s_prot;
 static deco_irq_t s_irq;
 static armpoll_t s_poll;   // the waits for the interrupt's flag (0x11f15c, pc 0x6288) and the vblank (IN2, pc 0x6648)
@@ -71,8 +74,10 @@ static lc7535_t s_vol[2];
 static void lc7535_clk(lc7535_t *v, int sel, int state);
 static uint32_t s_out_rate, s_oki_phase[3];
 static int32_t s_oki_last[3];
-static uint8_t s_pri_buf[VIS_W * VIS_H];
-static uint16_t s_sprbm[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
+static uint16_t (*s_sprbm_hp)[VIS_W * VIS_H];
+#define s_sprbm (*s_sprbm_hp)
 static struct {
 	deco16ic_t tile[2];
 	uint16_t rowscroll[4][0x800];
@@ -624,6 +629,26 @@ static void dg_exit(void);
 
 static int dg_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_rowscroll_hp && !(s_rowscroll_hp = calloc(1, sizeof(*s_rowscroll_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_rowscroll32_hp && !(s_rowscroll32_hp = calloc(1, sizeof(*s_rowscroll32_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_sprbm_hp && !(s_sprbm_hp = calloc(1, sizeof(*s_sprbm_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t t1s, t2s, t3s, o1s, o2s, o3s;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_snd_rom = rbx_region("audiocpu", &s_snd_rom_size);
@@ -786,6 +811,16 @@ static void dg_exit(void)
 	free(s_oki_main);
 	free(s_oki_gun);
 	s_mix_l = s_mix_r = s_oki_main = s_oki_gun = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_rowscroll_hp);
+	s_rowscroll_hp = NULL;
+	free(s_rowscroll32_hp);
+	s_rowscroll32_hp = NULL;
+	free(s_sprbm_hp);
+	s_sprbm_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void dg_frame(void)

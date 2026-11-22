@@ -74,11 +74,15 @@ static struct {
 	int video_on, cloud_draw, cloud_alpha;
 	k051316_t k316[2];
 } s_vs;
-static uint32_t s_frame32[BMP_H][BMP_W];   // (WEC: the rgb32 bitmap with its pads)
-static uint16_t s_frame16[VIS_H][VIS_W];   // (Hot Chase: the ind16 bitmap)
-static uint8_t s_dummy_pri[VIS_H * VIS_W];
+static uint32_t (*s_frame32_hp)[BMP_H][BMP_W];   // (WEC: the rgb32 bitmap with its pads)
+#define s_frame32 (*s_frame32_hp)
+static uint16_t (*s_frame16_hp)[VIS_H][VIS_W];   // (Hot Chase: the ind16 bitmap)
+#define s_frame16 (*s_frame16_hp)
+static uint8_t (*s_dummy_pri_hp)[VIS_H * VIS_W];
+#define s_dummy_pri (*s_dummy_pri_hp)
 #define BLACK_PEN 0x2000
-static int32_t s_snd[2][2048];
+static int32_t (*s_snd_hp)[2][2048];
+#define s_snd (*s_snd_hp)
 static int s_snd_n;
 
 static inline uint8_t pal4(int v) { return (uint8_t)((v & 15) * 17); }
@@ -614,9 +618,11 @@ static uint8_t selected_ip_r(void)
 #define Q_MAX 2048
 enum { Q_ADV, Q_LATCH, Q_IRQ, Q_ZRUN };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
-static int32_t s_out[2][2048];
+static int32_t (*s_out_hp)[2][2048];
+#define s_out (*s_out_hp)
 static int s_out_n, s_out_pos;
 static volatile int s_job_frame;
 
@@ -1055,6 +1061,30 @@ static void we_reset(void);
 
 static int we_init(const rbx_game *g)
 {
+	if (!s_dummy_pri_hp && !(s_dummy_pri_hp = calloc(1, sizeof(*s_dummy_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_frame16_hp && !(s_frame16_hp = calloc(1, sizeof(*s_frame16_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_frame32_hp && !(s_frame32_hp = calloc(1, sizeof(*s_frame32_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_out_hp && !(s_out_hp = calloc(1, sizeof(*s_out_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_snd_hp && !(s_snd_hp = calloc(1, sizeof(*s_snd_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_hot = !strcmp(g->machine, "hotchase");
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_subrom = rbx_region("sub", &s_subrom_size);
@@ -1252,6 +1282,18 @@ static void we_exit(void)
 	free(s_tilegfx);
 	free(s_roadgfx);
 	s_tilegfx = s_roadgfx = NULL;
+	free(s_dummy_pri_hp);
+	s_dummy_pri_hp = NULL;
+	free(s_frame16_hp);
+	s_frame16_hp = NULL;
+	free(s_frame32_hp);
+	s_frame32_hp = NULL;
+	free(s_out_hp);
+	s_out_hp = NULL;
+	free(s_q_hp);
+	s_q_hp = NULL;
+	free(s_snd_hp);
+	s_snd_hp = NULL;
 }
 
 static void we_reset(void)

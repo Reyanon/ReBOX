@@ -1,17 +1,20 @@
 // The game list's preview: ux0:data/rebox/snap/<set>.mp4 (AvPlayer, looped, with its sound), .png or .jpg, or the parent's.
 // A thread of its own opens, closes and plays the sound, so the list never waits; the frames are copied to two buffers of
 // ours, so the GPU never reads one the player is writing. GPL-2.0-or-later.
+#include "frontend/gamelist.h"
 #include "frontend/avsnap.h"
 
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 #include <psp2/audioout.h>
 #include <psp2/avplayer.h>
 #include <psp2/gxm.h>
 #include <psp2/io/stat.h>
 #include <psp2/kernel/sysmem.h>
+#include <psp2/kernel/processmgr.h>
 #include <psp2/kernel/threadmgr.h>
 #include <psp2/sysmodule.h>
 
@@ -26,6 +29,31 @@ static volatile unsigned s_req;       // the newest request's number
 static char s_req_game[32], s_req_parent[32];
 static SceAvPlayerHandle s_player;    // (the thread's)
 static int s_loaded;
+static SceUInt64 s_open_us;   // (when the player was opened)
+static volatile int s_had_frame;   // (the open player gave a frame)
+#define BAD_MAX 64
+static char s_bad[BAD_MAX][48], s_open_path[48];   // the videos that gave no frame this run, the one open
+static uint8_t s_bad_n[BAD_MAX];                      // (their failures)
+static int s_nbad;
+static int is_bad(const char *path)
+{
+	for (int i = 0; i < s_nbad; i++)
+		if (!strcmp(s_bad[i], path))
+			return s_bad_n[i] >= 2;   // (11-22: twice; once was the decoder's state as often as the file)
+	return 0;
+}
+static void bad_note(const char *path)
+{
+	for (int i = 0; i < s_nbad; i++)
+		if (!strcmp(s_bad[i], path)) {
+			s_bad_n[i]++;
+			return;
+		}
+	if (s_nbad < BAD_MAX) {
+		snprintf(s_bad[s_nbad], sizeof(s_bad[0]), "%s", path);
+		s_bad_n[s_nbad++] = 1;
+	}
+}
 static volatile int s_kind;           // RBX_SNAP_*: what is shown now
 static vita2d_texture *volatile s_img;
 static vita2d_texture s_tex;          // the video's picture
@@ -33,14 +61,36 @@ static void *s_buf[2];
 static int s_cur, s_have, s_fade_n;
 static int s_port = -1, s_port_grain, s_port_rate, s_port_mode;
 
+// the player's memory (user 11-22): its big blocks in memory blocks of their own, not the app's heap. With the heap
+// nearly full (0.6 MB free after a while in the list) the decoder got no memory and gave no frame, every video after
+#define BIG_ALLOC 0x10000u
 static void *mem_alloc(void *arg, uint32_t alignment, uint32_t size)
 {
 	(void)arg;
+	if (size >= BIG_ALLOC && alignment <= 4096) {
+		const SceUID uid = sceKernelAllocMemBlock("rbx_avsnap_mem", SCE_KERNEL_MEMBLOCK_TYPE_USER_RW,
+			(size + 0xfffu) & ~0xfffu, NULL);
+		void *p = NULL;
+		if (uid >= 0 && sceKernelGetMemBlockBase(uid, &p) >= 0)
+			return p;
+		if (uid >= 0)
+			sceKernelFreeMemBlock(uid);
+		RBX_LOG("avsnap: player memory %u in a block failed (%08x)", (unsigned)size, (unsigned)uid);
+	}
 	return memalign(alignment < 64 ? 64 : alignment, size);
 }
 static void mem_free(void *arg, void *p)
 {
 	(void)arg;
+	if (!p)
+		return;
+	const SceUID uid = sceKernelFindMemBlockByAddr(p, 0);
+	SceKernelMemBlockInfo bi;
+	bi.size = sizeof(bi);
+	if (uid >= 0 && sceKernelGetMemBlockInfoByAddr(p, &bi) >= 0 && bi.mappedBase == p) {   // (one of ours: its block)
+		sceKernelFreeMemBlock(uid);
+		return;
+	}
 	free(p);
 }
 // memory the GPU reads
@@ -57,27 +107,62 @@ static void *gpu_alloc(uint32_t size)
 	}
 	return p;
 }
-static void *frame_alloc(void *arg, uint32_t alignment, uint32_t size)
+// the player's frame blocks, kept so that those it does not give back are freed after its close: a video the
+// decoder cannot play (no frame ever) left its blocks, and after a few the next videos found no memory (user 11-15)
+#define FRAME_BLOCKS 32
+static void *s_fb[FRAME_BLOCKS];
+static SceKernelLwMutexWork s_fb_lock;
+static int s_fb_lock_ok;
+static void fb_lock(void) { if (s_fb_lock_ok) sceKernelLockLwMutex(&s_fb_lock, 1, NULL); }
+static void fb_unlock(void) { if (s_fb_lock_ok) sceKernelUnlockLwMutex(&s_fb_lock, 1); }
+static void gpu_free(void *p)
 {
-	(void)arg;
-	(void)alignment;
-	return gpu_alloc(size);
-}
-static void frame_free(void *arg, void *p)
-{
-	(void)arg;
 	const SceUID uid = sceKernelFindMemBlockByAddr(p, 0);
 	if (uid >= 0) {
 		sceGxmUnmapMemory(p);
 		sceKernelFreeMemBlock(uid);
 	}
 }
+static void *frame_alloc(void *arg, uint32_t alignment, uint32_t size)
+{
+	(void)arg;
+	(void)alignment;
+	void *p = gpu_alloc(size);
+	if (!p) {
+		RBX_LOG("avsnap: frame memory %u failed", (unsigned)size);
+		return NULL;
+	}
+	fb_lock();
+	for (int i = 0; i < FRAME_BLOCKS; i++)
+		if (!s_fb[i]) {
+			s_fb[i] = p;
+			break;
+		}
+	fb_unlock();
+	return p;
+}
+static void frame_free(void *arg, void *p)
+{
+	(void)arg;
+	fb_lock();
+	for (int i = 0; i < FRAME_BLOCKS; i++)
+		if (s_fb[i] == p)
+			s_fb[i] = NULL;
+	fb_unlock();
+	gpu_free(p);
+}
 
+static void mem_note(const char *what);
 static int open_video(const char *path)
 {
+	if (!s_fb_lock_ok)
+		s_fb_lock_ok = sceKernelCreateLwMutex(&s_fb_lock, "rbx_avsnap_fb", 0, 0, NULL) >= 0;
 	if (!s_loaded) {
-		if (sceSysmoduleLoadModule(SCE_SYSMODULE_AVPLAYER) < 0)
+		const int m = sceSysmoduleLoadModule(SCE_SYSMODULE_AVPLAYER);
+		if (m < 0) {
+			RBX_LOG("avsnap: AvPlayer module %08x", (unsigned)m);
 			return 0;
+		}
 		s_loaded = 1;
 	}
 	SceAvPlayerInitData d;
@@ -103,7 +188,25 @@ static int open_video(const char *path)
 		return 0;
 	}
 	sceAvPlayerSetLooping(s_player, SCE_TRUE);
+	s_had_frame = 0;
+	s_open_us = sceKernelGetProcessTimeWide();
+	snprintf(s_open_path, sizeof(s_open_path), "%s", path);
+	RBX_LOG("avsnap: %s opened", path);
+	mem_note("opened");
 	return 1;
+}
+
+// (the memory free now: logged with each open and each video that gave no frame, user 11-22: videos stopped coming after
+// a while in the list)
+static void mem_note(const char *what)
+{
+	SceKernelFreeMemorySizeInfo fm;
+	fm.size = sizeof(fm);
+	if (sceKernelGetFreeMemorySize(&fm) < 0)
+		fm.size_user = fm.size_cdram = fm.size_phycont = 0;
+	const struct mallinfo mi = mallinfo();
+	RBX_LOG("avsnap: %s: free user %u KB cdram %u KB phycont %u KB, heap in use %u KB free %u KB", what,
+		fm.size_user >> 10, fm.size_cdram >> 10, fm.size_phycont >> 10, (unsigned)mi.uordblks >> 10, (unsigned)mi.fordblks >> 10);
 }
 
 static void close_all(void)
@@ -111,9 +214,44 @@ static void close_all(void)
 	s_kind = RBX_SNAP_NONE;
 	sceKernelDelayThread(40000);   // (the frames being drawn are done with what was shown)
 	if (s_player) {
+		// (11-22: a player closed while it was still starting (the cursor moved on within a moment) left the decoder
+		// taken: every video after it gave no frame. It is kept 0.8 s at least; this thread waits, not the list)
+		for (int i = 0; i < 40 && !s_had_frame && sceAvPlayerIsActive(s_player) &&
+			sceKernelGetProcessTimeWide() - s_open_us < 800000; i++)
+			sceKernelDelayThread(20000);
+		// (no frame and the player stopped by itself: it could not decode the file; one left before its first frame
+		// only because the cursor moved on is not that)
+		const int failed = !s_had_frame && !sceAvPlayerIsActive(s_player);
 		sceAvPlayerStop(s_player);
+		for (int i = 0; i < 50 && sceAvPlayerIsActive(s_player); i++)   // (its threads stopped first)
+			sceKernelDelayThread(2000);
 		sceAvPlayerClose(s_player);
 		s_player = 0;
+		fb_lock();   // (the blocks it kept: freed now)
+		int left = 0;
+		for (int i = 0; i < FRAME_BLOCKS; i++)
+			if (s_fb[i]) {
+				gpu_free(s_fb[i]);
+				s_fb[i] = NULL;
+				left++;
+			}
+		fb_unlock();
+		if (left)
+			RBX_LOG("avsnap: %d frame blocks left by the player freed", left);
+		// (a video that gave no frame (some files the player cannot decode: it stops on them): not opened again this
+		// run, its picture shown instead. Opened a second time, no video played any more until the Vita restarted (a
+		// video opened next may fail once too and is left out with it))
+		if (failed && s_open_path[0]) {
+			bad_note(s_open_path);
+			RBX_LOG("avsnap: %s gave no frame%s", s_open_path, is_bad(s_open_path) ? ": not opened again" : "");
+			mem_note("no frame");
+			sceKernelDelayThread(500000);   // (the next video opened at once failed too: the decoder's time back)
+			// (11-22: the module is not loaded again after it: that left 5 MB of CDRAM behind each time)
+		}
+		s_open_path[0] = 0;
+		// (user 11-15: after many previews no video came any more, each player then leaking its frame blocks: one
+		// opened right after a close found the decoder still taken. Some time for it to be given back)
+		sceKernelDelayThread(100000);
 	}
 	if (s_img) {
 		vita2d_free_texture(s_img);
@@ -123,15 +261,25 @@ static void close_all(void)
 	s_fade_n = 0;
 }
 
+// an image file: the path as given, or with .png and .jpg swapped
+static vita2d_texture *load_any(const char *path)
+{
+	char alt[256];
+	snprintf(alt, sizeof(alt), "%s", path);
+	const size_t l = strlen(alt);
+	const int jpg = l > 4 && (!strcasecmp(alt + l - 4, ".jpg") || (l > 5 && !strcasecmp(alt + l - 5, ".jpeg")));
+	vita2d_texture *t = jpg ? vita2d_load_JPEG_file(alt) : vita2d_load_PNG_file(alt);
+	if (!t && l > 4 && alt[l - 4] == '.') {
+		strcpy(alt + l - 3, jpg ? "png" : "jpg");
+		t = jpg ? vita2d_load_PNG_file(alt) : vita2d_load_JPEG_file(alt);
+	}
+	return t;
+}
+
 static vita2d_texture *load_image(const char *name)
 {
-	char path[160];
-	snprintf(path, sizeof(path), RBX_DATA_DIR "snap/%s.png", name);
-	vita2d_texture *t = vita2d_load_PNG_file(path);
-	if (!t) {
-		snprintf(path, sizeof(path), RBX_DATA_DIR "snap/%s.jpg", name);
-		t = vita2d_load_JPEG_file(path);
-	}
+	char path[256];
+	vita2d_texture *t = rbx_gamelist_media(name, 1, path, sizeof(path)) ? load_any(path) : NULL;
 	if (t)
 		vita2d_texture_set_filters(t, SCE_GXM_TEXTURE_FILTER_LINEAR, SCE_GXM_TEXTURE_FILTER_LINEAR);
 	return t;
@@ -140,13 +288,14 @@ static vita2d_texture *load_image(const char *name)
 static void open_game(const char *game, const char *parent)
 {
 	const char *names[2] = { game, parent };
-	for (int k = 0; k < 2; k++) {   // (a video first, the set's or else its parent's)
-		char path[160];
+	for (int k = 0; k < 2; k++) {   // (a video first, the set's or else its parent's: the list's "video", else video/<set>.mp4)
+		char path[256];
 		SceIoStat st;
-		if (!names[k][0])
+		if (!names[k][0] || !rbx_gamelist_media(names[k], 2, path, sizeof(path)))
 			continue;
-		snprintf(path, sizeof(path), RBX_DATA_DIR "snap/%s.mp4", names[k]);
-		if (sceIoGetstat(path, &st) >= 0 && open_video(path)) {
+		if (sceIoGetstat(path, &st) < 0)   // (where the videos were before 11-22: snap/<set>.mp4)
+			snprintf(path, sizeof(path), RBX_DATA_DIR "snap/%s.mp4", names[k]);
+		if (sceIoGetstat(path, &st) >= 0 && !is_bad(path) && open_video(path)) {
 			s_kind = RBX_SNAP_VIDEO;
 			return;
 		}
@@ -218,7 +367,9 @@ void rbx_snap_request(const char *game, const char *parent)
 	s_kind = RBX_SNAP_NONE;   // (gone at once; the thread closes it)
 	if (s_thread < 0) {
 		s_sema = sceKernelCreateSema("rbx_avsnap", 0, 0, 1, NULL);
-		s_thread = sceKernelCreateThread("rbx_avsnap", snap_thread, 0x60, 0x40000, 0, 0, NULL);
+		// (CPU2, user 11-22: high priority for the sound, so on the list's core a picture decoded in it stopped the list's
+		// frames 80-100 ms. CPU2 draws the games, not the list)
+		s_thread = sceKernelCreateThread("rbx_avsnap", snap_thread, 0x60, 0x40000, 0, SCE_KERNEL_CPU_MASK_USER_2, NULL);
 		if (s_thread < 0)
 			return;
 		sceKernelStartThread(s_thread, 0, NULL);
@@ -243,6 +394,14 @@ vita2d_texture *rbx_snap_frame(void)
 		memset(&f, 0, sizeof(f));
 		if (sceAvPlayerIsActive(s_player) && sceAvPlayerGetVideoData(s_player, &f) && f.pData) {
 			const uint32_t w = f.details.video.width, h = f.details.video.height, size = w * h * 3 / 2;
+			if (!s_have)
+				RBX_LOG("avsnap: first frame %ux%u", (unsigned)w, (unsigned)h);
+			s_had_frame = 1;
+			if (size > FRAME_BLOCK) {
+				static unsigned big;
+				if (big++ % 120 == 0)
+					RBX_LOG("avsnap: frame %ux%u too big for our copy (%u bytes)", (unsigned)w, (unsigned)h, (unsigned)size);
+			}
 			if (size <= FRAME_BLOCK) {
 				const int next = !s_cur;
 				if (!s_buf[next])

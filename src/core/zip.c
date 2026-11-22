@@ -150,3 +150,63 @@ int rbx_zip_read(rbx_zip *z, int i, uint8_t *out)
 	free(in);
 	return rc;
 }
+
+int rbx_zip_read_cb(rbx_zip *z, int i, int (*cb)(void *user, const uint8_t *data, uint32_t len), void *user)
+{
+	if (!z || i < 0 || i >= z->count)
+		return -1;
+	const rbx_zip_entry *e = &z->e[i];
+	uint8_t lh[30];
+	if (fseek(z->fp, e->offset, SEEK_SET) || fread(lh, 1, 30, z->fp) != 30 || le32(lh) != 0x04034b50)
+		return -1;
+	if (fseek(z->fp, e->offset + 30 + le16(lh + 26) + le16(lh + 28), SEEK_SET))
+		return -1;
+	if (e->method != 0 && e->method != 8)
+		return -1;
+	enum { CHUNK = 0x40000 };
+	uint8_t *in = (uint8_t *)malloc(CHUNK), *out = (uint8_t *)malloc(CHUNK);
+	z_stream s;
+	memset(&s, 0, sizeof(s));
+	int rc = -1;
+	if (!in || !out || (e->method == 8 && inflateInit2(&s, -MAX_WBITS) != Z_OK))
+		goto done;
+	uint32_t left_in = e->method == 8 ? e->csize : e->size, total = 0;
+	int r = Z_OK;
+	while (total < e->size) {
+		if (e->method == 0) {   // (stored)
+			const uint32_t n = left_in < CHUNK ? left_in : CHUNK;
+			if (!n || fread(out, 1, n, z->fp) != n || cb(user, out, n))
+				break;
+			left_in -= n;
+			total += n;
+			continue;
+		}
+		if (!s.avail_in) {
+			const uint32_t n = left_in < CHUNK ? left_in : CHUNK;
+			if (n && fread(in, 1, n, z->fp) != n)
+				break;
+			left_in -= n;
+			s.next_in = in;
+			s.avail_in = n;
+		}
+		s.next_out = out;
+		s.avail_out = CHUNK;
+		r = inflate(&s, Z_NO_FLUSH);
+		if (r != Z_OK && r != Z_STREAM_END)
+			break;
+		const uint32_t n = CHUNK - s.avail_out;
+		if (total + n > e->size || (n && cb(user, out, n)))
+			break;
+		total += n;
+		if (r == Z_STREAM_END || (!n && !s.avail_in && !left_in))
+			break;
+	}
+	if (total == e->size)
+		rc = 0;
+	if (e->method == 8)
+		inflateEnd(&s);
+done:
+	free(in);
+	free(out);
+	return rc;
+}

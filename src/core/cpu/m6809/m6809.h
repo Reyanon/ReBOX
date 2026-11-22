@@ -36,6 +36,10 @@ struct m6809_s {
 	void *ctx;
 	// KONAMI1 (konami1.cpp): the opcode bytes (the prefixes' too) XOR-ed by the address's bits 1 and 3
 	uint8_t konami1;
+	// wait loops: idle_hook runs before an opcode is fetched at idle_pc[0] or [1] (NULL: none; a driver that skips
+	// loops it knows exactly)
+	uint16_t idle_pc[2];
+	void (*idle_hook)(m6809_t *c);
 };
 
 // clear registers and the bus tables (call once, then set the bus and m6809_reset)

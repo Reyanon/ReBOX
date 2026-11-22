@@ -8,7 +8,7 @@
 */
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
-#include "../machine/taito68705.h"
+#include "../../machine/taito68705.h"
 #include "../../sound/ay8910.h"
 #include "../../sound/msm5232.h"
 
@@ -69,7 +69,8 @@ static uint8_t s_snap_vram[0x800], s_snap_group[0x400], s_snap_spr[0xa0], s_snap
 static uint8_t s_snap_pal[0x200], s_snap_pal_ext[0x200];
 static uint8_t s_snap_char_bank;
 static int s_snap_spot;
-static int8_t s_key[SCREEN_W * VIS_H];
+static int8_t (*s_key_hp)[SCREEN_W * VIS_H];
+#define s_key (*s_key_hp)
 // ports
 static int s_p_dsw[3], s_p_in0, s_p_in1;
 
@@ -579,10 +580,16 @@ static void ny_exit(void)
 	s_tiles = s_sprites = NULL;
 	free(s_mix);
 	s_mix = NULL;
+	free(s_key_hp);
+	s_key_hp = NULL;
 }
 
 static int ny_init(const rbx_game *g)
 {
+	if (!s_key_hp && !(s_key_hp = calloc(1, sizeof(*s_key_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_kind = kind_of(g->machine);
 	if (s_kind < 0) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);

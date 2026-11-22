@@ -34,7 +34,8 @@
 static uint8_t *s_rom, *s_zrom;
 static uint32_t s_rom_size, s_zrom_size;
 static int s_boot;                         // sshanghab
-static uint16_t s_ram[0x4000];             // 0x3ec000 .. 0x3f3fff (bootleg: 0xfec000 .. 0xff3fff)
+static uint16_t (*s_ram_hp)[0x4000];             // 0x3ec000 .. 0x3f3fff (bootleg: 0xfec000 .. 0xff3fff)
+#define s_ram (*s_ram_hp)
 static uint16_t s_ram2[0x400];             // bootleg 0xff4000 .. 0xff47ff
 static uint16_t s_vram_ext[0xc00];         // 0x206800 .. 0x207fff
 static uint16_t s_spriteram[2][0x400];
@@ -52,7 +53,8 @@ static int s_port_in, s_port_sys, s_port_dsw;
 static int s_line;
 static uint32_t s_frame;
 static uint64_t s_cpu_frac, s_z80_frac, s_ym_frac;
-static uint16_t s_sbm[2][VIS_W * VIS_H];   // the sprites drawn raw (pen | colour << 4)
+static uint16_t (*s_sbm_hp)[2][VIS_W * VIS_H];   // the sprites drawn raw (pen | colour << 4)
+#define s_sbm (*s_sbm_hp)
 static struct {
 	deco16ic_t tile;
 	uint16_t rowscroll[2][0x400], spriteram[2][0x400], palram[0x800], video;
@@ -304,6 +306,14 @@ static void map_mirrors(uint32_t start, uint32_t end, void *mem, uint32_t size, 
 
 static int ss_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_sbm_hp && !(s_sbm_hp = calloc(1, sizeof(*s_sbm_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t tsize, s1s, s2s, os;
 	s_boot = !strcmp(g->set, "sshanghab");
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -430,6 +440,10 @@ static void ss_exit(void)
 	rbx_gfx_free(&s_gfxspr[1]);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_sbm_hp);
+	s_sbm_hp = NULL;
 }
 
 static void ss_frame(void)

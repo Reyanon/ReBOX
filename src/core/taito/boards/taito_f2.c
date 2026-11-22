@@ -297,9 +297,11 @@ static int s_nram;
 static uint16_t *s_pal;               // palette RAM (or TC0110PCR RAM)
 static uint32_t s_pal_bytes;
 static uint16_t s_pcr_addr;
-static uint16_t s_spr[0x8000];         // sprite RAM 0x10000 bytes
+static uint16_t (*s_spr_hp)[0x8000];         // sprite RAM 0x10000 bytes
+#define s_spr (*s_spr_hp)
 static uint16_t s_spr_buf[0x8000], s_spr_delayed[0x8000];
-static uint16_t s_ext[0x2000];         // sprite extension (0x4000 bytes mapped; 0x800 words used)
+static uint16_t (*s_ext_hp)[0x2000];         // sprite extension (0x4000 bytes mapped; 0x800 words used)
+#define s_ext (*s_ext_hp)
 static tc0100scn_t *s_scn[2];
 static tc0280grd_t *s_grd;
 static tc0480scp_t *s_scp;
@@ -738,7 +740,8 @@ static void screen_vblank(void)
 
 // ---- sprites: drawing (MAME draw_sprites, taito_f2_tc360_spritemixdraw) ----
 typedef struct { uint32_t code, color; int flipx, flipy, x, y, zoomx, zoomy; uint64_t primask; } tempsprite_t;
-static tempsprite_t s_list[0x400];
+static tempsprite_t (*s_list_hp)[0x400];
+#define s_list (*s_list_hp)
 
 static tempsprite_t *s_list_end;   // (the list draw_sprites made: s_list .. s_list_end)
 
@@ -1448,6 +1451,18 @@ static tc0100scn_t *make_scn(const char *region, int second)
 
 static int f2_init(const rbx_game *g)
 {
+	if (!s_ext_hp && !(s_ext_hp = calloc(1, sizeof(*s_ext_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_list_hp && !(s_list_hp = calloc(1, sizeof(*s_list_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_spr_hp && !(s_spr_hp = calloc(1, sizeof(*s_spr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_m = find_machine(g->machine);
 	if (!s_m) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);
@@ -1655,6 +1670,12 @@ static void f2_exit(void)
 		s_dz_oki = NULL;
 	} else
 		tsnd_exit();
+	free(s_ext_hp);
+	s_ext_hp = NULL;
+	free(s_list_hp);
+	s_list_hp = NULL;
+	free(s_spr_hp);
+	s_spr_hp = NULL;
 }
 
 // ---- frame ----

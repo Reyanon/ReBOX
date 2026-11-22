@@ -9,6 +9,7 @@
 #include <psp2/ctrl.h>
 #include <psp2/io/fcntl.h>
 #include <psp2/io/stat.h>
+#include <psp2/kernel/threadmgr.h>
 
 #include "frontend/settings.h"
 #include "platform/log.h"
@@ -82,11 +83,66 @@ static void load(void)
 	RBX_LOG("testpad: %d steps", s_n);
 }
 
+// the watcher (rbx_testfile_seen): one flag a file, set by the thread, taken by the frame loop
+static const char *const s_watch[] = { KEYS_PATH, RBX_DATA_DIR "shotgame", RBX_DATA_DIR "shotfb" };
+#define NWATCH (sizeof(s_watch) / sizeof(s_watch[0]))
+static volatile int s_seen[NWATCH];
+static volatile int s_watch_on, s_watch_quit;
+static SceUID s_watch_th = -1;
+static int watch_thread(SceSize args, void *argp)
+{
+	(void)args;
+	(void)argp;
+	while (!__atomic_load_n(&s_watch_quit, __ATOMIC_ACQUIRE)) {
+		for (unsigned i = 0; i < NWATCH; i++) {
+			SceIoStat st;
+			if (sceIoGetstat(s_watch[i], &st) >= 0)
+				__atomic_store_n(&s_seen[i], 1, __ATOMIC_RELEASE);
+		}
+		sceKernelDelayThread(250000);
+	}
+	return sceKernelExitDeleteThread(0);
+}
+void rbx_testfiles_start(void)
+{
+	if (s_watch_th >= 0)
+		return;
+	s_watch_quit = 0;
+	// (CPU1 at 190: below everything there, the sound thread 80 and the io worker 72; the card stat waits off the CPU)
+	s_watch_th = sceKernelCreateThread("rbx_testfiles", watch_thread, 190, 0x4000, 0, 0x00020000 /* CPU1 */, NULL);
+	if (s_watch_th < 0 || sceKernelStartThread(s_watch_th, 0, NULL) < 0) {
+		RBX_LOG("testpad: file watcher not started (0x%08x): the frame loop looks itself", (unsigned)s_watch_th);
+		if (s_watch_th >= 0)
+			sceKernelDeleteThread(s_watch_th);
+		s_watch_th = -1;
+		return;
+	}
+	__atomic_store_n(&s_watch_on, 1, __ATOMIC_RELEASE);
+}
+void rbx_testfiles_stop(void)
+{
+	if (s_watch_th < 0)
+		return;
+	__atomic_store_n(&s_watch_on, 0, __ATOMIC_RELEASE);
+	__atomic_store_n(&s_watch_quit, 1, __ATOMIC_RELEASE);
+	sceKernelWaitThreadEnd(s_watch_th, NULL, NULL);
+	s_watch_th = -1;
+}
+int rbx_testfile_seen(const char *path)
+{
+	if (!__atomic_load_n(&s_watch_on, __ATOMIC_ACQUIRE))
+		return 1;
+	for (unsigned i = 0; i < NWATCH; i++)
+		if (!strcmp(path, s_watch[i]))
+			return __atomic_exchange_n(&s_seen[i], 0, __ATOMIC_ACQ_REL);
+	return 1;   // (not watched: the caller looks)
+}
+
 uint32_t rbx_testpad_step(void)
 {
 	s_ton = 0;
 	if (s_i >= s_n) {
-		if (++s_poll % 30 == 0) {
+		if (++s_poll % 30 == 0 && rbx_testfile_seen(KEYS_PATH)) {
 			SceIoStat st;
 			if (sceIoGetstat(KEYS_PATH, &st) >= 0)
 				load();

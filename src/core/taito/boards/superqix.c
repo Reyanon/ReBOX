@@ -58,7 +58,8 @@ static uint8_t *s_rom;
 static uint32_t s_rom_size;
 static uint8_t s_ram[0x2000];          // e000-ffff (spriteram e000, videoram e800)
 static uint8_t s_palram[0x200];
-static uint8_t s_bitmap[2][0x7000];    // sqix bitmap RAM (I/O 0800-77ff, 8800-f7ff)
+static uint8_t (*s_bitmap_hp)[2][0x7000];    // sqix bitmap RAM (I/O 0800-77ff, 8800-f7ff)
+#define s_bitmap (*s_bitmap_hp)
 static z80 s_z;
 static int s_z80_reset;                // Z80 /RESET held by the 8751
 static int s_nmi_line, s_nmi_mask;
@@ -92,7 +93,8 @@ static uint8_t *s_char_used, *s_bg_used, *s_spr_used;   // tile has a non-zero p
 static int s_nchars, s_nbg, s_nspr;
 static uint8_t s_snap_ram[0x1000];     // e000-efff
 static uint8_t s_snap_pal[0x200];
-static uint8_t s_snap_bitmap[0x7000];
+static uint8_t (*s_snap_bitmap_hp)[0x7000];
+#define s_snap_bitmap (*s_snap_bitmap_hp)
 static int s_snap_gfxbank, s_snap_flip;
 static int s_line;
 // ports
@@ -700,10 +702,22 @@ static void sq_exit(void)
 	free(s_spr_used); s_spr_used = NULL;
 	free(s_smp_buf); s_smp_buf = NULL;
 	free(s_mix); s_mix = NULL;
+	free(s_bitmap_hp);
+	s_bitmap_hp = NULL;
+	free(s_snap_bitmap_hp);
+	s_snap_bitmap_hp = NULL;
 }
 
 static int sq_init(const rbx_game *g)
 {
+	if (!s_bitmap_hp && !(s_bitmap_hp = calloc(1, sizeof(*s_bitmap_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_snap_bitmap_hp && !(s_snap_bitmap_hp = calloc(1, sizeof(*s_snap_bitmap_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_m = find_machine(g->machine);
 	if (!s_m) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);

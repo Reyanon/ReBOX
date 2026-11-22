@@ -407,6 +407,7 @@ void m68k_op_divs_16_d(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(DY);
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -445,6 +446,7 @@ void m68k_op_divs_16_ai(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_AY_AI_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -483,6 +485,7 @@ void m68k_op_divs_16_pi(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_AY_PI_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -521,6 +524,7 @@ void m68k_op_divs_16_pd(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_AY_PD_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -559,6 +563,7 @@ void m68k_op_divs_16_di(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_AY_DI_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -597,6 +602,7 @@ void m68k_op_divs_16_ix(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_AY_IX_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -635,6 +641,7 @@ void m68k_op_divs_16_aw(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_AW_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -673,6 +680,7 @@ void m68k_op_divs_16_al(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_AL_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -711,6 +719,7 @@ void m68k_op_divs_16_pcdi(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_PCDI_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -749,6 +758,7 @@ void m68k_op_divs_16_pcix(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_PCIX_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -787,6 +797,7 @@ void m68k_op_divs_16_i(void)
 {
 	uint* r_dst = &DX;
 	sint src = MAKE_INT_16(OPER_I_16());
+	M68K_DIVS_TIMING(*r_dst, src);
 	sint quotient;
 	sint remainder;
 
@@ -825,6 +836,7 @@ void m68k_op_divu_16_d(void)
 {
 	uint* r_dst = &DX;
 	uint src = MASK_OUT_ABOVE_16(DY);
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -851,6 +863,7 @@ void m68k_op_divu_16_ai(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_AY_AI_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -877,6 +890,7 @@ void m68k_op_divu_16_pi(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_AY_PI_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -903,6 +917,7 @@ void m68k_op_divu_16_pd(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_AY_PD_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -929,6 +944,7 @@ void m68k_op_divu_16_di(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_AY_DI_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -955,6 +971,7 @@ void m68k_op_divu_16_ix(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_AY_IX_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -981,6 +998,7 @@ void m68k_op_divu_16_aw(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_AW_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -1007,6 +1025,7 @@ void m68k_op_divu_16_al(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_AL_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -1033,6 +1052,7 @@ void m68k_op_divu_16_pcdi(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_PCDI_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -1059,6 +1079,7 @@ void m68k_op_divu_16_pcix(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_PCIX_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -1085,6 +1106,7 @@ void m68k_op_divu_16_i(void)
 {
 	uint* r_dst = &DX;
 	uint src = OPER_I_16();
+	M68K_DIVU_TIMING(*r_dst, src);
 
 	if(src != 0)
 	{
@@ -10341,6 +10363,8 @@ void m68k_op_movem_32_re_pd(void)
 	AY = ea;
 
 	USE_CYCLES(count<<CYC_MOVEM_L);
+	if (m68ki_mame_timing && !CPU_TYPE_IS_000(CPU_TYPE))   /* ReBOX: 3 clocks a register on MAME's 68020 */
+		USE_CYCLES(-(int)count);
 }
 
 
@@ -11569,7 +11593,9 @@ void m68k_op_moveq_32(void)
 void m68k_op_muls_16_d(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(DY) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(DY);
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11583,7 +11609,9 @@ void m68k_op_muls_16_d(void)
 void m68k_op_muls_16_ai(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AY_AI_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_AI_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11597,7 +11625,9 @@ void m68k_op_muls_16_ai(void)
 void m68k_op_muls_16_pi(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AY_PI_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_PI_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11611,7 +11641,9 @@ void m68k_op_muls_16_pi(void)
 void m68k_op_muls_16_pd(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AY_PD_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_PD_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11625,7 +11657,9 @@ void m68k_op_muls_16_pd(void)
 void m68k_op_muls_16_di(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AY_DI_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_DI_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11639,7 +11673,9 @@ void m68k_op_muls_16_di(void)
 void m68k_op_muls_16_ix(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AY_IX_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_IX_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11653,7 +11689,9 @@ void m68k_op_muls_16_ix(void)
 void m68k_op_muls_16_aw(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AW_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AW_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11667,7 +11705,9 @@ void m68k_op_muls_16_aw(void)
 void m68k_op_muls_16_al(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AL_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AL_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11681,7 +11721,9 @@ void m68k_op_muls_16_al(void)
 void m68k_op_muls_16_pcdi(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_PCDI_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_PCDI_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11695,7 +11737,9 @@ void m68k_op_muls_16_pcdi(void)
 void m68k_op_muls_16_pcix(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_PCIX_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_PCIX_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11709,7 +11753,9 @@ void m68k_op_muls_16_pcix(void)
 void m68k_op_muls_16_i(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_I_16()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+	uint src16 = MASK_OUT_ABOVE_16(OPER_I_16());
+	M68K_MULS_TIMING(src16);
+	uint res = MASK_OUT_ABOVE_32(MAKE_INT_16(src16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
 	*r_dst = res;
 
@@ -11723,7 +11769,9 @@ void m68k_op_muls_16_i(void)
 void m68k_op_mulu_16_d(void)
 {
 	uint* r_dst = &DX;
-	uint res = MASK_OUT_ABOVE_16(DY) * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(DY);
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11737,7 +11785,9 @@ void m68k_op_mulu_16_d(void)
 void m68k_op_mulu_16_ai(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_AY_AI_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_AI_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11751,7 +11801,9 @@ void m68k_op_mulu_16_ai(void)
 void m68k_op_mulu_16_pi(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_AY_PI_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_PI_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11765,7 +11817,9 @@ void m68k_op_mulu_16_pi(void)
 void m68k_op_mulu_16_pd(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_AY_PD_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_PD_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11779,7 +11833,9 @@ void m68k_op_mulu_16_pd(void)
 void m68k_op_mulu_16_di(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_AY_DI_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_DI_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11793,7 +11849,9 @@ void m68k_op_mulu_16_di(void)
 void m68k_op_mulu_16_ix(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_AY_IX_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AY_IX_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11807,7 +11865,9 @@ void m68k_op_mulu_16_ix(void)
 void m68k_op_mulu_16_aw(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_AW_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AW_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11821,7 +11881,9 @@ void m68k_op_mulu_16_aw(void)
 void m68k_op_mulu_16_al(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_AL_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_AL_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11835,7 +11897,9 @@ void m68k_op_mulu_16_al(void)
 void m68k_op_mulu_16_pcdi(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_PCDI_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_PCDI_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11849,7 +11913,9 @@ void m68k_op_mulu_16_pcdi(void)
 void m68k_op_mulu_16_pcix(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_PCIX_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_PCIX_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 
@@ -11863,7 +11929,9 @@ void m68k_op_mulu_16_pcix(void)
 void m68k_op_mulu_16_i(void)
 {
 	uint* r_dst = &DX;
-	uint res = OPER_I_16() * MASK_OUT_ABOVE_16(*r_dst);
+	uint src16 = MASK_OUT_ABOVE_16(OPER_I_16());
+	M68K_MULU_TIMING(src16);
+	uint res = src16 * MASK_OUT_ABOVE_16(*r_dst);
 
 	*r_dst = res;
 

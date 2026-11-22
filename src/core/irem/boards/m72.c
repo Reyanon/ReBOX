@@ -233,7 +233,8 @@ static void m72_line(const seg_t *g, int y, uint16_t *d, uint8_t *pri)
 
 // the M82: tiles behind the sprites to the screen, those over them to f (0xffff: none), for after the sprites
 #define M82_NONE 0xffff
-static uint16_t s_m82_front[VIS_H][VIS_W];
+static uint16_t (*s_m82_front_hp)[VIS_H][VIS_W];
+#define s_m82_front (*s_m82_front_hp)
 
 static void m82_line(const seg_t *g, int y, uint16_t *d, uint16_t *f)
 {
@@ -638,6 +639,10 @@ static const m72_cfg *find_cfg(const char *m)
 
 static int m72_init(const rbx_game *g)
 {
+	if (!s_m82_front_hp && !(s_m82_front_hp = calloc(1, sizeof(*s_m82_front_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t ss = 0, s2 = 0, t0 = 0, t1 = 0;
 	s_k = find_cfg(g->machine);
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -703,6 +708,8 @@ static void m72_exit(void)
 	s_t0_rows = s_t1_rows = s_pri = NULL;
 	memset(&s_spr2, 0, sizeof(s_spr2));
 	memset(&s_t1, 0, sizeof(s_t1));
+	free(s_m82_front_hp);
+	s_m82_front_hp = NULL;
 }
 
 static void m72_reset(void)

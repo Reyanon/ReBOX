@@ -28,13 +28,15 @@ enum { V_WORLD, V_JAPAN, V_KOREA };
 static int s_var;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x4000];              // 0x0000 .. 0x3fff (RAM, sprites, text, background: by the variant's map)
+static uint8_t (*s_ram_hp)[0x4000];              // 0x0000 .. 0x3fff (RAM, sprites, text, background: by the variant's map)
+#define s_ram (*s_ram_hp)
 static int s_spr, s_txt, s_bg;             // (their s_ram offsets)
 static int s_bank, s_flip, s_coin_nmi;
 static m6502_t s_cpu;
 static rbx_gfx s_gfx8, s_gfxt, s_gfxspr;
 static uint32_t s_palette[256];
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 static int s_port_p[2], s_port_dsw[2];
 static int s_line;
 static uint32_t s_frame;
@@ -249,6 +251,14 @@ static void so_exit(void);
 
 static int so_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_var = !strcmp(g->machine, "shootoutj") ? V_JAPAN : !strcmp(g->machine, "shootoutk") ? V_KOREA : V_WORLD;
 	uint32_t csize, tsize, ssize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -362,6 +372,10 @@ static void so_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void so_frame(void)

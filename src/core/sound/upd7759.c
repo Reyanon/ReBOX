@@ -49,6 +49,8 @@ void upd7759_init(upd7759_t *u, const uint8_t *rom, uint32_t rom_size, uint32_t 
 	u->step = (uint32_t)(((uint64_t)clock << FRAC_BITS) / rate);   // (the chip's clocks a sample, MAME's 4 at clock / 4)
 	u->reset = 1;
 	u->start = 1;
+	u->md = 1;
+	u->timer_left = -1;
 	upd7759_reset(u);
 }
 
@@ -72,6 +74,8 @@ void upd7759_reset(upd7759_t *u)
 	u->adpcm_data = 0;
 	u->sample = 0;
 	u->drq = 0;
+	u->slave = 0;          // (MODE_STAND_ALONE)
+	u->timer_left = -1;
 }
 
 static void update_adpcm(upd7759_t *u, int data)
@@ -93,7 +97,7 @@ static void advance_state(upd7759_t *u)   // (the stand alone mode: the sample o
 		u->state = u->post_drq_state;
 		break;
 	case STATE_START:
-		u->req_sample = u->fifo_in;
+		u->req_sample = u->slave ? 0x10 : u->fifo_in;
 		u->clocks_left = 70;   // (+ the start delay: 0)
 		u->state = STATE_FIRST_REQ;
 		break;
@@ -103,7 +107,7 @@ static void advance_state(upd7759_t *u)   // (the stand alone mode: the sample o
 		u->state = STATE_LAST_SAMPLE;
 		break;
 	case STATE_LAST_SAMPLE:
-		u->last_sample = read_byte(u, 0);
+		u->last_sample = u->slave ? u->fifo_in : read_byte(u, 0);
 		u->drq = 1;
 		u->clocks_left = 28;
 		u->state = u->req_sample > u->last_sample ? STATE_IDLE : STATE_DUMMY1;
@@ -114,13 +118,13 @@ static void advance_state(upd7759_t *u)   // (the stand alone mode: the sample o
 		u->state = STATE_ADDR_MSB;
 		break;
 	case STATE_ADDR_MSB:
-		u->offset = (uint32_t)read_byte(u, (uint32_t)u->req_sample * 2 + 5) << (8 + 1);
+		u->offset = (uint32_t)(u->slave ? u->fifo_in : read_byte(u, (uint32_t)u->req_sample * 2 + 5)) << (8 + 1);
 		u->drq = 1;
 		u->clocks_left = 44;
 		u->state = STATE_ADDR_LSB;
 		break;
 	case STATE_ADDR_LSB:
-		u->offset |= (uint32_t)read_byte(u, (uint32_t)u->req_sample * 2 + 6) << 1;
+		u->offset |= (uint32_t)(u->slave ? u->fifo_in : read_byte(u, (uint32_t)u->req_sample * 2 + 6)) << 1;
 		u->drq = 1;
 		u->clocks_left = 36;
 		u->state = STATE_DUMMY2;
@@ -137,7 +141,7 @@ static void advance_state(upd7759_t *u)   // (the stand alone mode: the sample o
 			u->repeat_count--;
 			u->offset = u->repeat_offset;
 		}
-		u->block_header = read_byte(u, u->offset++);
+		u->block_header = u->slave ? u->fifo_in : read_byte(u, u->offset++);
 		u->drq = 1;
 		switch (u->block_header & 0xc0) {
 		case 0x00:   // (silence)
@@ -168,13 +172,13 @@ static void advance_state(upd7759_t *u)   // (the stand alone mode: the sample o
 			u->first_valid_header = 1;
 		break;
 	case STATE_NIBBLE_COUNT:
-		u->nibbles_left = (uint16_t)(read_byte(u, u->offset++) + 1);
+		u->nibbles_left = (uint16_t)((u->slave ? u->fifo_in : read_byte(u, u->offset++)) + 1);
 		u->drq = 1;
 		u->clocks_left = 36;
 		u->state = STATE_NIBBLE_MSN;
 		break;
 	case STATE_NIBBLE_MSN:
-		u->adpcm_data = read_byte(u, u->offset++);
+		u->adpcm_data = u->slave ? u->fifo_in : read_byte(u, u->offset++);
 		update_adpcm(u, u->adpcm_data >> 4);
 		u->drq = 1;
 		u->clocks_left = u->sample_rate * 4;
@@ -199,7 +203,48 @@ void upd7759_reset_w(upd7759_t *u, int state)
 	const uint8_t old = u->reset;
 	u->reset = state != 0;
 	if (old && !u->reset)
-		upd7759_reset(u);
+		upd7759_reset(u);   // (upd7759_device::device_reset: DRQ dropped, the timer stopped)
+}
+
+void upd7759_md_w(upd7759_t *u, int state)
+{
+	const uint8_t old_md = u->md;
+	u->md = state != 0;
+	if (u->state == STATE_IDLE && u->reset) {
+		if (old_md && !u->md) {
+			u->slave = 1;
+			u->state = STATE_START;
+			u->timer_left = 0;
+		} else if (!old_md && u->md)
+			u->slave = 0;
+	}
+}
+
+int upd7759_slave_advance(upd7759_t *u, int clocks)
+{
+	int rises = 0;
+	if (u->timer_left < 0)
+		return 0;
+	u->timer_left -= clocks;
+	while (u->timer_left <= 0) {   // drq_update
+		const uint8_t olddrq = u->drq;
+		const int old_state = u->state;
+		advance_state(u);
+		if (!olddrq && u->drq)
+			rises++;
+		if (u->state != STATE_IDLE || old_state != STATE_IDLE)
+			u->timer_left += u->clocks_left > 0 ? u->clocks_left : 0;
+		else {
+			u->timer_left = -1;
+			break;
+		}
+	}
+	return rises;
+}
+
+int upd7759_slave_state(upd7759_t *u, void *ctx, const char *tag)
+{
+	return rbx_state_io(ctx, tag, &u->md, (uint32_t)((const uint8_t *)&u->slave_end - (const uint8_t *)&u->md));
 }
 
 void upd7759_start_w(upd7759_t *u, int state)
@@ -220,6 +265,11 @@ void upd7759_render(upd7759_t *u, int32_t *out, int n)   // (sound_stream_update
 	uint32_t pos = u->pos;
 	int32_t sample = u->sample * 128;
 	int i = 0;
+	if (u->slave) {   // (the slave mode: the chip steps by its timer, the stream holds the sample)
+		for (; i < n; i++)
+			out[i] = u->state != STATE_IDLE ? sample : 0;
+		return;
+	}
 	if (u->state != STATE_IDLE)
 		for (; i < n; i++) {
 			out[i] = sample;

@@ -237,7 +237,8 @@ static void hook(int c)
 }
 
 // ---- video ----
-static uint16_t s_scr[256 * 256];
+static uint16_t (*s_scr_hp)[256 * 256];
+#define s_scr (*s_scr_hp)
 
 static const uint8_t *elem(const rbx_gfx *g, uint32_t code) { return g->pix + (size_t)rbx_wrap(code, g->count) * g->width * g->height; }
 
@@ -430,6 +431,10 @@ static void kb_exit(void);
 
 static int kb_init(const rbx_game *g)
 {
+	if (!s_scr_hp && !(s_scr_hp = calloc(1, sizeof(*s_scr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_rk = !strcmp(g->machine, "ringking");
 	static const char *const cpus[4] = { "maincpu", "video", "sprite", "audiocpu" };
 	for (int c = 0; c < 4; c++) {
@@ -548,6 +553,8 @@ static void kb_exit(void)
 	s_snap = NULL;
 	free(s_mix);
 	s_mix = NULL;
+	free(s_scr_hp);
+	s_scr_hp = NULL;
 }
 
 static void kb_frame(void)

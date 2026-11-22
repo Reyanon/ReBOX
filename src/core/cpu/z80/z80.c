@@ -601,8 +601,16 @@ static void ind(z80* const z) {
   z->mem_ptr = get_bc(z) - 2;
 }
 
+// (ReBOX: the full 16-bit port address is in mem_ptr during port_out too, put back after)
+static void out_c(z80* const z, uint8_t v) {
+  const uint16_t wz = z->mem_ptr;
+  z->mem_ptr = get_bc(z);
+  z->port_out(z, z->c, v);
+  z->mem_ptr = wz;
+}
+
 static void outi(z80* const z) {
-  z->port_out(z, z->c, rb(z, get_hl(z)));
+  out_c(z, rb(z, get_hl(z)));
   set_hl(z, get_hl(z) + 1);
   z->b -= 1;
   z->zf = z->b == 0;
@@ -1226,6 +1234,7 @@ static inline __attribute__((always_inline)) void exec_opcode_body(z80* const z,
 
   case 0xD3: {
     const uint8_t port = nextb(z);
+    z->mem_ptr = (uint16_t)(z->a << 8 | port);
     z->port_out(z, port, z->a);
     z->mem_ptr = (port + 1) | (z->a << 8);
   } break; // out (n), a
@@ -1660,15 +1669,15 @@ void exec_opcode_ed(z80* const z, uint8_t opcode) {
     }
     break; // indr
 
-  case 0x41: z->port_out(z, z->c, z->b); break; // out (c), b
-  case 0x49: z->port_out(z, z->c, z->c); break; // out (c), c
-  case 0x51: z->port_out(z, z->c, z->d); break; // out (c), d
-  case 0x59: z->port_out(z, z->c, z->e); break; // out (c), e
-  case 0x61: z->port_out(z, z->c, z->h); break; // out (c), h
-  case 0x69: z->port_out(z, z->c, z->l); break; // out (c), l
-  case 0x71: z->port_out(z, z->c, 0); break; // out (c), 0
+  case 0x41: out_c(z, z->b); break; // out (c), b
+  case 0x49: out_c(z, z->c); break; // out (c), c
+  case 0x51: out_c(z, z->d); break; // out (c), d
+  case 0x59: out_c(z, z->e); break; // out (c), e
+  case 0x61: out_c(z, z->h); break; // out (c), h
+  case 0x69: out_c(z, z->l); break; // out (c), l
+  case 0x71: out_c(z, 0); break; // out (c), 0
   case 0x79:
-    z->port_out(z, z->c, z->a);
+    out_c(z, z->a);
     z->mem_ptr = get_bc(z) + 1;
     break; // out (c), a
 

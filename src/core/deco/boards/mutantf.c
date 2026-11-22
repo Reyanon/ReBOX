@@ -15,7 +15,7 @@
 #include "../machine/deco16snd.h"
 #include "../video/deco16ic.h"
 #include "../video/decospr.h"
-#include "../video/decoband.h"
+#include "../../video/decoband.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -30,12 +30,15 @@
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint16_t s_ram[0x2000];            // 0x100000 (16 KB)
+static uint16_t (*s_ram_hp)[0x2000];            // 0x100000 (16 KB)
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[2][0x800], s_spriteram_buf[2][0x400];
 static uint16_t s_palram[0x1000];         // 0x160000: xBGR_888, 2048 entries of two words
-static uint16_t s_rowscroll[4][0x800];
+static uint16_t (*s_rowscroll_hp)[4][0x800];
+#define s_rowscroll (*s_rowscroll_hp)
 static uint16_t s_priority;
-static deco16ic_t s_tile[2];
+static deco16ic_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static decospr_t s_spr[2];
 static deco146_t s_prot;
 static rbx_gfx s_gfx8, s_gfx16a, s_gfx16b, s_gfxspr1, s_gfxspr2;
@@ -220,6 +223,18 @@ static void mf_exit(void);
 
 static int mf_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_rowscroll_hp && !(s_rowscroll_hp = calloc(1, sizeof(*s_rowscroll_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t snd_size, csize, t1s, t2s, s1s, s2s, o1s, o2s;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *snd = rbx_region("audiocpu", &snd_size), *chars = rbx_region("chars", &csize),
@@ -353,6 +368,12 @@ static void mf_exit(void)
 	rbx_gfx_free(&s_gfxspr2);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_rowscroll_hp);
+	s_rowscroll_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void mf_frame(void)

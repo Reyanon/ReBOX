@@ -122,7 +122,8 @@ static void ss_render(void)   // (screen_update)
 #define Q_MAX 2048
 enum { Q_ADV, Q_LATCH };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out[2048];
 static int s_out_n, s_out_pos;
@@ -271,6 +272,10 @@ static void ss_reset(void);
 
 static int ss_init(const rbx_game *g)
 {
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t ts, sps, ps;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("audiocpu", &s_zrom_size);
@@ -340,6 +345,8 @@ static void ss_exit(void)
 	free(s_chr);
 	free(s_spr);
 	s_chr = s_spr = NULL;
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void ss_reset(void)

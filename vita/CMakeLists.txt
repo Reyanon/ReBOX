@@ -40,6 +40,7 @@ target_link_libraries(rbx_core PUBLIC z)
 
 add_executable(${PROJECT_NAME}
   src/frontend/main.c
+  src/frontend/lang.c
   src/frontend/core_api.c
   src/frontend/medal.c
   src/frontend/neon.c
@@ -59,6 +60,8 @@ add_executable(${PROJECT_NAME}
   src/common/re_pad.c
   src/frontend/update.c
   src/frontend/testpad.c
+  src/frontend/sampler.c
+  src/frontend/present.c
   src/platform/clock.c
   src/platform/log.c
   src/platform/perf.c
@@ -173,15 +176,32 @@ vita_create_self(eboot.bin ${PROJECT_NAME} UNSAFE)
 # VPK: vita_create_vpk does not quote paths (this tree has a space), so the same steps are written out with VERBATIM.
 set(RBX_SCE_SYS_FILES
   sce_sys/icon0.png
+  sce_sys/pic0.png
   sce_sys/livearea/contents/bg.png
   sce_sys/livearea/contents/startup.png
   sce_sys/livearea/contents/template.xml
 )
 set(RBX_VPK_ADD_ARGS -a "${CMAKE_BINARY_DIR}/rbx_kctrl.skprx=module/rbx_kctrl.skprx"
   -a "${CMAKE_BINARY_DIR}/repad.skprx=module/repad.skprx"
-  -a "${CMAKE_SOURCE_DIR}/res/cacert.pem=cacert.pem")
+  -a "${CMAKE_SOURCE_DIR}/res/cacert.pem=cacert.pem"
+  -a "${CMAKE_SOURCE_DIR}/res/loading.png=loading.png")
 set(RBX_VPK_DEPS "${CMAKE_BINARY_DIR}/rbx_kctrl.skprx" "${CMAKE_BINARY_DIR}/repad.skprx"
-  "${CMAKE_SOURCE_DIR}/res/cacert.pem")
+  "${CMAKE_SOURCE_DIR}/res/cacert.pem" "${CMAKE_SOURCE_DIR}/res/loading.png")
+# the menus' languages (lang/<code>.json and the releases' v<version>-<code>.json): copied to the data folder when missing
+file(GLOB RBX_LANGS CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/res/lang/*.json")
+foreach(f ${RBX_LANGS})
+  get_filename_component(n "${f}" NAME)
+  list(APPEND RBX_VPK_ADD_ARGS -a "${f}=lang/${n}")
+  list(APPEND RBX_VPK_DEPS "${f}")
+endforeach()
+# the game lists, also beside the VPK in the release zip: the app copies the missing ones to ux0:data/rebox/gamelist/
+file(GLOB_RECURSE RBX_GAMELISTS CONFIGURE_DEPENDS RELATIVE "${CMAKE_SOURCE_DIR}/res/gamelist"
+  "${CMAKE_SOURCE_DIR}/res/gamelist/*.json")
+foreach(n ${RBX_GAMELISTS})
+  set(f "${CMAKE_SOURCE_DIR}/res/gamelist/${n}")
+  list(APPEND RBX_VPK_ADD_ARGS -a "${f}=gamelist/${n}")
+  list(APPEND RBX_VPK_DEPS "${f}")
+endforeach()
 foreach(f ${RBX_SCE_SYS_FILES})
   list(APPEND RBX_VPK_ADD_ARGS -a "${CMAKE_SOURCE_DIR}/${f}=${f}")
   list(APPEND RBX_VPK_DEPS "${CMAKE_SOURCE_DIR}/${f}")

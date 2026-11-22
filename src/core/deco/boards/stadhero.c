@@ -32,7 +32,8 @@
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint16_t s_ram[0x2000];             // 0xff8000 .. 0xffbfff
+static uint16_t (*s_ram_hp)[0x2000];             // 0xff8000 .. 0xffbfff
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[0x400];        // 0xffc000 (mirror 0x800)
 static uint16_t s_pal[0x400];              // xBGR_444
 static uint16_t s_pf1[0x400];              // the text layer (0x200000)
@@ -238,6 +239,10 @@ static void sh_exit(void);
 
 static int sh_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t csize, tsize, ssize, osize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("audiocpu", &s_zrom_size);
@@ -345,6 +350,8 @@ static void sh_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void sh_frame(void)

@@ -99,7 +99,8 @@ static void k54321_main_w(int r, uint8_t v)
 #define Q_MAX 2048
 enum { Q_ADV, Q_K54321, Q_IRQ };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out_l[2048], s_out_r[2048];
 static int s_out_n, s_out_pos;
@@ -406,6 +407,10 @@ static void xm_reset(void);
 
 static int xm_init(const rbx_game *g)
 {
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t pcm_size, tile_size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("audiocpu", &s_zrom_size);
@@ -488,6 +493,8 @@ static void xm_exit(void)
 	gx_video_exit();
 	k052109_exit(&s_k109);
 	rbx_ym_exit(0);
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void xm_reset(void)

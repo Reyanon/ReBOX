@@ -17,7 +17,7 @@
 #include "../../sound/rbx_ym.h"
 #include "../../video/gfxlayout.h"
 #include "../machine/deco146.h"
-#include "../video/decoband.h"
+#include "../../video/decoband.h"
 #include "../video/decospr.h"
 
 #include <stdlib.h>
@@ -39,7 +39,8 @@
 
 static uint8_t *s_rom, *s_zrom;
 static uint32_t s_rom_size, s_zrom_size;
-static uint16_t s_ram[0x8000];             // 0x100000 .. 0x10ffff
+static uint16_t (*s_ram_hp)[0x8000];             // 0x100000 .. 0x10ffff
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[2][0x400], s_sprbuf[2][0x400], s_sprtri[2][0x400];
 static uint16_t s_pal[0x800];              // xBGR_888, 1024 entries of two words
 static uint16_t s_control[8];              // 0x170000 (0: the pixel layer's x scroll, 2: the second half's, 6: bit 1 windowed)
@@ -56,7 +57,8 @@ static int s_line;
 static uint32_t s_frame;
 static uint64_t s_cpu_frac, s_snd_frac, s_ym_frac;
 static uint8_t s_track[2][2];              // the trackballs' counters (AN0 .. AN3)
-static uint16_t s_sbm[2][VIS_W * VIS_H];
+static uint16_t (*s_sbm_hp)[2][VIS_W * VIS_H];
+#define s_sbm (*s_sbm_hp)
 static struct {
 	uint16_t win[2][VIS_H][WIN_W];      // the pixel layer's words of each window (rows from the first visible one)
 	int nseg, xs[2], x0[2], x1[2], w0[2];
@@ -355,6 +357,14 @@ static void lm_exit(void);
 
 static int lm_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_sbm_hp && !(s_sbm_hp = calloc(1, sizeof(*s_sbm_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t s1s, s2s, osize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("audiocpu", &s_zrom_size);
@@ -463,6 +473,10 @@ static void lm_exit(void)
 	s_snap = NULL;
 	s_pixel0 = s_pixel1 = NULL;
 	s_vram_buf = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_sbm_hp);
+	s_sbm_hp = NULL;
 }
 
 static void lm_frame(void)

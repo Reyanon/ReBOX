@@ -35,7 +35,8 @@ static int s_fj;                          // Funky Jet's board
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
 static uint16_t *s_opcodes;               // the decrypted opcodes (MAME AS_OPCODES)
-static uint16_t s_ram[0x8000];            // 0x380000 (64 KB)
+static uint16_t (*s_ram_hp)[0x8000];            // 0x380000 (64 KB)
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[0x400];
 static uint16_t s_pal[0x800];             // xBGR_888 in word pairs (0x300 entries; the page's 4 KB); funkyjet xBGR_444
 static uint16_t s_rowscroll[2][0x800];
@@ -161,6 +162,10 @@ static void dg_exit(void);
 
 static int dg_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t snd_size, tsize, ssize, osize;
 	s_fj = !strcmp(g->machine, "funkyjet");
 	s_prot_base = s_fj ? 0x180000 : 0x340000;
@@ -295,6 +300,8 @@ static void dg_exit(void)
 	m68k_bus.op_size = 0;
 	free(s_opcodes);
 	s_opcodes = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void dg_frame(void)

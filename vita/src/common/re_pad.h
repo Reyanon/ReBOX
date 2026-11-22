@@ -71,6 +71,9 @@ int re_pad_vitacontrol_running(void);
 void re_pad_poll(void);  // once a frame: reads the ports the players use (and looks for new controllers twice a second)
 
 void re_pad_set_source(int player, int src);
+// players whose row was added by hand (the Controls' Add): they take their device even without one more controller
+// (the Vita's own controls too: 1P and 2P may both use them); 0 = only as many as there are devices
+void re_pad_set_added_players(int n);
 int re_pad_source(int player);
 int re_pad_port(int player);                     // port the player reads now, -1 = none
 int re_pad_read(int player, SceCtrlData *pad);   // that port's input from the last poll; 0 (nothing held) if none

@@ -30,9 +30,11 @@ static int s_vis_y0, s_vis_h;        // darius2d 3*8..255, warriorb 2*8..255
 static uint32_t s_scn_base[SCREENS], s_ctrl_base[SCREENS];
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x14000];
+static uint8_t (*s_ram_hp)[0x14000];
+#define s_ram (*s_ram_hp)
 static uint8_t s_spr[0x2000];        // 600000-6013ff (page sized)
-static uint16_t s_pcr[SCREENS][0x1000];
+static uint16_t (*s_pcr_hp)[SCREENS][0x1000];
+#define s_pcr (*s_pcr_hp)
 static uint16_t s_pcr_addr[SCREENS];
 static tc0100scn_t *s_scn[SCREENS], *s_snap_scn[SCREENS];
 static rbx_gfx s_sprgfx;
@@ -47,7 +49,8 @@ static struct {
 	uint8_t spr[0x1400];
 } *s_snap;
 static uint8_t *s_pri;
-static uint16_t s_pal_last[SCREENS][0x1000];   // palette RAM converted into rbx_video.palette
+static uint16_t (*s_pal_last_hp)[SCREENS][0x1000];   // palette RAM converted into rbx_video.palette
+#define s_pal_last (*s_pal_last_hp)
 static int s_pal_valid;
 
 // ---- sound: pancontrol_w (e400-e403), original volume * 3 ----
@@ -230,6 +233,18 @@ static void warriorb_exit(void);
 
 static int warriorb_init(const rbx_game *g)
 {
+	if (!s_pal_last_hp && !(s_pal_last_hp = calloc(1, sizeof(*s_pal_last_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pcr_hp && !(s_pcr_hp = calloc(1, sizeof(*s_pcr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t scn_size, spr_size;
 	s_wb = !strcmp(g->machine, "warriorb");
 	s_vis_y0 = s_wb ? 16 : 24;
@@ -361,6 +376,12 @@ static void warriorb_exit(void)
 	s_pri = NULL;
 	rbx_gfx_free(&s_sprgfx);
 	tsnd_exit();
+	free(s_pal_last_hp);
+	s_pal_last_hp = NULL;
+	free(s_pcr_hp);
+	s_pcr_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void warriorb_frame(void)

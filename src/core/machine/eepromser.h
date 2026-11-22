@@ -31,6 +31,7 @@ void eepser_clk_write(eepser_t *e, int state, int64_t now);
 void eepser_di_write(eepser_t *e, int state);
 int eepser_do_read(const eepser_t *e);
 int eepser_ready_read(const eepser_t *e, int64_t now);
+int eepser_do_read_93cxx(const eepser_t *e, int64_t now);   // (93Cxx: DO is the ready line before a command)
 // the default contents: a ROM region (big-endian words for 16-bit cells), else 0xff..
 void eepser_default(eepser_t *e, const uint8_t *data, uint32_t size);
 int eepser_state(eepser_t *e, void *ctx, int load, const char *tag);

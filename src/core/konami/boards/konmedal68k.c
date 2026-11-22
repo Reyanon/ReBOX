@@ -42,7 +42,8 @@ static int s_x0, s_y0, s_w, s_h;     // the visible area
 static int s_pal_n;                  // the palette entries the CPU reaches
 static uint8_t *s_tiles_raw, *s_tiles;   // the decoded tiles, 64 bytes each
 static uint32_t s_ntiles;
-static uint32_t s_pens[0x4000];      // the palette in 0x00RRGGBB
+static uint32_t (*s_pens_hp)[0x4000];      // the palette in 0x00RRGGBB
+#define s_pens (*s_pens_hp)
 static char s_nv_path[512];
 
 static struct {
@@ -668,6 +669,10 @@ static int decode_tiles(void)
 
 static int konmedal68k_init(const rbx_game *g)
 {
+	if (!s_pens_hp && !(s_pens_hp = calloc(1, sizeof(*s_pens_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t tile_size, ysize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	const uint8_t *tiles = rbx_region("k056832", &tile_size);
@@ -765,6 +770,8 @@ static void konmedal68k_exit(void)
 	s_tiles_raw = s_tiles = NULL;
 	s_snap = NULL;
 	s_ymz_l = s_ymz_r = NULL;
+	free(s_pens_hp);
+	s_pens_hp = NULL;
 }
 
 static void konmedal68k_reset(void)

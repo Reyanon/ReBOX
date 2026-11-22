@@ -55,7 +55,8 @@ static rbx_gfx s_gfx8, s_gfx16, s_gfxspr;
 static uint32_t s_palette[1024];          // (from the PROMs)
 static uint8_t s_scroll[4];                // (Gondomania / Garyo Retsuden: x MSB, x LSB, y MSB, y LSB)
 static int s_rotary[2];                    // (Gondomania: 0 .. 11)
-static uint8_t s_pri_buf[256 * 240];
+static uint8_t (*s_pri_buf_hp)[256 * 240];
+#define s_pri_buf (*s_pri_buf_hp)
 static int s_port_in[4], s_port_coin, s_port_dsw[2];
 static int s_line;
 static uint32_t s_frame;
@@ -479,6 +480,10 @@ static void gb_exit(void);
 
 static int gb_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_var = !strcmp(g->machine, "meikyuh") ? V_MEIKYUH : !strcmp(g->machine, "gondo") ? V_GONDO
 	      : !strcmp(g->machine, "garyoret") ? V_GARYORET : V_GHOSTB;
 	const int go = GONDO_LIKE;
@@ -609,6 +614,8 @@ static void gb_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
 }
 
 // the main CPU to the target, the NMI gate's latch applied after the instruction following its write

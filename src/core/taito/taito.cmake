@@ -23,7 +23,6 @@ list(APPEND RBX_CORE_SOURCES
   ${RBX_TAITO_DIR}/boards/opwolf.c
   ${RBX_TAITO_DIR}/boards/arkanoid.c
   ${RBX_TAITO_DIR}/boards/bublbobl.c
-  ${RBX_TAITO_DIR}/machine/taito68705.c
   ${RBX_TAITO_DIR}/boards/tnzs.c
   ${RBX_TAITO_DIR}/video/tc0100scn.c
   ${RBX_TAITO_DIR}/video/tc0280grd.c

@@ -17,17 +17,25 @@
 #include <psp2/kernel/threadmgr.h>
 #include <vita2d.h>
 
+#include "frontend/lang.h"
 #include "frontend/audio.h"
 #include "frontend/resample.h"
 #include "frontend/input.h"
 #include "frontend/medal.h"
+#include "frontend/present.h"
 #include "frontend/menu.h"
 #include "common/re_pad.h"
 #include "frontend/settings.h"
+#include "frontend/sampler.h"
+#include "frontend/testpad.h"
 #include "frontend/states.h"
 #include "frontend/threads.h"
 #include "frontend/touch.h"
+
+// the emulation thread helps draw the frame only when its frame so far took less than this (us)
+#define RENDER_HELP_US 11000
 #include "frontend/update.h"
+#include "frontend/gamelist.h"
 #include "frontend/video.h"
 #include "frontend/core_api.h"
 #include "rbx_games.h"
@@ -38,8 +46,11 @@
 
 #define ROM_DIR      RBX_DATA_DIR "roms/" // where the user puts ROMs (created at startup)
 // ROM folder candidates: roms/, then the data folder itself; first hit per game (rbx_games.c)
-static const char *const k_rom_dirs[] = { ROM_DIR, RBX_DATA_DIR };
-#define ROM_DIRS ((int)(sizeof(k_rom_dirs) / sizeof(k_rom_dirs[0])))
+// the ROM folders: roms/, the data folder, then the other folders the game lists' "rompath"s name (user 11-22)
+#define ROM_DIRS_MAX 18
+static const char *k_rom_dirs[ROM_DIRS_MAX] = { ROM_DIR, RBX_DATA_DIR };
+static int s_rom_dirs = 2;
+#define ROM_DIRS s_rom_dirs
 static int s_kctrl_restarted;   // started again by rbx_kctrl_init (the first start after boot)
 
 #ifndef RBX_INTERLEAVE_MUL
@@ -47,8 +58,10 @@ static int s_kctrl_restarted;   // started again by rbx_kctrl_init (the first st
 #endif
 #define CLEAR_COLOR RGBA8(0x00, 0x00, 0x00, 0xFF)
 
-// the core uses ~20MB for graphics ROM decoding etc., so reserve a generous newlib heap
-unsigned int _newlib_heap_size_user = 128 * 1024 * 1024;
+// the newlib heap holds the ROM regions: PGM's largest sets (martmast, kov2p) take 116 MB of regions. The drivers'
+// static buffers (BSS, 63 MB with every board in) and the heap share the app's memory: at 168 MB nothing was left for
+// the threads' stacks (render thread creation 0x80024302), so 152 MB
+unsigned int _newlib_heap_size_user = 152 * 1024 * 1024;
 
 // time the threads spend waiting for each other in the core (perf log: emu and render are busy time, sound = the
 // emulation thread's wait): [0] the emulation (main) thread, [1] the render thread, [2] others
@@ -273,6 +286,7 @@ static int s_ym_worker; // other boards: YM2151 synthesis worker thread in use
 static int with_threads_stopped(const fe_config *cfg, uint64_t *emu_frames, const char *load_path)
 {
 	const uint64_t t0 = rbx_time_us();
+	rbx_present_drain();   // (the frames posted shown first: the present thread waits for the render thread's)
 	if (cfg->threaded || s_ym_worker)
 		rbx_threads_stop();
 	if (cfg->render_threaded)
@@ -299,6 +313,19 @@ static int with_threads_stopped(const fe_config *cfg, uint64_t *emu_frames, cons
 	return rc;
 }
 
+// the frame buffer (ADR-195) as the settings want it now: the present thread started or stopped, and the sound's ring
+// a frame fuller with it. At the game's start and when the options close (only with the render thread: the frames
+// it posts are the render thread's)
+static void frame_buffer_apply(const fe_config *cfg)
+{
+	const int want = cfg->render_threaded && rbx_present_wanted();
+	if (want && !rbx_present_running())
+		rbx_present_start();
+	else if (!want && rbx_present_running())
+		rbx_present_stop();
+	rbx_audio_set_extra_frames(rbx_present_running());
+}
+
 static void reset_game(const fe_config *cfg, uint64_t *emu_frames)
 {
 	with_threads_stopped(cfg, emu_frames, NULL);
@@ -314,9 +341,9 @@ static void save_state(int slot)
 	int rc = rbx_core_state_save(path);
 	RBX_LOG("state: save %s rc %d, %.1f ms", path, rc, (rbx_time_us() - t0) / 1000.0);
 	if (rc == 0)
-		rbx_osd_show("Saved: %s", rbx_state_slot_name(slot));
+		rbx_osd_show(T("Saved: %s"), rbx_state_slot_name(slot));
 	else
-		rbx_osd_show("Save failed: %s", rbx_state_slot_name(slot));
+		rbx_osd_show(T("Save failed: %s"), rbx_state_slot_name(slot));
 	rbx_menu_states_changed();
 }
 
@@ -325,16 +352,16 @@ static void load_state(const fe_config *cfg, uint64_t *emu_frames, int slot)
 	char path[128];
 	rbx_state_path(slot, path, sizeof(path));
 	if (!rbx_core_state_exists(path)) {
-		rbx_osd_show("No state: %s", rbx_state_slot_name(slot));
+		rbx_osd_show(T("No state: %s"), rbx_state_slot_name(slot));
 		return;
 	}
 	const uint64_t t0 = rbx_time_us();
 	int rc = with_threads_stopped(cfg, emu_frames, path);
 	RBX_LOG("state: load %s rc %d, %.1f ms", path, rc, (rbx_time_us() - t0) / 1000.0);
 	if (rc == 0)
-		rbx_osd_show("Loaded: %s", rbx_state_slot_name(slot));
+		rbx_osd_show(T("Loaded: %s"), rbx_state_slot_name(slot));
 	else
-		rbx_osd_show("Load failed (game was reset): %s", rbx_state_slot_name(slot));
+		rbx_osd_show(T("Load failed (game was reset): %s"), rbx_state_slot_name(slot));
 }
 
 // keep the system from auto-suspending or turning the screen off while running without input (demo viewing, remote
@@ -359,7 +386,7 @@ static int run_game(const rbx_game_found *game)
 	rbx_loading_title(rbx_core_game_title(game->game));
 	rbx_loading_progress(0);
 	rbx_settings_load_game(set);
-	static const char *dirs[ROM_DIRS];
+	static const char *dirs[ROM_DIRS_MAX];
 	for (int i = 0; i < ROM_DIRS; i++)
 		dirs[i] = k_rom_dirs[i];
 	fe_config cfg = {
@@ -376,6 +403,7 @@ static int run_game(const rbx_game_found *game)
 			// (switchtest: no NVRAM / EEPROM file read or written, the player's settings and records kept from the
 			// measuring points' states)
 			.nvram_dir = SW_ACTIVE ? NULL : RBX_DATA_DIR "nvram/",
+			.cache_dir = RBX_DATA_DIR,   // (large ROM files read from there: the CV1000 NAND)
 			.wait_hook = core_wait,
 			.jit_alloc = jit_alloc,
 			.jit_write_begin = jit_write_begin,
@@ -386,7 +414,7 @@ static int run_game(const rbx_game_found *game)
 	const uint64_t t_load = rbx_time_us();
 	if (core_init_shown(&cfg) != 0) {
 		RBX_LOG("core: %s init failed: %s", set, rbx_core_error());
-		snprintf(s_notice, sizeof(s_notice), "%s did not start\n%s", set, rbx_core_error());
+		snprintf(s_notice, sizeof(s_notice), T("%s did not start\n%s"), set, rbx_core_error());
 		rbx_loading_done();
 		return GAME_LIST;
 	}
@@ -402,6 +430,7 @@ static int run_game(const rbx_game_found *game)
 	int sw = RBX_SCREEN_W, sh = RBX_SCREEN_H, sflags = 0;
 	rbx_core_screen(&sw, &sh, &sflags);
 	RBX_LOG("core: board %s, screen %dx%d flags %d", rbx_game_board(rbx_running_game()), sw, sh, sflags);
+	rbx_present_set_board(rbx_game_board(rbx_running_game()));   // (the frame buffer's Auto: on for the CV1000)
 	rbx_video_set_screen(sw, sh, sflags);
 	rbx_fps_reset_frames();
 	rbx_menu_set_game(set, rbx_core_game_name(), rbx_core_button_count());
@@ -412,7 +441,7 @@ static int run_game(const rbx_game_found *game)
 	rbx_loading_done();
 
 	if (rbx_video_init() != 0) {
-		snprintf(s_notice, sizeof(s_notice), "%s did not start\nvideo init failed", set);
+		snprintf(s_notice, sizeof(s_notice), T("%s did not start\nvideo init failed"), set);
 		rbx_video_fini();
 		rbx_core_exit();
 		return GAME_LIST;
@@ -429,6 +458,9 @@ static int run_game(const rbx_game_found *game)
 		RBX_LOG("threads: continuing without sound thread (no sound)");
 	if (!cfg.threaded && rbx_threads_start_ym() == 0) // other boards: YM2151 synthesis on CPU1 (same result)
 		s_ym_worker = 1;
+	rbx_sampler_start();   // (the data folder's "prof" / "profhi": the emulation thread's activity sampled, ADR-155)
+	rbx_threads_start_io();   // (a game reading a ROM region from its file: the reads ahead on a worker, ADR-160)
+	frame_buffer_apply(&cfg);   // (ADR-195: the present thread, before the first frame)
 
 	const int alen = RBX_RESAMPLE_MAX_IN; // (stereo samples per frame at most: about 800 at 48kHz, several frames' after a late worker)
 	int16_t *audio = (int16_t *)calloc((size_t)alen * 2 + 16, sizeof(int16_t));
@@ -444,13 +476,15 @@ static int run_game(const rbx_game_found *game)
 		uint64_t t0 = rbx_time_us();
 		rbx_perf_record(RBX_PERF_FRAME, (uint32_t)(t0 - prev_frame));
 		prev_frame = t0;
+		rbx_prof_set(RBX_PA_FE_PAD);   // (the frontend's parts of the frame, ADR-161)
 		power_tick();
 		uint32_t buttons = rbx_input_poll();
 		if (!menu_open)
 			rbx_medal_touch();
 
 		// options screen: the game is paused while open and the menu is drawn over the last frame
-		if (!menu_open && rbx_menu_should_open(buttons)) {
+		if (!menu_open && rbx_menu_should_open(buttons | (rbx_touch_menu_take() ? (SCE_CTRL_SELECT | SCE_CTRL_START) : 0))) {
+			rbx_present_drain();   // (ADR-195: the frames posted shown; the menu draws on this thread)
 			menu_open = 1;
 			RBX_LOG("menu: open f%llu", (unsigned long long)emu_frames);
 			rbx_fps_hide(); // (it covered the menu, e.g. Done of the touch layout editor)
@@ -487,6 +521,7 @@ static int run_game(const rbx_game_found *game)
 				menu_open = 0;
 				rbx_menu_hide();
 				rbx_video_apply_settings(); // (rotation, scanlines may have changed)
+				frame_buffer_apply(&cfg);   // (Display > Frame buffer may have changed)
 			}
 			continue;
 		}
@@ -535,15 +570,26 @@ static int run_game(const rbx_game_found *game)
 		}
 #endif
 		rbx_hud_update(buttons);
+		rbx_prof_set(RBX_PA_FRONT);
 #ifdef RBX_ENABLE_LOG
 		const uint64_t t_pre = rbx_time_us();   // (a stall's breakdown: the frame's sections, below)
 #endif
 
 		int pitch = 0;
 		void *fb = cfg.render_threaded ? NULL : rbx_video_target(&pitch);
+		const int present = rbx_present_running();   // (ADR-195: the present thread draws and swaps)
+		if (!present)
+			rbx_video_kick_border();   // (ADR-181: the corridor's moving parts made on CPU1 while the frame runs)
 		{
 			const int n = rbx_core_run_frame(fb, pitch, audio, alen);
+			rbx_prof_set(RBX_PA_FE_AUDIO);
 			rbx_audio_push(audio, n);
+			rbx_prof_set(RBX_PA_FRONT);
+			{   // (a board that narrows its screen while running: show that part of the buffer)
+				int vw, vh, vf;
+				rbx_core_screen(&vw, &vh, &vf);
+				rbx_video_set_visible(vw, vh);
+			}
 		}
 		emu_frames++;
 		{
@@ -557,6 +603,19 @@ static int run_game(const rbx_game_found *game)
 				RBX_LOG("wait: f%u %.1f ms: render %.1f aux %.1f aux2 %.1f aux3 %.1f driver %.1f other %.1f", (unsigned)emu_frames,
 					w / 1000.0, s_wait_site_us[1] / 1000.0, s_wait_site_us[2] / 1000.0, s_wait_site_us[3] / 1000.0,
 					s_wait_site_us[4] / 1000.0, s_wait_site_us[5] / 1000.0, s_wait_site_us[0] / 1000.0);
+			{	// (the emulation thread's waits by site, averaged over 300 frames: what the "sound" slot of the perf is)
+				static uint64_t sum[6];
+				static unsigned nf;
+				for (int i = 0; i < 6; i++)
+					sum[i] += s_wait_site_us[i];
+				if (++nf == 300) {
+					RBX_LOG("waits: render %.2f aux %.2f aux2 %.2f aux3 %.2f driver %.2f other %.2f ms/frame",
+						sum[1] / 300000.0, sum[2] / 300000.0, sum[3] / 300000.0, sum[4] / 300000.0, sum[5] / 300000.0,
+						sum[0] / 300000.0);
+					memset(sum, 0, sizeof(sum));
+					nf = 0;
+				}
+			}
 #endif
 			memset(s_wait_site_us, 0, sizeof(s_wait_site_us));
 		}
@@ -576,20 +635,43 @@ static int run_game(const rbx_game_found *game)
 		}
 #endif
 
+		// (the frame emulated: until the vblank this thread has time, so it draws bands of the frame the render
+		// thread is drawing, for the boards that split it)
+		// (only while the frame left this thread time: after a long emulation the render thread and its helper finish
+		// the bands, this thread goes on to the next frame; the bands come out the same whoever draws them)
+		if (cfg.render_threaded && rbx_time_us() - t0 < RENDER_HELP_US) {
+			rbx_prof_set(RBX_PA_VIDEO_OUT);   // (the sampled activity, ADR-155)
+			while (rbx_render_help_one(1))
+				;
+		}
 		const uint64_t tf0 = rbx_time_us();
+		rbx_prof_set(RBX_PA_DRAW);
 		rbx_touch_overlay_update(0);
-		vita2d_start_drawing();
-		vita2d_clear_screen();
-		if (cfg.render_threaded)
-			rbx_video_draw_rendered(emu_frames - 1); // show the previous frame the renderer finished
-		else
-			rbx_video_draw();
-		rbx_video_draw_layers();
-		vita2d_end_drawing();
+		// show the previous frame the renderer finished (depth 2, ADR-058: the one before, the renderer may still be
+		// drawing the previous one)
+		const uint64_t shown = emu_frames >= (uint64_t)rbx_video_depth() ? emu_frames - (uint64_t)rbx_video_depth() : 0;
+		if (present) {
+			// (ADR-195) the present thread draws and swaps it; this thread waits only while the frame it posted last
+			// has not been taken yet (it is then a frame ahead of the display)
+			rbx_prof_set(RBX_PA_SWAP);
+			rbx_present_post(shown);
+		} else {
+			vita2d_start_drawing();
+			vita2d_clear_screen();
+			if (cfg.render_threaded)
+				rbx_video_draw_rendered(shown);
+			else
+				rbx_video_draw();
+			rbx_video_draw_layers();
+			vita2d_end_drawing();
+		}
 		const uint64_t tf1 = rbx_time_us();
-		vita2d_swap_buffers();
+		rbx_prof_set(RBX_PA_SWAP);
+		if (!present)
+			vita2d_swap_buffers();
+		rbx_prof_set(RBX_PA_FRONT);
 #ifdef RBX_ENABLE_LOG
-		{	// (the frontend's part of the emulation thread's frame: the drawing lists, then the swap's wait)
+		if (!present) {	// (the frontend's part of the emulation thread's frame: the drawing lists, then the swap's wait)
 			static uint64_t sum_d, sum_s;
 			static uint32_t max_d, max_s, n;
 			const uint64_t tf2 = rbx_time_us();
@@ -608,11 +690,13 @@ static int run_game(const rbx_game_found *game)
 #ifdef RBX_ENABLE_LOG
 		const uint64_t t_swap = rbx_time_us();
 #endif
+		rbx_prof_set(RBX_PA_FE_TICKS);
 		rbx_fps_tick();
 		rbx_threads_tick();
 		rbx_medal_tick();
 		rbx_menu_shot_poll();
 		rbx_osd_tick();
+		rbx_prof_set(RBX_PA_FRONT);
 #ifdef RBX_ENABLE_LOG
 		{	// (a frame over 100 ms: where its time went)
 			const uint64_t t_end = rbx_time_us();
@@ -649,10 +733,17 @@ static int run_game(const rbx_game_found *game)
 
 	// game end: everything this game started stops, then the core and its buffers go (the next game in this process
 	// starts from scratch, as a fresh launch would; the harness checks it hashes the same, RBX_PRERUN)
+	// (the present thread first, ADR-195: it draws the layers hidden below and may wait for the render thread's frame;
+	// the frames posted are shown)
+	rbx_present_stop();
+	rbx_audio_set_extra_frames(0);
+	rbx_present_set_board(NULL);
 	rbx_menu_hide();
 	rbx_fps_hide();
 	rbx_medal_stop();
 	rbx_touch_overlay_update(1);
+	rbx_sampler_stop();
+	rbx_threads_stop_io();
 	rbx_threads_stop();
 	rbx_video_stop_render_thread();
 	s_ym_worker = 0;
@@ -685,6 +776,7 @@ int main(int argc, char *argv[])
 	(void)rbx_text_pad[0];
 #endif
 	rbx_log_init();
+	rbx_testfiles_start();   // (log builds: the test files looked for off the frame loop, ADR-161)
 	rbx_threads_pin_main();
 	s_main_tid = sceKernelGetThreadId();
 #ifdef RBX_CLOCK_SWEEP
@@ -716,6 +808,7 @@ int main(int argc, char *argv[])
 	vita2d_init();
 	vita2d_set_clear_color(CLEAR_COLOR);
 	vita2d_set_vblank_wait(1);
+	rbx_video_splash();   // (until the game list's first frame: the start below takes a few seconds)
 	rbx_hud_init();
 	rbx_input_init();
 	// pre-create the folders users fill
@@ -724,10 +817,127 @@ int main(int argc, char *argv[])
 	sceIoMkdir(RBX_DATA_DIR "nvram", 0777);  // EEPROM / NVRAM of the games
 	sceIoMkdir(RBX_DATA_DIR "cheats", 0777);  // user cheat file <set>.ini
 	sceIoMkdir(RBX_DATA_DIR "artwork", 0777); // user bezel artwork <set>.png (.jpg .bmp)
-	rbx_settings_move_game_files();             // the games' .cfg files in cfg/
+	{   // (testing: RBX_DATA_DIR "e12scalar" = the CV1000 blitter without its NEON rows, ADR-105)
+		SceIoStat st_e12;
+		if (sceIoGetstat(RBX_DATA_DIR "e12scalar", &st_e12) >= 0) {
+			setenv("RBX_EPIC12_SCALAR", "1", 1);
+			RBX_LOG("epic12: NEON rows off (e12scalar)");
+		}
+		// (testing, ADR-125: "cps3dmaworker" = the CPS3 character DMA on the worker, not the emulation thread;
+		// "cps3newdma" = its branch-light decoder)
+		if (sceIoGetstat(RBX_DATA_DIR "cps3dmaworker", &st_e12) >= 0) {   // (the worker DMA is off by default since 11-20)
+			setenv("RBX_CPS3_DMA_WORKER", "1", 1);
+			RBX_LOG("cps3: character DMA on the worker (cps3dmaworker)");
+		}
+		// (ADR-130: "sh3jitold" = the CV1000 SH-3 JIT's code as before ADR-130, for an A/B)
+		if (sceIoGetstat(RBX_DATA_DIR "sh3jitold", &st_e12) >= 0) {
+			setenv("RBX_SH3_JITOPT", "0", 1);
+			RBX_LOG("sh3 jit: the code shape before ADR-130 (sh3jitold)");
+		}
+		// (ADR-165: "spinold" = the SH-3 polling loop skips compare the cache array's and exc_pri's bytes, as before)
+		if (sceIoGetstat(RBX_DATA_DIR "spinold", &st_e12) >= 0) {
+			setenv("RBX_SH3_SPINOLD", "1", 1);
+			RBX_LOG("sh3: polling loop state compares as before ADR-165 (spinold)");
+		}
+		// (ADR-166: "sh3coldold" = the SH-3 blocks' cold paths and update point exits inline in each block, as before)
+		if (sceIoGetstat(RBX_DATA_DIR "sh3coldold", &st_e12) >= 0) {
+			setenv("RBX_SH3_SHR", "0", 1);
+			RBX_LOG("sh3 jit: cold paths in every block as before ADR-166 (sh3coldold)");
+		}
+		// (ADR-175: "idleunmap" = the SH-3 blitter polling loop's rounds recorded with the write table taken away, as
+		// before, also when the loop is proven to write nothing)
+		if (sceIoGetstat(RBX_DATA_DIR "idleunmap", &st_e12) >= 0) {
+			setenv("RBX_SH3_IDLEPURE", "0", 1);
+			RBX_LOG("sh3: polling loop rounds recorded with the write table away as before ADR-175 (idleunmap)");
+		}
+		// (ADR-176: "ymznohold" = the YMZ770 worker takes entries up to the frame end as before; "sndstat" = the
+		// YMZ770's work and frame-end times in the log at the game's end)
+		if (sceIoGetstat(RBX_DATA_DIR "ymznohold", &st_e12) >= 0) {
+			setenv("RBX_CV1K_SNDHOLD", "0", 1);
+			RBX_LOG("cv1k ymz770: the worker takes entries up to the frame end as before ADR-176 (ymznohold)");
+		}
+		if (sceIoGetstat(RBX_DATA_DIR "sndstat", &st_e12) >= 0)
+			setenv("RBX_CV1K_SNDSTAT", "1", 1);
+		// (ADR-177: "nandnodrop" = the NAND reads queued ahead kept at a jump; "nandnomerge" = the io worker reads one
+		// request at a time; "nandstat" = the NAND statistics in the log at the game's end)
+		if (sceIoGetstat(RBX_DATA_DIR "nandnodrop", &st_e12) >= 0) {
+			setenv("RBX_NAND_DROP", "0", 1);
+			RBX_LOG("cv1k nand: reads ahead kept at jumps as before ADR-177 (nandnodrop)");
+		}
+		if (sceIoGetstat(RBX_DATA_DIR "nandnomerge", &st_e12) >= 0) {
+			setenv("RBX_IO_MERGE", "0", 1);
+			RBX_LOG("io: one request a read as before ADR-177 (nandnomerge)");
+		}
+		// (ADR-178: "nandbuffered" = the region cache files read through stdio's 1 KB buffer as before)
+		if (sceIoGetstat(RBX_DATA_DIR "nandbuffered", &st_e12) >= 0) {
+			setenv("RBX_IO_STDBUF", "1", 1);
+			RBX_LOG("io: region files buffered as before ADR-178 (nandbuffered)");
+		}
+		if (sceIoGetstat(RBX_DATA_DIR "nandstat", &st_e12) >= 0)
+			setenv("RBX_NAND_STAT", "1", 1);
+		if (sceIoGetstat(RBX_DATA_DIR "cps3newdma", &st_e12) >= 0) {
+			setenv("RBX_CPS3_NEWDMA", "1", 1);
+			RBX_LOG("cps3: branch-light character DMA decoder (cps3newdma)");
+		}
+		// (ADR-150: "e12shotwait" = the CV1000 vblank waits for the blitter and copies the screen itself, as before,
+		// instead of queuing the copy for the lanes)
+		if (sceIoGetstat(RBX_DATA_DIR "e12shotwait", &st_e12) >= 0) {
+			setenv("RBX_CV1K_SHOTWAIT", "1", 1);
+			RBX_LOG("epic12: the vblank waits for the screen's drawing (e12shotwait)");
+		}
+		// (ADR-170 / 171: "e12oldlist" = the CV1000 blit list read and queued as before; "sh3olddma" = the SH-3 DMA's
+		// NAND to RAM copies a byte at a time as before)
+		if (sceIoGetstat(RBX_DATA_DIR "e12oldlist", &st_e12) >= 0) {
+			setenv("RBX_CV1K_OLDLIST", "1", 1);
+			RBX_LOG("epic12: the blit list read as before ADR-170 (e12oldlist)");
+		}
+		// (ADR-180: "feaudold" = the sound output's resampling and gain as before: the scalar loop, a pair at a time.
+		// ADR-181's "neonsync" is read by neon.c)
+		if (sceIoGetstat(RBX_DATA_DIR "feaudold", &st_e12) >= 0) {
+			rbx_audio_set_old(1);
+			RBX_LOG("audio: resampling and gain as before ADR-180 (feaudold)");
+		}
+		if (sceIoGetstat(RBX_DATA_DIR "sh3olddma", &st_e12) >= 0) {
+			setenv("RBX_SH3_OLDDMA", "1", 1);
+			RBX_LOG("sh3: the DMA's byte copies as before ADR-171 (sh3olddma)");
+		}
+		// (ADR-160, the CV1000 NAND: "nandold" = the cache as before (64 chunks, none read ahead), "nandsync" = the
+		// chunk cache without reads ahead; neither starts the io worker, threads.c. "nandcpu3": the worker on CPU3)
+		if (sceIoGetstat(RBX_DATA_DIR "nandold", &st_e12) >= 0) {
+			setenv("RBX_NAND_OLD", "1", 1);
+			RBX_LOG("cv1k nand: the cache before ADR-160 (nandold)");
+		} else if (sceIoGetstat(RBX_DATA_DIR "nandsync", &st_e12) >= 0) {
+			setenv("RBX_NAND_AHEAD", "0", 1);
+			RBX_LOG("cv1k nand: no reads ahead (nandsync)");
+		}
+		// (the CV1000 blitter's lanes, ADR-120: "e12onelane" one lane as ADR-105, "e12split2" / "e12split4" lane 1
+		// draws 1 in 2 / 4 row blocks instead of 1 in 3)
+		static const char *const sw[3][2] = { { "e12onelane", "0" }, { "e12split2", "2" }, { "e12split4", "4" } };
+		char path[128];
+		for (int i = 0; i < 3; i++) {
+			snprintf(path, sizeof(path), "%s%s", RBX_DATA_DIR, sw[i][0]);
+			if (sceIoGetstat(path, &st_e12) >= 0) {
+				setenv("RBX_CV1K_SPLIT", sw[i][1], 1);
+				RBX_LOG("epic12: split %s (%s)", sw[i][1], sw[i][0]);
+			}
+		}
+		// (ADR-145, how the blitter's NEON rows prefetch: "e12pf0" the next row's first pixels only, as before; "e12pf2"
+		// / "e12pf4" the first, middle and last cache lines two / four rows ahead instead of one)
+		static const char *const pf[3][2] = { { "e12pf0", "0" }, { "e12pf2", "2" }, { "e12pf4", "4" } };
+		for (int i = 0; i < 3; i++) {
+			snprintf(path, sizeof(path), "%s%s", RBX_DATA_DIR, pf[i][0]);
+			if (sceIoGetstat(path, &st_e12) >= 0) {
+				setenv("RBX_EPIC12_PF", pf[i][1], 1);
+				RBX_LOG("epic12: prefetch %s (%s)", pf[i][1], pf[i][0]);
+			}
+		}
+	}
+	rbx_present_check_files();                 // (testing, ADR-195: "runahead1" / "runahead0" = the frame buffer on / off)
+	rbx_settings_move_game_files();            // the games' .cfg files in cfg/
 	rbx_states_move_old();                      // the save states in states/
 	rbx_touch_init();
 	rbx_settings_load();
+	rbx_lang_init();   // (the menus' language: its files installed when missing, then read)
 	// input engine (setting): RePad = the Bluetooth controller plugin from the app, unless it already runs (ur0:tai, or
 	// another Re app); Native = whatever the system has
 	// (the first start after boot has just loaded the kernel helper and restarted: the device switched off once loading
@@ -736,6 +946,10 @@ int main(int argc, char *argv[])
 		sceKernelDelayThread(1000000);
 	g_settings.input_engine = re_pad_engine_init(g_settings.input_engine, "ux0:app/RBOX00001/module/repad.skprx"); // (the kernel cannot open app0:)
 	RBX_LOG("input engine: %s, RePad %s", re_pad_engine_name(g_settings.input_engine), re_pad_plugin() ? "running" : "not running");
+	rbx_gamelist_load();   // (the lists' ROM folders join the scan)
+	s_rom_dirs = 2 + rbx_gamelist_rom_dirs(k_rom_dirs, 2, k_rom_dirs + 2, ROM_DIRS_MAX - 2);
+	for (int i = 2; i < s_rom_dirs; i++)
+		RBX_LOG("roms: also in %s (game list)", k_rom_dirs[i]);
 	rbx_menu_init();
 	rbx_loading_prepare(); // (the loading screen's background, decoded once now rather than when a game is chosen)
 #ifdef RBX_ENABLE_LOG
@@ -752,6 +966,7 @@ int main(int argc, char *argv[])
 	}
 
 	RBX_LOG("exit");
+	rbx_testfiles_stop();
 	rbx_audio_shutdown();
 	rbx_menu_fini();
 	rbx_hud_fini();

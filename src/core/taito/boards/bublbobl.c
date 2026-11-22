@@ -8,7 +8,7 @@
 #include "../../cpu/z80/z80.h"
 #include "../../cpu/m6800/m6801.h"
 #include "../../cpu/m6805/m68705.h"
-#include "../machine/taito68705.h"
+#include "../../machine/taito68705.h"
 #include "../../sound/rbx_ym.h"
 
 #include <stdlib.h>

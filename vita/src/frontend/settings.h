@@ -36,6 +36,9 @@ enum { RBX_BORDER_BLACK, RBX_BORDER_ARTWORK, RBX_BORDER_COLOR, RBX_BORDER_MARQUE
 // Screen rotation: Auto = vertical games upright on the landscape screen; Off = the game's buffer as it is; Vertical L / R =
 // upright with the Vita turned left (right edge up) / right (left edge up), directions turned with it
 enum { RBX_ROT_AUTO, RBX_ROT_OFF, RBX_ROT_VL, RBX_ROT_VR, RBX_ROT_COUNT };
+// Display > Frame buffer (ADR-195): the emulation may run one frame ahead of the display (input about 17 ms later).
+// Auto = on for the Cave CV1000 games, off for the others (present.c rbx_present_wanted)
+enum { RBX_FRAMEBUF_AUTO, RBX_FRAMEBUF_OFF, RBX_FRAMEBUF_ONE, RBX_FRAMEBUF_COUNT };
 // Menu colour theme (global; Graphite is the ReBOX default, Red ReSys12's, Blue ReST-V's)
 enum { RBX_THEME_RED, RBX_THEME_BLUE, RBX_THEME_GREEN, RBX_THEME_PURPLE, RBX_THEME_ORANGE, RBX_THEME_GRAPHITE, RBX_THEME_PINK, RBX_THEME_COUNT };
 // A stick direction, and what it presses: nothing, a lever direction (order of RBX_SDIR_*), game buttons 1-6, coin, start
@@ -121,19 +124,23 @@ typedef struct {
 	rbx_port port[RBX_PROFILES]; // controls profiles: one per device (re_pad_profile), not per player
 	int pad_src[RBX_PORTS];             // RE_PAD_SRC_* of each player's controller (global only; 0 = Auto)
 	int input_engine;                   // RE_PAD_ENGINE_* (global only): Native or the bundled RePad plugin
+	int p2_added;                       // the 2P Controller row added by hand (Controls: Add / Delete), global only
 	int cheat_health;                   // 1P infinite health
 	int dip_count;                      // number of saved DIP bytes (0 = driver defaults). Per-game file <set>.cfg
 	uint8_t dip[RBX_DIP_BYTES_MAX];
+	char language[8];                   // the menus' language (lang.h: "eng", "kor", ...)
 	char last_game[16];                 // set name of the last game played (game list cursor)
 	int list_filter;                    // game list filter: RBX_LIST_*
 	int list_group;                     // game list grouping: RBX_GROUP_*
-	int list_snap;                      // the game list shows the snap of the game under the cursor
 	int show_list;                      // show the list next start even with one game (options screen Select game)
 	int rotate;                         // RBX_ROT_*
 	int touch_keys;                     // the touch screen buttons press their keys
 	int touch_show;                     // the touch buttons are drawn over the game
 	int theme;                          // RBX_THEME_* (global only)
 	int neon[7];                        // the neon corridor's knobs, RBX_NEON_* (neon.h; global only)
+	int neon_list[7];                   // the game list's corridor (user 11-22: set apart from the games' one)
+	int neon_list_gap;                  // its walls' distance (px, the middle of the screen between them)
+	int frame_buffer;                   // RBX_FRAMEBUF_* (per game or global)
 } rbx_settings;
 
 extern rbx_settings g_settings;

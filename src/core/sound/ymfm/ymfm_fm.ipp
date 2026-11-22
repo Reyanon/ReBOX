@@ -1297,6 +1297,15 @@ uint32_t fm_engine_base<RegisterType>::clock(uint32_t chanmask)
 				if (m_channel[chnum]->prepare())
 					m_active_channels |= 1 << chnum;
 
+		// ReBOX: the idle channels are left alone until the next prepare (a write prepares again); not the rhythm
+		// channels in rhythm mode (their phases make the noise of the others)
+		m_idle_channels = 0;
+		for (uint32_t chnum = 0; chnum < CHANNELS; chnum++)
+			if (bitfield(chanmask, chnum) && m_channel[chnum]->idle())
+				m_idle_channels |= 1 << chnum;
+		if (CHANNELS >= 9 && m_regs.rhythm_enable())
+			m_idle_channels &= ~(7u << 6);
+
 		// reset the modified channels and prepare count
 		m_modified_channels = m_prepare_count = 0;
 	}
@@ -1313,7 +1322,7 @@ uint32_t fm_engine_base<RegisterType>::clock(uint32_t chanmask)
 
 	// now update the state of all the channels and operators
 	for (uint32_t chnum = 0; chnum < CHANNELS; chnum++)
-		if (bitfield(chanmask, chnum))
+		if (bitfield(chanmask & ~m_idle_channels, chnum))
 			m_channel[chnum]->clock(m_env_counter, lfo_raw_pm);
 
 	// return the envelope counter as it is used to clock ADPCM-A

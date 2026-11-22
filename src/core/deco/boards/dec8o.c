@@ -41,10 +41,12 @@ static uint16_t s_sprbuf[0x400];           // buffer_spriteram16_w
 static int s_bank, s_bank_mask;
 static m6809_t s_cpu[2];
 static int s_irq[2], s_coin_state;
-static bac06_t s_tile[2];
+static bac06_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static decmxc06_t s_spr;
 static rbx_gfx s_gfx8, s_gfxt1, s_gfxt2, s_gfxspr;
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 static int s_port_in[3], s_port_dsw[2];
 static int s_txt, s_spr_ram, s_pal;        // (the s_ram offsets of the text, the sprite list, the palette)
 static int s_line;
@@ -342,6 +344,14 @@ static void d8o_exit(void);
 
 static int d8o_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_var = !strcmp(g->machine, "oscar") || !strcmp(g->machine, "oscarbl") ? V_OSCAR : V_COBRA;
 	const int oscar = s_var == V_OSCAR, bl = !strcmp(g->machine, "oscarbl");
 	uint32_t csize, t1size, t2size = 0, ssize;
@@ -490,6 +500,10 @@ static void d8o_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void d8o_frame(void)

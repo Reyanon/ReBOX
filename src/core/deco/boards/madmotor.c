@@ -25,11 +25,13 @@
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint16_t s_ram[0x2000];             // 0x3e0000 .. 0x3e3fff
+static uint16_t (*s_ram_hp)[0x2000];             // 0x3e0000 .. 0x3e3fff
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[0x400];
 static uint16_t s_pal[0x400];              // xBGR_444
 static uint16_t s_ram184080[0x1c0];        // 0x184080 .. 0x1843ff
-static bac06_t s_tile[3];
+static bac06_t (*s_tile_hp)[3];
+#define s_tile (*s_tile_hp)
 static decmxc06_t s_spr;
 static rbx_gfx s_gfx8, s_gfx16a, s_gfx16b, s_gfxspr;
 static int s_port_in, s_port_dsw, s_port_sys;
@@ -148,6 +150,14 @@ static void mm_exit(void);
 
 static int mm_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t snd_size, csize, t1s, t2s, ssize, o1s, o2s;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *snd = rbx_region("audiocpu", &snd_size), *chars = rbx_region("char", &csize),
@@ -251,6 +261,10 @@ static void mm_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void mm_frame(void)

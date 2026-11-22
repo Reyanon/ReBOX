@@ -36,7 +36,8 @@ static hd6309_t s_cpu;
 static k007121_t s_k121;
 static k051733_t s_k733;
 static int s_port_system, s_port_p[2], s_port_dsw[3];
-static uint8_t s_pri[VIS_W * VIS_H];
+static uint8_t (*s_pri_hp)[VIS_W * VIS_H];
+#define s_pri (*s_pri_hp)
 static int32_t s_out[2048];
 static int s_out_pos;
 
@@ -291,6 +292,10 @@ static void lr_reset(void);
 
 static int lr_init(const rbx_game *g)
 {
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t gsize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	const uint8_t *gfx = rbx_region("gfx", &gsize), *prom = rbx_region("proms", &psize);
@@ -357,6 +362,8 @@ static void lr_exit(void)
 	rbx_ym_exit(1);
 	free(s_gfx);
 	s_gfx = NULL;
+	free(s_pri_hp);
+	s_pri_hp = NULL;
 }
 
 static void lr_reset(void)

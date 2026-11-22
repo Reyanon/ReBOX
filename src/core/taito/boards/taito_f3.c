@@ -69,13 +69,19 @@ static const f3_machine *s_m;
 static int s_game, s_patch;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x20000];
+static uint8_t (*s_ram_hp)[0x20000];
+#define s_ram (*s_ram_hp)
 static int s_idle;   // the idle loops found (below): -1 not checked yet, else IDLE_* bits
-static uint8_t s_pal[0x8000];
-static uint8_t s_spr[0x10000];
-static uint8_t s_vram[0x10000];   // 0x610000-0x61ffff
-static uint8_t s_line[0x10000];
-static uint8_t s_pivot[0x10000];
+static uint8_t (*s_pal_hp)[0x8000];
+#define s_pal (*s_pal_hp)
+static uint8_t (*s_spr_hp)[0x10000];
+#define s_spr (*s_spr_hp)
+static uint8_t (*s_vram_hp)[0x10000];   // 0x610000-0x61ffff
+#define s_vram (*s_vram_hp)
+static uint8_t (*s_line_hp)[0x10000];
+#define s_line (*s_line_hp)
+static uint8_t (*s_pivot_hp)[0x10000];
+#define s_pivot (*s_pivot_hp)
 static uint16_t s_ctrl0[8], s_ctrl1[8];
 static uint32_t s_coin_word[2];
 static int s_dial[2];
@@ -264,6 +270,30 @@ static void f3_exit(void);
 
 static int f3_init(const rbx_game *g)
 {
+	if (!s_line_hp && !(s_line_hp = calloc(1, sizeof(*s_line_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pal_hp && !(s_pal_hp = calloc(1, sizeof(*s_pal_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pivot_hp && !(s_pivot_hp = calloc(1, sizeof(*s_pivot_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_spr_hp && !(s_spr_hp = calloc(1, sizeof(*s_spr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_vram_hp && !(s_vram_hp = calloc(1, sizeof(*s_vram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_m = find_machine(g->machine);
 	s_idle = -1;
 	const f3_set *fs = find_set(g);
@@ -375,6 +405,18 @@ static void f3_exit(void)
 		free(s_v);
 		s_v = NULL;
 	}
+	free(s_line_hp);
+	s_line_hp = NULL;
+	free(s_pal_hp);
+	s_pal_hp = NULL;
+	free(s_pivot_hp);
+	s_pivot_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_spr_hp);
+	s_spr_hp = NULL;
+	free(s_vram_hp);
+	s_vram_hp = NULL;
 }
 
 // rbx_line_cycles without its 64-bit division per line (the Vita's CPU has no divider): the same sequence from the

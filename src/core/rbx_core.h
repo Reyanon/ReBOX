@@ -5,6 +5,7 @@
 #define RBX_CORE_H
 
 #include <stdint.h>
+#include "rbx_prof.h"   // (the sampled activity, ADR-155: rbx_prof_cur, rbx_prof_get_name for the sampler)
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,6 +49,7 @@ typedef struct {
 	void (*progress)(int permille, void *user); // ROM loading progress, may be NULL
 	void *progress_user;
 	const char *nvram_dir;          // folder for EEPROM / NVRAM files ('/' at the end), NULL = none
+	const char *cache_dir;          // folder for large ROM files kept outside memory ('/' at the end), NULL = in memory
 	void (*wait_hook)(void);        // called while one thread waits for another (NULL = spin); rbx_wait_site() says on what
 	uint64_t (*time_us)(void);      // a microsecond clock for the drivers' profiling logs (rbx_clock_us), may be NULL
 	// memory for generated code (ARM: the F3 ESP and Konami DASP programs), NULL = none: jit_alloc once (8MB, the core
@@ -104,23 +106,36 @@ void rbx_render_stop(void);
 // another frontend thread (a spare core) helps draw the frame the render thread is drawing; 0 = nothing to do now
 int rbx_render_help(void);
 int rbx_render_help_one(int helper);   // (rbx.h)
+int rbx_video_depth(void);   // frames the emulation may post ahead of the render thread (1, or 2: show frame n - 2)
 int rbx_render_can_help(void);   // the running game splits its drawing (a helper thread is worth starting)
 // worker thread for a driver's own job (rbx.h rbx_aux_*): a thread loops on rbx_aux_run until it returns 0. Turn it on
 // or off between frames only
 void rbx_set_aux_thread(int on);
 int rbx_aux_has_job(void);  // the running game has a job for the worker
+int rbx_aux_by_render(void);   // (rbx.h rbx_aux_set_by_render)
 int rbx_aux_run(void);    // 1 = ran the job (or found nothing to do), 0 = stopped (rbx_aux_stop)
 void rbx_aux_stop(void);
 // the second worker thread (rbx.h rbx_aux2_*), the same way
 void rbx_set_aux2_thread(int on);
 int rbx_aux2_has_job(void);
-int rbx_aux2_alone(void);   // (rbx.h rbx_aux2_set_alone)
+int rbx_aux2_alone(void);   // (rbx.h rbx_aux2_set_alone: 1 = CPU3, RBX_AUX2_BY_RENDER = CPU2 below the render thread)
+#ifndef RBX_AUX2_BY_RENDER
+#define RBX_AUX2_BY_RENDER 2
+#endif
+int rbx_aux3_alone(void);     // (rbx.h rbx_aux3_set_alone: 1 = alone on CPU3, low)
 int rbx_aux3_has_job(void);   // (the third: rbx_set_aux3_thread / rbx_aux3_run / rbx_aux3_stop, the same way)
 void rbx_set_aux3_thread(int on);
 int rbx_aux3_run(void);
 int rbx_aux3_try(void);       // the job if kicked since it last ran (1), else 0 at once (the thread then sleeps until
 void rbx_set_aux3_wake(void (*wake)(void));   // wake: called by each kick, NULL = none)
 void rbx_aux3_stop(void);
+// the io worker (rbx.h rbx_io_*, ADR-160): a thread for a game with rbx_io_wanted() calls rbx_io_run (the requests
+// queued, read in order; 0 = none, sleep until the wake given to rbx_set_io_wake or a short timeout). rbx_set_io_thread
+// on once the thread runs, off before it is stopped (requests still queued are then read by the emulation thread)
+int rbx_io_wanted(void);
+void rbx_set_io_thread(int on);
+void rbx_set_io_wake(void (*wake)(void));
+int rbx_io_run(void);
 int rbx_aux2_run(void);
 void rbx_aux2_stop(void);
 

@@ -191,10 +191,14 @@ static void coins(void)
 }
 
 // ---- video ----
-static uint16_t s_scr[256 * 256];
-static uint8_t s_pri[256 * 256];
-static uint8_t s_ramtile[2][128 * 256];   // the gfx RAM's two tile sets (ram_tilelayout)
-static uint8_t s_ramtile_src[0x6000];    // the gfx RAM they were decoded from (only changed tiles again)
+static uint16_t (*s_scr_hp)[256 * 256];
+#define s_scr (*s_scr_hp)
+static uint8_t (*s_pri_hp)[256 * 256];
+#define s_pri (*s_pri_hp)
+static uint8_t (*s_ramtile_hp)[2][128 * 256];   // the gfx RAM's two tile sets (ram_tilelayout)
+#define s_ramtile (*s_ramtile_hp)
+static uint8_t (*s_ramtile_src_hp)[0x6000];    // the gfx RAM they were decoded from (only changed tiles again)
+#define s_ramtile_src (*s_ramtile_src_hp)
 static int s_ramtile_ok;
 
 static uint32_t pal3(int v) { return (uint32_t)((v << 5) | (v << 2) | (v >> 1)); }
@@ -382,6 +386,22 @@ static void bw_exit(void);
 
 static int bw_init(const rbx_game *g)
 {
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ramtile_hp && !(s_ramtile_hp = calloc(1, sizeof(*s_ramtile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ramtile_src_hp && !(s_ramtile_src_hp = calloc(1, sizeof(*s_ramtile_src_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_scr_hp && !(s_scr_hp = calloc(1, sizeof(*s_scr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_ramtile_ok = 0;
 	uint32_t cs, ss;
 	s_rom[0] = rbx_region("maincpu", &s_rom_size[0]);
@@ -460,6 +480,14 @@ static void bw_exit(void)
 	s_snap = NULL;
 	free(s_mix);
 	s_mix = NULL;
+	free(s_pri_hp);
+	s_pri_hp = NULL;
+	free(s_ramtile_hp);
+	s_ramtile_hp = NULL;
+	free(s_ramtile_src_hp);
+	s_ramtile_src_hp = NULL;
+	free(s_scr_hp);
+	s_scr_hp = NULL;
 }
 
 static void bw_frame(void)

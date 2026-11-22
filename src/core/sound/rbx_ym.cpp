@@ -24,12 +24,13 @@ public:
 	void ymfm_set_timer(uint32_t tnum, int32_t duration) override
 	{
 		if (tnum > 1) return;
+		if (cfg.set_timer) { cfg.set_timer((int)tnum, duration); return; }   // (the board's timers)
 		if (duration < 0) { timer_on[tnum] = 0; return; }
 		timer_on[tnum] = 1;
 		timer_left[tnum] = duration;
 	}
-	void ymfm_set_busy_end(uint32_t) override {}
-	bool ymfm_is_busy() override { return false; }
+	void ymfm_set_busy_end(uint32_t clocks) override { if (cfg.busy_end) cfg.busy_end(clocks); }
+	bool ymfm_is_busy() override { return cfg.is_busy && cfg.is_busy(); }
 	void ymfm_update_irq(bool asserted) override
 	{
 		int s = asserted ? 1 : 0;
@@ -42,6 +43,11 @@ public:
 			return cfg.adpcma && cfg.adpcma_size ? cfg.adpcma[address % cfg.adpcma_size] : 0;
 		if (type == ymfm::ACCESS_ADPCM_B)
 			return cfg.adpcmb && cfg.adpcmb_size ? cfg.adpcmb[address % cfg.adpcmb_size] : 0;
+		if (type == ymfm::ACCESS_PCM) {   // (YMF278B: the wave ROM, 0xff past it as MAME's unmapped high)
+			if (cfg.pcm_bank)   // (four 1 MB windows, the board's banks)
+				address = cfg.pcm_bank[(address >> 20) & 3] + (address & 0xfffff);
+			return cfg.adpcma && address < cfg.adpcma_size ? cfg.adpcma[address] : 0xff;
+		}
 		if (type == ymfm::ACCESS_IO && address == 0 && cfg.port_a_read)
 			return cfg.port_a_read();
 		if (type == ymfm::ACCESS_IO && address == 1 && cfg.port_b_read)
@@ -78,6 +84,7 @@ public:
 		if (timer_on[1]) timer_left[1] -= clocks;
 		return true;
 	}
+	void expire(uint32_t tnum) { m_engine->engine_timer_expired(tnum); }
 	void clear() { timer_on[0] = timer_on[1] = 0; timer_left[0] = timer_left[1] = 0; irq = 0; }
 
 	rbx_ym_config cfg {};
@@ -95,7 +102,9 @@ struct Chip {
 	ymfm::ym2151 *opm = nullptr;
 	ymfm::ym3526 *opl = nullptr;
 	ymfm::ym3812 *opl2 = nullptr;
+	ymfm::ymf278b *opl4 = nullptr;
 	ymfm::ym3438 *opn2 = nullptr;
+	ymfm::ym2413 *opll = nullptr;
 	uint32_t rate = 0, period = 1, acc = 0;
 	int vol = 256;
 };
@@ -111,6 +120,8 @@ static inline int32_t mix_sample(const Chip &c, const int32_t *d)
 		return (d[1] * g[0] + d[2] * g[1] + d[3] * g[2] + d[0] * g[3]) >> 8;
 	if (c.type == RBX_YM3526 || c.type == RBX_YM3812)
 		return (d[0] * g[0]) >> 8;
+	if (c.type == RBX_YMF278B)   // (all six outputs to the one speaker)
+		return ((d[0] + d[1] + d[2] + d[3] + d[4] + d[5]) * g[0]) >> 8;
 	return (d[0] * g[0] + d[1] * g[1]) >> 8;
 }
 // the two sides (MAME routes): YM2610 SSG to both, FM L / R; YM2151 L / R; the others the same on both
@@ -177,7 +188,22 @@ int gen(Chip &c, T *chip, int32_t *out, int max, uint32_t clocks, int32_t *outr 
 // of its cost); a second chip (the synth) is given the same writes at the same samples by a queue and makes them on
 // the rbx_aux worker; rbx_ym_async_take adds them to the board's mix. Its sound is the same as one chip's (the
 // synth's timers run as the first one's; nothing the board reads comes from the synth)
-enum { AQ_ADV, AQ_WRITE, AQ_GAIN, AQ_VOL, AQ_RESET };
+static void chip_reset(Chip &c)
+{
+	c.intf.clear();
+	if (c.opnb) c.opnb->reset();
+	if (c.opnb2) c.opnb2->reset();
+	if (c.opn) c.opn->reset();
+	if (c.opm) c.opm->reset();
+	if (c.opl) c.opl->reset();
+	if (c.opl2) c.opl2->reset();
+	if (c.opl4) c.opl4->reset();
+	if (c.opn2) c.opn2->reset();
+	if (c.opll) c.opll->reset();
+	c.acc = 0;
+}
+
+enum { AQ_ADV, AQ_WRITE, AQ_GAIN, AQ_VOL, AQ_RESET, AQ_EXPIRE, AQ_USER };
 struct AsyncOp { uint8_t kind, a; uint16_t b; uint32_t n; };
 enum { AQ_SIZE = 8192, AO_SIZE = 16384 };
 struct Async {
@@ -187,20 +213,28 @@ struct Async {
 	unsigned q_in = 0, q_done = 0;   // (emulation thread / worker)
 	int32_t out[AO_SIZE], out_r[AO_SIZE];
 	unsigned out_in = 0, out_take = 0;
+	void (*user)(uint8_t, uint16_t, uint32_t) = nullptr;   // (rbx_ym_async_set_user)
+	int busy = 0;   // (the chip's steps being made: by the worker, or by the emulation thread, rbx_ym_async_help)
 };
 Async *s_async[2];
+int s_help;   // rbx_ym_async_help
+
+// (the synth of a chip whose timers are the board's: its own timer settings go nowhere)
+void synth_no_timer(int tnum, int32_t duration) { (void)tnum; (void)duration; }
 
 void synth_write(Chip &c, uint32_t offset, uint8_t data);
 void synth_reset(Chip &c);
 int synth_gen(Chip &c, uint32_t clocks, int32_t *out, int max, int32_t *outr = nullptr);
 
-// the worker's job: every queued step of every chip on a worker (synth of chip k: s_chip[k + 2])
-void async_job()
+// a chip's queued steps (synth of chip k: s_chip[k + 2]), by whoever holds its busy flag: in their order, one thread at
+// a time (0: someone else is on it)
+int chip_run(int k)
 {
-	for (int k = 0; k < 2; k++) {
-		Async *a = s_async[k];
-		if (!a || !a->on)
-			continue;
+	Async *a = s_async[k];
+	int free = 0;
+	if (!__atomic_compare_exchange_n(&a->busy, &free, 1, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE))
+		return 0;
+	{
 		const unsigned end = __atomic_load_n(&a->q_in, __ATOMIC_ACQUIRE);
 		unsigned i = a->q_done;
 		Chip &c = s_chip[k + 2];
@@ -224,10 +258,42 @@ void async_job()
 			case AQ_WRITE: synth_write(c, op.a, (uint8_t)op.b); break;
 			case AQ_GAIN: c.intf.cfg.gain[op.a & 3] = op.b; break;
 			case AQ_VOL: c.vol = op.b; break;
+			case AQ_RESET: chip_reset(c); break;   // (the worker's synth copy reset in its turn too)
+			case AQ_EXPIRE: c.intf.expire(op.a); break;   // (the board's timer, between the same samples: CSM key-ons)
+			case AQ_USER: if (a->user) a->user(op.a, op.b, op.n); break;   // (the board's own step, in its turn)
 			}
 		}
 		__atomic_store_n(&a->q_done, i, __ATOMIC_RELEASE);
 	}
+	__atomic_store_n(&a->busy, 0, __ATOMIC_RELEASE);
+	return 1;
+}
+
+// the worker's job: every queued step of every chip on a worker (a chip the emulation thread is making, skipped: it
+// makes all of that chip's steps, none being queued meanwhile)
+void async_job()
+{
+	for (int k = 0; k < 2; k++)
+		if (s_async[k] && s_async[k]->on)
+			chip_run(k);
+}
+
+// the samples of chip k up to n since the last take (the worker's steps waited for). With rbx_ym_async_help, the
+// emulation thread makes the other chip's queued steps while the worker is on this one, and this one's when the
+// worker is not on it
+void take_wait(int k, int n)
+{
+	Async *a = s_async[k];
+	if ((int)(__atomic_load_n(&a->out_in, __ATOMIC_ACQUIRE) - a->out_take) >= n)
+		return;
+	if (s_help) {
+		Async *o = s_async[k ^ 1];
+		if (o && o->on && __atomic_load_n(&o->q_done, __ATOMIC_ACQUIRE) != o->q_in)
+			chip_run(k ^ 1);
+		if (chip_run(k))
+			return;
+	}
+	rbx_aux_sync();
 }
 
 void async_push(int chip, uint8_t kind, uint8_t a, uint16_t b, uint32_t n)
@@ -290,10 +356,20 @@ int rbx_ym_init(int chip, const rbx_ym_config *cfg)
 		if (!c.opl2) return -1;
 		c.rate = c.opl2->sample_rate(cfg->clock);
 		break;
+	case RBX_YMF278B:
+		c.opl4 = new (std::nothrow) ymfm::ymf278b(c.intf);
+		if (!c.opl4) return -1;
+		c.rate = c.opl4->sample_rate(cfg->clock);
+		break;
 	case RBX_YM3438:
 		c.opn2 = new (std::nothrow) ymfm::ym3438(c.intf);
 		if (!c.opn2) return -1;
 		c.rate = c.opn2->sample_rate(cfg->clock);
+		break;
+	case RBX_YM2413:
+		c.opll = new (std::nothrow) ymfm::ym2413(c.intf);
+		if (!c.opll) return -1;
+		c.rate = c.opll->sample_rate(cfg->clock);
 		break;
 	default:
 		return -1;
@@ -317,9 +393,12 @@ void rbx_ym_exit(int chip)
 	delete c.opm; c.opm = nullptr;
 	delete c.opl; c.opl = nullptr;
 	delete c.opl2; c.opl2 = nullptr;
+	delete c.opl4; c.opl4 = nullptr;
 	delete c.opn2; c.opn2 = nullptr;
+	delete c.opll; c.opll = nullptr;
 	c.type = -1;
 }
+
 
 void rbx_ym_reset(int chip)
 {
@@ -327,19 +406,18 @@ void rbx_ym_reset(int chip)
 		async_push(chip, AQ_RESET, 0, 0, 0);
 		rbx_aux_kick();
 	}
-	Chip &c = s_chip[chip];
-	c.intf.clear();
-	if (c.opnb) c.opnb->reset();
-	if (c.opnb2) c.opnb2->reset();
-	if (c.opn) c.opn->reset();
-	if (c.opm) c.opm->reset();
-	if (c.opl) c.opl->reset();
-	if (c.opl2) c.opl2->reset();
-	if (c.opn2) c.opn2->reset();
-	c.acc = 0;
+	chip_reset(s_chip[chip]);
 }
 
 uint32_t rbx_ym_rate(int chip) { return s_chip[chip].rate; }
+
+void rbx_ym_timer_expired(int chip, int tnum)
+{
+	// (the synth too, after the samples made so far: what a timer does to the sound, timer A's CSM key-on)
+	if (chip < 2 && s_async[chip] && s_async[chip]->on)
+		async_push(chip, AQ_EXPIRE, (uint8_t)tnum, 0, 0);
+	s_chip[chip].intf.expire((uint32_t)tnum);
+}
 
 uint8_t rbx_ym_read(int chip, uint32_t offset)
 {
@@ -350,6 +428,7 @@ uint8_t rbx_ym_read(int chip, uint32_t offset)
 	if (c.opm) return c.opm->read(offset & 1);
 	if (c.opl) return c.opl->read(offset & 1);
 	if (c.opl2) return c.opl2->read(offset & 1);
+	if (c.opl4) return c.opl4->read(offset & 7);
 	if (c.opn2) return c.opn2->read(offset & 3);
 	return 0xff;
 }
@@ -365,7 +444,9 @@ void rbx_ym_write(int chip, uint32_t offset, uint8_t data)
 	else if (c.opm) c.opm->write(offset & 1, data);
 	else if (c.opl) c.opl->write(offset & 1, data);
 	else if (c.opl2) c.opl2->write(offset & 1, data);
+	else if (c.opl4) c.opl4->write(offset & 7, data);
 	else if (c.opn2) c.opn2->write(offset & 3, data);
+	else if (c.opll) c.opll->write(offset & 1, data);
 }
 
 int rbx_ym_advance(int chip, uint32_t clocks, int32_t *out, int max)
@@ -383,6 +464,7 @@ int rbx_ym_advance(int chip, uint32_t clocks, int32_t *out, int max)
 				else if (c.opm) c.opm->clock_status(m);
 				else if (c.opl) c.opl->clock_status(m);
 				else if (c.opl2) c.opl2->clock_status(m);
+				else if (c.opl4) c.opl4->clock_status(m);
 				else if (c.opn2) c.opn2->clock_status(m);
 				n = m;
 			}
@@ -396,6 +478,7 @@ int rbx_ym_advance(int chip, uint32_t clocks, int32_t *out, int max)
 			else if (c.opm) c.opm->clock_status(1);
 			else if (c.opl) c.opl->clock_status(1);
 			else if (c.opl2) c.opl2->clock_status(1);
+			else if (c.opl4) c.opl4->clock_status(1);
 			else if (c.opn2) c.opn2->clock_status(1);
 			n++;
 		}
@@ -412,7 +495,9 @@ int rbx_ym_advance(int chip, uint32_t clocks, int32_t *out, int max)
 	if (c.opm) return gen(c, c.opm, out, max, clocks);
 	if (c.opl) return gen(c, c.opl, out, max, clocks);
 	if (c.opl2) return gen(c, c.opl2, out, max, clocks);
+	if (c.opl4) return gen(c, c.opl4, out, max, clocks);
 	if (c.opn2) return gen(c, c.opn2, out, max, clocks);
+	if (c.opll) return gen(c, c.opll, out, max, clocks);
 	return 0;
 }
 
@@ -427,7 +512,9 @@ int rbx_ym_advance_lr(int chip, uint32_t clocks, int32_t *l, int32_t *r, int max
 	if (c.opm) return gen(c, c.opm, l, max, clocks, r);
 	if (c.opl) return gen(c, c.opl, l, max, clocks, r);
 	if (c.opl2) return gen(c, c.opl2, l, max, clocks, r);
+	if (c.opl4) return gen(c, c.opl4, l, max, clocks, r);
 	if (c.opn2) return gen(c, c.opn2, l, max, clocks, r);
+	if (c.opll) return gen(c, c.opll, l, max, clocks, r);
 	return 0;
 }
 
@@ -461,7 +548,9 @@ static void copy_chip_state(Chip &from, Chip &to)
 	if (from.opm) from.opm->save_restore(st);
 	if (from.opl) from.opl->save_restore(st);
 	if (from.opl2) from.opl2->save_restore(st);
+	if (from.opl4) from.opl4->save_restore(st);
 	if (from.opn2) from.opn2->save_restore(st);
+	if (from.opll) from.opll->save_restore(st);
 	ymfm::ymfm_saved_state ld(buf, false);
 	if (to.opnb) to.opnb->save_restore(ld);
 	if (to.opnb2) to.opnb2->save_restore(ld);
@@ -469,7 +558,9 @@ static void copy_chip_state(Chip &from, Chip &to)
 	if (to.opm) to.opm->save_restore(ld);
 	if (to.opl) to.opl->save_restore(ld);
 	if (to.opl2) to.opl2->save_restore(ld);
+	if (to.opl4) to.opl4->save_restore(ld);
 	if (to.opn2) to.opn2->save_restore(ld);
+	if (to.opll) to.opll->save_restore(ld);
 	to.acc = from.acc;
 	to.intf.timer_on[0] = from.intf.timer_on[0];
 	to.intf.timer_on[1] = from.intf.timer_on[1];
@@ -479,6 +570,7 @@ static void copy_chip_state(Chip &from, Chip &to)
 
 int rbx_ym_set_async(int chip, int on)
 {
+	s_help = 0;   // (the board sets it again after its chips: rbx_ym_async_help)
 	if (chip >= 2 || s_chip[chip].type < 0)
 		return -1;
 	// (the YM2610s' ADPCM end flags, read by the sound CPU, move with the samples: their first chip runs the clocks
@@ -489,6 +581,7 @@ int rbx_ym_set_async(int chip, int on)
 		if (s_async[chip] && s_async[chip]->on) {
 			rbx_aux_sync();
 			s_async[chip]->on = false;
+			s_async[chip]->user = nullptr;
 			rbx_ym_exit(chip + 2);
 			if (!(s_async[chip ^ 1] && s_async[chip ^ 1]->on))
 				rbx_aux_set_job(nullptr);   // (no chip left on it)
@@ -508,6 +601,12 @@ int rbx_ym_set_async(int chip, int on)
 	cfg.port_b_write = nullptr;
 	cfg.port_a_read = nullptr;
 	cfg.port_b_read = nullptr;
+	// (the board's timers and busy flag are the first chip's alone: the synth's timer settings go nowhere, the board's
+	// expiries reach it through the queue, rbx_ym_timer_expired)
+	if (cfg.set_timer)
+		cfg.set_timer = synth_no_timer;
+	cfg.busy_end = nullptr;
+	cfg.is_busy = nullptr;
 	if (rbx_ym_init(chip + 2, &cfg))
 		return -1;
 	copy_chip_state(s_chip[chip], s_chip[chip + 2]);
@@ -515,9 +614,27 @@ int rbx_ym_set_async(int chip, int on)
 	a->q_in = a->q_done = 0;
 	a->out_in = a->out_take = 0;
 	a->lr = on == 2;
+	a->user = nullptr;
 	a->on = true;
 	rbx_aux_set_job(async_job);
 	return 0;
+}
+
+int rbx_ym_async_set_user(int chip, void (*fn)(uint8_t a, uint16_t b, uint32_t n))
+{
+	Async *a = chip < 2 ? s_async[chip] : nullptr;
+	if (!a || !a->on)
+		return -1;
+	rbx_aux_sync();
+	a->user = fn;
+	return 0;
+}
+
+void rbx_ym_async_help(int on) { s_help = on; }
+
+void rbx_ym_async_user(int chip, uint8_t a, uint16_t b, uint32_t n)
+{
+	async_push(chip, AQ_USER, a, b, n);
 }
 
 void rbx_ym_async_take_lr(int chip, int32_t *l, int32_t *r, int n)
@@ -525,8 +642,7 @@ void rbx_ym_async_take_lr(int chip, int32_t *l, int32_t *r, int n)
 	Async *a = chip < 2 ? s_async[chip] : nullptr;
 	if (!a || !a->on)
 		return;
-	if ((int)(__atomic_load_n(&a->out_in, __ATOMIC_ACQUIRE) - a->out_take) < n)
-		rbx_aux_sync();
+	take_wait(chip, n);
 	const unsigned have = __atomic_load_n(&a->out_in, __ATOMIC_ACQUIRE) - a->out_take;
 	if ((unsigned)n > have)
 		n = (int)have;
@@ -542,8 +658,7 @@ void rbx_ym_async_take(int chip, int32_t *dst, int n)
 	Async *a = chip < 2 ? s_async[chip] : nullptr;
 	if (!a || !a->on)
 		return;
-	if ((int)(__atomic_load_n(&a->out_in, __ATOMIC_ACQUIRE) - a->out_take) < n)
-		rbx_aux_sync();
+	take_wait(chip, n);
 	const unsigned have = __atomic_load_n(&a->out_in, __ATOMIC_ACQUIRE) - a->out_take;
 	if ((unsigned)n > have)
 		n = (int)have;
@@ -584,7 +699,9 @@ static int ym_state_on(int chip, void *ctx, int load)
 		if (c.opm) c.opm->save_restore(st);
 		if (c.opl) c.opl->save_restore(st);
 		if (c.opl2) c.opl2->save_restore(st);
+		if (c.opl4) c.opl4->save_restore(st);
 		if (c.opn2) c.opn2->save_restore(st);
+		if (c.opll) c.opll->save_restore(st);
 		size = (uint32_t)buf.size();
 	}
 	if (rbx_state_io(ctx, "ymsize", &size, 4)) return -1;
@@ -601,7 +718,9 @@ static int ym_state_on(int chip, void *ctx, int load)
 		if (c.opm) c.opm->save_restore(st);
 		if (c.opl) c.opl->save_restore(st);
 		if (c.opl2) c.opl2->save_restore(st);
+		if (c.opl4) c.opl4->save_restore(st);
 		if (c.opn2) c.opn2->save_restore(st);
+		if (c.opll) c.opll->save_restore(st);
 		c.acc = (uint32_t)misc[0];
 		c.intf.timer_on[0] = misc[1]; c.intf.timer_on[1] = misc[2];
 		c.intf.timer_left[0] = misc[3]; c.intf.timer_left[1] = misc[4];
@@ -621,7 +740,9 @@ void synth_write(Chip &c, uint32_t offset, uint8_t data)
 	else if (c.opm) c.opm->write(offset & 1, data);
 	else if (c.opl) c.opl->write(offset & 1, data);
 	else if (c.opl2) c.opl2->write(offset & 1, data);
+	else if (c.opl4) c.opl4->write(offset & 7, data);
 	else if (c.opn2) c.opn2->write(offset & 3, data);
+	else if (c.opll) c.opll->write(offset & 1, data);
 }
 void synth_reset(Chip &c)
 {
@@ -632,7 +753,9 @@ void synth_reset(Chip &c)
 	if (c.opm) c.opm->reset();
 	if (c.opl) c.opl->reset();
 	if (c.opl2) c.opl2->reset();
+	if (c.opl4) c.opl4->reset();
 	if (c.opn2) c.opn2->reset();
+	if (c.opll) c.opll->reset();
 	c.acc = 0;
 }
 int synth_gen(Chip &c, uint32_t clocks, int32_t *out, int max, int32_t *outr)
@@ -643,7 +766,9 @@ int synth_gen(Chip &c, uint32_t clocks, int32_t *out, int max, int32_t *outr)
 	if (c.opm) return gen(c, c.opm, out, max, clocks, outr);
 	if (c.opl) return gen(c, c.opl, out, max, clocks, outr);
 	if (c.opl2) return gen(c, c.opl2, out, max, clocks, outr);
+	if (c.opl4) return gen(c, c.opl4, out, max, clocks, outr);
 	if (c.opn2) return gen(c, c.opn2, out, max, clocks, outr);
+	if (c.opll) return gen(c, c.opll, out, max, clocks, outr);
 	return 0;
 }
 } // namespace

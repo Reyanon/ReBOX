@@ -23,9 +23,11 @@
 static int s_vs;
 static uint8_t *s_rom, *s_srom;
 static uint32_t s_rom_size, s_srom_size;
-static uint8_t s_opcodes[0x10000];
+static uint8_t (*s_opcodes_hp)[0x10000];
+#define s_opcodes (*s_opcodes_hp)
 static uint8_t s_ram[0x2000], s_ram2[0x1500], s_vram[0x400], s_cram[0x400], s_spriteram[0x100];
-static uint8_t s_sram[0xa000];             // (VS: 0x6000-0xffff; one player: 0xe000-0xe2ff)
+static uint8_t (*s_sram_hp)[0xa000];             // (VS: 0x6000-0xffff; one player: 0xe000-0xe2ff)
+#define s_sram (*s_sram_hp)
 static uint8_t s_latchbits;                // the LS259's outputs
 static int s_nmi_line, s_snd_nmi_enable, s_snd_nmi_line, s_snd_reset, s_lo_nibble;
 static uint8_t s_slatch, s_adpcm;
@@ -319,6 +321,14 @@ static void kc_exit(void);
 
 static int kc_init(const rbx_game *g)
 {
+	if (!s_opcodes_hp && !(s_opcodes_hp = calloc(1, sizeof(*s_opcodes_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_sram_hp && !(s_sram_hp = calloc(1, sizeof(*s_sram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_vs = !strcmp(g->machine, "kchampvs");
 	uint32_t g1s, g2s, ps;
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -414,6 +424,10 @@ static void kc_exit(void)
 	s_snap = NULL;
 	free(s_mix);
 	s_mix = NULL;
+	free(s_opcodes_hp);
+	s_opcodes_hp = NULL;
+	free(s_sram_hp);
+	s_sram_hp = NULL;
 }
 
 static void kc_frame(void)

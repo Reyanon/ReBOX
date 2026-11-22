@@ -3,7 +3,8 @@
 /*  Motorola MC6801 / MC6801U4 (6800 family) microcontroller, ported to C99 from MAME
     src/devices/cpu/m6800/m6800.cpp, 6800ops.hxx and m6801.cpp (BSD-3-Clause, copyright-holders: Aaron Giles).
     On-chip: ports 1-4, programmable timer (FRC/OCR/ICR, plus OCR2/OCR3 on the U4), RAM, port 3 handshake (IS3/OS3).
-    The SCI keeps its registers but does not shift data. Also runs a plain MC6800 (M6801_TYPE_6800).
+    The SCI keeps its registers but does not shift data. Also runs a plain MC6800 (M6801_TYPE_6800) and the
+    Hitachi HD6301V1 / HD63701V0 (m6801.cpp hd6301_cpu_device, 6800ops.hxx HD63701 opcodes).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #ifndef RBX_M6801_H
@@ -26,7 +27,11 @@ typedef union {
 enum { M6801_IRQ1_LINE = 0, M6801_NMI_LINE = 1, M6801_IS3_LINE = 2, M6801_TIN_LINE = 3 };
 // M6801_TYPE_6800: plain MC6800 / MC6802 core (6800 opcode and cycle tables, no on-chip I/O, RAM or timer;
 // the whole address space is the external bus)
-enum { M6801_TYPE_6801 = 0, M6801_TYPE_6801U4 = 1, M6801_TYPE_6800 = 2 };
+// M6801_TYPE_HD6301V1 / M6801_TYPE_HD63701V0: Hitachi HD6301 family (MAME hd6301_cpu_device subclasses with the
+// hd6801_mem map): MC6801 on-chip I/O, 128 bytes of RAM at 0x80-0xff, 4 KB of ROM at 0xf000-0xffff (pass it as
+// rom / rom_base = 0xf000 / rom_size = 0x1000), the HD63701 opcode and cycle tables (AIM/OIM/EIM/TIM, XGDX, SLP,
+// TRAP on illegal opcodes through 0xffee). The two types behave the same, as in MAME
+enum { M6801_TYPE_6801 = 0, M6801_TYPE_6801U4 = 1, M6801_TYPE_6800 = 2, M6801_TYPE_HD6301V1 = 3, M6801_TYPE_HD63701V0 = 4 };
 
 typedef struct m6801 m6801;
 struct m6801 {
@@ -65,6 +70,8 @@ void m6801_reset(m6801 *m);
 // carried into the next call
 int m6801_execute(m6801 *m, int cycles);
 // IRQ1 is level sensitive; NMI, IS3 (port 3 strobe) and TIN (input capture) act on edges
+// (IRQ1 also takes M6801_HOLD_LINE: MAME's HOLD_LINE, cleared when the interrupt is taken)
+#define M6801_HOLD_LINE 2
 void m6801_set_irq_line(m6801 *m, int line, int state);
 // RESET pin: asserting resets the chip, the CPU stays stopped while held
 void m6801_set_reset(m6801 *m, int state);

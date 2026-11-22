@@ -12,6 +12,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <zlib.h>
+
+// ---- the sampled activity (rbx_prof.h, ADR-155) ----
+volatile uint8_t rbx_prof_cur;
+#ifdef RBX_PROF_CNT
+unsigned long long rbx_prof_cnt;
+#endif
+static const char *s_prof_names[RBX_PROF_IDS] = {
+	"other", "front", "draw", "swap", "input", "driver", "video out", "audio out", "wait", "rom read", "io wait",
+	"fe pad", "fe audio", "fe ticks",
+};
+void rbx_prof_name(unsigned first, const char *const *names, unsigned n)
+{
+	for (unsigned i = 0; i < n && first + i < RBX_PROF_IDS; i++)
+		s_prof_names[first + i] = names[i];
+}
+const char *rbx_prof_get_name(unsigned id)
+{
+	return id < RBX_PROF_IDS && s_prof_names[id] ? s_prof_names[id] : "";
+}
 
 // ---- game tables: the modules' boards, in this order (rbx_module.h) ----
 #ifdef RBX_MOD_TAITO
@@ -29,6 +50,57 @@ extern const rbx_module rbx_mod_seta;
 #ifdef RBX_MOD_IREM
 extern const rbx_module rbx_mod_irem;
 #endif
+#ifdef RBX_MOD_IGS
+extern const rbx_module rbx_mod_igs;
+#endif
+#ifdef RBX_MOD_CAVE
+extern const rbx_module rbx_mod_cave;
+#endif
+#ifdef RBX_MOD_TOAPLAN
+extern const rbx_module rbx_mod_toaplan;
+#endif
+#ifdef RBX_MOD_CAPCOM
+extern const rbx_module rbx_mod_capcom;
+#endif
+#ifdef RBX_MOD_SNK
+extern const rbx_module rbx_mod_snk;
+#endif
+#ifdef RBX_MOD_SEGA
+extern const rbx_module rbx_mod_sega;
+#endif
+#ifdef RBX_MOD_PSIKYO
+extern const rbx_module rbx_mod_psikyo;
+#endif
+#ifdef RBX_MOD_NMK
+extern const rbx_module rbx_mod_nmk;
+#endif
+#ifdef RBX_MOD_NAMCO
+extern const rbx_module rbx_mod_namco;
+#endif
+#ifdef RBX_MOD_KANEKO
+extern const rbx_module rbx_mod_kaneko;
+#endif
+#ifdef RBX_MOD_VSYSTEM
+extern const rbx_module rbx_mod_vsystem;
+#endif
+#ifdef RBX_MOD_JALECO
+extern const rbx_module rbx_mod_jaleco;
+#endif
+#ifdef RBX_MOD_SEIBU
+extern const rbx_module rbx_mod_seibu;
+#endif
+#ifdef RBX_MOD_TECHNOS
+extern const rbx_module rbx_mod_technos;
+#endif
+#ifdef RBX_MOD_ATARI
+extern const rbx_module rbx_mod_atari;
+#endif
+#ifdef RBX_MOD_TECMO
+extern const rbx_module rbx_mod_tecmo;
+#endif
+#ifdef RBX_MOD_MIDWAY
+extern const rbx_module rbx_mod_midway;
+#endif
 static const rbx_module *const s_modules[] = {
 #ifdef RBX_MOD_TAITO
 	&rbx_mod_taito,
@@ -44,6 +116,57 @@ static const rbx_module *const s_modules[] = {
 #endif
 #ifdef RBX_MOD_IREM
 	&rbx_mod_irem,
+#endif
+#ifdef RBX_MOD_IGS
+	&rbx_mod_igs,
+#endif
+#ifdef RBX_MOD_CAVE
+	&rbx_mod_cave,
+#endif
+#ifdef RBX_MOD_TOAPLAN
+	&rbx_mod_toaplan,
+#endif
+#ifdef RBX_MOD_CAPCOM
+	&rbx_mod_capcom,
+#endif
+#ifdef RBX_MOD_SNK
+	&rbx_mod_snk,
+#endif
+#ifdef RBX_MOD_SEGA
+	&rbx_mod_sega,
+#endif
+#ifdef RBX_MOD_PSIKYO
+	&rbx_mod_psikyo,
+#endif
+#ifdef RBX_MOD_NMK
+	&rbx_mod_nmk,
+#endif
+#ifdef RBX_MOD_NAMCO
+	&rbx_mod_namco,
+#endif
+#ifdef RBX_MOD_KANEKO
+	&rbx_mod_kaneko,
+#endif
+#ifdef RBX_MOD_VSYSTEM
+	&rbx_mod_vsystem,
+#endif
+#ifdef RBX_MOD_JALECO
+	&rbx_mod_jaleco,
+#endif
+#ifdef RBX_MOD_SEIBU
+	&rbx_mod_seibu,
+#endif
+#ifdef RBX_MOD_TECHNOS
+	&rbx_mod_technos,
+#endif
+#ifdef RBX_MOD_ATARI
+	&rbx_mod_atari,
+#endif
+#ifdef RBX_MOD_TECMO
+	&rbx_mod_tecmo,
+#endif
+#ifdef RBX_MOD_MIDWAY
+	&rbx_mod_midway,
 #endif
 };
 #define NMODULES ((int)(sizeof(s_modules) / sizeof(s_modules[0])))
@@ -157,7 +280,7 @@ static char s_error[256];
 uint64_t rbx_clock_us(void) { return s_cfg.time_us ? s_cfg.time_us() : 0; }
 // executable memory: one block from the frontend for the app's life, its parts given out once each (the code in
 // them is only ever added to, never rewritten: ADR-012); the emulation thread
-#define RBX_JIT_BLOCK 0x800000
+#define RBX_JIT_BLOCK 0x1000000
 void *rbx_jit_alloc(unsigned size)
 {
 	static uint8_t *base;
@@ -210,13 +333,332 @@ static const rbx_driver *s_drv;
 static int s_game_index = -1;
 
 // ROM regions
-#define MAX_REGIONS 16
+#define MAX_REGIONS 48   // (CPS3: the BIOS and up to 40 flash chips)
 static uint8_t *s_reg_data[MAX_REGIONS];
 static uint32_t s_reg_size[MAX_REGIONS];
 // a region's first missing file: reported when the driver asks for the region (a region it never uses, a PROM or PLD
 // of a later MAME's set, does not keep the game from running)
 static const rbx_rom_load *s_reg_missing[MAX_REGIONS];
 static int s_nreg;
+// rbx_driver.file_regions: 1 = to be kept in a file, s_reg_fp its open cache file (NULL: the region is in memory)
+static uint8_t s_reg_isfile[MAX_REGIONS];
+static FILE *s_reg_fp[MAX_REGIONS];
+// a file region loaded with ROM_LOAD16_WORD_SWAP: rbx_region_read gives the file's bytes (each pair not swapped)
+static uint8_t s_reg_swap16[MAX_REGIONS];
+
+// a region the driver can do without (a newer dump than the user's ROM set): NULL when it is missing, no error
+uint8_t *rbx_region_opt(const char *name, uint32_t *size)
+{
+	for (int i = 0; s_game && i < s_nreg; i++)
+		if (!strcmp(s_game->regions[i].name, name) && s_reg_missing[i]) {
+			if (size)
+				*size = 0;
+			return NULL;
+		}
+	return rbx_region(name, size);
+}
+
+static int region_index(const char *name)
+{
+	for (int i = 0; s_game && i < s_nreg; i++)
+		if (!strcmp(s_game->regions[i].name, name))
+			return i;
+	return -1;
+}
+
+uint32_t rbx_region_file(const char *name)
+{
+	const int i = region_index(name);
+	if (i < 0 || !s_reg_isfile[i])
+		return 0;
+	if (s_reg_missing[i]) {
+		rbx_fail("%s: missing %s (crc %08x)", s_game->set, s_reg_missing[i]->file, (unsigned)s_reg_missing[i]->crc);
+		s_fail_sticky = 1;
+		return 0;
+	}
+	return s_reg_size[i];
+}
+
+int rbx_region_file_swap16(const char *name)
+{
+	for (int i = 0; s_game && i < s_nreg; i++)
+		if (!strcmp(s_game->regions[i].name, name))
+			return s_reg_isfile[i] && s_reg_swap16[i];
+	return 0;
+}
+
+/* (ADR-178) A file region's cache file is read without stdio's buffer: newlib (the Vita) reads a buffered stream
+   BUFSIZ = 1 KB a system call (a 16.5 KB NAND chunk = 17 sceIoRead, and fseek reads a block too); unbuffered, fread
+   is one read of the whole length into the caller's memory. The bytes are the same. RBX_IO_STDBUF=1: buffered as
+   before (set before the first open) */
+static void region_unbuffered(FILE *f)
+{
+	static int keep = -1;
+	if (keep < 0)
+		keep = getenv("RBX_IO_STDBUF") && atoi(getenv("RBX_IO_STDBUF"));
+	if (f && !keep)
+		setvbuf(f, NULL, _IONBF, 0);
+}
+
+/* (testing, ADR-177: RBX_IO_SLOW=us,us_per_KB: every card read of a file region, here and on the io worker, waits that
+   long after it (us a system call: with RBX_IO_STDBUF=1 one per KB and one for the seek), as a slow memory card would
+   take; the bytes are the same) */
+static int s_io_slow_set;
+static uint32_t s_io_slow_us, s_io_slow_kb;
+static void io_slow(uint32_t len)
+{
+	if (!s_io_slow_set) {
+		const char *e = getenv("RBX_IO_SLOW");
+		if (e)
+			sscanf(e, "%u,%u", &s_io_slow_us, &s_io_slow_kb);
+		s_io_slow_set = 1;
+	}
+	// (a buffered stream: a system call each BUFSIZ and one for the fseek, ADR-178)
+	const uint32_t calls = getenv("RBX_IO_STDBUF") && atoi(getenv("RBX_IO_STDBUF")) ? (len + 1023) / 1024 + 1 : 1;
+	const uint64_t us = (uint64_t)s_io_slow_us * calls + (uint64_t)s_io_slow_kb * len / 1024;
+	if (us && s_cfg.time_us) {
+		const uint64_t t0 = rbx_clock_us();
+		while (rbx_clock_us() - t0 < us)
+			;
+	}
+}
+
+int rbx_region_read(const char *name, uint32_t offset, void *dst, uint32_t len)
+{
+	const int i = region_index(name);
+	if (i < 0 || s_reg_missing[i] || offset > s_reg_size[i] || len > s_reg_size[i] - offset)
+		return -1;
+	const unsigned pa = rbx_prof_enter(RBX_PA_ROMREAD);
+	int rc = 0;
+	if (s_reg_data[i])
+		memcpy(dst, s_reg_data[i] + offset, len);
+	else if (!s_reg_fp[i] || fseek(s_reg_fp[i], 16 + (long)offset, SEEK_SET))
+		rc = -1;
+	else
+		rc = fread(dst, 1, len, s_reg_fp[i]) == len ? 0 : -1;
+	if (!s_reg_data[i])
+		io_slow(len);
+	rbx_prof_leave(pa);
+	return rc;
+}
+
+// ---- reads ahead of a file region on a worker thread (ADR-160) ----
+// The emulation thread queues reads it will soon need (rbx_io_submit); the worker reads them with its own FILE of the
+// region's cache file, in order. The emulation thread needing one takes it back unread (and reads it itself) when the
+// worker has not started it, or waits for it when it has: the bytes are the file's either way.
+// Requests live here (not in the driver), so a worker still holding an old id never touches freed memory.
+#define IO_N 64
+#define IO_RING 256
+enum { IO_FREE, IO_QUEUED, IO_READING, IO_DONE, IO_FAILED };
+static struct io_req { volatile int state; int reg; uint32_t off, len; void *dst; } s_io[IO_N];
+static int s_io_ring[IO_RING];
+static volatile unsigned s_io_head, s_io_tail;   // pushed by the emulation thread / popped by the worker
+static volatile int s_io_on;
+static void (*volatile s_io_wake)(void);
+static char *s_reg_path[MAX_REGIONS];   // a file region's cache file (the worker opens its own)
+static char *path_dup(const char *p)
+{
+	const size_t n = strlen(p) + 1;
+	char *d = (char *)malloc(n);
+	if (d)
+		memcpy(d, p, n);
+	return d;
+}
+static volatile int s_io_close;         // the regions released: the worker closes its file
+static struct { uint64_t worker, taken, waits, wait_us, reads; } s_io_st;   // (the driver's statistics: rbx_io_stat)
+static void wait_some(void);
+
+int rbx_io_on(void) { return __atomic_load_n(&s_io_on, __ATOMIC_ACQUIRE); }
+void rbx_set_io_thread(int on) { __atomic_store_n(&s_io_on, on, __ATOMIC_RELEASE); }
+void rbx_set_io_wake(void (*wake)(void)) { s_io_wake = wake; }
+int rbx_io_wanted(void)
+{
+	for (int i = 0; i < s_nreg; i++)
+		if (s_reg_fp[i] && s_reg_path[i])
+			return 1;
+	return 0;
+}
+
+int rbx_io_submit(const char *name, uint32_t offset, void *dst, uint32_t len)
+{
+	if (!rbx_io_on())
+		return -1;
+	const int i = region_index(name);
+	if (i < 0 || !s_reg_fp[i] || !s_reg_path[i] || offset > s_reg_size[i] || len > s_reg_size[i] - offset)
+		return -1;
+	const unsigned head = s_io_head;
+	if (head - __atomic_load_n(&s_io_tail, __ATOMIC_ACQUIRE) >= IO_RING)
+		return -1;
+	int id = -1;
+	for (int k = 0; k < IO_N && id < 0; k++)
+		if (__atomic_load_n(&s_io[k].state, __ATOMIC_ACQUIRE) == IO_FREE)
+			id = k;
+	if (id < 0)
+		return -1;
+	struct io_req *r = &s_io[id];
+	r->reg = i;
+	r->off = offset;
+	r->len = len;
+	r->dst = dst;
+	__atomic_store_n(&r->state, IO_QUEUED, __ATOMIC_RELEASE);
+	s_io_ring[head % IO_RING] = id;
+	__atomic_store_n(&s_io_head, head + 1, __ATOMIC_RELEASE);
+	void (*wake)(void) = s_io_wake;
+	if (wake)
+		wake();
+	return id;
+}
+
+int rbx_io_ready(int id)   // read by the worker (or failed there): rbx_io_finish will not wait
+{
+	const int st = __atomic_load_n(&s_io[id].state, __ATOMIC_ACQUIRE);
+	return st == IO_DONE || st == IO_FAILED;
+}
+
+int rbx_io_queued(int id) { return __atomic_load_n(&s_io[id].state, __ATOMIC_ACQUIRE) == IO_QUEUED; }
+
+// the request's bytes in place (0) or not readable (-1); the id is free again after
+int rbx_io_finish(int id)
+{
+	struct io_req *r = &s_io[id];
+	int st = IO_QUEUED;
+	if (__atomic_compare_exchange_n(&r->state, &st, IO_FREE, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) {
+		s_io_st.taken++;   // (not started: read here)
+		return rbx_region_read(s_game->regions[r->reg].name, r->off, r->dst, r->len);
+	}
+	if (st == IO_READING) {
+		const unsigned pa = rbx_prof_enter(RBX_PA_IOWAIT);
+		const uint64_t t0 = rbx_clock_us();
+		s_io_st.waits++;
+		for (int spin = 0; __atomic_load_n(&r->state, __ATOMIC_ACQUIRE) == IO_READING; spin++)
+			if (spin >= 200)
+				wait_some();
+		s_io_st.wait_us += rbx_clock_us() - t0;
+		rbx_prof_leave(pa);
+	}
+	const int rc = __atomic_load_n(&r->state, __ATOMIC_ACQUIRE) == IO_DONE ? 0 : -1;
+	__atomic_store_n(&r->state, IO_FREE, __ATOMIC_RELEASE);
+	return rc;
+}
+
+// not needed any more: taken back unread, or waited for while the worker reads into it
+void rbx_io_drop(int id)
+{
+	struct io_req *r = &s_io[id];
+	int st = IO_QUEUED;
+	if (__atomic_compare_exchange_n(&r->state, &st, IO_FREE, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE))
+		return;
+	if (__atomic_load_n(&r->state, __ATOMIC_ACQUIRE) == IO_READING) {
+		const unsigned pa = rbx_prof_enter(RBX_PA_IOWAIT);
+		while (__atomic_load_n(&r->state, __ATOMIC_ACQUIRE) == IO_READING)
+			wait_some();
+		rbx_prof_leave(pa);
+	}
+	__atomic_store_n(&r->state, IO_FREE, __ATOMIC_RELEASE);
+}
+
+int rbx_io_cancel(int id)
+{
+	int st = IO_QUEUED;
+	return __atomic_compare_exchange_n(&s_io[id].state, &st, IO_FREE, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE);
+}
+
+/* (ADR-177) The worker reads requests that follow each other in the file (the queued ones right after it in the ring,
+   the same region, each starting where the one before ends) with one read of up to s_io_merge bytes: the card's
+   time per read is mostly its own, not the bytes (a burst of the CV1000's 16.5 KB chunks). Into their buffers when
+   those follow each other in memory too, else into the worker's buffer and copied. The bytes are the file's either
+   way. RBX_IO_MERGE = bytes (0: one request a read, as before) */
+#define IO_MERGE_MAX (256 * 1024)
+static uint32_t s_io_merge = 64 * 1024;
+static int s_io_merge_set;
+
+// the worker: the queued requests read in order; the number read (0: none queued, the thread may sleep)
+int rbx_io_run(void)
+{
+	static FILE *fp;
+	static char path[512];
+	static uint8_t *stage;
+	int n = 0;
+	if (!s_io_merge_set) {
+		const char *e = getenv("RBX_IO_MERGE");
+		if (e)
+			s_io_merge = (uint32_t)atoi(e) < IO_MERGE_MAX ? (uint32_t)atoi(e) : IO_MERGE_MAX;
+		s_io_merge_set = 1;
+	}
+	if (fp && __atomic_load_n(&s_io_close, __ATOMIC_ACQUIRE)) {   // (the last game's file: closed before this one's reads)
+		fclose(fp);
+		fp = NULL;
+		__atomic_store_n(&s_io_close, 0, __ATOMIC_RELEASE);
+	}
+	for (;;) {
+		const unsigned tail = s_io_tail;
+		if (tail == __atomic_load_n(&s_io_head, __ATOMIC_ACQUIRE))
+			break;
+		const int id = s_io_ring[tail % IO_RING];
+		__atomic_store_n(&s_io_tail, tail + 1, __ATOMIC_RELEASE);
+		struct io_req *r = &s_io[id];
+		int st = IO_QUEUED;
+		if (!__atomic_compare_exchange_n(&r->state, &st, IO_READING, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE))
+			continue;   // (taken back, or a second entry of an id queued again)
+		const char *p = s_reg_path[r->reg];
+		if (fp && (!p || strcmp(p, path))) {
+			fclose(fp);
+			fp = NULL;
+		}
+		if (!fp && p && strlen(p) < sizeof(path)) {
+			strcpy(path, p);
+			fp = fopen(path, "rb");
+			region_unbuffered(fp);
+		}
+		// (the requests after it that follow it in the file, taken now: reading)
+		int ids[IO_N], k = 1, direct = 1;
+		uint32_t len = r->len;
+		ids[0] = id;
+		if (s_io_merge && !stage)
+			stage = (uint8_t *)malloc(IO_MERGE_MAX);
+		for (unsigned t = tail + 1; stage && k < IO_N && t != __atomic_load_n(&s_io_head, __ATOMIC_ACQUIRE); t++) {
+			const int j = s_io_ring[t % IO_RING];
+			struct io_req *q = &s_io[j];
+			if (__atomic_load_n(&q->state, __ATOMIC_ACQUIRE) != IO_QUEUED || q->reg != r->reg || q->off != r->off + len ||
+			    len + q->len > s_io_merge)
+				break;
+			int qs = IO_QUEUED;
+			if (!__atomic_compare_exchange_n(&q->state, &qs, IO_READING, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE))
+				break;   // (taken back just now)
+			if ((uint8_t *)q->dst != (uint8_t *)s_io[ids[k - 1]].dst + s_io[ids[k - 1]].len)
+				direct = 0;
+			ids[k++] = j;
+			len += q->len;
+		}
+		int ok = fp && !fseek(fp, 16 + (long)r->off, SEEK_SET);
+		if (k == 1 || direct)
+			ok = ok && fread(r->dst, 1, len, fp) == len;
+		else {
+			ok = ok && fread(stage, 1, len, fp) == len;
+			for (int i = 0, at = 0; ok && i < k; at += (int)s_io[ids[i]].len, i++)
+				memcpy(s_io[ids[i]].dst, stage + at, s_io[ids[i]].len);
+		}
+		io_slow(len);
+		s_io_st.worker += (uint64_t)k;
+		s_io_st.reads++;
+		for (int i = 0; i < k; i++)
+			__atomic_store_n(&s_io[ids[i]].state, ok ? IO_DONE : IO_FAILED, __ATOMIC_RELEASE);
+		n += k;
+	}
+	if (fp && __atomic_load_n(&s_io_close, __ATOMIC_ACQUIRE)) {
+		fclose(fp);
+		fp = NULL;
+		__atomic_store_n(&s_io_close, 0, __ATOMIC_RELEASE);
+	}
+	return n;
+}
+
+uint64_t rbx_io_nreads(void) { return s_io_st.reads; }
+
+void rbx_io_stat(uint64_t *worker, uint64_t *taken, uint64_t *waits, uint64_t *wait_us)
+{
+	*worker = s_io_st.worker, *taken = s_io_st.taken, *waits = s_io_st.waits, *wait_us = s_io_st.wait_us;
+}
 
 uint8_t *rbx_region(const char *name, uint32_t *size)
 {
@@ -242,9 +684,19 @@ uint8_t *rbx_region(const char *name, uint32_t *size)
 
 static void free_regions(void)
 {
-	for (int i = 0; i < s_nreg; i++)
+	for (int i = 0; i < s_nreg; i++) {
 		free(s_reg_data[i]);
+		s_reg_data[i] = NULL;
+		if (s_reg_fp[i])
+			fclose(s_reg_fp[i]);
+		s_reg_fp[i] = NULL;
+		s_reg_isfile[i] = 0;
+		free(s_reg_path[i]);
+		s_reg_path[i] = NULL;
+		__atomic_store_n(&s_io_close, 1, __ATOMIC_RELEASE);
+	}
 	s_nreg = 0;
+	memset(&s_io_st, 0, sizeof(s_io_st));
 }
 
 // zips of the set and its parents, in lookup order
@@ -288,6 +740,106 @@ static uint8_t *read_rom_file(const rbx_rom_load *l, uint32_t *size)
 	return NULL;
 }
 
+// a file region (rbx_driver.file_regions): the ROM file kept in <cache_dir>rbx_<region>.cache (a 16-byte header:
+// "RBXC", CRC, size, 0; written last), extracted again when the header is not this file's. Without the cache folder or
+// on a write error the file goes to memory as other regions do (streamed: no second copy). 0 = ok, -2 = no memory
+typedef struct { FILE *fp; uint8_t *mem; uint32_t pos, size, crc; int done, total; } extract_ctx;
+
+static int extract_cb(void *user, const uint8_t *data, uint32_t len)
+{
+	extract_ctx *x = (extract_ctx *)user;
+	if (x->fp && fwrite(data, 1, len, x->fp) != len)
+		return -1;
+	if (x->mem)
+		memcpy(x->mem + x->pos, data, len);
+	x->crc = (uint32_t)crc32(x->crc, data, len);
+	x->pos += len;
+	if (s_cfg.progress && x->total && x->size)
+		s_cfg.progress((int)(((uint64_t)x->done * x->size + x->pos) * 900 / ((uint64_t)x->total * x->size)), s_cfg.progress_user);
+	return 0;
+}
+
+static uint32_t rd_le32(const uint8_t *p) { return p[0] | p[1] << 8 | p[2] << 16 | (uint32_t)p[3] << 24; }
+
+// a region's loads done (MAME rom_load_manager::region_post_process): ROMREGION_INVERT
+static void region_post(const rbx_game *g, int reg)
+{
+	if (reg >= s_nreg || !s_reg_data[reg] || !(g->regions[reg].flags & RBX_REGION_INVERT))
+		return;
+	uint8_t *d = s_reg_data[reg];
+	for (uint32_t i = 0; i < s_reg_size[reg]; i++)
+		d[i] = (uint8_t)~d[i];
+}
+
+static int file_region_load(int reg, const rbx_rom_load *l, int done, int total)
+{
+	rbx_zip *z = NULL;
+	int zi = -1;
+	for (int k = 0; k < s_nzips && zi < 0; k++)
+		if ((zi = rbx_zip_find(s_zips[k], l->file, l->crc, l->length)) >= 0)
+			z = s_zips[k];
+	if (zi < 0)
+		return -1;
+	const rbx_zip_entry *e = rbx_zip_get(z, zi);
+	if (e->size != s_reg_size[reg])
+		return -1;
+	if (s_cfg.cache_dir) {
+		char nm[64], path[512], tmp[540];
+		int n = 0;
+		for (const char *c = s_game->regions[reg].name; *c && n < 63; c++)
+			nm[n++] = (char)((*c >= 'a' && *c <= 'z') || (*c >= 'A' && *c <= 'Z') || (*c >= '0' && *c <= '9') ? *c : '_');
+		nm[n] = 0;
+		snprintf(path, sizeof(path), "%srbx_%s.cache", s_cfg.cache_dir, nm);
+		FILE *f = fopen(path, "rb");
+		region_unbuffered(f);
+		uint8_t h[16];
+		if (f && fread(h, 1, 16, f) == 16 && !memcmp(h, "RBXC", 4) && rd_le32(h + 4) == e->crc && rd_le32(h + 8) == e->size &&
+		    !fseek(f, 0, SEEK_END) && ftell(f) == 16 + (long)e->size) {
+			s_reg_fp[reg] = f;
+			s_reg_path[reg] = path_dup(path);
+			rbx_log("%s: %s from %s", s_game->set, s_game->regions[reg].name, path);
+			return 0;
+		}
+		if (f)
+			fclose(f);
+		// (a name of this run: another process may be making the same cache)
+		int stack_mark;
+		snprintf(tmp, sizeof(tmp), "%s.%08x.tmp", path,
+		         (unsigned)((uintptr_t)&stack_mark ^ (uintptr_t)time(NULL) ^ (uintptr_t)clock()));
+		extract_ctx x = { fopen(tmp, "wb"), NULL, 0, e->size, 0, done, total };
+		static const uint8_t blank[16] = { 0 };
+		int ok = x.fp && fwrite(blank, 1, 16, x.fp) == 16 && !rbx_zip_read_cb(z, zi, extract_cb, &x) && x.crc == e->crc;
+		if (ok) {
+			const uint8_t hd[16] = { 'R', 'B', 'X', 'C', (uint8_t)e->crc, (uint8_t)(e->crc >> 8), (uint8_t)(e->crc >> 16),
+			                         (uint8_t)(e->crc >> 24), (uint8_t)e->size, (uint8_t)(e->size >> 8), (uint8_t)(e->size >> 16),
+			                         (uint8_t)(e->size >> 24), 0, 0, 0, 0 };
+			ok = !fseek(x.fp, 0, SEEK_SET) && fwrite(hd, 1, 16, x.fp) == 16;
+		}
+		if (x.fp && fclose(x.fp))
+			ok = 0;
+		if (ok) {
+			remove(path);
+			ok = !rename(tmp, path) && (s_reg_fp[reg] = fopen(path, "rb")) != NULL;
+			if (ok) {
+				region_unbuffered(s_reg_fp[reg]);
+				s_reg_path[reg] = path_dup(path);
+			}
+		}
+		if (ok) {
+			rbx_log("%s: %s extracted to %s", s_game->set, s_game->regions[reg].name, path);
+			return 0;
+		}
+		remove(tmp);
+		rbx_log("%s: %s could not be written to %s, kept in memory", s_game->set, s_game->regions[reg].name, path);
+	}
+	if (!(s_reg_data[reg] = (uint8_t *)malloc(s_reg_size[reg]))) {
+		rbx_fail("out of memory (%s, %u bytes)", s_game->regions[reg].name, (unsigned)s_reg_size[reg]);
+		return -2;
+	}
+	extract_ctx x = { NULL, s_reg_data[reg], 0, e->size, 0, done, total };
+	return rbx_zip_read_cb(z, zi, extract_cb, &x) || x.crc != e->crc ? -1 : 0;
+}
+
 // copy file bytes [*pos, *pos+length) into a region following the ROMX_LOAD layout
 static void place(uint8_t *reg, uint32_t regsize, uint32_t offset, const uint8_t *src, uint32_t srclen,
                   uint32_t *pos, uint32_t length, int group, int skip, int reverse)
@@ -295,6 +847,14 @@ static void place(uint8_t *reg, uint32_t regsize, uint32_t offset, const uint8_t
 	if (group < 1)
 		group = 1;
 	uint32_t d = offset;
+	if (reverse >= 2) {   // ROM_NIBBLE: each file byte's low 4 bits into the low (2) or high (3) nibble
+		const int sh = reverse == 3 ? 4 : 0;
+		const uint8_t mask = (uint8_t)(0x0f << sh);
+		for (uint32_t n = 0; n < length; n++, d += 1 + (uint32_t)skip, (*pos)++)
+			if (d < regsize && *pos < srclen)
+				reg[d] = (uint8_t)((reg[d] & ~mask) | ((src[*pos] << sh) & mask));
+		return;
+	}
 	for (uint32_t n = 0; n < length; n += group) {
 		for (int b = 0; b < group; b++) {
 			int sb = reverse ? group - 1 - b : b;
@@ -307,7 +867,77 @@ static void place(uint8_t *reg, uint32_t regsize, uint32_t offset, const uint8_t
 	}
 }
 
-static int load_roms(const rbx_game *g)
+// ReBOX: a ROM file placed while it is unpacked (no buffer of the whole file): the bytes place() would put, in groups
+typedef struct {
+	uint8_t *reg;
+	uint32_t regsize, d, n, length;
+	int group, skip, reverse, ncarry;
+	uint8_t carry[8];
+} stream_place;
+
+static void stream_group(stream_place *p, int have)
+{
+	for (int b = 0; b < p->group; b++) {
+		const int sb = p->reverse ? p->group - 1 - b : b;
+		if (p->d + b < p->regsize && sb < have && p->n + sb < p->length)
+			p->reg[p->d + b] = p->carry[sb];
+	}
+	p->n += (uint32_t)p->group;
+	p->d += (uint32_t)(p->group + p->skip);
+}
+
+static int stream_cb(void *user, const uint8_t *data, uint32_t len)
+{
+	stream_place *p = (stream_place *)user;
+	if (p->group == 1 && !p->skip) {   // (plain: a copy)
+		if (p->n < p->length && p->d < p->regsize) {
+			uint32_t k = len;
+			if (k > p->length - p->n) k = p->length - p->n;
+			if (k > p->regsize - p->d) k = p->regsize - p->d;
+			memcpy(p->reg + p->d, data, k);
+		}
+		p->n += len;
+		p->d += len;
+		return 0;
+	}
+	for (uint32_t i = 0; i < len; i++) {
+		p->carry[p->ncarry++] = data[i];
+		if (p->ncarry == p->group) {
+			stream_group(p, p->group);
+			p->ncarry = 0;
+		}
+	}
+	return 0;
+}
+
+// 0 = placed, -1 = not found / not readable
+static int stream_rom_file(const rbx_rom_load *l, uint8_t *reg, uint32_t rsize)
+{
+	for (int z = 0; z < s_nzips; z++) {
+		const int i = rbx_zip_find(s_zips[z], l->file, l->crc, l->length);
+		if (i < 0)
+			continue;
+		stream_place p;
+		memset(&p, 0, sizeof(p));
+		p.reg = reg;
+		p.regsize = rsize;
+		p.d = l->offset;
+		p.length = l->length;
+		p.group = l->group ? l->group : 1;
+		p.skip = l->skip;
+		p.reverse = l->reverse;
+		if (p.group > 8)
+			return -2;
+		if (rbx_zip_read_cb(s_zips[z], i, stream_cb, &p))
+			return -1;
+		if (p.ncarry)
+			stream_group(&p, p.ncarry);
+		return 0;
+	}
+	return -1;
+}
+
+static int load_roms(const rbx_game *g, const rbx_driver *drv)
 {
 	// zips: the set, then its parent chain
 	s_nzips = 0;
@@ -324,6 +954,27 @@ static int load_roms(const rbx_game *g)
 	s_fail_sticky = 0;
 	memset(s_reg_missing, 0, sizeof(s_reg_missing));
 	for (const rbx_rom_region *r = g->regions; r->name && s_nreg < MAX_REGIONS; r++) {
+		// a file region: one whole ROM file, nothing else loaded into it
+		int isfile = 0, loads = 0;
+		s_reg_swap16[s_nreg] = 0;
+		for (const char *const *f = drv ? drv->file_regions : NULL; f && *f && !isfile; f++)
+			isfile = !strcmp(*f, r->name);
+		for (const rbx_rom_load *l = g->loads; isfile && l->op != RBX_ROM_END; l++)
+			if (l->region == s_nreg && (++loads > 1 || l->op != RBX_ROM_LOAD || l->offset || l->length != r->size ||
+			                            l->skip || ((l->group > 1 || l->reverse) && !(l->group == 2 && l->reverse == 1))))
+				isfile = 0;
+			else if (l->region == s_nreg)
+				s_reg_swap16[s_nreg] = l->group == 2;   // (ROM_LOAD16_WORD_SWAP: the file's bytes, the driver swaps)
+		if (!isfile)
+			s_reg_swap16[s_nreg] = 0;
+		s_reg_isfile[s_nreg] = (uint8_t)(isfile && loads == 1 && !(r->flags & RBX_REGION_INVERT));
+		s_reg_fp[s_nreg] = NULL;
+		if (s_reg_isfile[s_nreg]) {
+			s_reg_data[s_nreg] = NULL;
+			s_reg_size[s_nreg] = r->size;
+			s_nreg++;
+			continue;
+		}
 		s_reg_data[s_nreg] = (uint8_t *)malloc(r->size);
 		if (!s_reg_data[s_nreg]) {
 			rbx_fail("out of memory (%s, %u bytes)", r->name, (unsigned)r->size);
@@ -339,13 +990,45 @@ static int load_roms(const rbx_game *g)
 	uint8_t *file = NULL;
 	uint32_t flen = 0, fpos = 0;
 	const rbx_rom_load *last = NULL;
-	int rc = 0;
+	int rc = 0, fin = 0;   // (the regions before fin are done: their post-processing applied, as MAME region_post_process)
 	for (const rbx_rom_load *l = g->loads; l->op != RBX_ROM_END; l++, done++) {
+		for (; fin < l->region; fin++)
+			region_post(g, fin);
 		uint8_t *reg = s_reg_data[l->region];
 		uint32_t rsize = s_reg_size[l->region];
+		if (s_reg_isfile[l->region]) {   // (its one RBX_ROM_LOAD)
+			const int fr = file_region_load(l->region, l, done, total);
+			if (fr == -2) {
+				rc = -1;
+				goto out;
+			}
+			if (fr) {
+				rbx_log("%s: missing %s (crc %08x)", g->set, l->file, (unsigned)l->crc);
+				if (!s_reg_missing[l->region])
+					s_reg_missing[l->region] = l;
+			}
+			last = NULL;
+			continue;
+		}
 		switch (l->op) {
 		case RBX_ROM_LOAD:
 			free(file);
+			file = NULL;
+			// (not used again by a CONTINUE / RELOAD after it: unpacked straight into the region)
+			if (l[1].op != RBX_ROM_CONTINUE && l[1].op != RBX_ROM_RELOAD && l->reverse < 2) {
+				const int sr = stream_rom_file(l, reg, rsize);
+				if (!sr) {
+					last = NULL;
+					break;
+				}
+				if (sr == -1) {
+					rbx_log("%s: missing %s (crc %08x)", g->set, l->file, (unsigned)l->crc);
+					if (!s_reg_missing[l->region])
+						s_reg_missing[l->region] = l;
+					last = NULL;
+					break;
+				}
+			}
 			file = read_rom_file(l, &flen);
 			if (!file) {   // (reported if the driver asks for this region: rbx_region)
 				rbx_log("%s: missing %s (crc %08x)", g->set, l->file, (unsigned)l->crc);
@@ -383,6 +1066,8 @@ static int load_roms(const rbx_game *g)
 		if (s_cfg.progress && total)
 			s_cfg.progress(done * 900 / total, s_cfg.progress_user);
 	}
+	for (; fin < s_nreg; fin++)
+		region_post(g, fin);
 out:
 	free(file);
 	for (int z = 0; z < s_nzips; z++)
@@ -687,6 +1372,34 @@ static void video_out(void *fb, int pitch)
 	}
 }
 
+#ifdef RBX_OUT_PROF   // -DRBX_OUT_PROF: the driver's render and video_out, ms a frame drawn, printed at exit
+static double s_vo_ms, s_dr_ms;
+static int s_dr_n;
+static double prof_ms(void) { struct timespec t; clock_gettime(CLOCK_MONOTONIC, &t); return t.tv_sec * 1e3 + t.tv_nsec / 1e6; }
+static void vo_print(void)
+{
+	const int n = s_dr_n ? s_dr_n : 1;
+	fprintf(stderr, "OUTPROF %d frames render %.3f video_out %.3f total %.3f ms\n", s_dr_n, s_dr_ms / n, s_vo_ms / n, (s_dr_ms + s_vo_ms) / n);
+}
+static void video_out_timed(void *fb, int pitch)
+{
+	const double a = prof_ms();
+	video_out(fb, pitch);
+	s_vo_ms += prof_ms() - a;
+}
+#define video_out video_out_timed
+static void drv_render(void)
+{
+	const double a = prof_ms();
+	s_drv->render();
+	s_dr_ms += prof_ms() - a;
+	if (!s_dr_n++)
+		atexit(vo_print);
+}
+#else
+#define drv_render() s_drv->render()
+#endif
+
 void rbx_screen(int *w, int *h)
 {
 	if (w) *w = rbx_video.width;
@@ -708,7 +1421,7 @@ static void render_with_out(void *fb, int pitch)
 {
 	out_offer(fb, pitch);
 	if (s_drv && s_drv->render)
-		s_drv->render();
+		drv_render();
 	rbx_video.out = NULL;
 	if (fb && !rbx_video.out_done)
 		video_out(fb, pitch);
@@ -721,11 +1434,13 @@ static volatile unsigned s_rt_posted, s_rt_done;   // frames captured / drawn
 static volatile int s_wait_site;   // (the emulation thread's mostly: profiling only)
 int rbx_wait_site(void) { return s_wait_site; }
 
-static void wait_site(int site)
+static void wait_site(int site)   // (the emulation thread only)
 {
 	s_wait_site = site;
+	const unsigned pa = rbx_prof_enter(RBX_PA_WAIT);
 	if (s_cfg.wait_hook)
 		s_cfg.wait_hook();
+	rbx_prof_leave(pa);
 	s_wait_site = 0;
 }
 
@@ -745,12 +1460,37 @@ void rbx_video_wait_idle(void)
 			wait_site(1);
 }
 
+// A driver with two frame snapshots (rbx_video_set_depth(2)) lets the emulation run one frame ahead of the render
+// thread: the snapshot of frame N + 1 is taken while frame N is still being drawn. Its vblank waits for a free
+// snapshot (rbx_video_wait_slot), takes it into slot rbx_video_post_seq() & 1 and posts it; render draws slot
+// rbx_video_render_seq() & 1. Both counts start at 0 together (rbx_set_render_thread), and without the render thread
+// both stay 0 (the frame is drawn in rbx_video_frame_done): the frames drawn are the same.
+static int s_rt_depth = 1;
+void rbx_video_set_depth(int depth) { s_rt_depth = depth >= 2 ? 2 : 1; }
+int rbx_video_depth(void) { return s_rt_depth; }
+int rbx_video_threaded(void) { return s_rt_on; }   // (the frames drawn by the render thread: set only while idle)
+unsigned rbx_video_post_seq(void) { return s_rt_on ? __atomic_load_n(&s_rt_posted, __ATOMIC_ACQUIRE) : 0; }
+unsigned rbx_video_render_seq(void) { return s_rt_on ? __atomic_load_n(&s_rt_done, __ATOMIC_ACQUIRE) : 0; }
+
+void rbx_video_wait_slot(void)
+{
+	if (!s_rt_on)
+		return;
+	while (__atomic_load_n(&s_rt_posted, __ATOMIC_ACQUIRE) - __atomic_load_n(&s_rt_done, __ATOMIC_ACQUIRE) >= (unsigned)s_rt_depth &&
+	       !__atomic_load_n(&s_rt_stop, __ATOMIC_ACQUIRE))
+		if (!(s_drv && s_drv->render_help && s_drv->render_help(1)))   // (help the render thread instead of waiting)
+			wait_site(1);
+}
+
 void rbx_video_frame_done(void)
 {
 	if (s_rt_on)
 		__atomic_add_fetch(&s_rt_posted, 1, __ATOMIC_RELEASE);
-	else if (s_drv && s_drv->render)
-		s_drv->render();
+	else if (s_drv && s_drv->render) {   // (here on the emulation thread)
+		const unsigned pa = rbx_prof_enter(RBX_PA_VIDEO_OUT);
+		drv_render();
+		rbx_prof_leave(pa);
+	}
 }
 
 void rbx_set_render_thread(int on)
@@ -802,6 +1542,7 @@ typedef struct {
 	volatile int on, stop;
 	volatile unsigned posted, done;   // requests / requests served
 	volatile int busy;                // the job running (on the worker, or on a waiting thread that took it: aux_sync)
+	volatile int spin_us;             // after a job, look for the next one this long before sleeping (rbx_aux_set_spin)
 } aux_worker;
 static aux_worker s_aux[3];
 uint64_t rbx_aux_sync_us[3];   // (profiling: the time waited in each worker's sync, spins and sleeps)
@@ -881,9 +1622,21 @@ static int aux_run(aux_worker *w)
 		const int help = __atomic_load_n(&s_aux_idle_help, __ATOMIC_ACQUIRE);
 		if (help && w == &s_aux[0] && s_rt_on && s_drv && s_drv->render_help && s_drv->render_help(help | 0x100))
 			continue;
+		if (w->spin_us) {   // (jobs a scanline apart: a sleep would make the next one wait ~100 us)
+			const uint64_t t0 = rbx_clock_us();
+			int got = 0;
+			for (int k = 0; !got; k++) {
+				got = __atomic_load_n(&w->posted, __ATOMIC_ACQUIRE) != __atomic_load_n(&w->done, __ATOMIC_ACQUIRE) ||
+				      __atomic_load_n(&w->stop, __ATOMIC_ACQUIRE);
+				if ((k & 63) == 63 && rbx_clock_us() - t0 > (uint64_t)w->spin_us)
+					break;
+			}
+			if (got)
+				continue;
+		}
 		wait_some();
 	}
-	if (!aux_claim_run(w))   // (a waiting thread has it: look again)
+	if (!aux_claim_run(w) && !w->spin_us)   // (a waiting thread has it: look again; spinning, at once)
 		wait_some();
 	return 1;
 }
@@ -891,7 +1644,11 @@ static int aux_run(aux_worker *w)
 void rbx_aux_kick(void) { aux_kick(&s_aux[0]); }
 void rbx_aux_sync(void) { aux_sync(&s_aux[0]); }
 int rbx_aux_has_job(void) { return s_aux[0].job != NULL; }
-void rbx_aux_set_job(void (*job)(void)) { aux_sync(&s_aux[0]); s_aux[0].job = job; }
+static int s_aux_by_render;
+void rbx_aux_set_job(void (*job)(void)) { aux_sync(&s_aux[0]); s_aux[0].job = job; if (!job) { s_aux_by_render = 0; s_aux[0].spin_us = 0; } }
+void rbx_aux_set_by_render(int on) { s_aux_by_render = on; }
+int rbx_aux_by_render(void) { return s_aux_by_render; }
+void rbx_aux_set_spin(int us) { s_aux[0].spin_us = us; }
 void rbx_set_aux_thread(int on) { aux_set_thread(&s_aux[0], on); }
 int rbx_aux_run(void) { return aux_run(&s_aux[0]); }
 void rbx_aux_stop(void) { __atomic_store_n(&s_aux[0].stop, 1, __ATOMIC_RELEASE); }
@@ -900,7 +1657,8 @@ void rbx_aux2_kick(void) { aux_kick(&s_aux[1]); }
 void rbx_aux2_sync(void) { aux_sync(&s_aux[1]); }
 int rbx_aux2_has_job(void) { return s_aux[1].job != NULL; }
 static int s_aux2_alone;
-void rbx_aux2_set_job(void (*job)(void)) { aux_sync(&s_aux[1]); s_aux[1].job = job; if (!job) s_aux2_alone = 0; }
+void rbx_aux2_set_job(void (*job)(void)) { aux_sync(&s_aux[1]); s_aux[1].job = job; if (!job) { s_aux2_alone = 0; s_aux[1].spin_us = 0; } }
+void rbx_aux2_set_spin(int us) { s_aux[1].spin_us = us; }
 void rbx_aux2_set_alone(int on) { s_aux2_alone = on; }
 int rbx_aux2_alone(void) { return s_aux2_alone; }
 void rbx_set_aux2_thread(int on) { aux_set_thread(&s_aux[1], on); }
@@ -930,7 +1688,12 @@ int rbx_aux3_try(void)
 }
 void rbx_aux3_sync(void) { aux_sync(&s_aux[2]); }
 int rbx_aux3_has_job(void) { return s_aux[2].job != NULL; }
-void rbx_aux3_set_job(void (*job)(void)) { aux_sync(&s_aux[2]); s_aux[2].job = job; }
+static int s_aux3_alone;
+void rbx_aux3_set_job(void (*job)(void)) { aux_sync(&s_aux[2]); s_aux[2].job = job; if (!job) s_aux3_alone = 0; }
+void rbx_aux3_set_alone(int on) { s_aux3_alone = on; }
+int rbx_aux3_alone(void) { return s_aux3_alone; }
+void rbx_aux_wait_for(int w) { wait_site(2 + (w & 3)); }
+void rbx_worker_wait(void) { wait_some(); }
 void rbx_set_aux3_thread(int on) { aux_set_thread(&s_aux[2], on); }
 int rbx_aux3_run(void) { return aux_run(&s_aux[2]); }
 void rbx_aux3_stop(void) { __atomic_store_n(&s_aux[2].stop, 1, __ATOMIC_RELEASE); }
@@ -1034,9 +1797,50 @@ static int audio_out(int16_t *out, int max)
 }
 
 // ---- init / exit / frame ----
+// (ADR-200) the driver's largest buffers, made before the ROM regions (rbx_driver.early)
+static void *s_early[RBX_EARLY_MAX];
+static size_t s_early_n[RBX_EARLY_MAX];
+void *rbx_early(int i, size_t *size)
+{
+	if (i < 0 || i >= RBX_EARLY_MAX)
+		return NULL;
+	if (size)
+		*size = s_early_n[i];
+	return s_early[i];
+}
+static void early_free(void)
+{
+	for (int i = 0; i < RBX_EARLY_MAX; i++) {
+		free(s_early[i]);
+		s_early[i] = NULL;
+		s_early_n[i] = 0;
+	}
+}
+static int early_make(const rbx_game *g, const rbx_driver *drv)
+{
+	if (!drv->early || getenv("RBX_EARLY_OFF"))   // (RBX_EARLY_OFF=1: the driver makes them itself, measurements)
+		return 0;
+	size_t sz[RBX_EARLY_MAX] = { 0 };
+	int n = drv->early(g, sz);
+	if (n > RBX_EARLY_MAX)
+		n = RBX_EARLY_MAX;
+	for (int i = 0; i < n; i++) {
+		if (!sz[i])
+			continue;
+		if (!(s_early[i] = calloc(1, sz[i]))) {
+			rbx_fail("%s: out of memory (a block of %u KB)", g->set, (unsigned)(sz[i] >> 10));
+			early_free();
+			return -1;
+		}
+		s_early_n[i] = sz[i];
+	}
+	return 0;
+}
+
 static void release(void)
 {
 	free_regions();
+	early_free();
 	free(rbx_video.bitmap);
 	free(rbx_video.palette);
 	free(s_lut);
@@ -1051,6 +1855,8 @@ static void release(void)
 int rbx_init(const rbx_config *cfg)
 {
 	s_cfg = *cfg;
+	for (unsigned i = RBX_PA_CPU; i < RBX_PROF_IDS; i++)   // (the last game's CPU and driver names gone)
+		s_prof_names[i] = NULL;
 	if (s_cfg.bytes_per_pixel != 2)
 		s_cfg.bytes_per_pixel = 4;
 	s_error[0] = 0;
@@ -1062,7 +1868,8 @@ int rbx_init(const rbx_config *cfg)
 	const rbx_driver *drv;
 	const rbx_game *g = game_at(idx, &drv);
 	s_game = g;
-	if (load_roms(g)) {
+	const uint64_t tl0 = rbx_clock_us();
+	if (early_make(g, drv) || load_roms(g, drv)) {
 		release();
 		s_game = NULL;
 		return -1;
@@ -1082,7 +1889,11 @@ int rbx_init(const rbx_config *cfg)
 	s_in_sys = 0;
 	dips_init();
 	update_ports();
-	if (drv->init(g)) {
+	const uint64_t tl1 = rbx_clock_us();
+	s_rt_depth = 1;
+	const int drv_rc = drv->init(g);
+	rbx_log("load: roms %u ms, driver init %u ms", (unsigned)((tl1 - tl0) / 1000), (unsigned)((rbx_clock_us() - tl1) / 1000));
+	if (drv_rc) {
 		if (!s_error[0])
 			rbx_fail("%s: board init failed", g->set);
 		release();
@@ -1121,21 +1932,28 @@ int rbx_run_frame(void *fb, int pitch, int16_t *audio, int max_samples)
 {
 	if (!s_drv)
 		return 0;
+	const unsigned pa = rbx_prof_enter(RBX_PA_INPUT);   // (the frontend's mark put back at the end)
 	tms57002_jit_install();   // (a DSP program compiled by the sound thread into place, see tms57002_jit.inc)
 	update_ports();
 	const int direct = !s_rt_on;   // (without the render thread the frame is drawn within run_frame: the fb on offer)
 	if (direct)
 		out_offer(fb, pitch);
+	rbx_prof_set(RBX_PA_DRIVER);
 	s_drv->run_frame();
 	if (direct) {
+		rbx_prof_set(RBX_PA_VIDEO_OUT);
 		rbx_video.out = NULL;
 		if (fb && !rbx_video.out_done)
 			video_out(fb, pitch);
 	}
+	int n = 0;
+	rbx_prof_set(RBX_PA_AUDIO_OUT);
 	if (audio)
-		return audio_out(audio, max_samples);
-	rbx_audio.count = 0;
-	return 0;
+		n = audio_out(audio, max_samples);
+	else
+		rbx_audio.count = 0;
+	rbx_prof_leave(pa);
+	return n;
 }
 
 // ---- save states ----
@@ -1171,6 +1989,45 @@ int rbx_state_io(void *vctx, const char *tag, void *data, uint32_t size)
 	}
 	c->pos += 12 + size;
 	return 0;
+}
+
+int rbx_state_checking(void *vctx) { return ((state_ctx *)vctx)->check; }
+
+void *rbx_state_var(void *vctx, const char *tag, uint32_t *size, int load)
+{
+	state_ctx *c = (state_ctx *)vctx;
+	uint8_t hdr[12] = { 0 };
+	strncpy((char *)hdr, tag, 8);
+	if (!load && !c->buf) {   // size pass
+		c->pos += 12 + *size;
+		return NULL;
+	}
+	if (c->pos + 12 > c->size) {
+		c->err = 1;
+		return NULL;
+	}
+	uint8_t *p = c->buf + c->pos;
+	if (load || c->check) {
+		const uint32_t n = (uint32_t)p[8] | (uint32_t)p[9] << 8 | (uint32_t)p[10] << 16 | (uint32_t)p[11] << 24;
+		if (memcmp(p, hdr, 8) || n > c->size - c->pos - 12) {
+			rbx_log("state: block %.8s does not match the file's %.8s", tag, (const char *)p);
+			c->err = 1;
+			return NULL;
+		}
+		c->pos += 12 + n;
+		if (!load)
+			return NULL;
+		*size = n;
+		return p + 12;
+	}
+	if (*size > c->size - c->pos - 12) {
+		c->err = 1;
+		return NULL;
+	}
+	memcpy(p, hdr, 8);
+	p[8] = (uint8_t)*size; p[9] = (uint8_t)(*size >> 8); p[10] = (uint8_t)(*size >> 16); p[11] = (uint8_t)(*size >> 24);
+	c->pos += 12 + *size;
+	return p + 12;
 }
 
 static int state_run(state_ctx *c)
@@ -1214,18 +2071,15 @@ int rbx_state_read(const void *buf, uint32_t size)
 	// (a state of another size is from an older build: refused whole. Loaded part way, it left the machine broken and
 	// the game hung, e.g. an F3 state from before the sound board format change)
 	const uint64_t t0 = rbx_clock_us();
-	if (size != rbx_state_size()) {
-		rbx_log("state: size %u, this build's %u", size, rbx_state_size());
-		state_ctx k = { (uint8_t *)buf, size, 0, 0, 0, 1 };   // (the check pass only: it logs the first block that differs)
-		state_run(&k);
-		return -1;
-	}
-	// every part's name and size checked first, nothing loaded: a state of an older layout (a part changed but the
-	// same total size) loaded part way and then refused left the machine broken
+	// every part's name and size checked first, nothing loaded (it logs the first block that differs): a state of an
+	// older layout (a part changed but the same total size) loaded part way and then refused left the machine broken.
+	// The parts must fill the state exactly (rbx_state_var blocks: their sizes as stored)
 	{
 		state_ctx k = { (uint8_t *)buf, size, 0, 0, 0, 1 };
-		if (state_run(&k))
+		if (state_run(&k) || k.pos != size) {
+			rbx_log("state: size %u, this build's layout %u", size, k.pos);
 			return -1;
+		}
 	}
 	const uint64_t t1 = rbx_clock_us();
 	rbx_state_load_us[2] = (uint32_t)(t1 - t0);

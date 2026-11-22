@@ -17,7 +17,7 @@
 #include "../machine/deco146.h"
 #include "../machine/deco16snd.h"
 #include "../video/deco16ic.h"
-#include "../video/decoband.h"
+#include "../../video/decoband.h"
 #include "../video/decospr.h"
 
 #include <stdlib.h>
@@ -37,14 +37,17 @@ enum { V_ROHGA, V_WIZD, V_NITRO, V_SCHM, V_HANGZO };
 static int s_var;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint16_t s_ram[0x10000];           // the work RAM (Rohga 0x3f0000; the others: their areas end to end)
+static uint16_t (*s_ram_hp)[0x10000];           // the work RAM (Rohga 0x3f0000; the others: their areas end to end)
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[2][0x800], s_spriteram_buf[2][0x400];
 static uint16_t s_palram[0x1000];         // 2048 entries of two words
 static uint8_t s_pal_dirty[0x800];
 static uint32_t s_pal[0x800];             // the palette its DMA took (0x00RRGGBB)
-static uint16_t s_rowscroll[4][0x1000];
+static uint16_t (*s_rowscroll_hp)[4][0x1000];
+#define s_rowscroll (*s_rowscroll_hp)
 static uint16_t s_priority;
-static deco16ic_t s_tile[2];
+static deco16ic_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static decospr_t s_spr[2];
 static deco146_t s_prot;
 static rbx_gfx s_gfx8, s_gfx16a, s_gfx16b, s_gfxspr[2];
@@ -52,9 +55,12 @@ static int s_port_in, s_port_dsw, s_port_sys, s_port_dsw3;
 static int s_line;
 static uint32_t s_frame;
 static uint64_t s_cpu_frac;
-static uint8_t s_pri_buf[VIS_W * VIS_H];
-static uint16_t s_l[4][VIS_W * VIS_H];    // (two-chip boards) the playfields' pens; the sprites raw
-static uint16_t s_sbm[2][VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
+static uint16_t (*s_l_hp)[4][VIS_W * VIS_H];    // (two-chip boards) the playfields' pens; the sprites raw
+#define s_l (*s_l_hp)
+static uint16_t (*s_sbm_hp)[2][VIS_W * VIS_H];
+#define s_sbm (*s_sbm_hp)
 static int s_565;
 static struct {
 	deco16ic_t tile[2];
@@ -378,6 +384,30 @@ static void rg_exit(void);
 
 static int rg_init(const rbx_game *g)
 {
+	if (!s_l_hp && !(s_l_hp = calloc(1, sizeof(*s_l_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_rowscroll_hp && !(s_rowscroll_hp = calloc(1, sizeof(*s_rowscroll_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_sbm_hp && !(s_sbm_hp = calloc(1, sizeof(*s_sbm_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_var = !strcmp(g->machine, "wizdfire") ? V_WIZD : !strcmp(g->machine, "nitrobal") ? V_NITRO
 	      : !strcmp(g->machine, "schmeisr") ? V_SCHM : !strcmp(g->machine, "hangzo") ? V_HANGZO : V_ROHGA;
 	uint32_t snd_size, csize, t1s, t2s, ssize, s2s = 0, o1s, o2s;
@@ -578,6 +608,18 @@ static void rg_exit(void)
 	rbx_gfx_free(&s_gfxspr[1]);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_l_hp);
+	s_l_hp = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_rowscroll_hp);
+	s_rowscroll_hp = NULL;
+	free(s_sbm_hp);
+	s_sbm_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void rg_frame(void)

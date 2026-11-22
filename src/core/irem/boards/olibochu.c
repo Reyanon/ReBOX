@@ -39,7 +39,8 @@ static const uint8_t *s_map[256], *s_smap[256];
 static ay8910_t s_ay;
 static int s_port[6];
 
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out[OUT_MAX];
 static int s_out_n, s_out_pos;
@@ -299,6 +300,10 @@ static void palette(void)
 
 static int ob_init(const rbx_game *g)
 {
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t s8, s16, ps;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_srom = rbx_region("audiocpu", &s_srom_size);
@@ -339,6 +344,8 @@ static void ob_exit(void)
 	rbx_aux_set_job(NULL);
 	rbx_gfx_free(&s_tiles);
 	rbx_gfx_free(&s_spr);
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void ob_reset(void)

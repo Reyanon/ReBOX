@@ -636,6 +636,12 @@ void pcm_engine::clock(uint32_t chanmask)
 				if (m_channel[chnum]->prepare())
 					m_active_channels |= 1 << chnum;
 
+		// ReBOX: the idle channels until the next prepare (a write prepares again)
+		m_idle_channels = 0;
+		for (int chnum = 0; chnum < CHANNELS; chnum++)
+			if (bitfield(chanmask, chnum) && m_channel[chnum]->idle())
+				m_idle_channels |= 1 << chnum;
+
 		// reset the modified channels and prepare count
 		m_modified_channels = m_prepare_count = 0;
 	}
@@ -649,7 +655,12 @@ void pcm_engine::clock(uint32_t chanmask)
 	// now update the state of all the channels and operators
 	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		if (bitfield(chanmask, chnum))
-			m_channel[chnum]->clock(m_env_counter >> 1);
+		{
+			if (bitfield(m_idle_channels, chnum))
+				m_channel[chnum]->clock_idle();
+			else
+				m_channel[chnum]->clock(m_env_counter >> 1);
+		}
 }
 
 
@@ -663,6 +674,7 @@ void pcm_engine::output(output_data &output, uint32_t chanmask)
 	chanmask &= debug::GLOBAL_PCM_CHANNEL_MASK;
 
 	// compute the output of each channel
+	chanmask &= ~m_idle_channels;   // (ReBOX: silent, output returns at once)
 	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		if (bitfield(chanmask, chnum))
 			m_channel[chnum]->output(output);

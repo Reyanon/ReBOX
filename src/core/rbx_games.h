@@ -18,7 +18,7 @@ typedef struct {
 
 // Fill out with all games in board order (table order), look up "<set>.zip" in dirs (first folder found, names
 // case-insensitive). Up to 16 folders. *npresent = games with ROMs
-#define RBX_GAMES_MAX 4096   // (1179 sets on 11-03: the list cut the last boards at 1024)
+#define RBX_GAMES_MAX 8192   // (1179 sets on 11-03: the list cut the last boards at 1024; 4117 on 11-09 cut at 4096)
 int rbx_games_scan(const char *const *dirs, int ndirs, rbx_game_found *out, int max, int *npresent);
 // (the tabs: rbx_core.h rbx_game_group)
 

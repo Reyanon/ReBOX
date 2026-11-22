@@ -8,7 +8,7 @@
 */
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
-#include "../machine/taito68705.h"
+#include "../../machine/taito68705.h"
 #include "../../sound/ay8910.h"
 #include "../../sound/msm5232.h"
 #include "../../sound/ta7630.h"
@@ -42,8 +42,10 @@ static uint32_t s_main_size, s_audio_size;
 static uint16_t s_ram_base, s_bank_base, s_io_base, s_vid_base, s_spr2_off, s_spr2_len;
 static zcpu s_main, s_audio;
 static uint8_t s_work[0x800], s_vram[0x800], s_vctrl[0x40], s_spr[0x40], s_cram[0x40], s_spr2[0x40], s_audio_ram[0x800];
-static uint8_t s_pixram[2][0x4000];
-static uint8_t s_pixbmp[2][256 * 256];   // pen (0-3) | color bank << 2
+static uint8_t (*s_pixram_hp)[2][0x4000];
+#define s_pixram (*s_pixram_hp)
+static uint8_t (*s_pixbmp_hp)[2][256 * 256];   // pen (0-3) | color bank << 2
+#define s_pixbmp (*s_pixbmp_hp)
 static int s_pixram_sel, s_color_bank, s_screen_disable, s_flip, s_pix_redraw, s_bank;
 static int16_t s_scrollx[32];
 static uint16_t s_shift_data;
@@ -528,10 +530,22 @@ static void ft_exit(void)
 	free(s_mix);
 	free(s_tmp);
 	s_mix = s_tmp = NULL;
+	free(s_pixbmp_hp);
+	s_pixbmp_hp = NULL;
+	free(s_pixram_hp);
+	s_pixram_hp = NULL;
 }
 
 static int ft_init(const rbx_game *g)
 {
+	if (!s_pixbmp_hp && !(s_pixbmp_hp = calloc(1, sizeof(*s_pixbmp_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pixram_hp && !(s_pixram_hp = calloc(1, sizeof(*s_pixram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_kind = kind_of(g->machine);
 	if (s_kind < 0) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);

@@ -44,7 +44,8 @@ static uint16_t s_address;
 static uint64_t s_frac_audio, s_frac_mcu;
 // video
 static uint8_t *s_fg_tiles, *s_bg_tiles, *s_sprites, *s_spr_opaque;
-static uint8_t s_spotmask[4][128 * 128];
+static uint8_t (*s_spotmask_hp)[4][128 * 128];
+#define s_spotmask (*s_spotmask_hp)
 static uint32_t s_palette[96];
 typedef struct {
 	uint8_t vram0[0x800], vram1[0x1000], spr[0x100];
@@ -392,10 +393,16 @@ static void pr_exit(void)
 	free(s_mix);
 	s_fg_tiles = s_bg_tiles = s_sprites = s_spr_opaque = NULL;
 	s_mix = NULL;
+	free(s_spotmask_hp);
+	s_spotmask_hp = NULL;
 }
 
 static int pr_init(const rbx_game *g)
 {
+	if (!s_spotmask_hp && !(s_spotmask_hp = calloc(1, sizeof(*s_spotmask_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t msize, asize, usize, ssize, bsize, fsize, spsize, psize;
 	s_main_rom = rbx_region("maincpu", &msize);
 	s_audio_rom = rbx_region("audiocpu", &asize);

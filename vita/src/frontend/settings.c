@@ -43,8 +43,10 @@ rbx_settings g_settings = {
 	.touch_keys = 1,
 	.touch_show = 1,
 	.theme = RBX_THEME_PINK,
-	.list_snap = 1,
 	.neon = { 10, 2, -10, 10, 5, 60, 200 },   // (fixed: the owner's choice, 2026-11-07; not in the settings file nor the menu)
+	.neon_list = { 10, 2, -10, 10, 5, 60, 200 },   // (in the list's options for now: the owner sets them, then fixed)
+	.neon_list_gap = 320,
+	.language = "eng",
 	.input_engine = RE_PAD_ENGINE_NATIVE,
 };
 
@@ -211,6 +213,7 @@ typedef struct {
 	int show_fps, aspect, filter, scan_type, scan_strength, border, border_color, rotate;
 	rbx_port port[RBX_PROFILES];
 	int touch_keys, touch_show;
+	int frame_buffer;
 } game_part;
 static game_part s_global;   // values from the global settings file (written back to it while per-game settings are on)
 static int s_game_on;        // per-game settings are on for the current game
@@ -223,6 +226,7 @@ static void part_get(game_part *g)
 	memcpy(g->port, g_settings.port, sizeof(g->port));
 	g->rotate = g_settings.rotate;
 	g->touch_keys = g_settings.touch_keys; g->touch_show = g_settings.touch_show;
+	g->frame_buffer = g_settings.frame_buffer;
 }
 static void part_set(const game_part *g)
 {
@@ -232,6 +236,7 @@ static void part_set(const game_part *g)
 	memcpy(g_settings.port, g->port, sizeof(g->port));
 	g_settings.rotate = g->rotate;
 	g_settings.touch_keys = g->touch_keys; g_settings.touch_show = g->touch_show;
+	g_settings.frame_buffer = g->frame_buffer;
 }
 // Old turbo lines (turbo_attack / turbo_jump, one key per button) seen in the file being read. If the file has no turbo_key,
 // parse_end maps them to the single turbo key: attack -> button 1, else jump -> button 2
@@ -345,6 +350,7 @@ static int read_part(const char *key, int val)
 	else if (!strcmp(key, "rotate")) g_settings.rotate = clampi(val, 0, RBX_ROT_COUNT - 1);
 	else if (!strcmp(key, "touch_keys")) g_settings.touch_keys = val != 0;
 	else if (!strcmp(key, "touch_show")) g_settings.touch_show = val != 0;
+	else if (!strcmp(key, "frame_buffer")) g_settings.frame_buffer = clampi(val, 0, RBX_FRAMEBUF_COUNT - 1);
 	else
 		return read_port(key, val);
 	return 1;
@@ -375,6 +381,7 @@ static void write_part(FILE *f, const game_part *g)
 				fprintf(f, "%scombo_%s=%d\n", pre, s_combo_keys[k], p->combo[k]);
 	}
 	fprintf(f, "rotate=%d\ntouch_keys=%d\ntouch_show=%d\n", g->rotate, g->touch_keys, g->touch_show);
+	fprintf(f, "frame_buffer=%d\n", g->frame_buffer);
 }
 
 // Favorite games: set names in favorites.cfg, one per line
@@ -472,14 +479,19 @@ void rbx_settings_load(void)
 		if (read_part(key, val)) continue;
 		else if (!strcmp(key, "menu_confirm")) g_settings.menu_confirm = clampi(val, 0, RBX_CONFIRM_COUNT - 1);
 		else if (!strcmp(key, "last_game")) snprintf(g_settings.last_game, sizeof(g_settings.last_game), "%s", sval);
+		else if (!strcmp(key, "language")) snprintf(g_settings.language, sizeof(g_settings.language), "%s", sval);
 		else if (!strcmp(key, "show_list")) g_settings.show_list = val != 0;
+		else if (!strcmp(key, "neon_list_gap"))
+			g_settings.neon_list_gap = val < 40 ? 40 : val > 520 ? 520 : val;
+		else if (!strncmp(key, "neon_list", 9) && key[9] >= '0' && key[9] <= '6' && !key[10])
+			g_settings.neon_list[key[9] - '0'] = val;
 		else if (!strcmp(key, "list_filter")) g_settings.list_filter = clampi(val, 0, RBX_LIST_FILTER_COUNT - 1);
 		else if (!strcmp(key, "list_group")) g_settings.list_group = clampi(val, 0, RBX_GROUP_COUNT - 1);
-		else if (!strcmp(key, "list_snap")) g_settings.list_snap = val != 0;
 		else if (!strcmp(key, "list_all")) g_settings.list_filter = val ? RBX_LIST_ALL : RBX_LIST_PLAYABLE; // (old two-state filter)
 		else if (!strcmp(key, "theme")) g_settings.theme = clampi(val, 0, RBX_THEME_COUNT - 1);
 		else if (!strcmp(key, "pad_p1")) g_settings.pad_src[0] = clampi(val, 0, RE_PAD_SRC_COUNT - 1);
 		else if (!strcmp(key, "pad_p2")) g_settings.pad_src[1] = clampi(val, 0, RE_PAD_SRC_COUNT - 1);
+		else if (!strcmp(key, "pad_p2_added")) g_settings.p2_added = val != 0;
 		else if (!strcmp(key, "input_engine")) g_settings.input_engine = clampi(val, 0, RE_PAD_ENGINE_COUNT - 1);
 		else if (!strncmp(key, "dip", 3)) read_dips(key, val); // (nbbatman-only era file: nbbatman's DIP)
 	}
@@ -561,9 +573,13 @@ void rbx_settings_save(void)
 		fprintf(f, "last_game=%s\n", g_settings.last_game);
 	if (g_settings.show_list)
 		fprintf(f, "show_list=1\n");
-	fprintf(f, "list_filter=%d\nlist_group=%d\nlist_snap=%d\ntheme=%d\n", g_settings.list_filter, g_settings.list_group,
-		g_settings.list_snap, g_settings.theme);
+	fprintf(f, "list_filter=%d\nlist_group=%d\ntheme=%d\n", g_settings.list_filter, g_settings.list_group, g_settings.theme);
+	for (int k = 0; k < 7; k++)
+		fprintf(f, "neon_list%d=%d\n", k, g_settings.neon_list[k]);
+	fprintf(f, "neon_list_gap=%d\n", g_settings.neon_list_gap);
+	fprintf(f, "language=%s\n", g_settings.language);
 	fprintf(f, "pad_p1=%d\npad_p2=%d\ninput_engine=%d\n", g_settings.pad_src[0], g_settings.pad_src[1], g_settings.input_engine);
+	fprintf(f, "pad_p2_added=%d\n", g_settings.p2_added);
 	fclose(f);
 	if (!s_game[0])
 		return;

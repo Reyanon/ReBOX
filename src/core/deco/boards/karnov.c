@@ -34,7 +34,8 @@
 static int s_wndrplnt;
 static uint8_t *s_rom, *s_mcu_rom;
 static uint32_t s_rom_size, s_mcu_size;
-static uint16_t s_ram[0x2000];             // 0x060000 .. 0x063fff
+static uint16_t (*s_ram_hp)[0x2000];             // 0x060000 .. 0x063fff
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[0x800], s_spriteram_buf[0x800];
 static uint16_t s_tx_vram[0x400], s_bg_vram[0x400];
 static uint16_t s_scroll[2];
@@ -283,6 +284,10 @@ static void kn_exit(void);
 
 static int kn_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_wndrplnt = !strcmp(g->machine, "wndrplnt");
 	uint32_t csize, tsize, ssize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -390,6 +395,8 @@ static void kn_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void kn_frame(void)

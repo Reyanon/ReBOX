@@ -33,7 +33,8 @@ static uint8_t *s_rom;
 static uint32_t s_rom_size;
 static const uint8_t *s_sprmap;
 static uint32_t s_sprmap_words;
-static uint8_t s_ram[0x10000];
+static uint8_t (*s_ram_hp)[0x10000];
+#define s_ram (*s_ram_hp)
 static uint16_t s_spr[0x800];          // 0x400000-0x4005ff (one 4KB page mapped)
 static uint16_t s_pcr[0x1000];         // TC0110PCR RAM
 static uint16_t s_pcr_addr;
@@ -56,7 +57,8 @@ static struct {
 static uint8_t *s_pribuf;
 
 typedef struct { uint32_t code, color; int flipx, flipy, x, y, zx, zy; uint32_t primask; } tempsprite_t;
-static tempsprite_t s_list[0x2000];
+static tempsprite_t (*s_list_hp)[0x2000];
+#define s_list (*s_list_hp)
 
 // ---- I/O ----
 static uint8_t ioc_read(int o)
@@ -275,6 +277,14 @@ static void othunder_exit(void);
 
 static int othunder_init(const rbx_game *g)
 {
+	if (!s_list_hp && !(s_list_hp = calloc(1, sizeof(*s_list_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *scn_gfx = rbx_region("tc0100scn", &size);
@@ -373,6 +383,10 @@ static void othunder_exit(void)
 	s_pribuf = NULL;
 	zoomgfx_free(&s_gfx);
 	tsnd_exit();
+	free(s_list_hp);
+	s_list_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void othunder_frame(void)

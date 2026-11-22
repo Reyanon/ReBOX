@@ -14,7 +14,7 @@
 #include "../machine/deco156.h"
 #include "../machine/deco146.h"
 #include "../machine/armpoll.h"
-#include "../video/decoband.h"
+#include "../../video/decoband.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,11 +36,13 @@ static uint32_t s_colour_mask, s_shadow_mask, s_shadow_shift;
 static arm_t s_cpu;
 static uint8_t *s_rom, *s_gfx2;
 static uint32_t s_rom_size, s_gfx2_size;
-static uint8_t s_ram[0x20000];            // 0x100000 (32-bit)
+static uint8_t (*s_ram_hp)[0x20000];            // 0x100000 (32-bit)
+#define s_ram (*s_ram_hp)
 static uint32_t s_irq_ram[0x20];          // 0x200000
 static uint32_t s_clip_ram[0x20];         // 0x200080
 static uint16_t s_spriteram[SPR_WORDS], s_spriteram_buf[SPR_WORDS];
-static uint32_t s_vram[0x8000];           // 0x280000
+static uint32_t (*s_vram_hp)[0x8000];           // 0x280000
+#define s_vram (*s_vram_hp)
 static uint16_t s_pal[0x800];             // 0x300000 (xBGR_555, the low halves)
 static uint32_t s_vbl_i;
 static int s_irq_target = -1;             // the raster interrupt's line (-1: none)
@@ -227,7 +229,8 @@ typedef struct {
 	int clipper, raster_select, shadow_mode;
 	uint32_t color;
 } mlc_block_t;
-static mlc_block_t s_blocks[SPR_WORDS / 8];
+static mlc_block_t (*s_blocks_hp)[SPR_WORDS / 8];
+#define s_blocks (*s_blocks_hp)
 static int s_nblocks;
 static uint32_t s_dx[1024];   // (16 << 16) / width (the ARM of the Vita has no divide instruction)
 static uint32_t s_count_mask; // the elements' count - 1 when a power of two, else 0
@@ -594,6 +597,18 @@ static int descramble(uint8_t *rom, uint32_t size)
 
 static int mlc_init(const rbx_game *g)
 {
+	if (!s_blocks_hp && !(s_blocks_hp = calloc(1, sizeof(*s_blocks_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_vram_hp && !(s_vram_hp = calloc(1, sizeof(*s_vram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t gsize, ysize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *gfx = rbx_region("gfx1", &gsize), *ymz = rbx_region("ymz", &ysize);
@@ -727,6 +742,12 @@ static void mlc_exit(void)
 	free(s_ymz_l);
 	free(s_ymz_r);
 	s_ymz_l = s_ymz_r = NULL;
+	free(s_blocks_hp);
+	s_blocks_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_vram_hp);
+	s_vram_hp = NULL;
 }
 
 static void mlc_frame(void)

@@ -35,7 +35,8 @@ static int64_t s_target;
 static uint64_t s_frac;
 static uint32_t s_rand;
 static m6502_t s_cpu;
-static uint8_t s_lines[256 * 256];   // pens drawn as the beam passes (64 = black)
+static uint8_t (*s_lines_hp)[256 * 256];   // pens drawn as the beam passes (64 = black)
+#define s_lines (*s_lines_hp)
 static uint8_t *s_snap;
 
 static int vblank(void) { return s_frame && s_line < LINES - VBSTART; }
@@ -225,6 +226,10 @@ static void af_exit(void);
 
 static int af_init(const rbx_game *g)
 {
+	if (!s_lines_hp && !(s_lines_hp = calloc(1, sizeof(*s_lines_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	const char *m = g->machine, *s = g->set;
 	s_machine = !strcmp(m, "tomahawk") ? M_TOMAHAWK : !strcmp(m, "spfghmk2") ? M_SPFGHMK2 :
 	            !strcmp(m, "abattle") ? M_ABATTLE : M_ASTROF;
@@ -298,6 +303,8 @@ static void af_exit(void)
 {
 	free(s_snap);
 	s_snap = NULL;
+	free(s_lines_hp);
+	s_lines_hp = NULL;
 }
 
 static void af_frame(void)

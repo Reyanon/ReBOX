@@ -116,7 +116,8 @@ static const machine_t *s_m;
 static const map_t *s_map;
 static uint8_t *s_rom;              // 68000 program, host-order words
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x10000];
+static uint8_t (*s_ram_hp)[0x10000];
+#define s_ram (*s_ram_hp)
 static uint8_t s_pal[0x2000];
 static tc0180vcu_t *s_vcu;
 // drawing snapshot taken at vblank (render thread or inline, rbx_video_frame_done)
@@ -443,6 +444,10 @@ static void tb_exit(void);
 
 static int tb_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_m = find_machine(g->machine);
 	if (!s_m) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);
@@ -542,6 +547,8 @@ static void tb_exit(void)
 	free(s_pixram);
 	s_pixram = NULL;
 	tsnd_exit();
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 // ---- frame ----

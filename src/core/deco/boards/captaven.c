@@ -37,10 +37,13 @@ static uint8_t s_ram[0x8000], s_ram2[0x8000];   // 0x120000 main, 0x160000 extra
 static uint8_t s_snd_ram[0x2000];
 static uint32_t s_pal[0x800];                    // 0x130000 (xBGR_888)
 static uint16_t s_spriteram[0x800], s_spriteram_buf[0x800];
-static uint32_t s_rowscroll32[4][0x1000];
-static uint16_t s_rowscroll[4][0x1000];
+static uint32_t (*s_rowscroll32_hp)[4][0x1000];
+#define s_rowscroll32 (*s_rowscroll32_hp)
+static uint16_t (*s_rowscroll_hp)[4][0x1000];
+#define s_rowscroll (*s_rowscroll_hp)
 static uint32_t s_pri;
-static deco16ic_t s_tile[2];
+static deco16ic_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static decospr_t s_spr;
 static deco146_t s_prot;
 static deco_irq_t s_irq;
@@ -56,7 +59,8 @@ static int32_t *s_mix_l, *s_mix_r;
 static int s_mix_cap, s_mix_n;
 static uint32_t s_out_rate, s_oki_phase[2];
 static int32_t s_oki_last[2];
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 static struct {
 	deco16ic_t tile[2];
 	uint16_t rowscroll[4][0x800], spriteram[0x800];
@@ -382,6 +386,22 @@ static void cv_exit(void);
 
 static int cv_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_rowscroll_hp && !(s_rowscroll_hp = calloc(1, sizeof(*s_rowscroll_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_rowscroll32_hp && !(s_rowscroll32_hp = calloc(1, sizeof(*s_rowscroll32_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t t1s, t2s, ss, o1s, o2s;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_snd_rom = rbx_region("audiocpu", &s_snd_rom_size);
@@ -512,6 +532,14 @@ static void cv_exit(void)
 	free(s_mix_l);
 	free(s_mix_r);
 	s_mix_l = s_mix_r = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_rowscroll_hp);
+	s_rowscroll_hp = NULL;
+	free(s_rowscroll32_hp);
+	s_rowscroll32_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void cv_frame(void)

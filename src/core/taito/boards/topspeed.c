@@ -35,11 +35,15 @@
 
 static uint8_t *s_rom, *s_sub_rom;
 static uint32_t s_rom_size, s_sub_rom_size;
-static uint8_t s_shared[0x10000];
-static uint8_t s_ram[0x10000];          // 0x800000-0x80ffff (raster control + work RAM)
-static uint16_t s_pal[0x2000];
+static uint8_t (*s_shared_hp)[0x10000];
+#define s_shared (*s_shared_hp)
+static uint8_t (*s_ram_hp)[0x10000];          // 0x800000-0x80ffff (raster control + work RAM)
+#define s_ram (*s_ram_hp)
+static uint16_t (*s_pal_hp)[0x2000];
+#define s_pal (*s_pal_hp)
 static uint16_t s_spr[0x800];
-static uint16_t s_sprmap[0x8000];
+static uint16_t (*s_sprmap_hp)[0x8000];
+#define s_sprmap (*s_sprmap_hp)
 static pc080sn_t *s_sn[2];
 static zoomgfx_t s_gfx;
 // CPU B (second Musashi context)
@@ -453,6 +457,22 @@ static void topspeed_exit(void);
 
 static int topspeed_init(const rbx_game *g)
 {
+	if (!s_pal_hp && !(s_pal_hp = calloc(1, sizeof(*s_pal_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_shared_hp && !(s_shared_hp = calloc(1, sizeof(*s_shared_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_sprmap_hp && !(s_sprmap_hp = calloc(1, sizeof(*s_sprmap_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t sn_size, spr_size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_sub_rom = rbx_region("subcpu", &s_sub_rom_size);
@@ -560,6 +580,14 @@ static void topspeed_exit(void)
 	s_pribuf = NULL;
 	zoomgfx_free(&s_gfx);
 	tsnd_exit();
+	free(s_pal_hp);
+	s_pal_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_shared_hp);
+	s_shared_hp = NULL;
+	free(s_sprmap_hp);
+	s_sprmap_hp = NULL;
 }
 
 static void topspeed_frame(void)

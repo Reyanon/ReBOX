@@ -11,6 +11,9 @@ m68k_bus_t m68k_bus;
 m68k_bus_t *m68k_bus_cur = &m68k_bus;
 
 void (*rbx_m68k_int_hook)(int level);
+void (*rbx_m68k_cmpild_hook)(int reg, unsigned int imm);
+void (*rbx_m68k_rte_hook)(void);
+void (*rbx_m68k_irqack_hook)(int level);
 
 void m68k_bus_select(m68k_bus_t *b) { m68k_bus_cur = b ? b : &m68k_bus; }
 
@@ -21,6 +24,12 @@ void m68k_bus_reset_map(void)
 	m68k_bus_cur->op = NULL;
 	m68k_bus_cur->op_size = 0;
 	m68k_bus_cur->nparts = 0;
+	memset(m68k_bus_cur->partpg, 0, sizeof(m68k_bus_cur->partpg));
+	m68k_bus_cur->read32 = NULL;
+	m68k_bus_cur->write32 = NULL;
+	rbx_m68k_cmpild_hook = NULL;   // (set again by the boards that use them)
+	rbx_m68k_rte_hook = NULL;
+	rbx_m68k_irqack_hook = NULL;
 }
 
 void m68k_bus_map(uint32_t start, uint32_t end, void *mem, uint32_t size, int readable, int writable)
@@ -53,8 +62,16 @@ void m68k_bus_map(uint32_t start, uint32_t end, void *mem, uint32_t size, int re
 		m68k_bus_cur->part[n].mem = (uint8_t *)mem;
 		m68k_bus_cur->part[n].rd = (uint8_t)readable;
 		m68k_bus_cur->part[n].wr = (uint8_t)writable;
+		for (uint32_t pg = start >> M68K_PAGE_BITS; pg <= end >> M68K_PAGE_BITS; pg++)
+			m68k_bus_cur->partpg[pg >> 5] |= 1u << (pg & 31);
 	} else if (partial)
 		fprintf(stderr, "m68k_bus_map: too many partial ranges (%06x-%06x)\n", (unsigned)start, (unsigned)end);
+}
+
+// a partial range overlaps the page of a (a: 24 bits)
+static inline int part_pg(uint32_t a)
+{
+	return (m68k_bus_cur->partpg[a >> (M68K_PAGE_BITS + 5)] >> ((a >> M68K_PAGE_BITS) & 31)) & 1;
 }
 
 // the word (host order) of a partial range holding byte address a, or NULL
@@ -83,7 +100,7 @@ unsigned int m68k_read_memory_8(unsigned int a)
 	uint8_t *p = m68k_bus_cur->rd[a >> M68K_PAGE_BITS];
 	if (p)
 		return p[(a & ((1u << M68K_PAGE_BITS) - 1)) ^ M68K_BYTE_XOR];
-	if (m68k_bus_cur->nparts && (p = part_word(a, 0)) != NULL)
+	if (part_pg(a) && (p = part_word(a, 0)) != NULL)
 		return p[(a & 1) ^ M68K_BYTE_XOR];
 	return m68k_bus_cur->read8(a);
 }
@@ -96,7 +113,7 @@ unsigned int m68k_read_memory_16(unsigned int a)
 	uint8_t *p = m68k_bus_cur->rd[a >> M68K_PAGE_BITS];
 	if (p)
 		return *(uint16_t *)(p + (a & ((1u << M68K_PAGE_BITS) - 1)));
-	if (m68k_bus_cur->nparts && (p = part_word(a, 0)) != NULL)
+	if (part_pg(a) && (p = part_word(a, 0)) != NULL)
 		return *(uint16_t *)p;
 	return m68k_bus_cur->read16(a);
 }
@@ -109,6 +126,8 @@ unsigned int m68k_read_memory_32(unsigned int a)
 		const uint8_t *p = m68k_bus_cur->rd[m >> M68K_PAGE_BITS];
 		if (p)
 			return (unsigned int)*(const uint16_t *)(p + off) << 16 | *(const uint16_t *)(p + off + 2);
+		if (m68k_bus_cur->read32 && !m68k_bus_cur->nparts)
+			return m68k_bus_cur->read32(m);
 	}
 	return m68k_read_memory_16(a) << 16 | m68k_read_memory_16(a + 2);
 }
@@ -119,7 +138,7 @@ void m68k_write_memory_8(unsigned int a, unsigned int v)
 	uint8_t *p = m68k_bus_cur->wr[a >> M68K_PAGE_BITS];
 	if (p)
 		p[(a & ((1u << M68K_PAGE_BITS) - 1)) ^ M68K_BYTE_XOR] = (uint8_t)v;
-	else if (m68k_bus_cur->nparts && (p = part_word(a, 1)) != NULL)
+	else if (part_pg(a) && (p = part_word(a, 1)) != NULL)
 		p[(a & 1) ^ M68K_BYTE_XOR] = (uint8_t)v;
 	else
 		m68k_bus_cur->write8(a, (uint8_t)v);
@@ -136,7 +155,7 @@ void m68k_write_memory_16(unsigned int a, unsigned int v)
 	uint8_t *p = m68k_bus_cur->wr[a >> M68K_PAGE_BITS];
 	if (p)
 		*(uint16_t *)(p + (a & ((1u << M68K_PAGE_BITS) - 1))) = (uint16_t)v;
-	else if (m68k_bus_cur->nparts && (p = part_word(a, 1)) != NULL)
+	else if (part_pg(a) && (p = part_word(a, 1)) != NULL)
 		*(uint16_t *)p = (uint16_t)v;
 	else
 		m68k_bus_cur->write16(a, (uint16_t)v);
@@ -152,6 +171,10 @@ void m68k_write_memory_32(unsigned int a, unsigned int v)
 			*(uint16_t *)(p + off + 2) = (uint16_t)v;
 			return;
 		}
+		if (m68k_bus_cur->write32 && !part_pg(m)) {   // (an unmapped page: through the handlers)
+			m68k_bus_cur->write32(m, v);
+			return;
+		}
 	}
 	m68k_write_memory_16(a, v >> 16);
 	m68k_write_memory_16(a + 2, v & 0xffff);
@@ -164,16 +187,10 @@ unsigned int m68k_read_disassembler_32(unsigned int a) { return m68k_read_memory
 // ---- interrupts: HOLD_LINE levels cleared when taken, plus ASSERT_LINE levels ----
 static void update_irq(void)
 {
-	int level = 0;
-	uint32_t lines = m68k_bus_cur->irq_pending | m68k_bus_cur->irq_asserted;
+	uint32_t lines = (m68k_bus_cur->irq_pending | m68k_bus_cur->irq_asserted) & 0xfe;   // (levels 1-7)
 	if (m68k_bus_cur->nmi_taken && !(m68k_bus_cur->irq_pending & 0x80))
 		lines &= ~0x80u;   // (Musashi takes 7 on its rising edge: raising it again would take it again)
-	for (int l = 7; l > 0; l--)
-		if (lines & (1u << l)) {
-			level = l;
-			break;
-		}
-	m68k_set_irq(level);
+	m68k_set_irq(lines ? 31 - __builtin_clz(lines) : 0);   // (the highest level up)
 }
 
 static void int_taken(int level)

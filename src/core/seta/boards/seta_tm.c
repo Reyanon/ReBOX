@@ -321,7 +321,8 @@ static uint16_t *s_ram;
 static uint32_t s_ram_size;
 static uint16_t *s_pal;              // (0x20000 bytes, on the bus at the map's PAL)
 static uint16_t s_snap_pal[0x1000 / 2 + 0x600];
-static uint16_t s_vram[2][0x8000];
+static uint16_t (*s_vram_hp)[2][0x8000];
+#define s_vram (*s_vram_hp)
 static x1_012_t *s_layer;            // [2]
 static int s_nlayers, s_pal_entries, s_npens, s_pal_first, s_pal2;
 static uint16_t *s_indirect;         // pen -> indirect color (NULL: pens are the colors)
@@ -333,7 +334,8 @@ static uint8_t *s_x1_rom, *s_x1_buf, *s_oki_rom, *s_oki_buf;
 static uint32_t s_x1_size, s_oki_size;
 static int s_port[PT_COUNT], s_port_bet[26], s_port_coin1;
 static uint8_t s_io_page[4096];
-static uint16_t s_io_pool[IO_PAGES][2048];   // (read entry << 8 | write entry) + 1 based, per word
+static uint16_t (*s_io_pool_hp)[IO_PAGES][2048];   // (read entry << 8 | write entry) + 1 based, per word
+#define s_io_pool (*s_io_pool_hp)
 static int s_io_pages;
 static int s_vis_h;
 
@@ -1390,6 +1392,14 @@ static void tm_reset(void)
 
 static int tm_init(const rbx_game *g)
 {
+	if (!s_io_pool_hp && !(s_io_pool_hp = calloc(1, sizeof(*s_io_pool_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_vram_hp && !(s_vram_hp = calloc(1, sizeof(*s_vram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_m = NULL;
 	for (int i = 0; i < NMACHINES; i++)
 		if (!strcmp(g->machine, s_machines[i].name))
@@ -1528,6 +1538,10 @@ static void tm_exit(void)
 	s_rgb = NULL;
 	s_x1_buf = s_oki_buf = NULL;
 	s_mix = s_ymbuf = NULL;
+	free(s_io_pool_hp);
+	s_io_pool_hp = NULL;
+	free(s_vram_hp);
+	s_vram_hp = NULL;
 }
 
 // ---- frame ----

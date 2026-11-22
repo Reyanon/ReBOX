@@ -255,6 +255,25 @@ public:
 	// prepare prior to clocking
 	bool prepare();
 
+	// ReBOX: released to silence (and no reverb to come): only the LFO and the total level move when clocked,
+	// the sample position is reset at the next key on; clock_idle does just those
+	bool idle() const
+	{
+		return m_env_attenuation == 0x3ff && m_key_state == 0 &&
+		       (m_eg_state == EG_REVERB || (m_eg_state == EG_RELEASE && !m_regs.ch_pseudo_reverb(m_choffs)));
+	}
+	void clock_idle()
+	{
+		m_lfo_counter += m_cache.lfo_step;
+		if (m_total_level != m_cache.total_level)
+		{
+			if (m_total_level < m_cache.total_level)
+				m_total_level = std::min<int32_t>(m_total_level + 19, m_cache.total_level);
+			else
+				m_total_level = std::max<int32_t>(m_total_level - 38, m_cache.total_level);
+		}
+	}
+
 	// master clocking function
 	void clock(uint32_t env_counter);
 
@@ -337,6 +356,7 @@ private:
 	uint32_t m_env_counter;                           // envelope counter
 	uint32_t m_modified_channels;                     // bitmask of modified channels
 	uint32_t m_active_channels;                       // bitmask of active channels
+	uint32_t m_idle_channels = 0;                     // ReBOX: channels clocked with clock_idle (by prepare)
 	uint32_t m_prepare_count;                         // counter to do periodic prepare sweeps
 	std::unique_ptr<pcm_channel> m_channel[CHANNELS]; // array of channels
 	pcm_registers m_regs;                             // registers

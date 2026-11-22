@@ -44,11 +44,14 @@ static uint32_t fold(uint32_t b)
 
 // players -> ports. Ports set by hand first; Auto players then take the free ports in order: the Vita, then the
 // controllers (handheld), or the controllers only (PS TV; the Vita port if there are none)
+static int s_added;   // players with a row added by hand (re_pad_set_added_players)
+
 static void resolve(void)
 {
 	int used[RE_PAD_PORTS] = { 0 };
-	const int shown = re_pad_devices(); // (a player without a row takes nothing: 2P set to the Vita while there is no
-	                                    // controller would leave 1P without one)
+	int shown = re_pad_devices(); // (a player without a row takes nothing)
+	if (shown < s_added && s_added <= RE_PAD_PLAYERS)
+		shown = s_added;
 	for (int p = 0; p < RE_PAD_PLAYERS; p++) {
 		const int s = s_src[p];
 		s_port[p] = -1;
@@ -79,6 +82,18 @@ static void resolve(void)
 		if (next < n)
 			s_port[p] = order[next++];
 	}
+	// the Vita's own controls can be two players' at once: 1P on Auto keeps them when 2P took them by hand and there is
+	// nothing else for it
+	if (shown > 0 && s_port[0] < 0 && s_src[0] == RE_PAD_SRC_AUTO && !s_tv)
+		s_port[0] = 0;
+}
+
+void re_pad_set_added_players(int n)
+{
+	if (n == s_added)
+		return;
+	s_added = n;
+	resolve();
 }
 
 static void scan(void)

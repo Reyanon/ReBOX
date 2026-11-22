@@ -30,11 +30,15 @@
 static int s_opwolf3;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x10000];
-static uint16_t s_spr[0x8000];
-static uint16_t s_spr_buf[0x8000];
+static uint8_t (*s_ram_hp)[0x10000];
+#define s_ram (*s_ram_hp)
+static uint16_t (*s_spr_hp)[0x8000];
+#define s_spr (*s_spr_hp)
+static uint16_t (*s_spr_buf_hp)[0x8000];
+#define s_spr_buf (*s_spr_buf_hp)
 static uint16_t s_ext[0x1000];
-static uint16_t s_pal[0x4000];
+static uint16_t (*s_pal_hp)[0x4000];
+#define s_pal (*s_pal_hp)
 static tc0480scp_t *s_scp, *s_snap_scp;
 static tc0360pri_t s_pri;
 static zoomgfx_t s_gfx;
@@ -267,7 +271,8 @@ static void update_sprites_active_area(void)
 }
 
 typedef struct { uint32_t code, color; int flipx, flipy, x, y, zoomx, zoomy; uint32_t primask; } tempsprite_t;
-static tempsprite_t s_list[0x400];
+static tempsprite_t (*s_list_hp)[0x400];
+#define s_list (*s_list_hp)
 
 static void draw_sprites(uint16_t *bm, int pitch, const uint32_t *primasks, int y_offset)
 {
@@ -539,6 +544,26 @@ static void slapshot_exit(void);
 
 static int slapshot_init(const rbx_game *g)
 {
+	if (!s_list_hp && !(s_list_hp = calloc(1, sizeof(*s_list_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pal_hp && !(s_pal_hp = calloc(1, sizeof(*s_pal_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_spr_hp && !(s_spr_hp = calloc(1, sizeof(*s_spr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_spr_buf_hp && !(s_spr_buf_hp = calloc(1, sizeof(*s_spr_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_opwolf3 = !strcmp(g->machine, "opwolf3");
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint32_t size;
@@ -653,6 +678,16 @@ static void slapshot_exit(void)
 	s_pribuf = NULL;
 	zoomgfx_free(&s_gfx);
 	tsnd_exit();
+	free(s_list_hp);
+	s_list_hp = NULL;
+	free(s_pal_hp);
+	s_pal_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_spr_hp);
+	s_spr_hp = NULL;
+	free(s_spr_buf_hp);
+	s_spr_buf_hp = NULL;
 }
 
 static void slapshot_frame(void)

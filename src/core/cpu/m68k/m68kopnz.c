@@ -3916,6 +3916,8 @@ void m68k_op_rtd_32(void)
 
 void m68k_op_rte_32(void)
 {
+	if (rbx_m68k_rte_hook)
+		rbx_m68k_rte_hook();
 	if(FLAG_S)
 	{
 		uint new_sr;

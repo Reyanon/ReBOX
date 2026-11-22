@@ -37,19 +37,22 @@ static int s_var;
 static int s_mb;                           // midresb / midresbj
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint16_t s_ram[0x2000];
+static uint16_t (*s_ram_hp)[0x2000];
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[0x400];
 static uint16_t s_pal[0x400];              // xBGR_444
 static uint16_t s_pri;
 static int s_prot_state, s_sound_prot_state;   // (Sly Spy)
-static bac06_t s_tile[3];
+static bac06_t (*s_tile_hp)[3];
+#define s_tile (*s_tile_hp)
 static decmxc06_t s_spr;
 static rbx_gfx s_gfx8, s_gfx16a, s_gfx16b, s_gfxspr;
 static int s_port_in, s_port_sys, s_port_dsw;
 static int s_line;
 static uint32_t s_frame;
 static uint64_t s_cpu_frac, s_snd_frac, s_ym1_frac, s_ym2_frac;
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 static int s_rotary[2];
 static struct {
 	bac06_t tile[3];
@@ -468,6 +471,18 @@ static void d1_exit(void);
 
 static int d1_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_var = !strcmp(g->machine, "slyspy") ? V_SLYSPY : V_MIDRES;
 	s_mb = !strcmp(g->machine, "midresb") || !strcmp(g->machine, "midresbj");
 	uint32_t snd_size, csize, t1s, t2s, ssize, osize;
@@ -615,6 +630,12 @@ static void d1_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void d1_frame(void)

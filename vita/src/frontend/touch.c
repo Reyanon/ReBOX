@@ -10,6 +10,7 @@
 #include "frontend/settings.h"
 #include "frontend/testpad.h"
 #include "platform/log.h"
+#include "platform/timer.h"
 
 #define TOUCH_PATH RBX_DATA_DIR "touch.cfg"
 
@@ -107,9 +108,14 @@ void rbx_touch_save(void)
 	fclose(f);
 }
 
+static int s_menu_hit, s_menu_held; // a menu touch button (RBX_TKEY_MENU): touched since the last take, still held
+static uint64_t s_pressed;           // (the overlay shows these pressed)
+
 uint32_t rbx_touch_key_code(int key)
 {
 	static const uint32_t dirs[4] = { SCE_CTRL_UP, SCE_CTRL_DOWN, SCE_CTRL_LEFT, SCE_CTRL_RIGHT };
+	if (key == RBX_TKEY_MENU)
+		return 0; // (rbx_touch_menu_take)
 	if (key >= RBX_TKEY_UP && key < RBX_TKEY_COUNT)
 		return dirs[key - RBX_TKEY_UP];
 	if (RBX_TKEY_IS_COMBO(key)) {
@@ -125,6 +131,8 @@ uint32_t rbx_touch_key_code(int key)
 const char *rbx_touch_key_name(int key)
 {
 	static const char *const dirs[4] = { "Up", "Down", "Left", "Right" };
+	if (key == RBX_TKEY_MENU)
+		return "Menu";
 	if (key >= RBX_TKEY_UP && key < RBX_TKEY_COUNT)
 		return dirs[key - RBX_TKEY_UP];
 	if (RBX_TKEY_IS_COMBO(key)) {
@@ -169,12 +177,46 @@ uint32_t rbx_touch_buttons(void)
 		return 0;
 	int x[6], y[6];
 	const int n = rbx_touch_read(x, y);
+	// (as ReST-V: a coin went in by itself when a game started, the finger that tapped Play still down.) After a pause in
+	// these calls (a game start, a closed menu, loading: over 100 ms) the touch buttons wait until no finger is down
+	static uint64_t last;
+	static int hold;
+	const uint64_t now = rbx_time_us();
+	if (now - last > 100000)
+		hold = 1;
+	last = now;
+	if (hold) {
+		if (n == 0)
+			hold = 0;
+		s_menu_held = n > 0; // (the finger that was down before the pause is not a new touch)
+		s_pressed = 0;
+		return 0;
+	}
 	uint32_t b = 0;
+	int menu = 0;
+	uint64_t pm = 0;
 	for (int k = 0; k < n; k++)
 		for (int i = 0; i < s_n; i++) {
 			const ReiTouchArea *a = &s_area[i];
-			if (x[k] >= a->x && x[k] < a->x + a->w && y[k] >= a->y && y[k] < a->y + a->h)
+			if (x[k] >= a->x && x[k] < a->x + a->w && y[k] >= a->y && y[k] < a->y + a->h) {
 				b |= rbx_touch_key_code(a->key);
+				menu |= a->key == RBX_TKEY_MENU;
+				if (i < 64)
+					pm |= 1ull << i;
+			}
 		}
+	s_pressed = pm;
+	if (menu && !s_menu_held)
+		s_menu_hit = 1; // (once a touch: the menu opens on the touch, not again while the finger stays)
+	s_menu_held = menu;
 	return b;
+}
+
+uint64_t rbx_touch_pressed(void) { return s_pressed; }
+
+int rbx_touch_menu_take(void)
+{
+	const int h = s_menu_hit;
+	s_menu_hit = 0;
+	return h;
 }

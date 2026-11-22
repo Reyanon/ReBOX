@@ -30,7 +30,8 @@ enum { OW_CCHIP, OW_PROTO, OW_BOOTLEG };
 static int s_kind;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x8000];
+static uint8_t (*s_ram_hp)[0x8000];
+#define s_ram (*s_ram_hp)
 static uint8_t s_pal[0x1000];
 static pc080sn_t *s_sn;
 static pc090oj_t *s_oj;
@@ -39,7 +40,8 @@ static struct {
 	pc090oj_regs oj;
 	uint8_t pal[0x1000];
 } *s_snap;
-static uint8_t s_pri[SCREEN_W * VIS_H];
+static uint8_t (*s_pri_hp)[SCREEN_W * VIS_H];
+#define s_pri (*s_pri_hp)
 static int s_port_dswa, s_port_dswb, s_port_in[4];   // IN0..IN3
 static uint64_t s_cpu_frac, s_cc_frac, s_sub_frac;
 static int s_gun_xoffs, s_gun_yoffs;
@@ -279,6 +281,14 @@ static void opwolf_exit(void);
 
 static int opwolf_init(const rbx_game *g)
 {
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t sn_size, oj_size;
 	s_kind = !strcmp(g->machine, "opwolfp") ? OW_PROTO : !strcmp(g->machine, "opwolfb") ? OW_BOOTLEG : OW_CCHIP;
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -385,6 +395,10 @@ static void opwolf_exit(void)
 	s_oj = NULL;
 	s_snap = NULL;
 	tsnd_exit();
+	free(s_pri_hp);
+	s_pri_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void opwolf_frame(void)

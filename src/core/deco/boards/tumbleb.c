@@ -46,7 +46,8 @@ static int s_lines, s_vbl_lines;
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint16_t s_ram[0x8000];           // main RAM (0x120000 16 KB; fncywld / magipur 64 KB; suprtrio 32 KB)
+static uint16_t (*s_ram_hp)[0x8000];           // main RAM (0x120000 16 KB; fncywld / magipur 64 KB; suprtrio 32 KB)
+#define s_ram (*s_ram_hp)
 static uint16_t s_ram2[0x800];           // 0x1a0000 (SemiCom 4 KB)
 static uint16_t s_ram3[0x1000];          // 0x341000 .. 0x342fff (SemiCom "extra RAM")
 static uint16_t s_pal[0x800];
@@ -696,6 +697,10 @@ static int is(const char *set, const char *const *list)
 
 static int tb_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	const char *m = g->machine, *set = g->set;
 	uint32_t tsize, ssize, zsize;
 	// the machine configuration
@@ -900,6 +905,8 @@ static void tb_exit(void)
 	s_snap = NULL;
 	free(s_okibuf);
 	s_okibuf = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void tb_frame(void)

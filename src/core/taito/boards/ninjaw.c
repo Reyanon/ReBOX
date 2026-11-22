@@ -36,7 +36,8 @@ static int s_darius2;
 static uint8_t *s_rom_a, *s_rom_b;
 static uint32_t s_rom_a_size, s_rom_b_size;
 static uint8_t s_ram_a[0x10000], s_ram_b[0x10000], s_share1[0x10000], s_spr[0x4000];
-static uint16_t s_pcr[SCREENS][0x1000];
+static uint16_t (*s_pcr_hp)[SCREENS][0x1000];
+#define s_pcr (*s_pcr_hp)
 static uint16_t s_pcr_addr[SCREENS];
 static tc0100scn_t *s_scn[SCREENS], *s_snap_scn[SCREENS];
 static rbx_gfx s_sprgfx;
@@ -54,7 +55,8 @@ static struct {
 	uint8_t spr[0x4000];
 } *s_snap;
 static uint8_t *s_pri;
-static uint16_t s_pal_last[SCREENS][0x1000];   // palette RAM converted into rbx_video.palette
+static uint16_t (*s_pal_last_hp)[SCREENS][0x1000];   // palette RAM converted into rbx_video.palette
+#define s_pal_last (*s_pal_last_hp)
 static int s_pal_valid;
 
 // ---- sound: pancontrol_w (e400-e403) ----
@@ -332,6 +334,14 @@ static void ninjaw_exit(void);
 
 static int ninjaw_init(const rbx_game *g)
 {
+	if (!s_pal_last_hp && !(s_pal_last_hp = calloc(1, sizeof(*s_pal_last_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pcr_hp && !(s_pcr_hp = calloc(1, sizeof(*s_pcr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t scn_size, spr_size;
 	s_darius2 = !strcmp(g->machine, "darius2");
 	s_rom_a = rbx_region("maincpu", &s_rom_a_size);
@@ -457,6 +467,10 @@ static void ninjaw_exit(void)
 	rbx_gfx_free(&s_sprgfx);
 	tsnd_exit();
 	m68k_multi_exit();
+	free(s_pal_last_hp);
+	s_pal_last_hp = NULL;
+	free(s_pcr_hp);
+	s_pcr_hp = NULL;
 }
 
 static void ninjaw_frame(void)

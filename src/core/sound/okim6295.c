@@ -33,6 +33,8 @@ static void tables(void)
 
 static uint8_t rd(okim6295_t *o, uint32_t a)
 {
+	if (o->read)
+		return o->read(o->user, a & 0x3ffff);
 	a = (a & 0x3ffff) + o->bank;
 	return o->rom && a < o->rom_size ? o->rom[a] : 0;
 }

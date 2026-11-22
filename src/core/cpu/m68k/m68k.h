@@ -294,8 +294,13 @@ int m68k_execute(int num_cycles);
  * that requires immediate processing by another CPU.
  */
 int m68k_cycles_run(void);              /* Number of cycles run so far */
+extern int rbx_m68k_next_base;            /* ReBOX: see m68kcpu.c (m68k_spin) */
 int m68k_cycles_remaining(void);        /* Number of cycles left */
 void m68k_modify_timeslice(int cycles); /* Modify cycles left */
+/* ReBOX: MAME's 68000 times where the tables differ (DIVU / DIVS / MULU / MULS by their operands, ADDQ.W #, An 8 clocks); 0 (the
+   default) keeps the tables. A board that sets it clears it at its exit */
+void m68k_set_mame_timing(int on);
+void m68k_add_int_cycles(int cycles);   /* ReBOX: clocks added to the interrupt being taken */
 void m68k_end_timeslice(void);          /* End timeslice now */
 
 /* Set the IPL0-IPL2 pins on the CPU (IRQ).
@@ -319,6 +324,10 @@ unsigned int m68k_get_context(void* dst);
 
 /* set the current cpu context */
 void m68k_set_context(void* dst);
+/* ReBOX: boards with several 68000s of one type on this core: the running CPU's registers saved to save and load's
+   taken (the context up to its cycle tables: those and the callbacks are the same for all), as m68k_get_context(save)
+   then m68k_set_context(load) */
+void m68k_switch_context(void* save, const void* load);
 
 /* Register the CPU state information */
 void m68k_state_register(const char *type);

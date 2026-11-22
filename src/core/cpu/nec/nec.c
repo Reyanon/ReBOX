@@ -403,6 +403,28 @@ static inline void v35_setrb(nec_t *c, unsigned x)
 }
 #define V35_SETRB v35_setrb
 
+
+// ---- the polling loops (nec_idle_enable) ----
+static inline unsigned idle_slot(uint32_t t) { return (t ^ (t >> 6) ^ (t >> 12)) & 63; }
+
+// a taken backward branch to ip (V30 / V33): the same target a third time in a row ends the slice for a probe
+static void nec_idle_see(nec_t *S, uint32_t ip)
+{
+	const uint32_t t = (((uint32_t)S->iram[0x70 + PS] << 4) + ip) & 0xfffff;
+	if (t != S->idle_tgt) {
+		S->idle_tgt = t;
+		S->idle_cnt = 0;
+		return;
+	}
+	if (++S->idle_cnt < 2)
+		return;
+	S->idle_cnt = 0;
+	const unsigned sl = idle_slot(t);
+	if (S->idle_bad[sl] == t && S->idle_badn[sl] >= 4)   // (a loop that failed its probes: left alone)
+		return;
+	S->stop |= 2;
+}
+
 // ---- the three cores ----
 #define NEC_V_ADDR(a) ((a) & 0xfffff)
 static inline uint32_t v33_addr(const nec_t *c, uint32_t a)
@@ -507,6 +529,211 @@ static inline void V35_WAKE(nec_t *c)
 	}
 }
 #include "nec_core.inc"
+
+// ---- the polling loops' probe (nec_idle_enable) ----
+static nec_t *s_idle_c;              // (the CPU probing)
+static int s_idle_fail;              // (a write through a handler, an impure read, an I/O port)
+static uint8_t *s_idle_wsaved[256];  // (the direct write pages, taken out of wmap while probing)
+static uint32_t s_idle_wa[64];       // (the bytes written: their addresses and first values)
+static uint8_t s_idle_wv[64];
+static int s_idle_wn;
+static uint8_t (*s_idle_r8)(uint32_t a), (*s_idle_in8)(uint32_t p);
+static uint16_t (*s_idle_r16)(uint32_t a), (*s_idle_in16)(uint32_t p);
+static void (*s_idle_w8)(uint32_t a, uint8_t v), (*s_idle_out8)(uint32_t p, uint8_t v);
+static void (*s_idle_w16)(uint32_t a, uint16_t v), (*s_idle_out16)(uint32_t p, uint16_t v);
+
+static void idle_log(uint32_t a)
+{
+	for (int i = 0; i < s_idle_wn; i++)
+		if (s_idle_wa[i] == a)
+			return;
+	if (s_idle_wn == 64) {
+		s_idle_fail = 1;
+		return;
+	}
+	s_idle_wa[s_idle_wn] = a;
+	s_idle_wv[s_idle_wn++] = s_idle_wsaved[a >> 12][a & 0xfff];
+}
+static void idle_w8(uint32_t a, uint8_t v)
+{
+	uint8_t *p = s_idle_wsaved[(a >> 12) & 0xff];
+	if (p) {
+		idle_log(a & 0xfffff);
+		p[a & 0xfff] = v;
+	} else {
+		s_idle_fail = 1;
+		s_idle_w8(a, v);
+	}
+}
+static void idle_w16(uint32_t a, uint16_t v)   // (even addresses)
+{
+	uint8_t *p = s_idle_wsaved[(a >> 12) & 0xff];
+	if (p) {
+		idle_log(a & 0xfffff);
+		idle_log((a + 1) & 0xfffff);
+		p[a & 0xfff] = (uint8_t)v;
+		p[(a & 0xfff) + 1] = (uint8_t)(v >> 8);
+	} else {
+		s_idle_fail = 1;
+		s_idle_w16(a, v);
+	}
+}
+static uint8_t idle_r8(uint32_t a)
+{
+	if (!s_idle_c->idle_pure || !s_idle_c->idle_pure(a))
+		s_idle_fail = 1;
+	return s_idle_r8(a);
+}
+static uint16_t idle_r16(uint32_t a)
+{
+	if (!s_idle_c->idle_pure || !s_idle_c->idle_pure(a) || !s_idle_c->idle_pure(a + 1))
+		s_idle_fail = 1;
+	return s_idle_r16(a);
+}
+static uint8_t idle_in8(uint32_t p) { s_idle_fail = 1; return s_idle_in8(p); }
+static uint16_t idle_in16(uint32_t p) { s_idle_fail = 1; return s_idle_in16(p); }
+static void idle_out8(uint32_t p, uint8_t v) { s_idle_fail = 1; s_idle_out8(p, v); }
+static void idle_out16(uint32_t p, uint16_t v) { s_idle_fail = 1; s_idle_out16(p, v); }
+
+// 1 = the instruction at the PC has a REP prefix (or its bytes are not on a direct page)
+static int idle_rep(const nec_t *c)
+{
+	for (int i = 0; i < 8; i++) {
+		const uint32_t a = (((uint32_t)c->iram[0x70 + PS] << 4) + ((c->ip + (uint32_t)i) & 0xffff)) & 0xfffff;
+		const uint8_t *p = c->omap[a >> 12];
+		if (!p)
+			return 1;
+		switch (p[a & 0xfff]) {
+		case 0xf2: case 0xf3: case 0x64: case 0x65:
+			return 1;
+		case 0x26: case 0x2e: case 0x36: case 0x3e: case 0xf0:
+			break;
+		default:
+			return 0;
+		}
+	}
+	return 1;
+}
+
+// the registers and the core's state compared, from bank 7 of iram up to the instruction's counters
+#define IDLE_CMP0 offsetof(nec_t, iram[112])
+#define IDLE_CMPN (offsetof(nec_t, ic) - IDLE_CMP0)
+
+// at the slice's end the core made for a polling loop's target (the PC); end: the run's. 1 = the run was aborted in
+// an instruction run here (it returns now)
+static int nec_idle_probe(nec_t *c, int64_t end)
+{
+	if (c->pending_irq || c->rep_params || c->halted || c->xa || end - c->total < 64)
+		return 0;
+	const uint32_t pc = (((uint32_t)c->iram[0x70 + PS] << 4) + c->ip) & 0xfffff;
+	uint8_t snap[IDLE_CMPN];
+	memcpy(snap, (const uint8_t *)c + IDLE_CMP0, IDLE_CMPN);
+	const int64_t t0 = c->total;
+	s_idle_c = c;
+	s_idle_fail = 0;
+	s_idle_wn = 0;
+	s_idle_r8 = c->read8;
+	s_idle_r16 = c->read16;
+	s_idle_w8 = c->write8;
+	s_idle_w16 = c->write16;
+	s_idle_in8 = c->in8;
+	s_idle_in16 = c->in16;
+	s_idle_out8 = c->out8;
+	s_idle_out16 = c->out16;
+	c->read8 = idle_r8;
+	c->read16 = idle_r16;
+	c->write8 = idle_w8;
+	c->write16 = idle_w16;
+	c->in8 = idle_in8;
+	c->in16 = idle_in16;
+	c->out8 = idle_out8;
+	c->out16 = idle_out16;
+	for (int p = 0; p < 256; p++) {
+		s_idle_wsaved[p] = c->wmap[p];
+		c->wmap[p] = NULL;
+	}
+	c->idle_on = 0;
+	int64_t T = 0;
+	int aborted = 0, tried = 0, k;
+	for (k = 0; k < 256; k++) {
+		if (idle_rep(c))
+			break;
+		c->slice = 1;
+		const int used = c->chip == NEC_V33 ? v33_run(c, 1) : v30_run(c, 1);
+		c->total += used;
+		c->slice = 0;
+		c->ic = 0;
+		if (c->stop) {   // (a handler's abort: stop & 1)
+			aborted = 1;
+			break;
+		}
+		if (s_idle_fail || c->pending_irq || c->rep_params || c->halted || c->total >= end)
+			break;
+		if (((((uint32_t)c->iram[0x70 + PS] << 4) + c->ip) & 0xfffff) == pc) {
+			tried = 1;
+			// (dead at an instruction's start without a REP pending: the EA temporaries, the prefix base, the REP's IP,
+			// the last instruction's counters)
+#define IDLE_SET(f) memcpy(snap + offsetof(nec_t, f) - IDLE_CMP0, &c->f, sizeof(c->f))
+			IDLE_SET(prev_ip);
+			IDLE_SET(rep_ip);
+			IDLE_SET(EO);
+			IDLE_SET(E16);
+			IDLE_SET(prefix_base);
+			IDLE_SET(EA);
+			IDLE_SET(cur_cycles);
+			IDLE_SET(popa_tmp);
+#undef IDLE_SET
+			int same = !memcmp(snap, (const uint8_t *)c + IDLE_CMP0, IDLE_CMPN);
+			for (int i = 0; i < s_idle_wn && same; i++)
+				same = s_idle_wsaved[s_idle_wa[i] >> 12][s_idle_wa[i] & 0xfff] == s_idle_wv[i];
+			if (same)
+				T = c->total - t0;
+			break;
+		}
+	}
+	c->read8 = s_idle_r8;
+	c->read16 = s_idle_r16;
+	c->write8 = s_idle_w8;
+	c->write16 = s_idle_w16;
+	c->in8 = s_idle_in8;
+	c->in16 = s_idle_in16;
+	c->out8 = s_idle_out8;
+	c->out16 = s_idle_out16;
+	for (int p = 0; p < 256; p++)
+		c->wmap[p] = s_idle_wsaved[p];
+	c->idle_on = 1;
+	s_idle_c = NULL;
+	if (aborted)
+		return 1;
+	const unsigned sl = idle_slot(pc);
+	if (T > 0) {
+		const int64_t left = end - c->total;
+		if (left > 2 * T)
+			c->total += (left / T - 1) * T;
+		if (c->idle_bad[sl] == pc)
+			c->idle_badn[sl] = 0;
+	} else if (tried || s_idle_fail || k == 256) {
+		if (c->idle_bad[sl] != pc) {
+			c->idle_bad[sl] = pc;
+			c->idle_badn[sl] = 0;
+		}
+		if (c->idle_badn[sl] < 255)
+			c->idle_badn[sl]++;
+	}
+	return 0;
+}
+
+void nec_idle_enable(nec_t *c, int (*pure)(uint32_t a))
+{
+	if (c->chip == NEC_V35)
+		return;
+	c->idle_on = 1;
+	c->idle_pure = pure;
+	c->idle_tgt = 0xffffffffu;
+	c->idle_cnt = 0;
+	memset(c->idle_bad, 0xff, sizeof(c->idle_bad));
+	memset(c->idle_badn, 0, sizeof(c->idle_badn));
+}
 
 // ---- the outside ----
 static uint8_t def_r8(uint32_t a) { (void)a; return 0; }
@@ -626,6 +853,14 @@ void nec_run_until(nec_t *c, int64_t end)
 			c->total += c->chip == NEC_V33 ? v33_run(c, n) : v30_run(c, n);
 			c->slice = 0;
 			c->ic = 0;
+			if (c->stop) {   // (1: a handler's abort; 2: a polling loop to probe, nec_idle_probe)
+				const int st = c->stop;
+				c->stop = 0;
+				if ((st & 1) || nec_idle_probe(c, end)) {
+					c->stop = 0;
+					break;
+				}
+			}
 		}
 		return;
 	}

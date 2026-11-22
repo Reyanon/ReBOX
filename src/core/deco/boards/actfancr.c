@@ -32,13 +32,15 @@
 static int s_trio;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x4000];              // 0x1f0000 .. 0x1f3fff
+static uint8_t (*s_ram_hp)[0x4000];              // 0x1f0000 .. 0x1f3fff
+#define s_ram (*s_ram_hp)
 static uint8_t s_spriteram[0x800];
 static uint16_t s_spriteram16[0x400];      // (the copy the MXC06 draws)
 static uint8_t s_pal[0x800];               // xBGR_444, little-endian byte pairs (0x600 used)
 static uint8_t s_control_select;           // (Trio The Punch)
 static h6280_t s_cpu;
-static bac06_t s_tile[2];
+static bac06_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static decmxc06_t s_spr;
 static rbx_gfx s_gfx8, s_gfx16, s_gfxspr;
 static int s_port_p1, s_port_p2, s_port_dsw1, s_port_dsw2, s_port_sys;
@@ -396,6 +398,10 @@ static void af_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void af_frame(void)
@@ -472,6 +478,14 @@ static int af_supported(const char *machine) { return !strcmp(machine, "actfancr
 
 static int af_init_ack(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	const int rc = af_init(g);
 	if (!rc)
 		s_cpu.irq_ack = irq_ack;

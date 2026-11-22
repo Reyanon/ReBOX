@@ -42,7 +42,8 @@ static const uint8_t *s_zmap[256];
 static k007121_t s_k121[2];
 static upd7759_t s_upd;
 static int s_port_in0, s_port_in1, s_port_dsw[3], s_port_track[4];
-static uint8_t s_pri[VIS_W * VIS_H];
+static uint8_t (*s_pri_hp)[VIS_W * VIS_H];
+#define s_pri (*s_pri_hp)
 
 static struct {
 	uint8_t pal[0x100];        // 0600-06ff (mirror 0700)
@@ -205,7 +206,8 @@ static void cs_render(void)   // (screen_update)
 #define Q_MAX 2048
 enum { Q_ADV, Q_LATCH, Q_IRQ };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out[2048];
 static int s_out_n, s_out_pos;
@@ -467,6 +469,14 @@ static int decode_gfx(int i, const uint8_t *rom, uint32_t size)   // (gfx_8x8x4_
 
 static int cs_init(const rbx_game *g)
 {
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t g0, g1, psize, usize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("audiocpu", &s_zrom_size);
@@ -533,6 +543,10 @@ static void cs_exit(void)
 		free(s_gfx[i]);
 		s_gfx[i] = NULL;
 	}
+	free(s_pri_hp);
+	s_pri_hp = NULL;
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void cs_reset(void)

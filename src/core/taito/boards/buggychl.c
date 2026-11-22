@@ -8,7 +8,7 @@
 #include "../../rbx.h"
 #include "../../rbx_core.h"
 #include "../../cpu/z80/z80.h"
-#include "../machine/taito68705.h"
+#include "../../machine/taito68705.h"
 #include "../../sound/ay8910.h"
 #include "../../sound/msm5232.h"
 #include "../../sound/ta7630.h"
@@ -61,7 +61,8 @@ static uint64_t s_frac_main, s_frac_audio, s_frac_mcu, s_frac_snd;
 // video (render side)
 static uint8_t *s_sprgfx;   // 0x4000 lines of 16 pixels
 static uint32_t s_nsprlines;
-static uint8_t s_chars[256 * 64];
+static uint8_t (*s_chars_hp)[256 * 64];
+#define s_chars (*s_chars_hp)
 static uint8_t s_snap_charram[0x2000], s_snap_vram[0x800], s_snap_spr[0x80], s_snap_scrollv[0x20], s_snap_scrollh[0x100];
 static uint8_t s_snap_pal[0x80], s_snap_lookup[0x2000], s_snap_dirty[256];
 static uint8_t s_snap_ctrl, s_snap_bg_scrollx;
@@ -470,12 +471,18 @@ static void bc_exit(void)
 	free(s_mix);
 	free(s_tmp);
 	s_mix = s_tmp = NULL;
+	free(s_chars_hp);
+	s_chars_hp = NULL;
 }
 
 static int bc_supported(const char *machine) { return !strcmp(machine, "buggychl"); }
 
 static int bc_init(const rbx_game *g)
 {
+	if (!s_chars_hp && !(s_chars_hp = calloc(1, sizeof(*s_chars_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	if (!bc_supported(g->machine)) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);
 		return -1;

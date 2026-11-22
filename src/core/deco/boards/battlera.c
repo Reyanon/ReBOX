@@ -50,7 +50,8 @@ static struct {
 	uint16_t palette[512], address, greyscales, pixels_per_clock, pixel_data, pixel_clock, last_h, last_v, height;
 	uint8_t blur, pad;
 } s_v;
-static uint16_t s_vram[0x10000];
+static uint16_t (*s_vram_hp)[0x10000];
+#define s_vram (*s_vram_hp)
 static const uint8_t vram_increments[4] = { 1, 32, 64, 128 };
 
 static h6280_t s_cpu, s_snd;
@@ -403,7 +404,8 @@ static void vdc_write(int offset, uint8_t data)
 }
 
 // ---------------------------------------------------------------- the VCE
-static uint16_t s_bmp[VIS_H][VIS_W];
+static uint16_t (*s_bmp_hp)[VIS_H][VIS_W];
+#define s_bmp (*s_bmp_hp)
 
 static uint8_t vce_read(int offset)
 {
@@ -582,7 +584,8 @@ static uint16_t (*s_snap)[VIS_W];
 // (the same samples with or without the worker thread)
 #define EV_MAX 2048
 typedef struct { uint16_t line; uint8_t seg, val; } br_ev_t;
-static br_ev_t s_ev[2][EV_MAX];
+static br_ev_t (*s_ev_hp)[2][EV_MAX];
+#define s_ev (*s_ev_hp)
 static int s_ev_n[2], s_ev_cur, s_line, s_seg;
 static int32_t *s_out;
 static int s_out_n;
@@ -766,6 +769,18 @@ static void br_exit(void);
 
 static int br_init(const rbx_game *g)
 {
+	if (!s_bmp_hp && !(s_bmp_hp = calloc(1, sizeof(*s_bmp_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ev_hp && !(s_ev_hp = calloc(1, sizeof(*s_ev_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_vram_hp && !(s_vram_hp = calloc(1, sizeof(*s_vram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_srom = rbx_region("audiocpu", &s_srom_size);
 	if (!s_rom || s_rom_size < 0x100000 || !s_srom || s_srom_size < 0x10000) {
@@ -826,6 +841,12 @@ static void br_exit(void)
 	s_out = NULL;
 	free(s_snap);
 	s_snap = NULL;
+	free(s_bmp_hp);
+	s_bmp_hp = NULL;
+	free(s_ev_hp);
+	s_ev_hp = NULL;
+	free(s_vram_hp);
+	s_vram_hp = NULL;
 }
 
 // the main CPU to its clock c, then the VCE to h_end of the line

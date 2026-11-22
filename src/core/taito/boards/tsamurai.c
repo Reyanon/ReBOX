@@ -50,7 +50,8 @@ static const machine_t *s_m;
 static const char *s_set;
 static uint8_t *s_rom[4];
 static uint32_t s_rom_size[4];
-static uint8_t s_ram[0x4000];               // main CPU 0xc000-0xffff
+static uint8_t (*s_ram_hp)[0x4000];               // main CPU 0xc000-0xffff
+#define s_ram (*s_ram_hp)
 static uint8_t s_sram[3][0x800];            // sound CPU work RAM
 static uint8_t s_sram3_hi[4];               // m660 audio3 0xfffc-0xffff
 static zcpu s_cpu[4];
@@ -69,8 +70,10 @@ static uint32_t s_ay_done;
 static uint8_t *s_bgt, *s_fgt, *s_spr;      // decoded 1 byte per pixel
 static uint8_t *s_bgo, *s_fgo;               // tile has a non-zero pixel
 static int s_bg_n, s_fg_n;
-static uint16_t s_frame[256 * 256];
-static uint8_t s_snap_ram[0x4000];
+static uint16_t (*s_frame_hp)[256 * 256];
+#define s_frame (*s_frame_hp)
+static uint8_t (*s_snap_ram_hp)[0x4000];
+#define s_snap_ram (*s_snap_ram_hp)
 static int s_snap_flip, s_snap_tb1, s_snap_tb2, s_snap_bgcolor, s_snap_sx, s_snap_sy, s_snap_gong;
 static uint32_t s_pal[256];
 // ports
@@ -510,10 +513,28 @@ static void ts_exit(void)
 	s_bgt = s_fgt = s_spr = s_bgo = s_fgo = NULL;
 	free(s_mix);
 	s_mix = NULL;
+	free(s_frame_hp);
+	s_frame_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_snap_ram_hp);
+	s_snap_ram_hp = NULL;
 }
 
 static int ts_init(const rbx_game *g)
 {
+	if (!s_frame_hp && !(s_frame_hp = calloc(1, sizeof(*s_frame_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_snap_ram_hp && !(s_snap_ram_hp = calloc(1, sizeof(*s_snap_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_m = find_machine(g->machine);
 	if (!s_m) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);

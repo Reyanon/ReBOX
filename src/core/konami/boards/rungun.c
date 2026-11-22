@@ -39,7 +39,8 @@ static uint8_t *s_roz_gfx, *s_ttl_gfx;   // (gfx1: gfx_16x16x4_packed_msb; gfx3:
 static uint32_t s_roz_n, s_ttl_n;
 static z80 s_z;
 static const uint8_t *s_zmap[256];
-static k054539_t s_k539[2];
+static k054539_t (*s_k539_hp)[2];
+#define s_k539 (*s_k539_hp)
 static eepser_t s_eeprom;
 static int s_port_sys, s_port_dsw, s_port_p[4];
 static int32_t s_gain_l, s_gain_r;
@@ -533,6 +534,10 @@ static uint8_t *decode_packed(const uint8_t *rom, uint32_t size, int w, uint32_t
 
 static int rng_init(const rbx_game *g)
 {
+	if (!s_k539_hp && !(s_k539_hp = calloc(1, sizeof(*s_k539_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t pcm_size, spr_size, ttl_size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("soundcpu", &s_zrom_size);
@@ -611,6 +616,8 @@ static void rng_exit(void)
 	free(s_ttl_gfx);
 	s_roz_gfx = s_ttl_gfx = NULL;
 	s_roz_n = s_ttl_n = 0;
+	free(s_k539_hp);
+	s_k539_hp = NULL;
 }
 
 static void rng_reset(void)

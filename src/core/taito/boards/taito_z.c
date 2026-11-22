@@ -198,14 +198,17 @@ static uint32_t s_rom_size[2];
 static uint8_t *s_ram[MAX_RAMS];
 static uint32_t s_ram_size[MAX_RAMS];
 static int s_nram;
-static uint8_t s_share[0x10000];
-static uint16_t s_spr[0x2000];          // sprite RAM (0x4000 bytes at most)
+static uint8_t (*s_share_hp)[0x10000];
+#define s_share (*s_share_hp)
+static uint16_t (*s_spr_hp)[0x2000];          // sprite RAM (0x4000 bytes at most)
+#define s_spr (*s_spr_hp)
 static uint16_t s_palram[0x1000];       // palette RAM or TC0110PCR RAM
 static uint16_t s_pcr_addr;
 static tc0100scn_t *s_scn;
 static tc0480scp_t *s_scp;
 static tc0150rod_t *s_rod;
-static m68k_bus_t s_bus[2];
+static m68k_bus_t (*s_bus_hp)[2];
+#define s_bus (*s_bus_hp)
 static uint8_t s_ctx[2][1024];
 static int s_cur;                        // CPU whose context is in Musashi
 static int s_sub_reset;                  // sub CPU held in reset (cpua_ctrl bit 0 low)
@@ -1010,6 +1013,18 @@ static void tz_exit(void);
 
 static int tz_init(const rbx_game *g)
 {
+	if (!s_bus_hp && !(s_bus_hp = calloc(1, sizeof(*s_bus_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_share_hp && !(s_share_hp = calloc(1, sizeof(*s_share_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_spr_hp && !(s_spr_hp = calloc(1, sizeof(*s_spr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_m = find_machine(g->machine);
 	if (!s_m) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);
@@ -1174,6 +1189,12 @@ static void tz_exit(void)
 	s_mix = NULL;
 	m68k_bus_select(NULL);   // other boards use the default bus
 	s_m = NULL;
+	free(s_bus_hp);
+	s_bus_hp = NULL;
+	free(s_share_hp);
+	s_share_hp = NULL;
+	free(s_spr_hp);
+	s_spr_hp = NULL;
 }
 
 // ---- frame ----

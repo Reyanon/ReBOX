@@ -42,7 +42,8 @@ static z80 s_z;
 static const uint8_t *s_zmap[256];
 static k052109_t s_k109;
 static k007232_t s_k232;
-static uint16_t s_gfxram[0x10000];   // 180000 / 280000: the K052109's characters (host order words)
+static uint16_t (*s_gfxram_hp)[0x10000];   // 180000 / 280000: the K052109's characters (host order words)
+#define s_gfxram (*s_gfxram_hp)
 static uint8_t s_dirty[0x1000];      // (the characters written since the last decoding)
 static int s_any_dirty;
 static int s_port_sys, s_port_p1, s_port_p2, s_port_dsw[3];
@@ -189,7 +190,8 @@ static void k051960_vblank(void)
 #define Q_MAX 2048
 enum { Q_ADV, Q_LATCH, Q_IRQ };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out[2048];
 static int s_out_n, s_out_pos;
@@ -417,6 +419,14 @@ static void g3_reset(void);
 
 static int g3_init(const rbx_game *g)
 {
+	if (!s_gfxram_hp && !(s_gfxram_hp = calloc(1, sizeof(*s_gfxram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t pcm_size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_subrom = rbx_region("sub", &s_subrom_size);
@@ -518,6 +528,10 @@ static void g3_exit(void)
 	k052109_exit(&s_k109);
 	m68k_multi_exit();
 	rbx_ym_exit(0);
+	free(s_gfxram_hp);
+	s_gfxram_hp = NULL;
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void g3_reset(void)

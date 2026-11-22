@@ -1014,6 +1014,94 @@ static inline uint8_t char_pixel(const uint16_t *tiles, int code, int px, int py
 	return (uint8_t)((row >> (px * 4)) & 0xf);
 }
 
+// one 8-pixel cell at a time: the text layer (characters from char RAM) or the pixel layer (pivot RAM, the palette
+// from the text layer as MAME get_tile_info_pixel, including its scroll offset hack). use_pix and flip (the tilemap
+// flip) are constants in each caller's copy
+static inline __attribute__((always_inline)) void fetch_pivot_cells(const f3v_t *v, const pv_inf *pv, int gy, layer_line *restrict ll,
+                                                                    const mixbuf *restrict z, uint8_t prio, const int use_pix, const int flip)
+{
+	const uint16_t *text = v->vram + 0x6000, *chars = v->vram + 0x7000;
+	const uint8_t fsel = (uint8_t)(0x80 | pv->blend_select_v);
+	const int uy = flip ? (use_pix ? 255 : 511) - gy : gy;
+	const int row = uy >> 3, py = uy & 7;
+	const uint16_t *trow;
+	if (use_pix) {
+		int ty = row;
+		int y_offs = row * 8 + v->ctrl1[5];
+		if (flip)
+			y_offs += 0x100;
+		if ((y_offs & 0x1ff) >= 256)
+			ty += 32;
+		trow = text + (ty << 6);
+	} else
+		trow = text + row * 64;
+	const uint16_t *pixrow = v->pivotram + row * 16;   // (cell col: + col * 32 * 16)
+	const int sx = pv->reg_sx;
+	int x = H_START;
+	while (x < H_END) {
+		const int gx = (x + sx) & 0x1ff;
+		const int ux = flip ? 511 - gx : gx;
+		const int col = ux >> 3;
+		const uint16_t t = trow[col];
+		const int ry = (t & 0x8000) ? 7 - py : py;
+		const uint16_t *r = use_pix ? pixrow + col * 32 * 16 + ry * 2 : chars + (t & 0xff) * 16 + ry * 2;
+		uint32_t bits = (uint32_t)r[0] << 16 | r[1];
+		// screen pixels of this cell: ux moves by +1 (or -1 when flipped) per screen pixel
+		int left = flip ? (ux & 7) + 1 : 8 - (ux & 7);
+		if (left > H_END - x)
+			left = H_END - x;
+		if (!bits) {   // (the colours of transparent pixels are never used)
+			if (left == 8)
+				memset(ll->f + x, 0, 8);
+			else
+				memset(ll->f + x, 0, (size_t)left);
+			x += left;
+			continue;
+		}
+		if (left == 8) {   // (the 8 pixels taken by the layers above: this layer changes none of them)
+			v8u8 sp, dp;
+			memcpy(&sp, z->src_prio + x, 8);
+			memcpy(&dp, z->dst_prio + x, 8);
+			const v8u8 need = (v8u8)(sp < prio) | (v8u8)(dp <= prio);
+			uint64_t nm;
+			memcpy(&nm, &need, 8);
+			if (nm == 0) {
+				memset(ll->f + x, 0, 8);
+				x += 8;
+				continue;
+			}
+		}
+		const int color16 = ((t >> 9) & 0x3f) * 16;
+		// pixel px of the cell for screen pixel i: (ux & 7) +- i, 7 - that with the cell flipped; with the
+		// nibbles reversed when it goes backwards the pixels are the bits from s up
+		const int xflip = (t & 0x100) != 0;
+		int s0 = xflip ? 7 - (ux & 7) : ux & 7;
+		if (flip ^ xflip) {
+			bits = __builtin_bswap32(bits);
+			bits = ((bits >> 4) & 0x0f0f0f0fu) | ((bits << 4) & 0xf0f0f0f0u);
+			s0 = 7 - s0;
+		}
+		bits >>= s0 * 4;
+		if (left == 8) {   // (a whole cell: the 8 nibbles spread to bytes at once)
+			const uint32_t lo = bits & 0x0f0f0f0fu, hi = (bits >> 4) & 0x0f0f0f0fu;
+			v8u8 a8, p8;
+			memcpy(&a8, &lo, 4);
+			memcpy((uint8_t *)&a8 + 4, &hi, 4);
+			p8 = __builtin_shuffle(a8, (v8u8){ 0, 4, 1, 5, 2, 6, 3, 7 });
+			const v8u16 w = __builtin_convertvector(p8, v8u16) + (uint16_t)color16;
+			const v8u8 f8 = (v8u8)(p8 != 0) & fsel;
+			memcpy(ll->pal + x, &w, 16);
+			memcpy(ll->f + x, &f8, 8);
+		} else
+			for (int i = 0; i < left; i++, bits >>= 4) {
+				const uint8_t p = (uint8_t)(bits & 0xf);
+				ll->pal[x + i] = (uint16_t)(color16 + p);
+				ll->f[x + i] = p ? fsel : 0;
+			}
+		x += left;
+	}
+}
+
 // z, prio: the mix so far and this layer's priority: a whole cell this layer can change nothing of is left empty
 static void fetch_pivot(fetch_ctx *fc, const pv_inf *pv, int y_line, line_inf *line, layer_line *ll, const mixbuf *z, uint8_t prio)
 {
@@ -1023,77 +1111,11 @@ static void fetch_pivot(fetch_ctx *fc, const pv_inf *pv, int y_line, line_inf *l
 	int gy = (pv->reg_sy + y_line) & (use_pix ? 0xff : 0x1ff);
 	int sel = pv->blend_select_v;
 	if (!pv->m.x_sample_enable || line->x_sample == 1) {
-		// one 8-pixel cell at a time: the text layer (characters from char RAM) or the pixel layer (pivot RAM, the
-		// palette from the text layer as MAME get_tile_info_pixel, including its scroll offset hack)
-		const uint8_t fsel = (uint8_t)(0x80 | sel);
-		const int uy = fc->tm_flip ? (use_pix ? 255 : 511) - gy : gy;
-		const int row = uy >> 3, py = uy & 7;
-		const uint16_t *trow;
-		if (use_pix) {
-			int ty = row;
-			int y_offs = row * 8 + v->ctrl1[5];
-			if (fc->tm_flip)
-				y_offs += 0x100;
-			if ((y_offs & 0x1ff) >= 256)
-				ty += 32;
-			trow = text + (ty << 6);
-		} else
-			trow = text + row * 64;
-		int x = H_START;
-		while (x < H_END) {
-			int gx = (x + pv->reg_sx) & 0x1ff;
-			int ux = fc->tm_flip ? 511 - gx : gx;
-			int col = ux >> 3;
-			uint16_t t = trow[col];
-			int ry = (t & 0x8000) ? 7 - py : py;
-			const uint16_t *r = use_pix ? v->pivotram + (col * 32 + row) * 16 + ry * 2 : chars + (t & 0xff) * 16 + ry * 2;
-			uint32_t bits = (uint32_t)r[0] << 16 | r[1];
-			int color16 = ((t >> 9) & 0x3f) * 16;
-			// screen pixels of this cell: ux moves by +1 (or -1 when flipped) per screen pixel
-			int left = fc->tm_flip ? (ux & 7) + 1 : 8 - (ux & 7);
-			if (left > H_END - x)
-				left = H_END - x;
-			int covered = 0;
-			if (bits && left == 8) {   // (the 8 pixels taken by the layers above: this layer changes none of them)
-				v8u8 sp, dp;
-				memcpy(&sp, z->src_prio + x, 8);
-				memcpy(&dp, z->dst_prio + x, 8);
-				const v8u8 need = (v8u8)(sp < prio) | (v8u8)(dp <= prio);
-				uint64_t nm;
-				memcpy(&nm, &need, 8);
-				covered = nm == 0;
-			}
-			if (!bits || covered)
-				memset(ll->f + x, 0, (size_t)left);   // (the colours of transparent pixels are never used)
-			else {
-				// pixel px of the cell for screen pixel i: (ux & 7) +- i, 7 - that with the cell flipped; with the
-				// nibbles reversed when it goes backwards the pixels are the bits from s up
-				const int xflip = (t & 0x100) != 0;
-				int s0 = xflip ? 7 - (ux & 7) : ux & 7;
-				if (fc->tm_flip ^ xflip) {
-					bits = __builtin_bswap32(bits);
-					bits = ((bits >> 4) & 0x0f0f0f0fu) | ((bits << 4) & 0xf0f0f0f0u);
-					s0 = 7 - s0;
-				}
-				bits >>= s0 * 4;
-				if (left == 8) {   // (a whole cell: the 8 nibbles spread to bytes at once)
-					const uint32_t lo = bits & 0x0f0f0f0fu, hi = (bits >> 4) & 0x0f0f0f0fu;
-					v8u8 a8, p8;
-					memcpy(&a8, &lo, 4);
-					memcpy((uint8_t *)&a8 + 4, &hi, 4);
-					p8 = __builtin_shuffle(a8, (v8u8){ 0, 4, 1, 5, 2, 6, 3, 7 });
-					const v8u16 w = __builtin_convertvector(p8, v8u16) + (uint16_t)color16;
-					const v8u8 f8 = (v8u8)(p8 != 0) & fsel;
-					memcpy(ll->pal + x, &w, 16);
-					memcpy(ll->f + x, &f8, 8);
-				} else
-					for (int i = 0; i < left; i++, bits >>= 4) {
-						const uint8_t p = (uint8_t)(bits & 0xf);
-						ll->pal[x + i] = (uint16_t)(color16 + p);
-						ll->f[x + i] = p ? fsel : 0;
-					}
-			}
-			x += left;
+		switch ((use_pix << 1) | (fc->tm_flip != 0)) {
+		case 0: fetch_pivot_cells(v, pv, gy, ll, z, prio, 0, 0); break;
+		case 1: fetch_pivot_cells(v, pv, gy, ll, z, prio, 0, 1); break;
+		case 2: fetch_pivot_cells(v, pv, gy, ll, z, prio, 1, 0); break;
+		default: fetch_pivot_cells(v, pv, gy, ll, z, prio, 1, 1); break;
 		}
 		return;
 	}
@@ -1275,10 +1297,10 @@ static void render_line(const f3v_t *v, blend_state *bs, const mixbuf *z, uint16
 // render_line's blend palette, when full, gives the source colour instead: here the blend still)
 static int s_out565;   // (out_color is RGB565 by its values: the line goes straight there)
 static inline uint16_t rgb565(uint32_t rgb) { return (uint16_t)(((rgb >> 8) & 0xf800) | ((rgb >> 5) & 0x07e0) | ((rgb >> 3) & 0x001f)); }
-static void render_line_565(const f3v_t *v, const mixbuf *z, uint16_t *o)
+// the 8 pixels from x0 when some of them blend: all 8 blended at once, then the simple ones from the table
+static __attribute__((noinline)) void out565_blend8(const uint32_t *clut, const mixbuf *z, int x0, uint16_t *d)
 {
-	const uint32_t *clut = v->pal_rgb;
-	for (int x0 = H_START; x0 < H_END; x0 += 8) {
+	{
 		v8u16 vs, vd;
 		v8u8 bs8, bd8;
 		memcpy(&vs, z->src_pal + x0, 16);
@@ -1292,15 +1314,6 @@ static void render_line_565(const f3v_t *v, const mixbuf *z, uint16_t *o)
 		const v8u16 same = (v8u16)((vs == vd) & (vsb + vdb == 8));
 		const v8u16 simple = take_s | take_d | same;
 		const v8u16 idx = (take_d & vd) | (~take_d & vs);
-		uint16_t *d = o + (x0 - H_START);
-		uint64_t m[2];
-		memcpy(m, &simple, 16);
-		if ((m[0] & m[1]) == ~0ull) {
-			for (int i = 0; i < 8; i++)
-				d[i] = s_outlut16[idx[i]];
-			continue;
-		}
-		// (some of the 8 blend: all 8 blended at once, then the simple ones from the table)
 		uint16_t sr[8], sg[8], sbl[8], dr[8], dg[8], dbl[8], lut[8];
 		for (int i = 0; i < 8; i++) {
 			const uint32_t sc = clut[vs[i]], dc = clut[vd[i]];
@@ -1330,6 +1343,45 @@ static void render_line_565(const f3v_t *v, const mixbuf *z, uint16_t *o)
 		const v8u16 c565 = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | (b >> 3);
 		const v8u16 out = (simple & vlut) | (~simple & c565);
 		memcpy(d, &out, 16);
+	}
+}
+
+// Two passes: the vector work of the whole line into memory first (each pixel's entry, the source's or the
+// destination's, and whether it is taken as it is), then the table lookups by the integer pipeline. (One pass read
+// each 8-pixel test and the 8 entries out of NEON registers: on the A9 a NEON-to-ARM move waits for the NEON queue.)
+static void render_line_565(const f3v_t *v, const mixbuf *z, uint16_t *o)
+{
+	uint16_t idx[H_VIS] __attribute__((aligned(16)));
+	uint8_t simple[H_VIS] __attribute__((aligned(8)));
+	for (int x0 = H_START; x0 < H_END; x0 += 8) {
+		v8u16 vs, vd;
+		v8u8 bs8, bd8;
+		memcpy(&vs, z->src_pal + x0, 16);
+		memcpy(&vd, z->dst_pal + x0, 16);
+		memcpy(&bs8, z->src_blend + x0, 8);
+		memcpy(&bd8, z->dst_blend + x0, 8);
+		vs &= 0x1fff;
+		vd &= 0x1fff;
+		const v8u16 vsb = __builtin_convertvector(bs8, v8u16), vdb = __builtin_convertvector(bd8, v8u16);
+		const v8u16 take_s = (v8u16)((vsb == 8) & (vdb == 0)), take_d = (v8u16)((vsb == 0) & (vdb == 8)) & ~take_s;
+		const v8u16 same = (v8u16)((vs == vd) & (vsb + vdb == 8));
+		const v8u16 ix = (take_d & vd) | (~take_d & vs);
+		const v8u8 s8 = __builtin_convertvector(take_s | take_d | same, v8u8);
+		memcpy(idx + (x0 - H_START), &ix, 16);
+		memcpy(simple + (x0 - H_START), &s8, 8);
+	}
+	const uint16_t *lut = s_outlut16;
+	for (int x = 0; x < H_VIS; x += 8) {
+		uint32_t m0, m1;
+		memcpy(&m0, simple + x, 4);
+		memcpy(&m1, simple + x + 4, 4);
+		if ((m0 & m1) == 0xffffffffu) {
+			const uint16_t *ip = idx + x;
+			uint16_t *d = o + x;
+			d[0] = lut[ip[0]]; d[1] = lut[ip[1]]; d[2] = lut[ip[2]]; d[3] = lut[ip[3]];
+			d[4] = lut[ip[4]]; d[5] = lut[ip[5]]; d[6] = lut[ip[6]]; d[7] = lut[ip[7]];
+		} else
+			out565_blend8(v->pal_rgb, z, x + H_START, o + x);
 	}
 }
 

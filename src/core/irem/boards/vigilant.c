@@ -35,9 +35,11 @@ static int s_kind, s_nym, s_port[5], s_vx0, s_vw, s_pages;
 static uint32_t s_pix, s_htotal, s_cpu_clock, s_snd_clock, s_ym_clock, s_den;
 static int s_rate;
 
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
-static int32_t s_out[OUT_MAX];
+static int32_t (*s_out_hp)[OUT_MAX];
+#define s_out (*s_out_hp)
 static int s_out_n, s_out_pos;
 static volatile int s_job_frame;
 
@@ -470,6 +472,14 @@ static void vi_reset(void);
 
 static int vi_init(const rbx_game *g)
 {
+	if (!s_out_hp && !(s_out_hp = calloc(1, sizeof(*s_out_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t cs, ss, bs = 0;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_srom = rbx_region("soundcpu", &s_srom_size);
@@ -553,6 +563,10 @@ static void vi_exit(void)
 	memset(&s_bg, 0, sizeof(s_bg));
 	for (int i = 0; i < s_nym; i++)
 		rbx_ym_exit(i);
+	free(s_out_hp);
+	s_out_hp = NULL;
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void vi_reset(void)

@@ -22,6 +22,11 @@ int rbx_threads_start_sound(void);
 // Other boards: YM2151 synthesis worker on CPU1 (only if the core supports it, 0 = started)
 int rbx_threads_start_ym(void);
 
+// The io worker (ADR-160: a file region's reads ahead, the CV1000 NAND) for a game that wants one: CPU1 at 72
+// (RBX_DATA_DIR "nandcpu3": CPU3, "nandsync" / "nandold": none). Started after the game's init, stopped before its exit
+void rbx_threads_start_io(void);
+void rbx_threads_stop_io(void);
+
 // Stop and join the sound/YM threads (includes rbx_core_stop)
 void rbx_threads_tick(void);   // once a frame (thread placement by load)
 void rbx_threads_stop(void);

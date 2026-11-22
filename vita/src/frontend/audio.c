@@ -5,6 +5,7 @@
 #include <psp2/audioout.h>
 #include <psp2/kernel/threadmgr.h>
 
+#include "frontend/audio_gain.h"
 #include "frontend/resample.h"
 #include "platform/log.h"
 
@@ -40,7 +41,7 @@ void rbx_audio_dump(const char *path, int slot, const int16_t *samples, int fram
 #define GRAIN       256              // samples per sceAudioOutOutput call (multiple of 64)
 #define RING_FRAMES 8192             // ring buffer size (sample pairs, power of 2, ~170ms)
 #define RING_MASK   (RING_FRAMES - 1)
-#define PREFILL     1600             // prefill before start (2 frames)
+#define PREFILL     1600             // prefill before start (2 frames; = DRC_TARGET, the start waits for s_drc_target)
 #define OUT_BUFS    3                // number of rotating output buffers
 
 // single-producer (emu thread) / single-consumer (output thread) ring buffer. Sample pairs stored as uint32
@@ -48,6 +49,7 @@ static uint32_t s_ring[RING_FRAMES];
 static volatile uint32_t s_head; // total written by producer
 static volatile uint32_t s_tail; // total read by consumer
 
+static volatile int32_t s_drc_target;   // (DRC below)
 static int s_port = -1;
 static SceUID s_thread = -1;
 static volatile int s_running;
@@ -74,7 +76,7 @@ static int audio_thread(SceSize args, void *argp)
 		uint32_t avail = head - tail;
 
 		if (!started) {
-			if (avail < PREFILL) {
+			if (avail < (uint32_t)s_drc_target) {   // (PREFILL, and the frame buffer's frame: the DRC target, ADR-195)
 				sceKernelDelayThread(1000);
 				continue;
 			}
@@ -102,6 +104,7 @@ static int audio_thread(SceSize args, void *argp)
 }
 
 static int32_t s_drc_err;
+static int s_block = 1;   // (ADR-180: 0 = the gain a pair at a time as before, "feaudold")
 static volatile int32_t s_drc_ppm;
 // The output port and thread live as long as the app (in-app game switching): each game only starts the ring over.
 // (Opening a port per game leaked ports: a port still in sceAudioOutOutput is not released, and after 8 games the
@@ -145,29 +148,15 @@ int rbx_audio_init(void)
 		return -1;
 	}
 	sceKernelStartThread(s_thread, 0, NULL);
-	RBX_LOG("audio: %d Hz, grain %d, ring %d", RBX_AUDIO_RATE, GRAIN, RING_FRAMES);
+	RBX_LOG("audio: %d Hz, grain %d, ring %d, rounding %s, %s", RBX_AUDIO_RATE, GRAIN, RING_FRAMES,
+		rbx_resample_fast_rint() ? "vcvtr" : "lrintf", rbx_resample_neon() && s_block ? "NEON block" : "as before");
 	return 0;
-}
-
-static int32_t s_env = 4096 << 8;   // the output gain's peak envelope of the input (both sides, x256): out_gain below
-static int32_t s_gain256 = 6 * 256;
-// a DC blocker ahead of the gain (a one-pole high pass near 5 Hz): legacy AY outputs carry a large constant level
-// (B-Wings: 12000 of a 15000 peak), which the gain would take for loudness
-static int32_t s_dc[2];   // (x256)
-static inline int32_t dc_block(int ch, int32_t v)
-{
-	const int32_t x = v << 8;
-	s_dc[ch] += (x - s_dc[ch]) >> 11;
-	int32_t y = (x - s_dc[ch]) >> 8;
-	return y > 32767 ? 32767 : y < -32768 ? -32768 : y;
 }
 
 void rbx_audio_fini(void)
 {
 	ring_restart(); // (game end: what is left in the ring is not played; the port stays for the next game)
-	s_env = 4096 << 8;   // (the next game's gain from x6)
-	s_dc[0] = s_dc[1] = 0;
-	s_gain256 = 6 * 256;
+	gain_reset();
 }
 
 void rbx_audio_shutdown(void)
@@ -188,9 +177,21 @@ void rbx_audio_shutdown(void)
 // --- dynamic rate control (DRC, docs/RULES.md section 3) ---
 // The Vita display is 59.94Hz, so 800 samples per frame falls slightly short of 48kHz consumption. Input is stretched or
 // shrunk within ±0.5% (16-tap resampling, resample.c) to keep the ring buffer fill at the target (2 frames).
-#define DRC_TARGET   1600                  // target fill (sample pairs)
+#define DRC_TARGET   1600                  // target fill (sample pairs); also the gain's scale (ppm per pair of error)
 #define DRC_MAX_PPM  5000                  // max adjustment 0.5%
-static int16_t s_drc_out[(RBX_RESAMPLE_MAX_IN + RBX_RESAMPLE_MAX_IN / 64 + 4) * 2];
+// (ADR-195) the frame buffer shows each picture a frame later: the ring holds a frame more (800 pairs) so the sound
+// comes as much later and stays with the picture. The gain stays that of DRC_TARGET
+static volatile int32_t s_drc_target = DRC_TARGET;   // (declared above for the prefill)
+void rbx_audio_set_extra_frames(int frames)
+{
+	s_drc_target = DRC_TARGET + (frames > 0 ? frames : 0) * (RBX_AUDIO_RATE / 60);
+}
+static int16_t s_drc_out[(RBX_RESAMPLE_MAX_IN + RBX_RESAMPLE_MAX_IN / 64 + 4) * 2] __attribute__((aligned(16)));
+void rbx_audio_set_old(int old)
+{
+	s_block = !old;
+	rbx_resample_set_neon(!old);
+}
 // s_drc_err: low-passed fill error (sample pairs * 256); s_drc_ppm: current adjustment (stats). Both above rbx_audio_init
 
 static void ring_put(uint32_t *head, uint32_t tail, int16_t l, int16_t r)
@@ -203,42 +204,6 @@ static void ring_put(uint32_t *head, uint32_t tail, int16_t l, int16_t r)
 	(*head)++;
 }
 
-// output gain: the sound was too quiet on the Vita speaker. x6 (x2 as ReSys12 / ReST-V, x2 more by user request
-// 2026-10-31, ADR-009, and x1.5 more 2026-11-01: still quiet in Bubble Memories), with a soft limit above 75% of full scale instead of clipping: past the knee the curve bends
-// smoothly towards full scale (same slope at the knee)
-// 2026-11-03 (ADR-021): the fixed x6 kept loud games (Diet Go Go: 4x the level of the others) in the soft limit nearly
-// all the time, heard as an amplified, muffled sound. The gain now follows the level: x6 at most, less where the
-// peaks would pass the knee (an envelope of the peaks: at once up, ~11 s down), the soft limit left for what is past it.
-// 2026-11-03: the envelope in x256 (the decay rounded up to 1 a sample came back from a peak in 0.6 s, not the 1.4 s
-// meant: Diet Go Go's gain swung 5 dB a second with its drums, heard as a wavering sound), and a slower decay so a
-// game's gain settles
-static inline void gain_track(int32_t l, int32_t r)
-{
-	int32_t m = l < 0 ? -l : l;
-	const int32_t mr = r < 0 ? -r : r;
-	if (mr > m)
-		m = mr;
-	m <<= 8;
-	if (m > s_env)
-		s_env = m;
-	else
-		s_env -= (s_env - m) >> 19;
-	const int32_t e = (s_env >> 8) < 4096 ? 4096 : (s_env >> 8);
-	s_gain256 = (int32_t)((int64_t)24576 * 256 / e);
-	if (s_gain256 > 6 * 256)
-		s_gain256 = 6 * 256;
-}
-static inline int16_t out_gain(int32_t v)
-{
-	enum { KNEE = 24576, ROOM = 32767 - KNEE };
-	v = (int32_t)(((int64_t)v * s_gain256) >> 8);
-	const int32_t m = v < 0 ? -v : v;
-	if (m <= KNEE)
-		return (int16_t)v;
-	const int32_t e = m - KNEE, y = KNEE + (int32_t)((int64_t)e * ROOM / (e + ROOM));
-	return (int16_t)(v < 0 ? -y : y);
-}
-
 void rbx_audio_push(const int16_t *samples, int frames)
 {
 	uint32_t head = s_head;
@@ -246,7 +211,7 @@ void rbx_audio_push(const int16_t *samples, int frames)
 	int32_t fill = (int32_t)(head - tail);
 
 	// track the error slowly so pitch doesn't wobble (1/16 low-pass)
-	s_drc_err += (((fill - DRC_TARGET) << 8) - s_drc_err) >> 4;
+	s_drc_err += (((fill - s_drc_target) << 8) - s_drc_err) >> 4;
 	int32_t ppm = (int32_t)((int64_t)(s_drc_err >> 8) * DRC_MAX_PPM / DRC_TARGET);
 	if (ppm > DRC_MAX_PPM) ppm = DRC_MAX_PPM;
 	if (ppm < -DRC_MAX_PPM) ppm = -DRC_MAX_PPM;
@@ -255,6 +220,14 @@ void rbx_audio_push(const int16_t *samples, int frames)
 	uint32_t step = (uint32_t)(65536 + (int64_t)65536 * ppm / 1000000);
 
 	int n = rbx_resample(samples, frames, step, s_drc_out);
+	if (s_block) {   // (ADR-180: the gain over the block in registers; the ring's room taken once, tail as read above)
+		const uint32_t used = head - tail;
+		const int room = used >= RING_FRAMES ? 0 : (int)(RING_FRAMES - used), nw = n < room ? n : room;
+		gain_block(s_drc_out, n, s_ring, head, RING_MASK, nw);
+		s_overflows += (uint32_t)(n - nw);
+		__atomic_store_n(&s_head, head + (uint32_t)nw, __ATOMIC_RELEASE);
+		return;
+	}
 	for (int i = 0; i < n; i++) {
 		const int32_t l = dc_block(0, s_drc_out[i * 2]), r = dc_block(1, s_drc_out[i * 2 + 1]);
 		gain_track(l, r);

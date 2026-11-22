@@ -32,7 +32,8 @@ static uint8_t s_gfx_control[3], s_vram_bank;
 static int s_bank, s_flip, s_nmi, s_coin_prev;
 static m6502_t s_cpu;
 static rbx_gfx s_gfx8, s_gfxspr;
-static uint8_t s_bgpix[128 * 256];         // (the background's tiles, decoded from s_vram_gfx at render)
+static uint8_t (*s_bgpix_hp)[128 * 256];         // (the background's tiles, decoded from s_vram_gfx at render)
+#define s_bgpix (*s_bgpix_hp)
 static uint32_t s_palette[32];
 static int s_port_dsw, s_port_p[2], s_port_sys;
 static int s_line;
@@ -282,6 +283,10 @@ static void to_exit(void);
 
 static int to_init(const rbx_game *g)
 {
+	if (!s_bgpix_hp && !(s_bgpix_hp = calloc(1, sizeof(*s_bgpix_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t csize, ssize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("audiocpu", &s_zrom_size);
@@ -372,6 +377,8 @@ static void to_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_bgpix_hp);
+	s_bgpix_hp = NULL;
 }
 
 static void to_frame(void)

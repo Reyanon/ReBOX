@@ -1916,6 +1916,8 @@ void m68k_op_addq_16_a(void)
 	uint* r_dst = &AY;
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + (((REG_IR >> 9) - 1) & 7) + 1);
+	if (m68ki_mame_timing && CPU_TYPE_IS_000(CPU_TYPE))   /* ReBOX: 8 clocks on the 68000 (m68k_set_mame_timing) */
+		USE_CYCLES(4);
 }
 
 
@@ -11880,6 +11882,9 @@ void m68k_op_cmpi_32_d(void)
 	uint src = OPER_I_32();
 	uint dst = DY;
 	uint res = dst - src;
+
+	if (rbx_m68k_cmpild_hook)
+		rbx_m68k_cmpild_hook((int)(REG_IR & 7), src);
 
 	FLAG_N = NFLAG_32(res);
 	FLAG_Z = MASK_OUT_ABOVE_32(res);

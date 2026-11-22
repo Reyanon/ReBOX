@@ -15,6 +15,11 @@ void rbx_audio_shutdown(void); // app exit: thread and port released
 
 // Interleaved stereo INT16, frames = sample pairs. Excess is dropped when full
 void rbx_audio_push(const int16_t *samples, int frames);
+// (ADR-180) 1 = the resampling and the gain as before ADR-180 (scalar loop, a pair at a time): the data folder's "feaudold"
+void rbx_audio_set_old(int old);
+// (ADR-195) frames the picture is shown later than without the frame buffer (0 or 1): the ring's target fill grows by
+// as many frames of sound
+void rbx_audio_set_extra_frames(int frames);
 
 typedef struct {
 	uint32_t underruns;  // times silence was output for lack of samples

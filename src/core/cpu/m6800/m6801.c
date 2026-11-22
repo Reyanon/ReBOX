@@ -3,7 +3,8 @@
 /*  Motorola MC6801 / MC6801U4, ported to C99 from MAME src/devices/cpu/m6800/m6800.cpp, 6800ops.hxx and
     m6801.cpp (BSD-3-Clause, copyright-holders: Aaron Giles). The opcode handlers are MAME's 6800ops.hxx with
     the member accesses rewritten; the 6803 opcode / cycle tables are MAME's.
-    Not carried over: SCI data shifting (registers only), OS3 / SC2 output, standby and NVRAM, HD6301 variants.
+    HD6301V1 / HD63701V0 (hd6301_cpu_device): hd63701_insn / cycles_63701 tables and the TRAP vector.
+    Not carried over: SCI data shifting (registers only), OS3 / SC2 output, standby and NVRAM, HD6301X/Y/HD6303.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "m6801.h"
@@ -45,6 +46,9 @@
 #define TOD     m->timer_over.d
 
 #define M6800_WAI 8
+#define M6800_SLP 0x10   // HD63701 only
+
+#define IS_HD6301(m) ((m)->type == M6801_TYPE_HD6301V1 || (m)->type == M6801_TYPE_HD63701V0)
 
 #define M6801_TRCSR_RDRF        0x80
 #define M6801_TRCSR_ORFE        0x40
@@ -408,8 +412,16 @@ static void WM(m6801 *m, uint32_t addr, uint8_t data)
 
 #define RM(Addr) RM(m, Addr)
 #define WM(Addr,Value) WM(m, Addr, Value)
-#define M_RDOP(Addr) RM(Addr)
-#define M_RDOP_ARG(Addr) RM(Addr)
+// (opcode and argument fetches: the on-chip ROM first, the same result as RM)
+static inline uint8_t rdop(m6801 *m, uint32_t addr)
+{
+	const uint32_t o = (uint16_t)addr - m->rom_base;
+	if (m->rom && o < m->rom_size && (uint16_t)addr >= 0x100)
+		return m->rom[o];
+	return RM(addr);
+}
+#define M_RDOP(Addr) rdop(m, Addr)
+#define M_RDOP_ARG(Addr) rdop(m, Addr)
 
 static uint32_t rm16(m6801 *m, uint32_t Addr)
 {
@@ -566,6 +578,8 @@ static void enter_interrupt(m6801 *m, uint16_t irq_vector)
 
 static void take_irq2(m6801 *m, uint16_t irq_vector)
 {
+	m->wai_state &= ~M6800_SLP;
+
 	if (!(m->cc & 0x10))
 		enter_interrupt(m, irq_vector);
 }
@@ -588,11 +602,16 @@ static void check_irq2(m6801 *m)
 static void check_irq_lines(m6801 *m)
 {
 	if (m->nmi_pending) {
+		m->wai_state &= ~M6800_SLP;
 		m->nmi_pending = 0;
 		enter_interrupt(m, 0xfffc);
 	} else if (m->irq_state[M6801_IRQ1_LINE]) {
-		if (!(CC & 0x10))
+		m->wai_state &= ~M6800_SLP;
+		if (!(CC & 0x10)) {
 			enter_interrupt(m, 0xfff8);
+			if (m->irq_state[M6801_IRQ1_LINE] == M6801_HOLD_LINE)   // (MAME HOLD_LINE: cleared when taken)
+				m->irq_state[M6801_IRQ1_LINE] = 0;
+		}
 	} else if (m->type != M6801_TYPE_6800) {
 		check_irq2(m);
 	}
@@ -2486,6 +2505,131 @@ static void op_cmpx_ex(m6801 *m)
 	SET_Z16(r.d);
 }
 
+// ---- HD63701 only (6800ops.hxx) ----
+// illegal opcode: hd6301_cpu_device::take_trap
+static void op_trap(m6801 *m)
+{
+	PC--;
+	enter_interrupt(m, 0xffee);
+}
+
+/* $12 ILLEGAL */
+static void op_undoc1(m6801 *m)
+{
+	X += RM( S + 1 );
+}
+
+/* $13 ILLEGAL */
+static void op_undoc2(m6801 *m)
+{
+	X += RM( S + 1 );
+}
+
+/* $18 XGDX inherent ----- */
+static void op_xgdx(m6801 *m)
+{
+	uint16_t t = X;
+	X = D;
+	D=t;
+}
+
+/* $1a SLP */
+static void op_slp(m6801 *m)
+{
+	// wait for next IRQ (same as waiting of WAI)
+	m->wai_state |= M6800_SLP;
+
+	check_irq_lines(m);
+	if (m->wai_state & M6800_SLP)
+		eat_cycles(m);
+}
+
+/* $61 AIM --**0- */
+static void op_aim_ix(m6801 *m)
+{
+	uint8_t t, r;
+	IMMBYTE(t);
+	IDXBYTE(r);
+	r &= t;
+	CLR_NZV; SET_NZ8(r);
+	WM(EAD,r);
+}
+
+/* $62 OIM --**0- */
+static void op_oim_ix(m6801 *m)
+{
+	uint8_t t, r;
+	IMMBYTE(t);
+	IDXBYTE(r);
+	r |= t;
+	CLR_NZV; SET_NZ8(r);
+	WM(EAD,r);
+}
+
+/* $65 EIM --**0- */
+static void op_eim_ix(m6801 *m)
+{
+	uint8_t t, r;
+	IMMBYTE(t);
+	IDXBYTE(r);
+	r ^= t;
+	CLR_NZV; SET_NZ8(r);
+	WM(EAD,r);
+}
+
+/* $6b TIM --**0- */
+static void op_tim_ix(m6801 *m)
+{
+	uint8_t t, r;
+	IMMBYTE(t);
+	IDXBYTE(r);
+	r &= t;
+	CLR_NZV; SET_NZ8(r);
+}
+
+/* $71 AIM --**0- */
+static void op_aim_di(m6801 *m)
+{
+	uint8_t t, r;
+	IMMBYTE(t);
+	DIRBYTE(r);
+	r &= t;
+	CLR_NZV; SET_NZ8(r);
+	WM(EAD,r);
+}
+
+/* $72 OIM --**0- */
+static void op_oim_di(m6801 *m)
+{
+	uint8_t t, r;
+	IMMBYTE(t);
+	DIRBYTE(r);
+	r |= t;
+	CLR_NZV; SET_NZ8(r);
+	WM(EAD,r);
+}
+
+/* $75 EIM --**0- */
+static void op_eim_di(m6801 *m)
+{
+	uint8_t t, r;
+	IMMBYTE(t);
+	DIRBYTE(r);
+	r ^= t;
+	CLR_NZV; SET_NZ8(r);
+	WM(EAD,r);
+}
+
+/* $7b TIM --**0- */
+static void op_tim_di(m6801 *m)
+{
+	uint8_t t, r;
+	IMMBYTE(t);
+	DIRBYTE(r);
+	r &= t;
+	CLR_NZV; SET_NZ8(r);
+}
+
 static void (*const insn_6803[256])(m6801 *) = {
 	op_illegl1, op_nop, op_illegl1, op_illegl1, op_lsrd, op_asld, op_tap, op_tpa,
 	op_inx, op_dex, op_clv, op_sev, op_clc, op_sec, op_cli, op_sei,
@@ -2595,6 +2739,61 @@ static const uint8_t cycles_6800[256] = {
 	4, 4, 4, XX, 4, 4, 4, 5, 4, 4, 4, 4, XX, XX, 5, 6,
 };
 
+// MAME m6801_cpu_device::hd63701_insn / cycles_63701 (hd6301_cpu_device)
+static void (*const insn_63701[256])(m6801 *) = {
+	op_trap, op_nop, op_trap, op_trap, op_lsrd, op_asld, op_tap, op_tpa,
+	op_inx, op_dex, op_clv, op_sev, op_clc, op_sec, op_cli, op_sei,
+	op_sba, op_cba, op_undoc1, op_undoc2, op_trap, op_trap, op_tab, op_tba,
+	op_xgdx, op_daa, op_slp, op_aba, op_trap, op_trap, op_trap, op_trap,
+	op_bra, op_brn, op_bhi, op_bls, op_bcc, op_bcs, op_bne, op_beq,
+	op_bvc, op_bvs, op_bpl, op_bmi, op_bge, op_blt, op_bgt, op_ble,
+	op_tsx, op_ins, op_pula, op_pulb, op_des, op_txs, op_psha, op_pshb,
+	op_pulx, op_rts, op_abx, op_rti, op_pshx, op_mul, op_wai, op_swi,
+	op_nega, op_trap, op_trap, op_coma, op_lsra, op_trap, op_rora, op_asra,
+	op_asla, op_rola, op_deca, op_trap, op_inca, op_tsta, op_trap, op_clra,
+	op_negb, op_trap, op_trap, op_comb, op_lsrb, op_trap, op_rorb, op_asrb,
+	op_aslb, op_rolb, op_decb, op_trap, op_incb, op_tstb, op_trap, op_clrb,
+	op_neg_ix, op_aim_ix, op_oim_ix, op_com_ix, op_lsr_ix, op_eim_ix, op_ror_ix, op_asr_ix,
+	op_asl_ix, op_rol_ix, op_dec_ix, op_tim_ix, op_inc_ix, op_tst_ix, op_jmp_ix, op_clr_ix,
+	op_neg_ex, op_aim_di, op_oim_di, op_com_ex, op_lsr_ex, op_eim_di, op_ror_ex, op_asr_ex,
+	op_asl_ex, op_rol_ex, op_dec_ex, op_tim_di, op_inc_ex, op_tst_ex, op_jmp_ex, op_clr_ex,
+	op_suba_im, op_cmpa_im, op_sbca_im, op_subd_im, op_anda_im, op_bita_im, op_lda_im, op_trap,
+	op_eora_im, op_adca_im, op_ora_im, op_adda_im, op_cpx_im, op_bsr, op_lds_im, op_trap,
+	op_suba_di, op_cmpa_di, op_sbca_di, op_subd_di, op_anda_di, op_bita_di, op_lda_di, op_sta_di,
+	op_eora_di, op_adca_di, op_ora_di, op_adda_di, op_cpx_di, op_jsr_di, op_lds_di, op_sts_di,
+	op_suba_ix, op_cmpa_ix, op_sbca_ix, op_subd_ix, op_anda_ix, op_bita_ix, op_lda_ix, op_sta_ix,
+	op_eora_ix, op_adca_ix, op_ora_ix, op_adda_ix, op_cpx_ix, op_jsr_ix, op_lds_ix, op_sts_ix,
+	op_suba_ex, op_cmpa_ex, op_sbca_ex, op_subd_ex, op_anda_ex, op_bita_ex, op_lda_ex, op_sta_ex,
+	op_eora_ex, op_adca_ex, op_ora_ex, op_adda_ex, op_cpx_ex, op_jsr_ex, op_lds_ex, op_sts_ex,
+	op_subb_im, op_cmpb_im, op_sbcb_im, op_addd_im, op_andb_im, op_bitb_im, op_ldb_im, op_trap,
+	op_eorb_im, op_adcb_im, op_orb_im, op_addb_im, op_ldd_im, op_trap, op_ldx_im, op_trap,
+	op_subb_di, op_cmpb_di, op_sbcb_di, op_addd_di, op_andb_di, op_bitb_di, op_ldb_di, op_stb_di,
+	op_eorb_di, op_adcb_di, op_orb_di, op_addb_di, op_ldd_di, op_std_di, op_ldx_di, op_stx_di,
+	op_subb_ix, op_cmpb_ix, op_sbcb_ix, op_addd_ix, op_andb_ix, op_bitb_ix, op_ldb_ix, op_stb_ix,
+	op_eorb_ix, op_adcb_ix, op_orb_ix, op_addb_ix, op_ldd_ix, op_std_ix, op_ldx_ix, op_stx_ix,
+	op_subb_ex, op_cmpb_ex, op_sbcb_ex, op_addd_ex, op_andb_ex, op_bitb_ex, op_ldb_ex, op_stb_ex,
+	op_eorb_ex, op_adcb_ex, op_orb_ex, op_addb_ex, op_ldd_ex, op_std_ex, op_ldx_ex, op_stx_ex,
+};
+
+static const uint8_t cycles_63701[256] = {
+	XX, 1, XX, XX, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, XX, XX, XX, XX, 1, 1, 2, 2, 4, 1, XX, XX, XX, XX,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	1, 1, 3, 3, 1, 1, 4, 4, 4, 5, 1, 10, 5, 7, 9, 12,
+	1, XX, XX, 1, 1, XX, 1, 1, 1, 1, 1, XX, 1, 1, XX, 1,
+	1, XX, XX, 1, 1, XX, 1, 1, 1, 1, 1, XX, 1, 1, XX, 1,
+	6, 7, 7, 6, 6, 7, 6, 6, 6, 6, 6, 5, 6, 4, 3, 5,
+	6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 6, 4, 3, 5,
+	2, 2, 2, 3, 2, 2, 2, XX, 2, 2, 2, 2, 3, 5, 3, XX,
+	3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 4, 5, 4, 4,
+	4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
+	4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 5, 6, 5, 5,
+	2, 2, 2, 3, 2, 2, 2, XX, 2, 2, 2, 2, 3, XX, 3, XX,
+	3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4,
+	4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
+	4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
+};
+
 #undef XX
 
 // ---- execution ----
@@ -2606,6 +2805,9 @@ static void execute_one(m6801 *m)
 	if (m->type == M6801_TYPE_6800) {
 		insn_6800[ireg](m);
 		increment_counter(m, cycles_6800[ireg]);
+	} else if (IS_HD6301(m)) {
+		insn_63701[ireg](m);
+		increment_counter(m, cycles_63701[ireg]);
 	} else {
 		insn_6803[ireg](m);
 		increment_counter(m, cycles_6803[ireg]);
@@ -2667,7 +2869,7 @@ int m6801_execute(m6801 *m, int cycles)
 	check_irq_lines(m);
 	cleanup_counters(m);
 	do {
-		if (m->wai_state & M6800_WAI)
+		if (m->wai_state & (M6800_WAI | M6800_SLP))
 			eat_cycles(m);
 		else
 			execute_one(m);
@@ -2677,6 +2879,7 @@ int m6801_execute(m6801 *m, int cycles)
 
 void m6801_set_irq_line(m6801 *m, int line, int state)
 {
+	const int hold = line == M6801_IRQ1_LINE && state == M6801_HOLD_LINE;
 	state = state != 0;
 	switch (line) {
 	case M6801_NMI_LINE:
@@ -2708,7 +2911,7 @@ void m6801_set_irq_line(m6801 *m, int line, int state)
 		}
 		break;
 	default:
-		m->irq_state[M6801_IRQ1_LINE] = (uint8_t)state;
+		m->irq_state[M6801_IRQ1_LINE] = (uint8_t)(hold ? M6801_HOLD_LINE : state);
 		break;
 	}
 }

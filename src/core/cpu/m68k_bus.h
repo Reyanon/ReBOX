@@ -18,6 +18,13 @@ typedef struct {
 	uint16_t (*read16)(uint32_t a);
 	void (*write8)(uint32_t a, uint8_t v);
 	void (*write16)(uint32_t a, uint16_t v);
+	// a 32-bit read not on a mapped page, as one access (a device that counts its reads: Namco's key chips);
+	// NULL: two 16-bit reads, high word first. Cleared by m68k_bus_reset_map
+	uint32_t (*read32)(uint32_t a);
+	// a 32-bit write at an even address with both words on one page that is neither mapped nor partly mapped, in one
+	// call (it must do what the two 16-bit writes, high word first, do); NULL: the two writes. Cleared by
+	// m68k_bus_reset_map
+	void (*write32)(uint32_t a, uint32_t v);
 	uint32_t irq_pending;      // HOLD_LINE levels (bit n = level n), cleared when the CPU takes them
 	uint32_t irq_asserted;     // ASSERT_LINE levels (m68k_bus_set_line), held until cleared
 	// level 7 (the NMI: taken on its edge) taken while its line stays asserted: not raised again until it drops
@@ -30,6 +37,9 @@ typedef struct {
 	// the board's handlers (the newest first)
 	struct { uint32_t start, end, size; uint8_t *mem; uint8_t rd, wr; } part[24];
 	int nparts;
+	// the pages a partial range overlaps (bit per page): only these are looked up in part[] (the others go straight
+	// to the handlers)
+	uint32_t partpg[M68K_PAGES / 32];
 } m68k_bus_t;
 
 // the bus of the board CPU. Boards with two 68000s keep one m68k_bus_t per CPU and switch with m68k_bus_select

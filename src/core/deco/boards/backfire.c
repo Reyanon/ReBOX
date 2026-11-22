@@ -16,7 +16,7 @@
 #include "../machine/armpoll.h"
 #include "../video/deco16ic.h"
 #include "../video/decospr.h"
-#include "../video/decoband.h"
+#include "../../video/decoband.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,12 +33,14 @@
 static arm_t s_cpu;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x8000];             // 0x170000 main RAM (32-bit)
+static uint8_t (*s_ram_hp)[0x8000];             // 0x170000 main RAM (32-bit)
+#define s_ram (*s_ram_hp)
 static uint16_t s_pal[0x800];             // 0x160000 (xBGR_555, 16-bit)
 static uint16_t s_spriteram[2][0x800];
 static uint16_t s_rowscroll[4][0x400];
 static uint32_t s_pri_reg[2];             // left / right priority (0x1a8000 / 0x1ac000)
-static deco16ic_t s_tile[2];
+static deco16ic_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static decospr_t s_spr[2];
 static rbx_gfx s_gfx8[2], s_gfx16[2], s_gfxspr[2];
 static ymz280b_t s_ymz;
@@ -57,7 +59,8 @@ static int32_t *s_ymz_l, *s_ymz_r;
 static int s_ymz_cap, s_ymz_n;
 static uint32_t s_out_rate, s_ymz_line0, s_ymz_line_n;
 static int64_t s_line_c0, s_line_cn;
-static uint8_t s_pri[2 * VIS_W * VIS_H];
+static uint8_t (*s_pri_hp)[2 * VIS_W * VIS_H];
+#define s_pri (*s_pri_hp)
 static struct {
 	deco16ic_t tile[2];
 	uint16_t rowscroll[4][0x400], spriteram[2][0x800], pal[0x800];
@@ -314,6 +317,18 @@ static int decode_tiles(int i, uint8_t *rom, uint32_t size)
 
 static int bf_init(const rbx_game *g)
 {
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t ts[2], ss[2], ys;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *tiles[2] = { rbx_region("tiles1", &ts[0]), rbx_region("tiles2", &ts[1]) };
@@ -423,6 +438,12 @@ static void bf_exit(void)
 	free(s_ymz_l);
 	free(s_ymz_r);
 	s_ymz_l = s_ymz_r = NULL;
+	free(s_pri_hp);
+	s_pri_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void run_cpu(int64_t end)

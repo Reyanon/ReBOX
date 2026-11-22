@@ -56,7 +56,8 @@ static int s_line_pos;                 // audio CPU clocks at the start of the c
 // video
 static uint8_t *s_chr, *s_spr16, *s_spr32;
 static uint32_t s_pal[256];
-static uint16_t s_frame[512 * 256];
+static uint16_t (*s_frame_hp)[512 * 256];
+#define s_frame (*s_frame_hp)
 static uint8_t s_snap[0x2800];
 static int s_snap_page, s_snap_display, s_snap_flip;
 // ports
@@ -444,10 +445,16 @@ static void cm_exit(void)
 	free(s_mix);
 	s_mix = NULL;
 	rbx_ym_exit(0);
+	free(s_frame_hp);
+	s_frame_hp = NULL;
 }
 
 static int cm_init(const rbx_game *g)
 {
+	if (!s_frame_hp && !(s_frame_hp = calloc(1, sizeof(*s_frame_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	if (strcmp(g->machine, "cyclemb") && strcmp(g->machine, "skydest")) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);
 		return -1;

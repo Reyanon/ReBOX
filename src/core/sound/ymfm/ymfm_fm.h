@@ -187,6 +187,9 @@ public:
 	// prepare prior to clocking
 	bool prepare();
 
+	// ReBOX: released to silence, nothing but the phase moves when clocked (reset at the next key on)
+	bool idle() const { return m_env_state == EG_RELEASE && m_env_attenuation == 0x3ff && !m_ssg_inverted && !m_regs.op_ssg_eg_enable(m_opoffs); }
+
 	// master clocking function
 	void clock(uint32_t env_counter, int32_t lfo_raw_pm);
 
@@ -278,6 +281,17 @@ public:
 
 	// prepare prior to clocking
 	bool prepare();
+
+	// ReBOX: every operator idle and the feedback settled: clocking it changes nothing that is heard
+	bool idle() const
+	{
+		if (m_feedback[0] != m_feedback[1] || m_feedback[1] != m_feedback_in)
+			return false;
+		for (auto op : m_op)
+			if (op != nullptr && !op->idle())
+				return false;
+		return true;
+	}
 
 	// master clocking function
 	void clock(uint32_t env_counter, int32_t lfo_raw_pm);
@@ -451,6 +465,7 @@ protected:
 	uint8_t m_timer_running[2];      // current timer running state
 	uint8_t m_total_clocks;          // low 8 bits of the total number of clocks processed
 	uint32_t m_active_channels;      // mask of active channels (computed by prepare)
+	uint32_t m_idle_channels = 0;    // ReBOX: channels not clocked (idle, computed by prepare)
 	uint32_t m_modified_channels;    // mask of channels that have been modified
 	uint32_t m_prepare_count;        // counter to do periodic prepare sweeps
 	RegisterType m_regs;             // register accessor

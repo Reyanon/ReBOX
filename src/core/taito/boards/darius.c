@@ -42,7 +42,8 @@ static uint8_t s_ram_a[0x10000], s_ram_b[0x10000], s_ram_e10[0x1000];
 static uint8_t s_pal[0x1000];
 static uint8_t s_spr[0x1000];      // e00000-e00fff (sprite RAM from 0x100)
 static uint8_t s_share2[0x2000];   // e01000-e02fff
-static uint8_t s_fg[0x8000];       // e08000-e0ffff
+static uint8_t (*s_fg_hp)[0x8000];       // e08000-e0ffff
+#define s_fg (*s_fg_hp)
 static pc080sn_t *s_sn;
 static rbx_gfx s_sprgfx, s_txtgfx;
 static int s_port[5];              // P1, P2, SYSTEM, DSW
@@ -431,6 +432,10 @@ static void darius_exit(void);
 
 static int darius_init(const rbx_game *g)
 {
+	if (!s_fg_hp && !(s_fg_hp = calloc(1, sizeof(*s_fg_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t sn_size, spr_size, txt_size;
 	s_rom_a = rbx_region("maincpu", &s_rom_a_size);
 	s_rom_b = rbx_region("cpub", &s_rom_b_size);
@@ -560,6 +565,8 @@ static void darius_exit(void)
 	rbx_ym_exit(0);
 	rbx_ym_exit(1);
 	m68k_multi_exit();
+	free(s_fg_hp);
+	s_fg_hp = NULL;
 }
 
 static void darius_frame(void)

@@ -50,7 +50,8 @@ static arm_t s_cpu;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
 static uint8_t s_sysram[0x1000];          // 0x201000 work RAM (32-bit), mirrored at 0x203000
-static uint16_t s_mainram[0x2000];        // common + 0x00000 (16-bit on the 32-bit bus)
+static uint16_t (*s_mainram_hp)[0x2000];        // common + 0x00000 (16-bit on the 32-bit bus)
+#define s_mainram (*s_mainram_hp)
 static uint16_t s_spriteram[0x800];
 static uint16_t s_pal[0x400];
 static uint16_t s_rowscroll[2][0x800];
@@ -208,7 +209,8 @@ static uint32_t pri_cb(uint16_t x, int extpri)
 
 static int bank_cb(int bank) { return (bank & 0x70) << 8; }
 
-static uint8_t s_pri[VIS_W * VIS_H];
+static uint8_t (*s_pri_hp)[VIS_W * VIS_H];
+#define s_pri (*s_pri_hp)
 
 static void sp_render(void)
 {
@@ -295,6 +297,14 @@ static void sp_exit(void);
 
 static int sp_init(const rbx_game *g)
 {
+	if (!s_mainram_hp && !(s_mainram_hp = calloc(1, sizeof(*s_mainram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_m = NULL;
 	for (size_t i = 0; i < sizeof(s_maps) / sizeof(s_maps[0]); i++)
 		if (!strcmp(s_maps[i].machine, g->machine))
@@ -436,6 +446,10 @@ static void sp_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_mainram_hp);
+	s_mainram_hp = NULL;
+	free(s_pri_hp);
+	s_pri_hp = NULL;
 }
 
 static void run_cpu(int cycles)

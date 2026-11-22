@@ -30,7 +30,8 @@ enum { K_LIBERATE, K_LIBERATB, K_BOOMRANG, K_KAMIKCAB, K_PROSOCCR, K_PROSPORT };
 static int s_k, s_yellowcb;
 static uint8_t *s_rom, *s_srom;
 static uint32_t s_rom_size, s_srom_size;
-static uint8_t s_opcodes[0x8000];           // (Liberation: the decrypted opcodes of 0x8000-0xffff)
+static uint8_t (*s_opcodes_hp)[0x8000];           // (Liberation: the decrypted opcodes of 0x8000-0xffff)
+#define s_opcodes (*s_opcodes_hp)
 static const uint8_t *s_user1;              // the background map ROM (and the view's ROM at 0x4000)
 static uint32_t s_user1_size;
 static uint8_t s_ram[0x1000], s_ram2[0x600];   // 0x0000-0x0fff, 0x6200-0x67ff
@@ -329,7 +330,8 @@ static void vbl_irq(void)
 }
 
 // ---- video ----
-static uint16_t s_scr[256 * 256];
+static uint16_t (*s_scr_hp)[256 * 256];
+#define s_scr (*s_scr_hp)
 
 static const uint8_t *elem(const rbx_gfx *g, uint32_t code) { return g->pix + (size_t)rbx_wrap(code, g->count) * g->width * g->height; }
 
@@ -745,6 +747,14 @@ static int pro_init(const rbx_game *g)
 
 static int lb_init(const rbx_game *g)
 {
+	if (!s_opcodes_hp && !(s_opcodes_hp = calloc(1, sizeof(*s_opcodes_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_scr_hp && !(s_scr_hp = calloc(1, sizeof(*s_scr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	const char *m = g->machine;
 	s_k = !strcmp(m, "liberatb") ? K_LIBERATB : !strcmp(m, "boomrang") ? K_BOOMRANG : !strcmp(m, "kamikcab") ? K_KAMIKCAB
 	    : !strcmp(m, "prosoccr") ? K_PROSOCCR : !strcmp(m, "prosport") ? K_PROSPORT : K_LIBERATE;
@@ -876,6 +886,10 @@ static void lb_exit(void)
 	s_snap = NULL;
 	free(s_mix);
 	s_mix = NULL;
+	free(s_opcodes_hp);
+	s_opcodes_hp = NULL;
+	free(s_scr_hp);
+	s_scr_hp = NULL;
 }
 
 static void lb_frame(void)

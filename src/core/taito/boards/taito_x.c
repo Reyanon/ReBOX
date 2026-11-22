@@ -40,7 +40,8 @@ static const machine_t s_machines[] = {
 static const machine_t *s_m;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x4000];
+static uint8_t (*s_ram_hp)[0x4000];
+#define s_ram (*s_ram_hp)
 static uint8_t s_pal[0x1000];
 static x1_001_t *s_x1, *s_snap;
 static uint8_t s_snap_pal[0x1000];
@@ -169,6 +170,10 @@ static void tx_exit(void);
 
 static int tx_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_m = find_machine(g->machine);
 	if (!s_m) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);
@@ -262,6 +267,8 @@ static void tx_exit(void)
 	free(s_snap);
 	s_x1 = s_snap = NULL;
 	tsnd_exit();
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void tx_frame(void)

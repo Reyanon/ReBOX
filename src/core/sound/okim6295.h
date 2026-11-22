@@ -22,6 +22,9 @@ typedef struct {
 	uint32_t bank;           // added to sample addresses (boards with banked sample ROM)
 	uint32_t rate;           // samples per second (clock / 132 or 165)
 	int gain;                // 1/256
+	// optional: the sample ROM through the board's banking (NMK112, a sound CPU's bank latches); a = 0 .. 0x3ffff
+	uint8_t (*read)(void *user, uint32_t a);
+	void *user;
 } okim6295_t;
 
 void oki_init(okim6295_t *o, uint32_t clock, int pin7_high, const uint8_t *rom, uint32_t size, int gain256);

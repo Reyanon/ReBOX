@@ -20,6 +20,16 @@ typedef struct {
 static Glyph s_glyph[96];
 static SceFontLibHandle s_lib;
 static SceFontHandle s_font;
+// (user 11-22, the menus in 14 languages: any letter, UTF-8. ASCII stays in s_glyph; the others are made from the
+// system's Latin, Japanese or Korean font when first drawn and kept in a table)
+static SceFontHandle s_font_jp, s_font_kr;
+static int s_jp_tried, s_kr_tried;
+#define SC_MAX 8
+#define SC_PH 4
+typedef struct { uint8_t *px; int w, h, dx, dy; } SGlyph;
+typedef struct { uint32_t cp; Glyph g; SGlyph *sc[SC_MAX]; } DGlyph;
+#define DG_N 4096   // (open addressing; a menu in Japanese uses a few hundred letters)
+static DGlyph *s_dg;
 
 static void *font_alloc(void *u, unsigned int n) { (void)u; return malloc(n); }
 static void font_free(void *u, void *p) { (void)u; free(p); }
@@ -31,7 +41,7 @@ void ui_init(void)
 	sceSysmoduleLoadModule(SCE_SYSMODULE_PGF);
 	SceFontNewLibParams params;
 	memset(&params, 0, sizeof(params));
-	params.numFonts = 1;
+	params.numFonts = 4;
 	params.allocFunc = font_alloc;
 	params.freeFunc = font_free;
 	unsigned int err = 0;
@@ -80,6 +90,107 @@ void ui_init(void)
 		(double)s_glyph['A' - 32].adv);
 }
 
+static SceFontHandle open_lang(int lang)
+{
+	if (!s_lib)
+		return NULL;
+	SceFontStyle style;
+	memset(&style, 0, sizeof(style));
+	style.fontH = 10.0f;
+	style.fontV = 10.0f;
+	style.fontLanguage = (unsigned short)lang;
+	unsigned int err = 0;
+	const int idx = sceFontFindOptimumFont(s_lib, &style, &err);
+	SceFontHandle f = idx >= 0 ? sceFontOpen(s_lib, idx, 0, &err) : NULL;
+	RBX_LOG("ui: font for language %d: %s (%08x)", lang, f ? "open" : "none", err);
+	return f;
+}
+
+static int glyph_from(SceFontHandle f, uint32_t cp, Glyph *g)
+{
+	SceFontCharInfo ci;
+	if (!f || sceFontGetCharInfo(f, cp, &ci) < 0)
+		return 0;
+	g->w = (int)ci.bitmapWidth;
+	g->h = (int)ci.bitmapHeight;
+	g->left = (int)ci.bitmapLeft;
+	g->top = (int)ci.bitmapTop;
+	g->adv = (float)ci.sfp26AdvanceH / 64.0f;
+	if (g->adv <= 0.0f && (g->w <= 0 || g->h <= 0))
+		return 0;   // (the font has no such letter)
+	g->px = NULL;
+	if (g->w > 0 && g->h > 0) {
+		g->px = (uint8_t *)calloc((size_t)g->w * g->h, 1);
+		if (!g->px)
+			return 0;
+		SceFontGlyphImage im;
+		memset(&im, 0, sizeof(im));
+		im.pixelFormat = SCE_FONT_PIXELFORMAT_8;
+		im.bufWidth = (unsigned short)g->w;
+		im.bufHeight = (unsigned short)g->h;
+		im.bytesPerLine = (unsigned short)g->w;
+		im.bufferPtr = (unsigned int)(uintptr_t)g->px;
+		sceFontGetCharGlyphImage(f, cp, &im);
+	}
+	return 1;
+}
+
+static int is_hangul(uint32_t cp) { return (cp >= 0xAC00 && cp <= 0xD7A3) || (cp >= 0x1100 && cp <= 0x11FF) || (cp >= 0x3130 && cp <= 0x318F); }
+static int is_cjk(uint32_t cp)
+{
+	return (cp >= 0x3000 && cp <= 0x30FF) || (cp >= 0x3400 && cp <= 0x9FFF) || (cp >= 0xFF00 && cp <= 0xFFEF) ||
+		(cp >= 0x31F0 && cp <= 0x31FF);
+}
+
+// a letter outside ASCII: the table's, made the first time (Korean letters from the Korean font, Japanese and the other
+// CJK ones from the Japanese font, the rest from the Latin font, then the others when it has none)
+static DGlyph *dglyph(uint32_t cp)
+{
+	if (!s_dg && !(s_dg = (DGlyph *)calloc(DG_N, sizeof(DGlyph))))
+		return NULL;
+	unsigned h = (cp * 2654435761u) & (DG_N - 1);
+	for (int n = 0; n < DG_N; n++, h = (h + 1) & (DG_N - 1)) {
+		DGlyph *d = &s_dg[h];
+		if (d->cp == cp)
+			return d->g.adv > 0.0f || d->g.px ? d : NULL;
+		if (d->cp)
+			continue;
+		d->cp = cp;   // (a free slot: made now; a letter no font has stays as an empty entry)
+		if (is_hangul(cp) && !s_kr_tried) { s_kr_tried = 1; s_font_kr = open_lang(SCE_FONT_LANGUAGE_KOREAN); }
+		if ((is_cjk(cp) || is_hangul(cp)) && !s_jp_tried) { s_jp_tried = 1; s_font_jp = open_lang(SCE_FONT_LANGUAGE_JAPANESE); }
+		SceFontHandle order[3] = { s_font, s_font_jp, s_font_kr };
+		if (is_hangul(cp)) { order[0] = s_font_kr; order[1] = s_font_jp; order[2] = s_font; }
+		else if (is_cjk(cp)) { order[0] = s_font_jp; order[1] = s_font_kr; order[2] = s_font; }
+		for (int k = 0; k < 3; k++)
+			if (glyph_from(order[k], cp, &d->g))
+				return d;
+		memset(&d->g, 0, sizeof(d->g));
+		return NULL;
+	}
+	return NULL;
+}
+
+// the next letter of UTF-8 text (a byte that is not valid UTF-8: taken as it is)
+static uint32_t utf8_next(const char **ps)
+{
+	const unsigned char *s = (const unsigned char *)*ps;
+	uint32_t c = s[0];
+	int n = c < 0x80 ? 0 : c >= 0xF0 ? 3 : c >= 0xE0 ? 2 : c >= 0xC0 ? 1 : 0;
+	if (n) {
+		c &= 0x3F >> n;
+		for (int i = 1; i <= n; i++) {
+			if ((s[i] & 0xC0) != 0x80) {
+				n = 0;
+				c = s[0];
+				break;
+			}
+			c = (c << 6) | (s[i] & 0x3F);
+		}
+	}
+	*ps = (const char *)(s + 1 + n);
+	return c;
+}
+
 void ui_fini(void)
 {
 	if (s_font)
@@ -94,7 +205,7 @@ void ui_fini(void)
 // colors kept as premultiplied RGBA; compositing is only mul/add (no divide). vita2d blends straight alpha
 // (SRC_ALPHA, ONE_MINUS_SRC_ALPHA), so the copy into the texture divides the colours by alpha again (ui_commit).
 // Only the changed area (dirty) is copied to the GPU texture (3 textures rotate, so union of the last 3 areas)
-#define NBUF 3 // GPU may still be reading an earlier texture (CPU up to 2 frames ahead)
+#define NBUF 4 // GPU may still be reading an earlier texture (CPU up to 2 frames ahead, 3 with the frame buffer: ADR-195)
 typedef struct { int x0, y0, x1, y1; } Rect;
 struct UiCanvas {
 	int slot, x, y, w, h;
@@ -463,11 +574,17 @@ void ui_save_ppm(UiCanvas *c, const char *path, uint32_t bg)
 
 int ui_text_width(float scale, const char *s)
 {
+	s = ui_tr(s);
 	float w = 0;
-	for (; *s; s++) {
-		const unsigned ch = (unsigned char)*s;
+	while (*s) {
+		const uint32_t ch = utf8_next(&s);
 		if (ch >= 32 && ch < 128)
 			w += s_glyph[ch - 32].adv * scale;
+		else if (ch >= 128) {
+			const DGlyph *d = dglyph(ch);
+			if (d)
+				w += d->g.adv * scale;
+		}
 	}
 	return (int)(w + 0.5f);
 }
@@ -479,19 +596,14 @@ int ui_text(UiCanvas *c, int x, int y, uint32_t col, float scale, const char *s)
 
 // scaled glyphs: made once per scale and quarter-pixel phase, by the same bilinear sampling as before. Filtering every
 // pixel at each draw took 5 ms for one title line. The baseline stays exact (y offset baked in)
-#define SC_MAX 8
-#define SC_PH 4
-typedef struct { uint8_t *px; int w, h, dx, dy; } SGlyph;
 static float s_sc[SC_MAX];
 static int s_nsc;
 static SGlyph *s_sg[SC_MAX]; // 96 glyphs x SC_PH phases each
 
-static const SGlyph *scaled_glyph(int si, int k, int ph)
+static const SGlyph *scaled_glyph_of(int si, const Glyph *g, SGlyph *sg, int ph)
 {
-	SGlyph *sg = &s_sg[si][k * SC_PH + ph];
 	if (sg->px || sg->w < 0)
 		return sg;
-	const Glyph *g = &s_glyph[k];
 	const float scale = s_sc[si], inv = 1.0f / scale;
 	const float ox = (float)ph / SC_PH + g->left * scale, oy = -g->top * scale;
 	const int x0 = (int)floorf(ox), y0 = (int)floorf(oy), x1 = (int)ceilf(ox + g->w * scale), y1 = (int)ceilf(oy + g->h * scale);
@@ -566,13 +678,29 @@ int ui_text_clip(UiCanvas *c, int x, int y, uint32_t col, float scale, const cha
 		if (si < 0)
 			si = 0; // (more than SC_MAX sizes: not used by the menus)
 	}
+	s = ui_tr(s);
 	float pen = (float)x;
-	for (; *s; s++) {
-		const unsigned ch = (unsigned char)*s;
-		if (ch < 32 || ch >= 128)
+	while (*s) {
+		const uint32_t ch = utf8_next(&s);
+		if (ch < 32)
 			continue;
-		const int k = (int)ch - 32;
-		const Glyph *g = &s_glyph[k];
+		const Glyph *g;
+		SGlyph *scs = NULL;   // (the letter's scaled copies at scale si: SC_PH of them)
+		if (ch < 128) {
+			g = &s_glyph[ch - 32];
+			if (si >= 0 && s_sg[si])
+				scs = &s_sg[si][(ch - 32) * SC_PH];
+		} else {
+			DGlyph *d = dglyph(ch);
+			if (!d)
+				continue;
+			g = &d->g;
+			if (si >= 0 && scale != 1.0f) {
+				if (!d->sc[si])
+					d->sc[si] = (SGlyph *)calloc(SC_PH, sizeof(SGlyph));
+				scs = d->sc[si];
+			}
+		}
 		if (g->px) {
 			if (scale == 1.0f)
 				cov_blit(c, g->px, g->w, g->h, (int)floorf(pen + g->left + 0.5f), y - g->top, col, cx0, cx1);
@@ -582,8 +710,8 @@ int ui_text_clip(UiCanvas *c, int x, int y, uint32_t col, float scale, const cha
 					ph = 0;
 					ip++;
 				}
-				const SGlyph *sg = scaled_glyph(si, k, ph);
-				if (sg->px)
+				const SGlyph *sg = scs ? scaled_glyph_of(si, g, &scs[ph], ph) : NULL;
+				if (sg && sg->px)
 					cov_blit(c, sg->px, sg->w, sg->h, ip + sg->dx, y + sg->dy, col, cx0, cx1);
 			}
 		}

@@ -14,7 +14,7 @@
 #include "../machine/deco16snd.h"
 #include "../video/deco16ic.h"
 #include "../video/decospr.h"
-#include "../video/decoband.h"
+#include "../../video/decoband.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -30,13 +30,16 @@
 
 static uint8_t *s_rom[2];
 static uint32_t s_rom_size[2];
-static uint16_t s_ram[2][0x2000];         // 0x3f8000 of each CPU (16 KB)
+static uint16_t (*s_ram_hp)[2][0x2000];         // 0x3f8000 of each CPU (16 KB)
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[2][0x800], s_spriteram_buf[2][0x400];
 static uint16_t s_shared[0x800];          // the MB8421 (11-bit addresses)
-static uint16_t s_palram[0x2000];         // 0x100000: xBGR_888, 4096 entries of two words
+static uint16_t (*s_palram_hp)[0x2000];         // 0x100000: xBGR_888, 4096 entries of two words
+#define s_palram (*s_palram_hp)
 static uint16_t s_rowscroll[2][0x800];    // rowscroll_2, rowscroll_4
 static uint16_t s_priority;
-static deco16ic_t s_tile[2];
+static deco16ic_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static decospr_t s_spr[2];
 static rbx_gfx s_gfx8, s_gfx16a, s_gfx16b, s_gfxspr1, s_gfxspr2;
 static int s_port[5], s_port_vbl;
@@ -44,8 +47,10 @@ static int s_line;
 static uint32_t s_frame;
 static uint64_t s_cpu_frac[2];
 static int s_565;
-static uint16_t s_l[4][VIS_W * VIS_H];    // the back, middle, front-middle and top playfields' pens (0xffff: none)
-static uint16_t s_sbm[2][VIS_W * VIS_H];
+static uint16_t (*s_l_hp)[4][VIS_W * VIS_H];    // the back, middle, front-middle and top playfields' pens (0xffff: none)
+#define s_l (*s_l_hp)
+static uint16_t (*s_sbm_hp)[2][VIS_W * VIS_H];
+#define s_sbm (*s_sbm_hp)
 static struct {
 	deco16ic_t tile[2];
 	uint16_t rowscroll[2][0x800], spriteram[2][0x400], priority;
@@ -359,6 +364,26 @@ static void dz_exit(void);
 
 static int dz_init(const rbx_game *g)
 {
+	if (!s_l_hp && !(s_l_hp = calloc(1, sizeof(*s_l_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_palram_hp && !(s_palram_hp = calloc(1, sizeof(*s_palram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_sbm_hp && !(s_sbm_hp = calloc(1, sizeof(*s_sbm_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t snd_size, csize, t1s, t2s, s1s, s2s, o1s, o2s;
 	s_rom[0] = rbx_region("maincpu", &s_rom_size[0]);
 	s_rom[1] = rbx_region("sub", &s_rom_size[1]);
@@ -501,6 +526,16 @@ static void dz_exit(void)
 	rbx_gfx_free(&s_gfxspr2);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_l_hp);
+	s_l_hp = NULL;
+	free(s_palram_hp);
+	s_palram_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_sbm_hp);
+	s_sbm_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void dz_frame(void)

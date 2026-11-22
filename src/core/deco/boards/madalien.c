@@ -41,10 +41,12 @@ static ay8910_t s_ay;
 static int16_t *s_chbuf;
 static int s_ch_cap;
 static uint8_t s_tiles[32][16 * 16];   // the edge tiles (gfx1, 16x16x3)
-static uint8_t s_headlight[128][128];
+static uint8_t (*s_headlight_hp)[128][128];
+#define s_headlight (*s_headlight_hp)
 static int s_tile_count;
 static uint32_t s_rgb[0x30];
-static uint8_t s_scr[256 * 256];
+static uint8_t (*s_scr_hp)[256 * 256];
+#define s_scr (*s_scr_hp)
 static struct {
 	uint8_t vram[0x400], chr[0x1800], video_control, video_flags, headlight_pos, edge1_pos, edge2_pos, scroll, flip_dsw;
 } *s_snap;
@@ -501,6 +503,14 @@ static void ma_exit(void);
 
 static int ma_init(const rbx_game *g)
 {
+	if (!s_headlight_hp && !(s_headlight_hp = calloc(1, sizeof(*s_headlight_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_scr_hp && !(s_scr_hp = calloc(1, sizeof(*s_scr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t gs, hs, ps;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_srom = rbx_region("audiocpu", &s_srom_size);
@@ -591,6 +601,10 @@ static void ma_exit(void)
 	s_snap = NULL;
 	free(s_chbuf);
 	s_chbuf = NULL;
+	free(s_headlight_hp);
+	s_headlight_hp = NULL;
+	free(s_scr_hp);
+	s_scr_hp = NULL;
 }
 
 static void sound_line(void)

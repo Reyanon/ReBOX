@@ -785,6 +785,13 @@ public:
 
 	// generate samples of sound
 	void generate(output_data *output, uint32_t numsamples = 1);
+	// ReBOX: count the clocks a generate() of numsamples would (the status a read sees: the load flag too)
+	void clock_status(uint32_t numsamples = 1)
+	{
+		m_fm.count_clocks(numsamples);
+		if (m_load_remaining > 0)
+			m_load_remaining -= std::min<uint32_t>(m_load_remaining, numsamples);
+	}
 
 protected:
 	// internal state

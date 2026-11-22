@@ -1996,6 +1996,7 @@
 #define m68k_read_memory_8 snd_m68k_read_memory_8
 #define m68k_set_bkpt_ack_callback snd_m68k_set_bkpt_ack_callback
 #define m68k_set_context snd_m68k_set_context
+#define m68k_switch_context snd_m68k_switch_context
 #define m68k_set_cpu_type snd_m68k_set_cpu_type
 #define m68k_set_fc_callback snd_m68k_set_fc_callback
 #define m68k_set_instr_hook_callback snd_m68k_set_instr_hook_callback
@@ -2027,4 +2028,12 @@
 #define rbx_board_peek snd_rbx_board_peek
 #define rbx_board_poke snd_rbx_board_poke
 #define rbx_m68k_int_hook snd_rbx_m68k_int_hook
+#define rbx_m68k_cmpild_hook snd_rbx_m68k_cmpild_hook
+#define rbx_m68k_rte_hook snd_rbx_m68k_rte_hook
+#define rbx_m68k_irqack_hook snd_rbx_m68k_irqack_hook
+#define rbx_m68k_next_base snd_rbx_m68k_next_base
+#define m68ki_cycles_base snd_m68ki_cycles_base
+#define m68k_set_mame_timing snd_m68k_set_mame_timing
+#define m68k_add_int_cycles snd_m68k_add_int_cycles
+#define m68ki_mame_timing snd_m68ki_mame_timing
 #endif

@@ -30,7 +30,8 @@ static uint8_t *s_rom;
 static uint32_t s_rom_size;
 static uint8_t *s_gfx;
 static uint32_t s_gfx_count;
-static uint16_t s_ctab[NPENS];
+static uint16_t (*s_ctab_hp)[NPENS];
+#define s_ctab (*s_ctab_hp)
 static uint16_t s_transmask[16];
 static hd6309_t s_cpu;
 static k007121_t s_k121;
@@ -243,6 +244,10 @@ static void fl_reset(void);
 
 static int fl_init(const rbx_game *g)
 {
+	if (!s_ctab_hp && !(s_ctab_hp = calloc(1, sizeof(*s_ctab_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t gsize, psize, p0size, p1size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	const uint8_t *gfx = rbx_region("gfx", &gsize), *prom = rbx_region("proms", &psize);
@@ -295,6 +300,8 @@ static void fl_exit(void)
 {
 	free(s_gfx);
 	s_gfx = NULL;
+	free(s_ctab_hp);
+	s_ctab_hp = NULL;
 }
 
 static void fl_reset(void)

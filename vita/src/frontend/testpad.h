@@ -18,9 +18,18 @@
 uint32_t rbx_testpad_step(void);
 // the touch the script makes now (1, x, y in screen pixels) or 0
 int rbx_testpad_touch(int *x, int *y);
+// (ADR-161) the test files the frame loop looked for on the memory card (keys, shotgame, shotfb), looked for instead by a
+// low-priority thread every 250 ms: a card stat on the emulation thread could stall it for seconds while the card is
+// being written. rbx_testfile_seen: the watcher saw that file since the last call (then look for it once), or the
+// watcher is not running (then look as before, at the caller's pace)
+void rbx_testfiles_start(void);
+void rbx_testfiles_stop(void);
+int rbx_testfile_seen(const char *path);
 #else
 static inline uint32_t rbx_testpad_step(void) { return 0; }
 static inline int rbx_testpad_touch(int *x, int *y) { (void)x; (void)y; return 0; }
+static inline void rbx_testfiles_start(void) {}
+static inline void rbx_testfiles_stop(void) {}
 #endif
 
 #endif

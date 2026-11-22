@@ -29,7 +29,8 @@
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
 static uint16_t *s_opcodes;
-static uint16_t s_ram[0x8000];            // 0x170000 (64 KB)
+static uint16_t (*s_ram_hp)[0x8000];            // 0x170000 (64 KB)
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[0x800];       // (0x800 bytes used; the page)
 static uint16_t s_pal[0x800];             // xBGR_888 in word pairs
 static uint16_t s_rowscroll[2][0x800];
@@ -170,6 +171,10 @@ static void pg_exit(void);
 
 static int pg_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t tsize, ssize, o1s, o2s;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *tiles = rbx_region("tiles", &tsize), *spr = rbx_region("sprites", &ssize);
@@ -275,6 +280,8 @@ static void pg_exit(void)
 	m68k_bus.op_size = 0;
 	free(s_opcodes);
 	s_opcodes = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void pg_frame(void)

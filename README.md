@@ -1,13 +1,12 @@
 <p align="center">
-  <img src="vita/sce_sys_src/bg.png" width="840" alt="ReBOX">
+  <img src="vita/sce_sys/pic0.png" width="840" alt="ReBOX">
 </p>
 
 <h1 align="center">ReBOX</h1>
 
 <p align="center">
-  <b>Arcade board emulator for PlayStation Vita: Taito, Konami, Data East, Seta and Irem</b><br>
-  MAME drivers ported to C &middot; Musashi 68000 &middot; Z80 &middot; ymfm sound<br>
-  <a href="https://www.patreon.com/Reyanon">Support on Patreon</a> or <a href="https://ko-fi.com/reyanon">Ko-Fi</a>
+  <b>Arcade board emulator for PlayStation Vita</b><br>
+  MAME drivers ported to C &middot; 22 makers, about 90 boards, 4454 sets
 </p>
 
 ---
@@ -16,7 +15,7 @@
 
 1. [Introduction](#1-introduction)
 2. [Highlights](#2-highlights)
-3. [Supported Games](#3-supported-games)
+3. [Supported Boards](#3-supported-boards)
 4. [Download](#4-download)
 5. [Installation](#5-installation)
 6. [Usage](#6-usage)
@@ -30,7 +29,8 @@
 
 ## 1. Introduction
 
-ReBOX is an emulator for the 2D arcade boards of five makers: Taito, Konami, Data East, Seta and Irem.
+ReBOX is an arcade board emulator for the PS Vita. It covers boards from Capcom, Taito, Data East, Konami, Sega, SNK,
+Namco, Irem, Seibu, Cave, Midway, Atari, Toaplan and more.
 
 Each board is a C port of its [MAME](https://www.mamedev.org/) driver: memory map, machine configuration, video
 chips and sound chips follow MAME. The MAME device framework is not used; the drivers are written directly against a
@@ -42,15 +42,17 @@ and no errors that affect play. Every frame is emulated and drawn.
 ## 2. Highlights
 
 **Core**
-- Board drivers ported from MAME 0.289: Taito B, F2, F3, H, L, O, SJ, X and Z Systems; Konami TMNT, GX, Mystic
-  Warriors, Nemesis, Twin 16 and others; Data East dec0, dec8, DECO 16 / 32 / 156, MLC and Cassette; Seta 1; Irem
-  M52 to M107. Many single-game boards of the same makers too.
-- CPUs: Musashi (68000, 68EC020), superzazu/z80, and MAME's cores for ARM, HuC6280, HD6309, 8080, Konami, 6502,
-  6800, 6805, 6809, MCS-48 / 51, NEC V20-V35, TMS320C1x, TMS57002 and uPD7810.
-- Sound: ymfm for the Yamaha FM chips (YM2151, YM2203, YM2610 / B, ...) and ports of MAME's PCM and PSG chips
-  (OKI MSM6295, AY-3-8910, K007232, K053260, K054539, ES5505, X1-010, YMZ280B, ...).
+- Board drivers ported from MAME 0.289, from 8-bit classics up to CPS3, Sega System 32 and Y-Board, Cave CV1000, PGM, PGM2,
+  Seibu SPI and the Midway T / Wolf / Y units (see [Supported Boards](#3-supported-boards)).
+- CPUs:
+  - Musashi (68000, 68EC020) and superzazu/z80.
+  - Ports of MAME's cores: SH-2 and SH-3 (with a dynamic recompiler to ARM), V60 / V70, TMS34010, i386, ARM7,
+    NEC V20-V35, HuC6280, HD6309, 6502, 6800, 6805, 6809, Konami, 8080, MCS-48 / 51, M37710, TLCS-90, ADSP-2100,
+    TMS320C1x, TMS57002, PIC16C5x and uPD7810.
+- Sound: ymfm for the Yamaha FM chips and ports of MAME's PCM and PSG chips (QSound, YMZ770, YMF271, ICS2115, C140,
+  C352, MultiPCM, K054539, ES5505, OKI MSM6295, AY-3-8910, ...).
 - Game lists, ROM layouts and input ports (with DIP switches) are generated from the MAME sources.
-- Drawing runs on its own CPU core, so emulation and drawing of a frame overlap.
+- Drawing and the heavier sound chips run on other CPU cores, so emulation, drawing and sound of a frame overlap.
 
 **Frontend**
 - Game list with a tab for each maker, grouped by board, genre, publisher or year, and a Playable / All /
@@ -59,43 +61,152 @@ and no errors that affect play. Every frame is emulated and drawn.
 - Button mapping with turbo and combo keys, two players, external controllers. Bluetooth pads the Vita does not
   accept by itself work through the bundled [RePad](https://github.com/Reyanon/RePad) plugin.
 - Touch buttons and touch in the game list and the menus.
-- Display options: screen size, rotation, filter, scanlines (CRT soft / sharp, every 2 / 3 / 4 px), border
-  (black, graphic, color or marquee), frame rate counter.
+- Display options:
+  - screen size, rotation, filter;
+  - scanlines (CRT soft / sharp, every 2 / 3 / 4 px);
+  - border (black, graphic, color or marquee);
+  - frame rate counter.
 - Per-game settings, menu themes, and in-app updates from GitHub.
 - Medal games (Taito O System) with an on-screen cabinet panel (lamps, hopper, medal counters).
 
-## 3. Supported Games
+## 3. Supported Boards
 
-Set names are the MAME set names. ROMs must match the MAME romset (see [ROM sets](#rom-sets)). The game list in
-the app shows every set, with its board, year, publisher and genre.
+ReBOX runs **4454 sets**, parents and clones. Of the 20545 arcade sets that work in MAME 0.289, ReBOX runs
+**4263 (21%)**.
 
-| Maker | Sets | Boards |
-|---|---|---|
-| Taito | 697 | B, F2, F3, H, L, O, SJ, X and Z Systems, classic and single-game boards |
-| Data East | 439 | DECO Cassette, Karnov, dec0, dec8, DECO 16, DECO 32, DECO 156, MLC, classic and single-game boards |
-| Konami | 429 | TMNT, TMNT 2, GX, Mystic Warriors, Nemesis, Super Contra, Twin 16, medal, classic and single-game boards |
-| Irem | 190 | M52, M57, M58, M62, M63, M72, M90, M92, M107 and classic boards |
-| Seta | 67 | Seta 1 (Seta, Banpresto, Allumer and others) |
+The columns of the table:
+- *Sets*: the number of sets ReBOX runs on that board.
+- *Ported*: the share of the sets that MAME 0.289 runs on the same drivers.
 
-**Speed.** Measured on a PS Vita at 444 MHz in play (coin, start, buttons pressed). Most parent sets run at 60 fps
-with no sound dropouts. Known exceptions:
+A board below 100% has sets that are not done yet: for example another cabinet, a device that is not emulated, or
+ROMs that do not match. The game list in the app shows every set with its board, year, publisher and genre. It also
+shows the other working MAME boards that are not ported yet, greyed out.
+
+| Maker | Board | Sets | Ported |
+|---|---|---:|---:|
+| **Capcom** | CPS1 | 212 | 93% |
+|  | CPS2 | 323 | 100% |
+|  | CPS3 | 61 | 100% |
+|  | Classic boards (19 drivers: 1942, 1943, bionicc, blktiger, ...) | 162 | 87% |
+| **Taito** | B System | 38 | 100% |
+|  | F2 System | 68 | 96% |
+|  | F3 System | 98 | 98% |
+|  | H System | 9 | 100% |
+|  | L System | 33 | 92% |
+|  | O System | 2 | 100% |
+|  | SJ System | 28 | 100% |
+|  | X System | 10 | 100% |
+|  | Z System | 37 | 100% |
+|  | Classic boards (33 drivers: 40love, 8080bw, arkanoid, bking, ...) | 154 | 50% |
+|  | Single-game boards (25 drivers: arkanoid, asuka, bigevglf, bublbobl, ...) | 220 | 91% |
+| **Data East** | DECO 156 | 19 | 100% |
+|  | DECO 16 | 115 | 97% |
+|  | DECO 32 | 26 | 90% |
+|  | DECO Cassette | 61 | 100% |
+|  | DECO dec0 | 35 | 90% |
+|  | DECO dec8 | 32 | 100% |
+|  | DECO Karnov | 7 | 70% |
+|  | DECO MLC | 12 | 86% |
+|  | Classic boards (13 drivers: astrof, btime, bwing, chanbara, ...) | 88 | 97% |
+|  | Single-game boards (11 drivers: actfancr, battlera, brkthru, compgolf, ...) | 44 | 98% |
+| **Konami** | GX | 22 | 54% |
+|  | Medal | 27 | 100% |
+|  | Mystic Warriors | 30 | 97% |
+|  | Nemesis | 19 | 83% |
+|  | Super Contra | 10 | 100% |
+|  | TMNT | 17 | 94% |
+|  | TMNT 2 | 38 | 88% |
+|  | Twin 16 | 14 | 100% |
+|  | Classic boards (22 drivers: circusc, finalizr, gberet, gyruss, ...) | 75 | 82% |
+|  | Single-game boards (36 drivers: 88games, ajax, aliens, asterix, ...) | 177 | 93% |
+| **Sega** | System 16 | 210 | 89% |
+|  | System 24 | 27 | 100% |
+|  | System 32 | 54 | 86% |
+|  | X-Board | 39 | 91% |
+|  | Y-Board | 20 | 95% |
+| **SNK** | Alpha 68K | 27 | 100% |
+|  | Neo Geo | 241 | 85% |
+|  | SNK 68000 | 16 | 94% |
+|  | Single-game boards (1 drivers: prehisle) | 5 | 100% |
+| **Seibu** | COP | 66 | 89% |
+|  | SPI | 60 | 100% |
+|  | Wiz | 10 | 100% |
+|  | Classic boards (1 drivers: kncljoe) | 3 | 100% |
+|  | Single-game boards (17 drivers: airraid, bloodbro, cabal, darkmist, ...) | 64 | 86% |
+| **Namco** | 8-bit | 33 | 100% |
+|  | NA-1/NA-2 | 26 | 100% |
+|  | NB-1/NB-2 | 21 | 100% |
+|  | System 1 | 40 | 100% |
+|  | System 2 | 61 | 100% |
+|  | System 86 | 11 | 100% |
+| **Irem** | M107 | 6 | 100% |
+|  | M52 | 4 | 100% |
+|  | M57 | 2 | 100% |
+|  | M58 | 6 | 100% |
+|  | M62 | 26 | 100% |
+|  | M63 | 4 | 100% |
+|  | M72 | 45 | 88% |
+|  | M90 | 19 | 100% |
+|  | M92 | 40 | 95% |
+|  | Classic boards (7 drivers: m10, m14, olibochu, redalert, ...) | 38 | 97% |
+| **IGS** | PGM | 150 | 100% |
+|  | PGM2 | 22 | 77% |
+| **Midway** | T-Unit | 29 | 100% |
+|  | Wolf Unit | 25 | 100% |
+|  | Y-Unit | 43 | 73% |
+| **Atari** | Gauntlet | 28 | 100% |
+|  | System 1 | 27 | 100% |
+|  | Single-game boards (8 drivers: blstroid, cyberbal, eprom, klax, ...) | 40 | 82% |
+| **Technos** | Double Dragon | 23 | 85% |
+|  | Double Dragon 3 | 16 | 100% |
+|  | Classic boards (6 drivers: bogeyman, dogfgt, matmania, mystston, ...) | 13 | 87% |
+|  | Single-game boards (10 drivers: battlane, blockout, chinagat, matmania, ...) | 42 | 93% |
+| **Cave** | Cave | 63 | 88% |
+|  | CV1000 | 29 | 100% |
+| **Toaplan** | GP9001 | 57 | 81% |
+|  | Toaplan 1 | 13 | 57% |
+|  | Twin Cobra | 20 | 100% |
+| **Seta** | Seta Hardware | 67 | 100% |
+| **Jaleco** | Mega System 1 | 54 | 98% |
+| **Psikyo** | 68EC020 | 17 | 89% |
+|  | PS3/PS5 | 14 | 88% |
+|  | PS4 | 8 | 100% |
+| **Kaneko** | Kaneko16 | 38 | 100% |
+| **NMK** | NMK16 | 36 | 36% |
+| **Video System** | Video System | 32 | 100% |
+| **Tecmo** | Ninja Gaiden | 14 | 93% |
+|  | Tecmo 16 | 7 | 100% |
+|  | Single-game boards (1 drivers: spbactn) | 2 | 67% |
+
+**Speed.** The heaviest game of each board was measured on a PS Vita at 444 MHz in play (coin, start, buttons
+pressed):
+- 108 of the 125 games measured hold 60 fps.
+- 11 more drop below 60 fps only in a few heavy moments.
+
+Known slower games:
 
 | Set | FPS | Notes |
 |---|---|---|
+| `tdragon2` (Thunder Dragon 2) | about 40 | NMK16: the drawing is too heavy for now |
 | `tattass` (Tattoo Assassins) | about 45 | the BSMT2000 sound DSP is too heavy |
-| `thndzone` (Thunder Zone) | about 59 | |
+| `luckywld` (Lucky & Wild) | about 57 | drawing |
+| `wpksoc`, `kftgoal` (Irem M107 football) | about 57 | during the match |
+| `mk` (Mortal Kombat) | about 57 | the sound board |
+| `ibara`, `espgal2`, `ddpdfk` (Cave CV1000) | 55-60 | slowdown in the heaviest bullet patterns |
 
-**Fourth CPU core.** The speed was measured with the Vita's fourth CPU core open to the app. ReBOX opens it by itself
-when the system code matches the one verified on firmware 3.65 (an empty file `ux0:data/rebox/nocpu3` turns this
-off). With the core closed, the heaviest games run slower (Riding Fight about 53 fps). The app sets 444 MHz by itself,
-so an overclock plugin is not needed.
+**Fourth CPU core.** The speed was measured with the Vita's fourth CPU core open to the app.
+- ReBOX opens it by itself when the system code matches the one verified on firmware 3.65.
+- With the core closed, the heaviest games run slower.
+
+The app sets 444 MHz by itself, so an overclock plugin is not needed.
 
 **Known issues**
 - Irem 8-bit boards (M52, M58, M62, M63): sound is the plain mix of the AY and MSM chips, without the board's filter
   and drum circuits.
-- Real Puncher (Taito B System) is not emulated (camera board).
-- 21 sets list ROM files that are not in the MAME 0.260 romsets (for example `cameltry`, `wgp2`, `dietgo`,
-  `brkthru`, `gradius3j`). They stay in the list and start when the zip has the files the current MAME expects.
+- Seibu SPI cartridge sets write their sound flash on the first start. That first start takes several minutes; later
+  starts are immediate.
+- Some sets list ROM files that are not in the MAME 0.260 romsets, for example `cameltry`, `wgp2`, `dietgo`,
+  `brkthru` and `progear`. They stay in the list and start when the zip has the files that MAME 0.289 expects.
 
 ## 4. Download
 
@@ -127,11 +238,11 @@ Requirements:
    Accept the extended permissions prompt. A **ReBOX** bubble appears on the home screen (title ID `RBOX00001`).
 5. The `.vpk` file can be deleted after installation.
 
-**Copy the game lists and add ROMs**
+**Add ROMs**
 
-1. Copy the `data` folder from the zip to the root of `ux0:`, so that the game lists are in
-   `ux0:data/rebox/gamelist/` and the empty folder is `ux0:data/rebox/roms/`. The game lists are not inside the
-   VPK: without them the list shows set names only.
+1. The game lists are also inside the VPK. At start, ReBOX copies any list missing from `ux0:data/rebox/gamelist/`
+   there. Lists already in that folder are never overwritten, so your own edits stay. Copying the zip's `data`
+   folder to `ux0:` is optional.
 2. Put your ROM zips in `ux0:data/rebox/roms/`, unchanged and not extracted, for example
    `ux0:data/rebox/roms/pbobble.zip`.
 3. Start ReBOX. The *Playable* filter shows the sets whose zip was found.
@@ -140,22 +251,52 @@ Updates installed from inside the app also refresh the game lists.
 
 ### ROM sets
 
-- **Required MAME version: non-merged romsets from MAME 0.260.** 0.260 is the version we test with. The drivers and
-  the set list come from the MAME 0.289 source, so a few sets changed after 0.260 (see Known issues). Romsets older
-  than 0.260 are not tested.
-- Keep each set as one zip named after the set, for example `pbobble.zip`. Do not rename or extract them.
-  Files inside the zip are matched by CRC32, so their names do not matter.
-- Non-merged sets are recommended. Clone sets can also read missing files from the parent zip in the same folder.
-- CHD images are not used.
+**Which MAME version.** Use **non-merged romsets from MAME 0.260**: ReBOX is tested with that romset version.
+- The drivers and the set list come from the MAME 0.289 source.
+- The ROM files of almost every set are the same in 0.260 and 0.289, so 0.289 non-merged romsets work too.
+- A few sets changed after 0.260 (see Known issues).
+- Romsets older than 0.260 are not tested.
+
+**Non-merged or split.** Non-merged sets are recommended, because each zip has everything. Split sets also work when
+the parent zip is in the same folder, because a clone set reads its missing files from the parent zip.
+
+**Zip names.** Keep each set as one zip named after the set, for example `pbobble.zip`. Do not rename or extract the
+zips. Files inside a zip are matched by CRC32, so their names do not matter.
+
+**BIOS zips.** Non-merged sets already contain the BIOS files, so no separate BIOS zip is needed. With split sets,
+put the BIOS zip in the same folder as the games, as in MAME: `neogeo.zip` (Neo Geo), `pgm.zip` (IGS PGM),
+`konamigx.zip` (Konami GX), `decocass.zip` (DECO Cassette).
+
+**CPS3 and CHD.** CPS3 uses the "no CD" sets, for example `sfiii3n`, `jojoban` and `redearthn`. CHD images are not
+used.
 
 ### Optional files
 
 | What | Path |
 |---|---|
-| Game lists (tabs, titles, boards, genres; editable JSON) | `ux0:data/rebox/gamelist/*.json` |
+| Game lists (tabs, titles, boards, genres, paths; editable JSON) | `ux0:data/rebox/gamelist/*.json` and `gamelist/<folder>/*.json` |
 | Border artwork | `ux0:data/rebox/artwork/<set>.png` (or `.jpg`) |
 | Snaps shown in the game list | `ux0:data/rebox/snap/<set>.png` (or `.jpg`) |
-| Marquees (list and *Marquee* border) | `ux0:data/rebox/marquees/<set>.png` (or `.jpg`) |
+| Videos shown in the game list | `ux0:data/rebox/video/<set>.mp4` |
+| Marquees (*Marquee* border) | `ux0:data/rebox/marquee/<set>.png` (or `.jpg`) |
+
+**Game list entries.** Each game in a list names its files:
+
+```json
+{"rompath":"/roms/shuuz.zip","title":"Shuuz (version 8.0)","board":"Standalone","publisher":"Atari Games",
+ "year":"1990","genre":"Puzzle","marquee":"/marquee/shuuz.png","snap":"/snap/shuuz.png",
+ "video":"/video/shuuz.mp4","description":null}
+```
+
+- The paths:
+  - A path that starts with `/` is in `ux0:data/rebox/`.
+  - A full path such as `ux0:roms/shuuz.zip` is used as it is.
+  - The ROM file's name (without `.zip`) is the MAME set name.
+  - ROMs in another folder are found there too.
+- The list files:
+  - Every `.json` in `gamelist/` and in its folders is read.
+  - Lists with the same tab name are merged.
+  - ReBOX adds the lists it ships when they are missing and never overwrites a list already there.
 
 Files written by the emulator:
 
@@ -225,7 +366,7 @@ bash tools/build.sh vita Release -DRBX_LOG=OFF   # build-vita/eboot.bin and buil
 src/core/            shared core: front-end API, ROM loader (zip, CRC), MAME input ports and DIP switches, save states
   cpu/ sound/        CPU cores and sound chips shared by the makers
   machine/ video/    shared devices and video chips
-  taito/ konami/ deco/ seta/ irem/    one module for each maker: board drivers, custom chips, generated tables
+  capcom/ taito/ sega/ ...   one module for each maker: board drivers, custom chips, generated tables
 vita/                PS Vita port: frontend, video output (libvita2d), kernel helper, RePad, LiveArea assets
 vita/res/gamelist/   the game lists shipped in the release zip
 ```
@@ -257,13 +398,16 @@ The original copyright headers are kept in all imported sources.
   [Mbed TLS](https://github.com/Mbed-TLS/mbedtls), [libpng](https://github.com/pnggroup/libpng),
   [libjpeg-turbo](https://github.com/libjpeg-turbo/libjpeg-turbo), [zlib](https://zlib.net/).
 
-**Trademarks.** Taito, Konami, Data East, Seta, Irem and all game titles are trademarks of their respective owners.
+**Trademarks.** All company names and game titles are trademarks of their respective owners.
 This project is not affiliated with or endorsed by any of them or any rights holder. No ROM images, game graphics or
 logos are included in this repository or in the release packages.
 
 ## 11. Support
 
-ReBOX is free software. If you want to support its development, you can do so on
-[Patreon](https://www.patreon.com/Reyanon) or [Ko-Fi](https://ko-fi.com/reyanon). Support is for the emulator work only.
+If you enjoy ReBOX, you can support its development on [Patreon](https://www.patreon.com/Reyanon) or Ko-fi:
+
+<a href="https://ko-fi.com/reyanon"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi"></a>
+
+Support is for the emulator work only.
 
 **ROMs are never provided, to anyone, including supporters.** Do not ask for them.

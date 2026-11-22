@@ -33,10 +33,12 @@ static int s_k, s_nmi_type, s_coin_kind, s_vis_x0, s_vis_w;
 static uint32_t s_cpu_clock;
 static uint8_t *s_rom, *s_srom;
 static uint32_t s_rom_size, s_srom_size;
-static uint8_t s_ram[0x4000];               // main RAM (lnc: 0x0000-0x3bff; disco: the low 0x500)
+static uint8_t (*s_ram_hp)[0x4000];               // main RAM (lnc: 0x0000-0x3bff; disco: the low 0x500)
+#define s_ram (*s_ram_hp)
 static uint8_t s_ram_b[0x400];              // lnc 0xb000-0xb1ff, cookrace 0xd000-0xd3ff, bnj 0x5200-0x53ff
 static uint8_t s_vram[0x400], s_cram[0x400], s_bgram[0x400];
-static uint8_t s_charram[0x6000];           // disco
+static uint8_t (*s_charram_hp)[0x6000];           // disco
+#define s_charram (*s_charram_hp)
 static uint8_t s_spriteram[0x20];           // disco
 static uint8_t s_palram[16];
 static uint8_t s_scroll[2], s_zoar_scroll[4], s_palbank, s_flip, s_charbank;
@@ -559,7 +561,8 @@ static void main_w(void *ctx, uint16_t a, uint8_t v)
 }
 
 // ---- video ----
-static uint16_t s_bnjbg[256 * 512];          // bnj's background bitmap (512 x 256)
+static uint16_t (*s_bnjbg_hp)[256 * 512];          // bnj's background bitmap (512 x 256)
+#define s_bnjbg (*s_bnjbg_hp)
 static uint8_t s_disco8[1024 * 64], s_disco16[256 * 256];   // disco's RAM graphics (0x6000 / 3 / 8, / 32)
 
 // a gfx element drawn into the 256 x 256 screen (MAME transpen / opaque, clipped to the bitmap)
@@ -581,7 +584,8 @@ static void blit(const uint8_t *pix, int w, int h, int base, int fx, int fy, int
 		}
 	}
 }
-static uint16_t s_scr[256 * 256];
+static uint16_t (*s_scr_hp)[256 * 256];
+#define s_scr (*s_scr_hp)
 
 static const uint8_t *elem(const rbx_gfx *g, uint32_t code) { return g->pix + (size_t)rbx_wrap(code, g->count) * g->width * g->height; }
 
@@ -906,6 +910,22 @@ static void palette_from_proms(int n, int lnc)   // btime_palette / lnc_palette
 
 static int bt_init(const rbx_game *g)
 {
+	if (!s_bnjbg_hp && !(s_bnjbg_hp = calloc(1, sizeof(*s_bnjbg_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_charram_hp && !(s_charram_hp = calloc(1, sizeof(*s_charram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_scr_hp && !(s_scr_hp = calloc(1, sizeof(*s_scr_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	const char *m = g->machine;
 	static const struct { const char *machine; int k, cpu, nmi, coin; uint32_t clock; } cfg[] = {
 		{ "btime", K_BTIME, CPU_DECO7, NMI_DIRECT, COIN_IRQ_HI, 1500000 },
@@ -1047,6 +1067,14 @@ static void bt_exit(void)
 	free(s_mix);
 	s_chbuf[0] = s_chbuf[1] = NULL;
 	s_mix = NULL;
+	free(s_bnjbg_hp);
+	s_bnjbg_hp = NULL;
+	free(s_charram_hp);
+	s_charram_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_scr_hp);
+	s_scr_hp = NULL;
 }
 
 static void bt_frame(void)

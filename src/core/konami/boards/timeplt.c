@@ -53,7 +53,8 @@ static struct {
 
 // ---- the drawing's snapshot: the sprites line by line (taken at each line's start), the tilemap at vblank ----
 typedef struct { uint8_t s0[0x30], s1[0x30]; } spr_line_t;   // (0x10-0x3f of the two sprite RAMs)
-static spr_line_t s_lines[VIS_H];
+static spr_line_t (*s_lines_hp)[VIS_H];
+#define s_lines (*s_lines_hp)
 static struct { uint8_t vram[0x800], video_enable; spr_line_t spr[VIS_H]; } s_vs;
 
 static void capture_line(int y)
@@ -129,7 +130,8 @@ static void tp_render(void)   // (screen_update, a line at a time)
 #define Q_MAX 2048
 enum { Q_ADV, Q_LATCH, Q_IRQ, Q_MUTE };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out[2048];
 static int s_out_n, s_out_pos;
@@ -345,6 +347,14 @@ static void tp_reset(void);
 
 static int tp_init(const rbx_game *g)
 {
+	if (!s_lines_hp && !(s_lines_hp = calloc(1, sizeof(*s_lines_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t ts, ss, ps;
 	s_mach = !strcmp(g->machine, "psurge") ? M_PSURGE : M_TIMEPLT;
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -410,6 +420,10 @@ static void tp_exit(void)
 	free(s_chr);
 	free(s_spr);
 	s_chr = s_spr = NULL;
+	free(s_lines_hp);
+	s_lines_hp = NULL;
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void tp_reset(void)

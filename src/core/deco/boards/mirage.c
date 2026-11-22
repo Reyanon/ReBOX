@@ -29,7 +29,8 @@
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint16_t s_ram[0x2000];             // 0x170000 .. 0x173fff
+static uint16_t (*s_ram_hp)[0x2000];             // 0x170000 .. 0x173fff
+#define s_ram (*s_ram_hp)
 static uint16_t s_spriteram[0x400], s_spriteram_buf[0x400];
 static uint16_t s_pal[0x400];              // xBGR_555
 static uint16_t s_rowscroll[2][0x600];     // 0x110000 .. 0x110bff, 0x112000 .. 0x112bff
@@ -48,7 +49,8 @@ static uint64_t s_cpu_frac;
 static uint64_t s_snd_frac;
 static uint32_t s_out_rate, s_sfx_rate, s_sfx_phase;
 static int32_t s_sfx_last;
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 static struct {
 	deco16ic_t tile;
 	uint16_t rowscroll[2][0x800], spriteram[0x400], pal[0x400];
@@ -177,6 +179,14 @@ static void mj_exit(void);
 
 static int mj_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t tsize, ssize, bsize, fsize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *tiles = rbx_region("tiles", &tsize), *spr = rbx_region("sprites", &ssize),
@@ -280,6 +290,10 @@ static void mj_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 // ---- sound: the 2 MHz OKI's rate out, the 1 MHz one's samples held ----

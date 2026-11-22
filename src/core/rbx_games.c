@@ -120,6 +120,8 @@ int rbx_games_scan(const char *const *dirs, int ndirs, rbx_game_found *out, int 
 		if (p)
 			find_zip(dirs, lists, ndirs, d, p, f->parent, sizeof(f->parent));
 	}
+	if (n < rbx_game_count())   // (the table outgrew max: the last modules' games left out)
+		rbx_log("games: %d of %d listed (RBX_GAMES_MAX)", n, rbx_game_count());
 	for (int i = 0; i < ndirs; i++)
 		free(lists[i].names);
 	qsort(out, (size_t)n, sizeof(out[0]), cmp_found);

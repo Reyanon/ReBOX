@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "rbx_prof.h"   // (the sampled activity marks, ADR-155)
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,9 +21,11 @@ typedef struct {
 	const char *file;
 	uint32_t offset, length, crc;
 	uint8_t group, skip, reverse;   // ROMX_LOAD layout: bytes per group, bytes skipped after a group, byte order reversed
+	                                // (reverse 2 / 3: ROM_NIBBLE, ROM_SHIFT_NIBBLE_LO / HI)
 	uint32_t value;                 // FILL value, COPY (source region << 24 | source offset)
 } rbx_rom_load;
-typedef struct { const char *name; uint32_t size; uint8_t fill; } rbx_rom_region;
+#define RBX_REGION_INVERT 0x01      // ROMREGION_INVERT: the region's bytes inverted once its loads are done
+typedef struct { const char *name; uint32_t size; uint8_t fill, flags; } rbx_rom_region;
 
 // ---- input ports (MAME ioport model) ----
 enum {
@@ -88,7 +91,17 @@ typedef struct {
 	void (*render)(void);                    // draw the last captured frame into rbx_video (any thread, see rbx_video_frame_done)
 	// optional: called by a thread waiting for render (rbx_video_wait_idle) to do part of it; 0 = nothing to do now
 	int (*render_help)(int helper);   // helper 1: the emulation thread, 2: a frontend thread (rbx_render_help)
+	// optional: regions the driver reads with rbx_region_read instead of rbx_region (NULL-terminated): kept in a file
+	// (rbx_config.cache_dir) rather than in memory when the region is one whole ROM file
+	const char *const *file_regions;
+	// optional (ADR-200): the sizes of the driver's largest buffers (up to RBX_EARLY_MAX, largest first), made zeroed by
+	// the core before the ROM regions are loaded, so that they take the lowest holes of a fixed-size heap (newlib's,
+	// the Vita) before the regions and the loader's buffers do; returns their count. The driver takes them in init with
+	// rbx_early; the core frees them after the driver's exit (and when the load fails)
+	int (*early)(const rbx_game *g, size_t *sizes);
 } rbx_driver;
+#define RBX_EARLY_MAX 4
+void *rbx_early(int i, size_t *size);   // block i of rbx_driver.early (NULL: none)
 
 // ---- services for drivers ----
 void rbx_log(const char *fmt, ...);
@@ -105,6 +118,30 @@ const char *rbx_rom_dir(int i);
 
 // ROM region by MAME name ("maincpu", "audiocpu", "ymsnd:adpcma" ...). NULL if the set has none
 uint8_t *rbx_region(const char *name, uint32_t *size);
+// the same for a region the driver can do without: NULL when missing, without an error
+uint8_t *rbx_region_opt(const char *name, uint32_t *size);
+// a region of rbx_driver.file_regions: its size (0 = missing, reported as rbx_region does) and its bytes
+// [offset, offset + len) (0 = ok). The file's reads are slow next to memory: the driver keeps its own cache
+uint32_t rbx_region_file(const char *name);
+int rbx_region_read(const char *name, uint32_t offset, void *dst, uint32_t len);
+// 1: the file region was loaded with ROM_LOAD16_WORD_SWAP, and rbx_region_read gives the file's bytes (the driver
+// swaps each pair: byte offset ^ 1 in the region = the file's byte)
+int rbx_region_file_swap16(const char *name);
+// reads of a file region ahead, on the frontend's io worker thread (ADR-160): rbx_io_submit queues one (its id, or -1:
+// no worker, or no room: the driver reads it itself when needed). rbx_io_finish = the bytes in place (0) or not readable
+// (-1): taken back and read here when the worker has not started it, waited for when it has; the id is free after.
+// rbx_io_ready: done by the worker (finish will not wait); rbx_io_queued: not started; rbx_io_drop: no longer needed.
+// The emulation thread only; every id submitted is finished or dropped before the driver's exit returns
+int rbx_io_on(void);
+int rbx_io_submit(const char *name, uint32_t offset, void *dst, uint32_t len);
+int rbx_io_ready(int id);
+int rbx_io_queued(int id);
+int rbx_io_finish(int id);
+void rbx_io_drop(int id);
+// (ADR-177) not needed any more if the worker has not started it (1: the id is free), else 0 (left as it is)
+int rbx_io_cancel(int id);
+void rbx_io_stat(uint64_t *worker, uint64_t *taken, uint64_t *waits, uint64_t *wait_us);   // (since the game started)
+uint64_t rbx_io_nreads(void);   // (the worker's card reads: requests merged into one read count once, ADR-177)
 
 // input ports: index by tag (-1 = none), current value (inputs, DIPs and defaults combined)
 int rbx_port_find(const char *tag);
@@ -147,6 +184,13 @@ int rbx_video_setup(int width, int height, int palette_size);
 // on the render thread. The driver also waits before touching state the drawing side writes (sprite frame buffer)
 void rbx_video_wait_idle(void);
 void rbx_video_frame_done(void);
+// two snapshots (core.c): set at init, the vblank waits with rbx_video_wait_slot instead of rbx_video_wait_idle, takes
+// slot rbx_video_post_seq() & 1; render draws slot rbx_video_render_seq() & 1
+void rbx_video_set_depth(int depth);
+void rbx_video_wait_slot(void);
+unsigned rbx_video_post_seq(void);
+unsigned rbx_video_render_seq(void);
+int rbx_video_threaded(void);   // (1: render runs on the render thread, not within rbx_video_frame_done)
 // a driver job that may run on a worker thread (the F3 ES5510 effects DSP): the job does the work queued so far.
 // rbx_aux_kick() after queuing (the worker starts on it), rbx_aux_sync() waits until the job has done all that was
 // queued before the call. Without a worker thread both run the job themselves: the results are the same.
@@ -154,17 +198,35 @@ void rbx_video_frame_done(void);
 void rbx_aux_set_job(void (*job)(void));   // NULL = none (at exit; syncs first)
 void rbx_aux_kick(void);
 void rbx_aux_sync(void);
+// the first worker waits for its next job by spinning this many microseconds after a job before it sleeps (jobs every
+// scanline: PGM's sound CPU); 0 = sleep at once. Cleared with the job
+void rbx_aux_set_spin(int us);
+// the first job's thread beside the render thread (CPU2 on the Vita, below the render thread's priority: a board whose
+// drawing is light, whose CPU1 is crowded; set before the game starts, cleared with the job)
+void rbx_aux_set_by_render(int on);
 // a second job on its own worker thread, the same way (the F3 ES5505 voices), and a third (the F3 sound board)
 void rbx_aux2_set_job(void (*job)(void));
 void rbx_aux2_kick(void);
 void rbx_aux2_sync(void);
-// the second job's thread on a core of its own (CPU3 on the Vita: a board without a drawing helper; set before the
-// game starts, cleared with the job)
+// the second job's thread on a core of its own (1: CPU3 on the Vita, a board without a drawing helper;
+// RBX_AUX2_BY_RENDER: CPU2 on the Vita below the render thread, a board whose drawing is light; set before the game
+// starts, cleared with the job)
+#ifndef RBX_AUX2_BY_RENDER   // (also in rbx_core.h)
+#define RBX_AUX2_BY_RENDER 2
+#endif
 void rbx_aux2_set_alone(int on);
+void rbx_aux2_set_spin(int us);   // (as rbx_aux_set_spin, for the second worker; cleared with the job)
 void rbx_aux3_set_job(void (*job)(void));
 void rbx_aux3_kick(void);
 void rbx_aux3_nudge(void);   // rbx_aux3_kick with its thread only (without, nothing)
 void rbx_aux3_sync(void);
+// the third job's thread alone on CPU3 at a low priority on the Vita (the CV1000 blitter's second lane: work the
+// others take over when it falls behind); set before the game starts, cleared with the job
+void rbx_aux3_set_alone(int on);
+// a moment's wait (the frontend's: a sleep) on the emulation thread for worker w (0..2: rbx_aux, aux2, aux3; profiled
+// as that worker's wait), and on a worker thread
+void rbx_aux_wait_for(int w);
+void rbx_worker_wait(void);
 // a short wait (the frontend's: a sleep) while another thread works
 void rbx_wait(void);
 // one piece of the frame being drawn by a board that splits its drawing (helper 1: the emulation thread, 2: the
@@ -207,6 +269,12 @@ static inline void rbx_audio_put_stereo(int32_t l, int32_t r)
 
 // save state helpers: a flat buffer of tagged blocks
 int rbx_state_io(void *ctx, const char *tag, void *data, uint32_t size);
+// a block whose size the driver chooses (packed data): saving, *size = the bytes it will write and the result is
+// where to write them (NULL in the sizing pass or on an error); loading, the block's bytes with *size set (NULL = error)
+void *rbx_state_var(void *ctx, const char *tag, uint32_t *size, int load);
+// the load's check walk (the save walk over a loaded state, headers compared only): a block's packed size need not be
+// computed then (rbx_state_var reads it from the file)
+int rbx_state_checking(void *ctx);
 
 // clocks of a CPU for the next scanline at a frame rate in milli-Hz (fractions carried in *frac)
 // floor(num / den) without a 64-bit division (a libgcc call of a few hundred cycles on ARM): a double estimate

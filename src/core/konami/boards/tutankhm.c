@@ -147,7 +147,8 @@ static void tk_render(void)   // (screen_update: screen_update_scramble / screen
 #define Q_MAX 2048
 enum { Q_ADV, Q_LATCH, Q_IRQ, Q_MUTE };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out[2048];
 static int s_out_n, s_out_pos;
@@ -386,6 +387,10 @@ static void stars_init(uint8_t *st, int scramble)   // (stars_init_bootleg / sta
 
 static int tk_init(const rbx_game *g)
 {
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("timeplt_audio:tpsound", &s_zrom_size);
 	if (!s_rom || s_rom_size < 0x20000 || !s_zrom) {
@@ -447,6 +452,8 @@ static void tk_exit(void)
 	free(s_stars[0]);
 	free(s_stars[1]);
 	s_stars[0] = s_stars[1] = NULL;
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void tk_reset(void)

@@ -1,3 +1,4 @@
+#include "frontend/gamelist.h"
 #include "frontend/video.h"
 #include "frontend/avsnap.h"
 
@@ -21,7 +22,10 @@
 
 #define SCREEN_W 960
 #define SCREEN_H 544
-#define NTEX     3
+// the render thread's ring: shown n - depth, drawing n - 1 and n, and the GPU may read up to two swaps late. With the
+// frame buffer (ADR-195) the emulation is one more frame ahead of what is drawn: frame n + 1 may be rendering while
+// n - depth - 1 is still read, so 8 (was 4)
+#define NTEX     8
 
 #define RENDER_PRIORITY   80
 #define RENDER_STACK_SIZE (256 * 1024)
@@ -29,11 +33,13 @@
 static vita2d_texture *s_tex[NTEX];
 // Game draw buffer size and orientation (M92 320x240, other boards rbx_core_screen). Vertical games show the buffer rotated
 static int s_gw = RBX_SCREEN_W, s_gh = RBX_SCREEN_H, s_gflags;
+// the part of the buffer shown (a board may narrow its screen while running: System 32's 416 / 320 modes)
+static volatile int s_vw = RBX_SCREEN_W, s_vh = RBX_SCREEN_H;
 // quarter turns clockwise the buffer is shown with: the game's monitor (vertical, flipped) and Display > Rotate
 static int s_rot;
 int rbx_input_rot;
-#define DISP_W (s_rot & 1 ? s_gh : s_gw) // visible game screen (after rotation)
-#define DISP_H (s_rot & 1 ? s_gw : s_gh)
+#define DISP_W (s_rot & 1 ? s_vh : s_vw) // visible game screen (after rotation)
+#define DISP_H (s_rot & 1 ? s_vw : s_vh)
 static void update_rotation(void)
 {
 	const int vert = (s_gflags & RBX_SCREEN_VERTICAL) != 0, flip = (s_gflags & RBX_SCREEN_FLIPPED) != 0;
@@ -52,7 +58,17 @@ void rbx_video_set_screen(int w, int h, int flags)
 {
 	s_gw = w;
 	s_gh = h;
+	s_vw = w;
+	s_vh = h;
 	s_gflags = flags;
+}
+
+void rbx_video_set_visible(int w, int h)
+{
+	if (w > 0 && w <= s_gw)
+		s_vw = w;
+	if (h > 0 && h <= s_gh)
+		s_vh = h;
 }
 static void free_art(void);
 static int s_pic_ok; // a game picture was drawn (rbx_video_picture_rect)
@@ -221,27 +237,6 @@ static uint8_t *load_png_rgba(const char *path, int *w, int *h)
 	return buf;
 }
 
-// an image of a folder of the data dir, the game's or else its parent's
-static vita2d_texture *load_named(const char *dir, const char *name)
-{
-	char path[160];
-	snprintf(path, sizeof(path), RBX_DATA_DIR "%s/%s.png", dir, name);
-	vita2d_texture *t = vita2d_load_PNG_file(path);
-	if (!t) {
-		snprintf(path, sizeof(path), RBX_DATA_DIR "%s/%s.jpg", dir, name);
-		t = vita2d_load_JPEG_file(path);
-	}
-	return t;
-}
-static vita2d_texture *load_game_image(const char *dir, const char *game, const char *parent)
-{
-	vita2d_texture *t = game ? load_named(dir, game) : NULL;
-	if (!t && game && parent)
-		t = load_named(dir, parent);
-	if (t)
-		vita2d_texture_set_filters(t, SCE_GXM_TEXTURE_FILTER_LINEAR, SCE_GXM_TEXTURE_FILTER_LINEAR);
-	return t;
-}
 static vita2d_texture *s_marquee;
 void rbx_video_set_marquee(const char *game, const char *parent)
 {
@@ -249,10 +244,29 @@ void rbx_video_set_marquee(const char *game, const char *parent)
 		vita2d_wait_rendering_done();
 		vita2d_free_texture(s_marquee);
 	}
-	s_marquee = load_game_image("marquees", game, parent);
+	s_marquee = NULL;
+	const char *names[2] = { game, parent };
+	for (int k = 0; k < 2 && !s_marquee; k++) {   // (the list's "marquee", else marquee/<set>.png; the set's, else its parent's)
+		char path[256];
+		if (names[k] && rbx_gamelist_media(names[k], 0, path, sizeof(path))) {
+			s_marquee = vita2d_load_PNG_file(path);
+			if (!s_marquee) {
+				const size_t l = strlen(path);
+				if (l > 4 && path[l - 4] == '.') {
+					strcpy(path + l - 3, "jpg");
+					s_marquee = vita2d_load_JPEG_file(path);
+				}
+			}
+		}
+	}
+	if (s_marquee)
+		vita2d_texture_set_filters(s_marquee, SCE_GXM_TEXTURE_FILTER_LINEAR, SCE_GXM_TEXTURE_FILTER_LINEAR);
 }
 void rbx_video_set_preview(const char *game, const char *parent) { rbx_snap_request(game, parent); }
+static float s_ui_hide;
+void rbx_video_set_ui_hide(float h) { s_ui_hide = h < 0.0f ? 0.0f : h > 1.0f ? 1.0f : h; }
 int rbx_video_preview_shown(void) { return rbx_snap_kind() != RBX_SNAP_NONE && rbx_snap_fade() > 0.0f; }
+int rbx_video_preview_is_video(void) { return rbx_snap_kind() == RBX_SNAP_VIDEO; }
 // the marquee at both sides of the picture, turned along them: its top towards the picture
 static void draw_marquee(void)
 {
@@ -317,6 +331,13 @@ static void draw_border(void)
 		draw_marquee();
 }
 
+// (ADR-181) the corridor draw_border will draw (Graphic without artwork), from the last drawing's picture columns
+void rbx_video_kick_border(void)
+{
+	if (s_pic_ok && g_settings.border == RBX_BORDER_ARTWORK && !s_art && g_settings.aspect != RBX_ASPECT_FULL)
+		rbx_neon_kick(s_pic_x, s_pic_w, rbx_menu_accent());
+}
+
 static void draw_scaled(vita2d_texture *tex)
 {
 	// Fit the visible game screen (DISP_W x DISP_H, after rotation) to w x h per the aspect setting
@@ -343,13 +364,13 @@ static void draw_scaled(vita2d_texture *tex)
 	s_pic_ok = 1;
 	draw_border();
 	if (!s_rot) {
-		vita2d_draw_texture_part_scale(tex, x, y, 0, 0, s_gw, s_gh, w / s_gw, h / s_gh);
+		vita2d_draw_texture_part_scale(tex, x, y, 0, 0, s_vw, s_vh, w / s_vw, h / s_vh);
 	} else {
 		// turned clockwise by s_rot quarters around the picture centre; turned a quarter, the buffer width is the
 		// screen height
 		const float rad = 1.5707963f * s_rot;
-		const float sx = (s_rot & 1) ? h / s_gw : w / s_gw, sy = (s_rot & 1) ? w / s_gh : h / s_gh;
-		vita2d_draw_texture_part_scale_rotate(tex, x + w * 0.5f, y + h * 0.5f, 0, 0, s_gw, s_gh, sx, sy, rad);
+		const float sx = (s_rot & 1) ? h / s_vw : w / s_vw, sy = (s_rot & 1) ? w / s_vh : h / s_vh;
+		vita2d_draw_texture_part_scale_rotate(tex, x + w * 0.5f, y + h * 0.5f, 0, 0, s_vw, s_vh, sx, sy, rad);
 	}
 	if (s_scan)
 		vita2d_draw_texture_scale(s_scan, x, y, w / 8.0f, h / (float)s_scan_h);
@@ -510,6 +531,12 @@ void rbx_video_reset_rendered(void)
 	__atomic_store_n(&s_rendered, 0, __ATOMIC_RELEASE);
 }
 
+void rbx_video_wait_rendered(uint64_t frame_n)
+{
+	while (__atomic_load_n(&s_rendered, __ATOMIC_ACQUIRE) < frame_n && s_render_running)
+		sceKernelDelayThread(100);
+}
+
 void rbx_video_draw_rendered(uint64_t frame_n)
 {
 	if (frame_n == 0)
@@ -621,6 +648,15 @@ void rbx_video_layer_rot(int slot, int rot)
 		s_layer[slot].rot = rot & 3;
 }
 
+// the game list's rows hidden by h (0..1) between screen rows y0 and y1 (the Info over them, the corridor seen through)
+static float s_list_hide;
+static int s_hide_y0, s_hide_y1;
+void rbx_video_list_hide(float h, int y0, int y1)
+{
+	s_list_hide = h < 0.0f ? 0.0f : h > 1.0f ? 1.0f : h;
+	s_hide_y0 = y0;
+	s_hide_y1 = y1;
+}
 static ReiStrip s_strip[RBX_NSTRIP];
 static int s_nstrip, s_strip_y0, s_strip_y1;
 void rbx_video_strips(const ReiStrip *s, int n, int y0, int y1)
@@ -634,13 +670,43 @@ void rbx_video_strips(const ReiStrip *s, int n, int y0, int y1)
 	s_strip_y1 = y1;
 }
 
+static const ReiTex *s_list_under;
+void rbx_video_list_under(const ReiTex *t) { s_list_under = t; }
+static int s_list_neon;   // (the game list: the neon corridor under its see-through background, user 11-22)
+void rbx_video_list_neon(int on) { s_list_neon = on; rbx_neon_rotate(on); }
+
 static void draw_strips(void)
 {
-	// (over a preview the rows are see-through: 80% over a video, 90% over a picture)
-	const int a8 = rbx_video_preview_shown() ? 255 - (int)((rbx_snap_kind() == RBX_SNAP_VIDEO ? 51.0f : 26.0f) * rbx_snap_fade()) : 255;
+	// (opaque; 11-22: the snap is in a box over the rows, not behind them; faded as the Info comes)
+	const int a8 = (int)((1.0f - s_list_hide) * 255.0f + 0.5f);
+	if (a8 <= 0)
+		return;
+	// (user 11-22: the rows fade out at the area's top and bottom over FADE px, as the tab row at its ends: drawn there in
+	// slices of growing opacity)
+	enum { FADE = 20, SLICE = 2 };
 	for (int i = 0; i < s_nstrip; i++) {
 		const ReiStrip *s = &s_strip[i];
-		const int y0 = s->y > s_strip_y0 ? s->y : s_strip_y0, y1 = s->y + s->t->h < s_strip_y1 ? s->y + s->t->h : s_strip_y1;
+		int y0 = s->y > s_strip_y0 ? s->y : s_strip_y0, y1 = s->y + s->t->h < s_strip_y1 ? s->y + s->t->h : s_strip_y1;
+		if (y1 <= y0)
+			continue;
+		for (int e = 0; e < 2; e++) {   // the faded parts: top, bottom
+			const int z0 = e ? s_strip_y1 - FADE : s_strip_y0, z1 = e ? s_strip_y1 : s_strip_y0 + FADE;
+			const int f0 = y0 > z0 ? y0 : z0, f1 = y1 < z1 ? y1 : z1;
+			for (int y = f0; y < f1; y += SLICE) {
+				const int hh = y + SLICE < f1 ? SLICE : f1 - y;
+				const float d = e ? (float)(s_strip_y1 - y) / FADE : (float)(y + hh - s_strip_y0) / FADE;
+				const int b8 = (int)((float)a8 * (d > 1.0f ? 1.0f : d) + 0.5f);
+				if (b8 > 0)
+					vita2d_draw_texture_tint_part((vita2d_texture *)s->t->tex, s->x, y, 0, y - s->y, s->t->w, hh,
+						RGBA8(b8, b8, b8, b8));
+			}
+			if (f1 > f0) {   // (the rest of the strip: past this zone)
+				if (e == 0)
+					y0 = f1;
+				else
+					y1 = f0;
+			}
+		}
 		if (y1 <= y0)
 			continue;
 		if (a8 < 255)
@@ -649,6 +715,69 @@ static void draw_strips(void)
 		else
 			vita2d_draw_texture_part((vita2d_texture *)s->t->tex, s->x, y0, 0, y0 - s->y, s->t->w, y1 - y0);
 	}
+}
+
+// the game list's snap (user 11-22): no longer behind the list, drawn in a box (the focused row, or the Info's) over the
+// rows, with a black border. zoom 1: it fills the box (cut at the sides or top and bottom), 0: all of it in the box at
+// its own shape (centred), between: in between (the Info's growing box). w <= 0: not drawn
+static struct { float x, y, w, h, a, zoom; int y0, y1; } s_snap_box;
+void rbx_video_snap_box(float x, float y, float w, float h, float a, float zoom, int clip_y0, int clip_y1)
+{
+	s_snap_box.x = x;
+	s_snap_box.y = y;
+	s_snap_box.w = w;
+	s_snap_box.h = h;
+	s_snap_box.a = a;
+	s_snap_box.zoom = zoom;
+	s_snap_box.y0 = clip_y0;
+	s_snap_box.y1 = clip_y1;
+}
+// the game list's Info (user 11-22): a full-screen texture drawn once, shown over everything between rows y0 and y1 at
+// opacity a (its fade is the GPU's), the snap's box over it
+static const ReiTex *s_info_tex;
+static float s_info_a;
+static int s_info_y0, s_info_y1;
+void rbx_video_info_overlay(const ReiTex *t, int y0, int y1, float a)
+{
+	s_info_tex = t;
+	s_info_y0 = y0;
+	s_info_y1 = y1;
+	s_info_a = a;
+}
+static void draw_snap_box(vita2d_texture *snap)
+{
+	if (!snap || s_snap_box.w <= 2.0f || s_snap_box.h <= 2.0f || s_snap_box.a <= 0.0f)
+		return;
+	const float tw = (float)vita2d_texture_get_width(snap), th = (float)vita2d_texture_get_height(snap);
+	const float fit = s_snap_box.w / tw < s_snap_box.h / th ? s_snap_box.w / tw : s_snap_box.h / th;
+	const float cover = s_snap_box.w / tw > s_snap_box.h / th ? s_snap_box.w / tw : s_snap_box.h / th;
+	const float sc = fit + (cover - fit) * s_snap_box.zoom;
+	// the picture's part in the box: its size on the screen, at most the box, centred
+	const float dw = tw * sc < s_snap_box.w ? tw * sc : s_snap_box.w, dh = th * sc < s_snap_box.h ? th * sc : s_snap_box.h;
+	float dx = s_snap_box.x + (s_snap_box.w - dw) * 0.5f, dy = s_snap_box.y + (s_snap_box.h - dh) * 0.5f;
+	float sx0 = (tw - dw / sc) * 0.5f, sy0 = (th - dh / sc) * 0.5f, sw = dw / sc, sh = dh / sc;
+	const float a = s_snap_box.a * rbx_snap_fade();
+	const int a8 = (int)(a * 255.0f + 0.5f);
+	// the border (2 px, black), then the picture; both cut to the rows' area
+	{
+		float by0 = dy - 2.0f, by1 = dy + dh + 2.0f;
+		if (by0 < (float)s_snap_box.y0) by0 = (float)s_snap_box.y0;
+		if (by1 > (float)s_snap_box.y1) by1 = (float)s_snap_box.y1;
+		if (by1 > by0)
+			vita2d_draw_rectangle(dx - 2.0f, by0, dw + 4.0f, by1 - by0, RGBA8(0, 0, 0, a8));
+	}
+	if (dy < (float)s_snap_box.y0) {
+		const float cut = (float)s_snap_box.y0 - dy;
+		sy0 += cut / sc;
+		sh -= cut / sc;
+		dy = (float)s_snap_box.y0;
+	}
+	if (dy + sh * sc > (float)s_snap_box.y1)
+		sh = ((float)s_snap_box.y1 - dy) / sc;
+	if (sh <= 0.0f || sw <= 0.0f)
+		return;
+	vita2d_texture_set_filters(snap, SCE_GXM_TEXTURE_FILTER_LINEAR, SCE_GXM_TEXTURE_FILTER_LINEAR);
+	vita2d_draw_texture_tint_part_scale(snap, dx, dy, sx0, sy0, sw, sh, sc, sc, RGBA8(a8, a8, a8, a8));
 }
 
 static struct { ReiTex *t; float x, y, r, a; } s_fx[RBX_FX_LAYERS];
@@ -704,23 +833,40 @@ static void draw_touch_fx(void)
 void rbx_video_draw_layers(void)
 {
 	static const int order[RBX_NLAYER] = { 5, 6, 4, 0, 1, 2, 3 }; // (medal panels and touch buttons under the menu layers)
+	const ReiTex *const under = s_list_under;
+	if (under && s_list_neon) {   // (before the premultiplied drawing, as beside a game)
+		rbx_neon_draw(NEON_LIST_Y, NEON_LIST_H, rbx_menu_accent());
+		// the header and the footer set apart from the list over the corridor (user 11-22): dark glass bands with a
+		// thin line of the theme's colour on their inner edge
+		const uint32_t acc = rbx_menu_accent() & 0x00FFFFFFu;
+		const int hb = 48, fb = SCREEN_H - 40;   // (the title line; the footer's buttons: menu.c TITLE_H - 8, LIST_FOOT_H)
+		vita2d_draw_rectangle(0, 0, SCREEN_W, hb, RGBA8(8, 6, 14, 200));
+		vita2d_draw_rectangle(0, hb, SCREEN_W, 2, acc | 0xB0000000u);
+		vita2d_draw_rectangle(0, fb, SCREEN_W, SCREEN_H - fb, RGBA8(8, 6, 14, 200));
+		vita2d_draw_rectangle(0, fb - 2, SCREEN_W, 2, acc | 0xB0000000u);
+	}
 	premul_begin();
+	vita2d_texture *const snap = rbx_snap_frame();
 	for (int o = 0; o < RBX_NLAYER; o++) {
 		const int k = order[o];
-		vita2d_texture *pv = o == 4 ? rbx_snap_frame() : NULL;
-		if (pv) {   // (the list's preview, over its background, under its rows)
-			// (video 60%, picture 50%; premultiplied: the tint scales the colour too)
-			const int a8 = (int)((rbx_snap_kind() == RBX_SNAP_VIDEO ? 153.0f : 128.0f) * rbx_snap_fade());
-			vita2d_draw_texture_tint_scale(pv, 0, 0, (float)SCREEN_W / vita2d_texture_get_width(pv),
-				(float)SCREEN_H / vita2d_texture_get_height(pv), RGBA8(a8, a8, a8, a8));
+		if (o == 3 && under) {
+			// (a still preview under the list: its opaque background, the picture, then slot 0 with a half see-through
+			// background and opaque text; the same mix as the picture at 50% over an opaque list, text kept solid)
+			if (!s_list_neon)   // (the neon corridor alone under the list: user 11-22, the gradient gone)
+				vita2d_draw_texture_part_scale((vita2d_texture *)under->tex, 0, 0, 0, 0, 1, under->h, (float)SCREEN_W, 1.0f);
 		}
-		if (o == 4)
+		if (o == 4) {
 			draw_strips(); // (over slot 0, under the focus outline)
+			if (!s_info_tex || s_info_a <= 0.0f)
+				draw_snap_box(snap);   // (in its row, over the rows)
+		}
 		const ReiTex *t = s_layer[k].t;
 		if (!t)
 			continue;
 		vita2d_texture *tex = (vita2d_texture *)t->tex;
-		const float a = s_layer[k].a;
+		const float a = s_layer[k].a * (k == 1 ? 1.0f - s_list_hide : 1.0f);   // (the focus goes with the rows)
+		if (a <= 0.0f)
+			continue;
 		const int a8 = (int)(a * 255.0f + 0.5f);
 		const unsigned int col = RGBA8(a8, a8, a8, a8); // (premultiplied: the tint scales the colour too)
 		const int rot = s_layer[k].rot, w = s_layer[k].w, h = s_layer[k].h;
@@ -728,10 +874,23 @@ void rbx_video_draw_layers(void)
 			const float ow = (float)((rot & 1) ? h : w), oh = (float)((rot & 1) ? w : h);
 			vita2d_draw_texture_part_tint_scale_rotate(tex, s_layer[k].x + ow * 0.5f, s_layer[k].y + oh * 0.5f, 0, 0, w, h,
 				1.0f, 1.0f, 1.5707963f * rot, col);
+		} else if (k == 0 && s_list_hide > 0.0f && s_layer[k].x == 0 && s_layer[k].y == 0) {
+			// (the list's canvas under the Info: its header and footer as they are, the rows between them fading out)
+			const int y0 = s_hide_y0, y1 = s_hide_y1, b8 = (int)((1.0f - s_list_hide) * a * 255.0f + 0.5f);
+			vita2d_draw_texture_tint_part(tex, 0, 0, 0, 0, w, y0, col);
+			if (b8 > 0)
+				vita2d_draw_texture_tint_part(tex, 0, y0, 0, y0, w, y1 - y0, RGBA8(b8, b8, b8, b8));
+			vita2d_draw_texture_tint_part(tex, 0, y1, 0, y1, w, h - y1, col);
 		} else if (a < 1.0f)
 			vita2d_draw_texture_tint_part(tex, s_layer[k].x, s_layer[k].y, 0, 0, w, h, col);
 		else
 			vita2d_draw_texture_part(tex, s_layer[k].x, s_layer[k].y, 0, 0, w, h);
+	}
+	if (s_info_tex && s_info_a > 0.0f) {   // the Info over the list (between the header and the footer), its snap over it
+		const int a8 = (int)(s_info_a * 255.0f + 0.5f);
+		vita2d_draw_texture_tint_part((vita2d_texture *)s_info_tex->tex, 0, (float)s_info_y0, 0, (float)s_info_y0,
+			(float)s_info_tex->w, (float)(s_info_y1 - s_info_y0), RGBA8(a8, a8, a8, a8));
+		draw_snap_box(snap);
 	}
 	premul_end();
 	draw_touch_fx();
@@ -756,7 +915,31 @@ void rbx_video_present_dialog(void)
 	vita2d_swap_buffers();
 }
 
+// the ROM loading screen's picture (user 11-22: its own, app0:loading.png; the LiveArea has another)
 uint8_t *rbx_video_load_bg(int *w, int *h)
 {
-	return load_png_rgba("app0:sce_sys/livearea/contents/bg.png", w, h);
+	uint8_t *p = load_png_rgba("app0:loading.png", w, h);
+	return p ? p : load_png_rgba("app0:sce_sys/livearea/contents/bg.png", w, h);
+}
+
+// the start splash (user 11-22): sce_sys/pic0.png over the whole screen (scaled to cover it, centred, filtered), shown
+// until the menu draws its first frame; the system shows the same picture before the app runs. The ROM loading screen
+// uses the LiveArea background (rbx_video_load_bg)
+void rbx_video_splash(void)
+{
+	vita2d_texture *t = vita2d_load_PNG_file("app0:sce_sys/pic0.png");
+	if (!t)
+		return;
+	vita2d_texture_set_filters(t, SCE_GXM_TEXTURE_FILTER_LINEAR, SCE_GXM_TEXTURE_FILTER_LINEAR);   // (smooth when scaled)
+	const float tw = (float)vita2d_texture_get_width(t), th = (float)vita2d_texture_get_height(t);
+	const float sx = SCREEN_W / tw, sy = SCREEN_H / th, sc = sx > sy ? sx : sy;
+	for (int i = 0; i < 2; i++) {   // (both buffers: the screen keeps it whichever one is shown)
+		vita2d_start_drawing();
+		vita2d_clear_screen();
+		vita2d_draw_texture_scale(t, (SCREEN_W - tw * sc) * 0.5f, (SCREEN_H - th * sc) * 0.5f, sc, sc);
+		vita2d_end_drawing();
+		vita2d_swap_buffers();
+	}
+	vita2d_wait_rendering_done();
+	vita2d_free_texture(t);
 }

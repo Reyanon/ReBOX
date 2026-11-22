@@ -58,7 +58,8 @@ static struct {
 	int nseg;
 	uint16_t vram[0x8000], spr[MAX_SPR][0x800], pal[0x800];
 } s_vs;
-static uint16_t s_spr_old[MAX_SPR][0x800];   // (the sprite buffer before a write in the frame being run)
+static uint16_t (*s_spr_old_hp)[MAX_SPR][0x800];   // (the sprite buffer before a write in the frame being run)
+#define s_spr_old (*s_spr_old_hp)
 static int s_spr_n;
 
 static void seg_capture(int line)
@@ -360,6 +361,10 @@ static const uint8_t *dec_table(const char *m)
 
 static int m107_init(const rbx_game *g)
 {
+	if (!s_spr_old_hp && !(s_spr_old_hp = calloc(1, sizeof(*s_spr_old_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t cs = 0, ss = 0;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	const uint8_t *chr = rbx_region("tiles", &cs), *spr = rbx_region("sprites", &ss);
@@ -410,6 +415,8 @@ static void m107_exit(void)
 	free(s_chr_rows);
 	free(s_pri);
 	s_chr_rows = s_pri = NULL;
+	free(s_spr_old_hp);
+	s_spr_old_hp = NULL;
 }
 
 static void m107_reset(void)

@@ -24,7 +24,7 @@
 #include "../machine/decobsmt.h"
 #include "../video/deco16ic.h"
 #include "../video/decospr.h"
-#include "../video/decoband.h"
+#include "../../video/decoband.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,17 +43,22 @@ static arm_t s_cpu;
 static h6280_t s_snd;
 static uint8_t *s_rom, *s_snd_rom;
 static uint32_t s_rom_size, s_snd_rom_size;
-static uint8_t s_ram[0x20000];                 // 0x100000 (32-bit)
+static uint8_t (*s_ram_hp)[0x20000];                 // 0x100000 (32-bit)
+#define s_ram (*s_ram_hp)
 static uint8_t s_snd_ram[0x2000];
 static uint32_t s_palram[0x800];                 // 0x168000 buffered palette (red bits 0-7, green 8-15, blue 16-23)
 static uint8_t s_pal_dirty[0x800];
 static uint32_t s_pal[0x800];                    // the palette the DMA last set (0x00RRGGBB)
 static uint16_t s_spriteram[0x800], s_spriteram_buf[0x800];
-static uint16_t s_prot_lo[0x2000];               // (the low halves of 0x200000: the 146 only maps the high ones)
-static uint32_t s_rowscroll32[4][0x800];
-static uint16_t s_rowscroll[4][0x800];
+static uint16_t (*s_prot_lo_hp)[0x2000];               // (the low halves of 0x200000: the 146 only maps the high ones)
+#define s_prot_lo (*s_prot_lo_hp)
+static uint32_t (*s_rowscroll32_hp)[4][0x800];
+#define s_rowscroll32 (*s_rowscroll32_hp)
+static uint16_t (*s_rowscroll_hp)[4][0x800];
+#define s_rowscroll (*s_rowscroll_hp)
 static uint32_t s_pri;
-static deco16ic_t s_tile[2];
+static deco16ic_t (*s_tile_hp)[2];
+#define s_tile (*s_tile_hp)
 static decospr_t s_spr;
 static deco146_t s_prot;
 static eeprom93c46_t s_eeprom;
@@ -123,7 +128,8 @@ static void tt_job(void)   // (the frame queued last: the other buffer than the 
 // colour banks
 static uint16_t s_ace[0x28];
 static uint32_t s_palbuf[0x800];
-static uint32_t s_pens[0x1000];
+static uint32_t (*s_pens_hp)[0x1000];
+#define s_pens (*s_pens_hp)
 static uint16_t s_spriteram2[0x800], s_spriteram2_buf[0x800];
 static uint8_t s_spr_bank[2];
 static decospr_t s_spr2;
@@ -145,7 +151,8 @@ static int32_t *s_mix_l, *s_mix_r;
 static int s_mix_cap, s_mix_n;
 static uint32_t s_out_rate, s_oki_phase[2];
 static int32_t s_oki_last[2];
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 static struct {
 	deco16ic_t tile[2];
 	uint16_t rowscroll[4][0x800], spriteram[0x800];
@@ -815,6 +822,34 @@ static void fh_exit(void);
 
 static int fh_init(const rbx_game *g)
 {
+	if (!s_pens_hp && !(s_pens_hp = calloc(1, sizeof(*s_pens_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_prot_lo_hp && !(s_prot_lo_hp = calloc(1, sizeof(*s_prot_lo_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_rowscroll_hp && !(s_rowscroll_hp = calloc(1, sizeof(*s_rowscroll_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_rowscroll32_hp && !(s_rowscroll32_hp = calloc(1, sizeof(*s_rowscroll32_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_tile_hp && !(s_tile_hp = calloc(1, sizeof(*s_tile_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t t1s, t2s, ss, o1s, o2s;
 	s_old = !strcmp(g->machine, "fghthisto");
 	s_tt = !strcmp(g->machine, "tattass");
@@ -1055,6 +1090,20 @@ static void fh_exit(void)
 	free(s_mix_l);
 	free(s_mix_r);
 	s_mix_l = s_mix_r = NULL;
+	free(s_pens_hp);
+	s_pens_hp = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
+	free(s_prot_lo_hp);
+	s_prot_lo_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
+	free(s_rowscroll_hp);
+	s_rowscroll_hp = NULL;
+	free(s_rowscroll32_hp);
+	s_rowscroll32_hp = NULL;
+	free(s_tile_hp);
+	s_tile_hp = NULL;
 }
 
 static void fh_frame(void)

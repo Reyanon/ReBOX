@@ -36,7 +36,8 @@ static uint32_t s_rom_size;
 static uint8_t *s_snd_rom, *s_sub_rom;
 static uint32_t s_snd_rom_size, s_sub_rom_size;
 // 68000 memory (host-order words)
-static uint16_t s_ram[0x2000];       // 080000-083fff
+static uint16_t (*s_ram_hp)[0x2000];       // 080000-083fff
+#define s_ram (*s_ram_hp)
 static uint16_t s_fg[4][0x400];      // 088000 / 088800 / 08c000 / 08c800
 static uint16_t s_spr[0x400];        // 090000-0907ff
 static uint16_t s_pal[4][0x400];     // 098000 / 099000 / 09a000 / 09b000
@@ -76,7 +77,8 @@ enum { AYQ_SIZE = 8192, AYO_SIZE = 8192 };   // (powers of two)
 static struct { uint16_t clocks; uint8_t kind, chip, v; } s_ayq[AYQ_SIZE];
 static unsigned s_ayq_in, s_ayq_done;        // (emulation thread / worker)
 static ay8910_t s_ay_w[2];
-static int32_t s_ay_out[AYO_SIZE];
+static int32_t (*s_ay_out_hp)[AYO_SIZE];
+#define s_ay_out (*s_ay_out_hp)
 static unsigned s_ay_out_in, s_ay_out_take;
 static int s_ay_taken;   // slots at the front of s_mix_ay that have their YM2149 samples
 
@@ -478,10 +480,22 @@ static void sh_exit(void)
 	rbx_aux2_set_job(NULL);
 	rbx_ym_exit(0);
 	rbx_ym_exit(1);
+	free(s_ay_out_hp);
+	s_ay_out_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static int sh_init(const rbx_game *g)
 {
+	if (!s_ay_out_hp && !(s_ay_out_hp = calloc(1, sizeof(*s_ay_out_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t g1s = 0, g2s = 0;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_snd_rom = rbx_region("audiocpu", &s_snd_rom_size);

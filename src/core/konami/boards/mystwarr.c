@@ -84,7 +84,8 @@ static uint8_t *s_rom, *s_zrom;
 static uint32_t s_rom_size, s_zrom_size;
 static z80 s_z;
 static const uint8_t *s_zmap[256];
-static k054539_t s_k539[2];
+static k054539_t (*s_k539_hp)[2];
+#define s_k539 (*s_k539_hp)
 static eepser_t s_eeprom;
 static int s_port_in0, s_port_in1, s_port_p12, s_port_p34;
 static int32_t s_gain_l, s_gain_r;   // the K054321's volume (x 4096)
@@ -173,7 +174,8 @@ static void k54321_main_w(int r, uint8_t v)
 #define Q_MAX 2048
 enum { Q_ADV, Q_K54321, Q_IRQ };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out_l[2048], s_out_r[2048];
 static int s_out_n, s_out_pos;
@@ -941,6 +943,14 @@ static void mw_reset(void);
 
 static int mw_init(const rbx_game *g)
 {
+	if (!s_k539_hp && !(s_k539_hp = calloc(1, sizeof(*s_k539_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t pcm_size, tile_size, spr_size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("soundcpu", &s_zrom_size);
@@ -1071,6 +1081,10 @@ static void mw_exit(void)
 	s_roz_n = 0;
 	gx.sub1_roz = NULL;
 	gx.pre_capture = NULL;
+	free(s_k539_hp);
+	s_k539_hp = NULL;
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void mw_reset(void)

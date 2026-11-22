@@ -134,6 +134,7 @@ uint32_t rbx_input_poll(void)
 {
 	// the players' controllers from the settings (loaded, or changed in the menu)
 	static int src[2] = { -1, -1 };
+	re_pad_set_added_players(g_settings.p2_added ? 2 : 0);   // (a 2P row added by hand takes its device)
 	for (int p = 0; p < 2; p++)
 		if (src[p] != g_settings.pad_src[p]) {
 			src[p] = g_settings.pad_src[p];
@@ -147,11 +148,18 @@ uint32_t rbx_input_poll(void)
 	const uint32_t test = rbx_testpad_step(); // (log builds: the test input script)
 	p1.buttons |= test;
 	all.buttons |= test;
-	uint32_t b = p1.buttons;
-	if (g_settings.touch_keys) // touch buttons press their Vita keys (in the game only: the value returned is the pads alone)
-		b |= rbx_touch_buttons();
+	uint32_t b = p1.buttons, b2 = p2.buttons;
+	// touch buttons press their Vita keys (in the game only: the value returned is the pads alone), for the player on the
+	// Vita's own controls (as ReST-V: 1P on a controller, 2P on the Vita: the touch is 2P's); 1P's when nobody reads it
+	if (g_settings.touch_keys) {
+		const uint32_t tb = rbx_touch_buttons();
+		if (re_pad_port(0) != 0 && re_pad_port(1) == 0)
+			b2 |= tb;
+		else
+			b |= tb;
+	}
 	map_player(0, &p1, p1.buttons, b);
-	map_player(1, &p2, p2.buttons, p2.buttons);
+	map_player(1, &p2, p2.buttons, b2);
 	return all.buttons;
 }
 

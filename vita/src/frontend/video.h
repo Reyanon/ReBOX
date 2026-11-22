@@ -14,6 +14,8 @@
 
 // Game draw buffer size and orientation (rbx_core_screen values, RBX_SCREEN_VERTICAL/FLIPPED). Before rbx_video_init. Default 320x240
 void rbx_video_set_screen(int w, int h, int flags);
+// the part of the buffer shown when a board narrows its screen while running (<= the size given above)
+void rbx_video_set_visible(int w, int h);
 int rbx_video_init(void);   // per game: the game textures
 void rbx_video_fini(void);  // per game: game textures, scanlines, the game's artwork (the overlay layers stay)
 
@@ -32,6 +34,8 @@ void rbx_video_stop_render_thread(void);
 // Call after main finishes frame N: waits until frame N-1 is drawn, then draws that texture
 // (between start_drawing and end_drawing). Draws nothing if N == 0.
 void rbx_video_draw_rendered(uint64_t frame_n);
+// the same wait asleep (the present thread, ADR-195: it shares CPU0 with the emulation thread above it)
+void rbx_video_wait_rendered(uint64_t frame_n);
 // Call after a game reset before restarting the render thread (frame numbers restart at 0)
 void rbx_video_reset_rendered(void);
 void rbx_video_dump_rendered(const char *path);
@@ -41,12 +45,15 @@ void rbx_video_apply_settings(void);
 // Outside-screen image (Border = Artwork): user artwork/<game>.png/.jpg/.bmp (else parent set name), else the moving neon
 // corridor (neon.c)
 void rbx_video_set_art(const char *game, const char *parent);
-// The game's marquee (ux0:data/rebox/marquees/<set>.png, .jpg, or the parent's): at both sides of the picture while it runs
+// The game's marquee (the list's "marquee", else ux0:data/rebox/marquee/<set>.png or .jpg; or the parent's): at both sides of the picture while it runs
 void rbx_video_set_marquee(const char *game, const char *parent);
 // The game list's preview (ux0:data/rebox/snap/<set>.mp4, .png, .jpg, in that order, or the parent's): full screen over the
 // background at 30%, under the rows. NULL: none
 void rbx_video_set_preview(const char *game, const char *parent);
 int rbx_video_preview_shown(void);
+int rbx_video_preview_is_video(void);   // (the preview is a movie, not a still picture)
+// the game list hidden over its preview: 0 shown .. 1 gone (the preview then fully opaque)
+void rbx_video_set_ui_hide(float h);
 // where the game picture was drawn last (screen pixels); 0 before the first game frame
 int rbx_video_picture_rect(int *x, int *y, int *w, int *h);
 // The touch effect over everything, light added to the picture: in each of RBX_FX_LAYERS slots texture t centred at x, y,
@@ -83,12 +90,31 @@ void rbx_video_layer_rot(int slot, int rot);   // turned clockwise by rot * 90 d
 #define RBX_NSTRIP 48
 typedef struct { const ReiTex *t; int x, y; } ReiStrip;
 void rbx_video_strips(const ReiStrip *s, int n, int y0, int y1);
+// the game list's opaque background under slot 0, the list's still preview between them (t: SCREEN_H rows, stretched
+// across). Set while slot 0 holds the list with a see-through background (its text stays opaque); NULL: the preview over
+// slot 0 as before
+void rbx_video_list_under(const ReiTex *t);
 void rbx_video_draw_layers(void);              // between start_drawing and end_drawing
+void rbx_video_kick_border(void);               // (ADR-181) the frame's start: the corridor's moving parts on a worker
 // one frame of only the layers (game list, loading screen): waits for vblank
 void rbx_video_present(void);
 // rbx_video_present with a system dialog (the on-screen keyboard) drawn over it
 void rbx_video_present_dialog(void);
 // the app's LiveArea background as RGBA pixels (malloc'd, NULL if missing): the loading screen
 uint8_t *rbx_video_load_bg(int *w, int *h);
+void rbx_video_splash(void);
+// the game list's snap in a box (screen px), a its opacity, zoom 1 filling the box / 0 all of it shown, cut to rows
+// clip_y0..clip_y1; w <= 0: none
+void rbx_video_snap_box(float x, float y, float w, float h, float a, float zoom, int clip_y0, int clip_y1);
+// the game list's Info: texture t (full screen) shown between rows y0 and y1 at opacity a over everything, the snap's box
+// over it; t NULL or a 0: none
+void rbx_video_info_overlay(const ReiTex *t, int y0, int y1, float a);
+// the game list: the neon corridor under its background (1) or not
+void rbx_video_list_neon(int on);
+// the game list's rows (the canvas between y0 and y1, the strips, the focus) faded out by h (0..1): the Info over them
+void rbx_video_list_hide(float h, int y0, int y1);
+// the list's corridor: its walls' rows (turned: up and down), the gap in the middle of the screen (settings)
+#define NEON_LIST_H ((float)g_settings.neon_list_gap)
+#define NEON_LIST_Y (272.0f - NEON_LIST_H * 0.5f)   // the LiveArea background as the start splash (after vita2d_init)
 
 #endif

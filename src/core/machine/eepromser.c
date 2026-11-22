@@ -216,6 +216,12 @@ int eepser_do_read(const eepser_t *e)
 
 int eepser_ready_read(const eepser_t *e, int64_t now) { return ready(e, now); }
 
+// eeprom_serial_93cxx_device::do_read: the ready state while waiting for the start bit
+int eepser_do_read_93cxx(const eepser_t *e, int64_t now)
+{
+	return e->state == ST_WAIT_FOR_START_BIT ? ready(e, now) : eepser_do_read(e);
+}
+
 int eepser_state(eepser_t *e, void *ctx, int load, const char *tag)
 {
 	(void)load;

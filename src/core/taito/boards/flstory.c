@@ -6,7 +6,7 @@
 */
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
-#include "../machine/taito68705.h"
+#include "../../machine/taito68705.h"
 #include "../../sound/ay8910.h"
 #include "../../sound/msm5232.h"
 #include "../../sound/ta7630.h"
@@ -61,7 +61,8 @@ static uint8_t *s_tiles, *s_sprites;
 static uint32_t s_ntiles, s_nsprites;
 static uint8_t s_snap_vram[0x800], s_snap_spr[0xa0], s_snap_scrl[0x20], s_snap_pal[0x200], s_snap_pal_ext[0x200];
 static uint8_t s_snap_char_bank, s_snap_flip;
-static uint8_t s_pri[SCREEN_W * (VIS_Y1 - VIS_Y0 + 1)];
+static uint8_t (*s_pri_hp)[SCREEN_W * (VIS_Y1 - VIS_Y0 + 1)];
+#define s_pri (*s_pri_hp)
 // ports
 static int s_p_sw[3], s_p_system, s_p_p1, s_p_p2, s_p_ex1, s_p_ex2;
 
@@ -519,10 +520,16 @@ static void fl_exit(void)
 	free(s_mix);
 	free(s_tmp);
 	s_mix = s_tmp = NULL;
+	free(s_pri_hp);
+	s_pri_hp = NULL;
 }
 
 static int fl_init(const rbx_game *g)
 {
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_kind = kind_of(g->machine);
 	if (s_kind < 0) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);

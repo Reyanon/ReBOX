@@ -5,6 +5,7 @@
 // ReBOX_vX.Y.Z_vita.vpk asset), unpacks the VPK's files to ux0:data/rebox/update/files and exits; the kernel helper copies
 // them into the app folder once the app is gone (no process can write the folder of a running app); the user starts
 // it again.
+#include "frontend/lang.h"
 #include "frontend/update.h"
 
 #include <psp2/appmgr.h>
@@ -637,7 +638,8 @@ static int unzip(const char *path, const char *dir, const char *want, const char
 	return ok && found > 0;
 }
 
-// the game lists beside the VPK in the release zip (data/rebox/gamelist/*.json) to ux0:data/rebox/gamelist/
+// the game lists beside the VPK in the release zip (data/rebox/gamelist/*.json and v<version>/*.json) to
+// ux0:data/rebox/gamelist/, the files not there only (a list already there, maybe edited, is kept: user 11-22)
 static void unzip_lists(const char *path)
 {
 	static const char pre[] = "data/rebox/gamelist/";
@@ -647,9 +649,18 @@ static void unzip_lists(const char *path)
 	for (int i = 0; i < rbx_zip_count(z); i++) {
 		const char *nm = rbx_zip_entry_path(z, i);
 		const size_t nl = strlen(nm);
-		if (nl < sizeof(pre) + 5 || strncmp(nm, pre, sizeof(pre) - 1) || strcmp(nm + nl - 5, ".json") ||
-		    strchr(nm + sizeof(pre) - 1, '/') || strstr(nm, ".."))
+		if (nl < sizeof(pre) + 5 || strncmp(nm, pre, sizeof(pre) - 1) || strcmp(nm + nl - 5, ".json") || strstr(nm, ".."))
 			continue;
+		const char *rel = nm + sizeof(pre) - 1, *sl = strchr(rel, '/');
+		if (sl && strchr(sl + 1, '/'))   // (one folder level: a version's folder)
+			continue;
+		{
+			char out[256];
+			SceIoStat st;
+			snprintf(out, sizeof(out), RBX_DATA_DIR "gamelist/%s", rel);
+			if (sceIoGetstat(out, &st) >= 0)
+				continue;
+		}
 		const uint32_t size = rbx_zip_entry_size(z, i);
 		uint8_t *data = (uint8_t *)malloc(size ? size : 1);
 		if (data && rbx_zip_read(z, i, data) == 0) {
@@ -709,7 +720,7 @@ const char *rbx_update_install(void (*progress)(const char *stage, int percent))
 	reiKCtrlInstallOnExit();
 	for (int i = 5; i > 0; i--) { // (percent -2: the stage text alone)
 		char t[96];
-		snprintf(t, sizeof(t), "ReBOX closes in %d s to install %s. Start it again then.", i, s_tag);
+		snprintf(t, sizeof(t), T("ReBOX closes in %d s to install %s. Start it again then."), i, s_tag);
 		progress(t, -2);
 		sceKernelDelayThread(1000 * 1000);
 	}

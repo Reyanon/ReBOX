@@ -35,6 +35,9 @@
 
 #include "m68k.h"
 extern void (*rbx_m68k_int_hook)(int level); /* ReBOX: called with the level taken, NULL = none */
+extern void (*rbx_m68k_cmpild_hook)(int reg, unsigned int imm); /* ReBOX: CMPI.L #imm,Dn executed (MAME cmpild_callback, the FD1094) */
+extern void (*rbx_m68k_rte_hook)(void);
+extern void (*rbx_m68k_irqack_hook)(int level); /* ReBOX: an interrupt taken (besides rbx_m68k_int_hook) */ /* ReBOX: RTE executed (MAME rte_callback) */
 #include <limits.h>
 
 /* ReBOX: reads of directly mapped memory (ROM, RAM pages of m68k_bus) inline, the call only for handlers and
@@ -824,6 +827,71 @@ static inline unsigned int rbx_m68k_op8(unsigned int a)
 #define SET_CYCLES(A)    m68ki_remaining_cycles = A
 #define GET_CYCLES()     m68ki_remaining_cycles
 #define USE_ALL_CYCLES() m68ki_remaining_cycles %= CYC_INSTRUCTION[REG_IR]
+
+/* ReBOX: MAME's 68000 times where the tables differ (m68k_set_mame_timing; off by default: the boards ported before
+   keep the table times): DIVU / DIVS by their operands (the tables' 140 / 158 are the worst cases; the microcode's
+   steps as documented by Jorge Cwik, "68000 division timing", an overflow ending the instruction early), MULU /
+   MULS by their source (38 + 2n clocks: n its 1 bits / its 01 and 10 pairs; the tables' 54), and ADDQ.W #, An in 8
+   clocks (the table's 4; SUBQ.W #, An already 8); on the 68020 MOVEM.L regs,-(An) in 3 clocks a register as
+   MAME's 68EC020 runs it (traced; the table's 4) */
+extern int m68ki_mame_timing;
+static inline int m68ki_divu_cycles(unsigned int dividend, unsigned short divisor)
+{
+	if ((unsigned short)(dividend >> 16) >= divisor)
+		return 10;   /* overflow */
+	int mcycles = 38;
+	const unsigned int hdivisor = (unsigned int)divisor << 16;
+	for (int i = 0; i < 15; i++) {
+		const unsigned int temp = dividend;
+		dividend <<= 1;
+		if (temp & 0x80000000u)
+			dividend -= hdivisor;
+		else {
+			mcycles += 2;
+			if (dividend >= hdivisor) {
+				dividend -= hdivisor;
+				mcycles--;
+			}
+		}
+	}
+	return mcycles * 2;
+}
+static inline int m68ki_divs_cycles(int dividend, short divisor)
+{
+	int mcycles = 6;
+	if (dividend < 0)
+		mcycles++;
+	const unsigned int adividend = dividend < 0 ? 0u - (unsigned int)dividend : (unsigned int)dividend;
+	const unsigned int adivisor = divisor < 0 ? (unsigned int)(-(int)divisor) : (unsigned int)divisor;
+	if ((adividend >> 16) >= adivisor)
+		return (mcycles + 2) * 2;   /* overflow */
+	unsigned int aquot = adividend / adivisor;
+	mcycles += 55;
+	if (divisor >= 0) {
+		if (dividend >= 0)
+			mcycles--;
+		else
+			mcycles++;
+	}
+	for (int i = 0; i < 15; i++) {
+		if (!(aquot & 0x8000u))
+			mcycles++;
+		aquot <<= 1;
+	}
+	return mcycles * 2;
+}
+#define M68K_DIVU_TIMING(DIVIDEND, DIVISOR) 	do { if (m68ki_mame_timing && (DIVISOR) != 0 && CPU_TYPE_IS_000(CPU_TYPE)) USE_CYCLES(m68ki_divu_cycles((unsigned int)(DIVIDEND), (unsigned short)(DIVISOR)) - 140); } while (0)
+static inline int m68ki_popcount16(unsigned int v)
+{
+	v &= 0xffff;
+	v = v - ((v >> 1) & 0x5555);
+	v = (v & 0x3333) + ((v >> 2) & 0x3333);
+	v = (v + (v >> 4)) & 0x0f0f;
+	return (int)((v + (v >> 8)) & 0x1f);
+}
+#define M68K_MULU_TIMING(SRC) 	do { if (m68ki_mame_timing && CPU_TYPE_IS_000(CPU_TYPE)) USE_CYCLES(38 + 2 * m68ki_popcount16(SRC) - 54); } while (0)
+#define M68K_MULS_TIMING(SRC) 	do { if (m68ki_mame_timing && CPU_TYPE_IS_000(CPU_TYPE)) USE_CYCLES(38 + 2 * m68ki_popcount16((SRC) ^ ((SRC) << 1)) - 54); } while (0)
+#define M68K_DIVS_TIMING(DIVIDEND, DIVISOR) 	do { if (m68ki_mame_timing && (DIVISOR) != 0 && CPU_TYPE_IS_000(CPU_TYPE)) USE_CYCLES(m68ki_divs_cycles((int)(DIVIDEND), (short)(DIVISOR)) - 158); } while (0)
 
 
 
@@ -2036,6 +2104,8 @@ INLINE void m68ki_exception_interrupt(uint int_level)
 	/* ReBOX: tell the board which level was taken (HOLD_LINE sources are cleared) */
 	if (rbx_m68k_int_hook)
 		rbx_m68k_int_hook((int)int_level);
+	if (rbx_m68k_irqack_hook)   /* (MAME's irq acknowledge callback: the FD1094's irq mode) */
+		rbx_m68k_irqack_hook((int)int_level);
 #endif /* M68K_EMULATE_INT_ACK */
 }
 

@@ -11,10 +11,14 @@
 #include <string.h>
 
 #include <psp2/gxm.h>
+#include <psp2/io/stat.h>
+#include <psp2/kernel/cpu.h>
 #include <psp2/kernel/sysmem.h>
+#include <psp2/kernel/threadmgr.h>
 #include <vita2d.h>
 
 #include "frontend/settings.h"
+#include "platform/log.h"
 #include "platform/timer.h"
 
 // speed: the HTML's speed; density: rings between the screen's edge and the picture; hue: degrees, below 0 the theme's;
@@ -39,22 +43,35 @@ void rbx_neon_value_text(int k, int v, char *out, int size)
 		snprintf(out, size, "%d", v);
 }
 
-#define SW 960
-#define SH 544
+// (turned, user 11-22: the game list's corridor runs up and down, its walls at the top and bottom. Made upright on a
+// 544 x 960 screen and each vertex's x and y swapped)
+static int s_rot, s_lay_rot = -1;
+#define SW (s_lay_rot == 1 ? 544 : 960)
+#define SH (s_lay_rot == 1 ? 960 : 544)
+void rbx_neon_rotate(int on) { s_rot = on != 0; }
 #define ZM 40.0f       // the depth whose walls meet the picture's sides
-#define DENSITY ((float)g_settings.neon[RBX_NEON_DENSITY])
-#define SPEED ((float)g_settings.neon[RBX_NEON_SPEED])
-#define GLOW (g_settings.neon[RBX_NEON_GLOW] * 0.1f)
-#define BRIGHT (g_settings.neon[RBX_NEON_BRIGHT] * 0.1f)
+#define KN (s_lay_rot == 1 ? g_settings.neon_list : g_settings.neon)   // (the list's own knobs, user 11-22)
+#define DENSITY ((float)KN[RBX_NEON_DENSITY])
+#define SPEED ((float)KN[RBX_NEON_SPEED])
+#define GLOW (KN[RBX_NEON_GLOW] * 0.1f)
+#define BRIGHT (KN[RBX_NEON_BRIGHT] * 0.1f)
 #define NPULSE_MAX 60
 #define NDUST_MAX 300
-#define NPULSE (g_settings.neon[RBX_NEON_PULSES])
-#define NDUST (g_settings.neon[RBX_NEON_DUST])
+#define NPULSE (KN[RBX_NEON_PULSES])
+#define NDUST (KN[RBX_NEON_DUST])
 #define RAIL_SEG 16
 #define STATIC_BYTES (512 * 1024)
 #define DYN_MAX 9000   // vertices a frame
 
 typedef vita2d_color_vertex Vtx;
+static void swap_xy(Vtx *v, int n)
+{
+	for (int i = 0; i < n; i++) {
+		const float t = v[i].x;
+		v[i].x = v[i].y;
+		v[i].y = t;
+	}
+}
 
 static float F, HW, HH, ZN, ZF, RING, cx, cy, edge;
 static float s_lay_x = -1, s_lay_w = -1;
@@ -280,6 +297,8 @@ static void static_make(void)
 	}
 	s_nstatic = s_n;
 	s_add = 0;
+	if (s_lay_rot == 1)
+		swap_xy(s_static, s_nstatic);
 }
 
 static void pulse_new(int i, float z)
@@ -296,46 +315,45 @@ static void draw_list(const Vtx *v, int n)
 		vita2d_draw_array(SCE_GXM_PRIMITIVE_TRIANGLES, v + i, n - i < 6000 ? n - i : 6000);
 }
 
-void rbx_neon_draw(float game_x, float game_w, uint32_t accent)
+static int s_dust_init;
+static int lay_changed(float game_x, float game_w, uint32_t accent)
 {
-	static int init;
-	if (!init) {
-		init = 1;
-		for (int i = 0; i < NDUST_MAX; i++) {
-			s_dust[i].sx = rnd() < 0.5f ? -1.0f : 1.0f;
-			s_dust[i].fx = 0.75f + rnd() * 0.25f;
-			s_dust[i].fy = rnd() * 2 - 1;
-			s_dust[i].t = rnd();
-		}
-	}
-	if (game_x != s_lay_x || game_w != s_lay_w || accent != s_lay_acc || s_blk < 0 ||
-		memcmp(s_lay_knobs, g_settings.neon, sizeof(s_lay_knobs))) {
-		const int first = s_lay_w < 0;
-		memcpy(s_lay_knobs, g_settings.neon, sizeof(s_lay_knobs));
-		s_lay_x = game_x;
-		s_lay_w = game_w;
-		s_lay_acc = accent;
-		s_hue = g_settings.neon[RBX_NEON_HUE] < 0 ? hue_of(accent) : (float)g_settings.neon[RBX_NEON_HUE];
-		s_sat = s_hue < 0 ? 0.0f : 0.85f;
-		if (s_hue < 0)
-			s_hue = 0;
-		C50 = rgb_hsl(s_hue, 0.50f);
-		C55 = rgb_hsl(s_hue, 0.55f);
-		C62 = rgb_hsl(s_hue, 0.62f);
-		C76 = rgb_hsl(s_hue, 0.76f);
-		C82 = rgb_hsl(s_hue, 0.82f);
-		P65 = rgb_hsl(s_hue + 25, 0.65f);
-		P88 = rgb_hsl(s_hue + 25, 0.88f);
-		D80 = rgb_hsl(s_hue - 20, 0.80f);
-		layout(game_x, game_w);
-		if (first)
-			for (int i = 0; i < NPULSE_MAX; i++)
-				pulse_new(i, ZN + rnd() * (ZF - ZN));
-		static_make();
-	}
-	if (!s_static)
-		return;
-	const uint64_t now = rbx_time_us();
+	return game_x != s_lay_x || game_w != s_lay_w || accent != s_lay_acc || s_blk < 0 || s_rot != s_lay_rot ||
+		memcmp(s_lay_knobs, s_rot ? g_settings.neon_list : g_settings.neon, sizeof(s_lay_knobs));
+}
+
+// a new picture width, theme or knob: the colours, the layout and the kept vertices again
+static void lay_make(float game_x, float game_w, uint32_t accent)
+{
+	const int first = s_lay_w < 0;
+	memcpy(s_lay_knobs, s_rot ? g_settings.neon_list : g_settings.neon, sizeof(s_lay_knobs));
+	s_lay_x = game_x;
+	s_lay_w = game_w;
+	s_lay_rot = s_rot;
+	s_lay_acc = accent;
+	s_hue = KN[RBX_NEON_HUE] < 0 ? hue_of(accent) : (float)KN[RBX_NEON_HUE];
+	s_sat = s_hue < 0 ? 0.0f : 0.85f;
+	if (s_hue < 0)
+		s_hue = 0;
+	C50 = rgb_hsl(s_hue, 0.50f);
+	C55 = rgb_hsl(s_hue, 0.55f);
+	C62 = rgb_hsl(s_hue, 0.62f);
+	C76 = rgb_hsl(s_hue, 0.76f);
+	C82 = rgb_hsl(s_hue, 0.82f);
+	P65 = rgb_hsl(s_hue + 25, 0.65f);
+	P88 = rgb_hsl(s_hue + 25, 0.88f);
+	D80 = rgb_hsl(s_hue - 20, 0.80f);
+	layout(game_x, game_w);
+	if (first)
+		for (int i = 0; i < NPULSE_MAX; i++)
+			pulse_new(i, ZN + rnd() * (ZF - ZN));
+	static_make();
+}
+
+// the moving parts (rings, pulses, dust) at the clock now into v, up to max vertices (v NULL: none made and, as the
+// loops below stop at once, the pulses and dust stay where they are); returns the vertices made
+static int dyn_make(uint64_t now, Vtx *v, int max)
+{
 	float dt = s_last ? (now - s_last) / 1e6f : 0;
 	s_last = now;
 	if (dt > 0.05f)
@@ -343,14 +361,10 @@ void rbx_neon_draw(float game_x, float game_w, uint32_t accent)
 	s_travel = fmodf(s_travel + SPEED * dt * 0.22f, RING * 5.0f);
 	s_time += dt;
 
-	draw_list(s_static, s_nbg);
-	vita2d_set_blend_mode_add(1);
-	draw_list(s_static + s_nbg, s_nstatic - s_nbg);
-
 	s_add = 1;
-	s_v = (Vtx *)vita2d_pool_memalign(DYN_MAX * sizeof(Vtx), sizeof(Vtx));
+	s_v = v;
 	s_n = 0;
-	s_max = s_v ? DYN_MAX : 0;
+	s_max = s_v ? max : 0;
 	// rings: upright on the walls, flowing out to the screen's edges
 	int idx = (int)ceilf((ZF + s_travel) / RING);
 	for (float z = idx * RING - s_travel; z > ZN * 0.98f && s_v; z -= RING, idx--) {
@@ -422,8 +436,155 @@ void rbx_neon_draw(float game_x, float game_w, uint32_t accent)
 		const uint32_t c = col(D80, a);
 		rect(sx - r, sy - r, sx + r, sy + r, c, c);
 	}
-	if (s_n)
-		draw_list(s_v, s_n);
-	vita2d_set_blend_mode_add(0);
 	s_add = 0;
+	if (s_lay_rot == 1 && s_v)
+		swap_xy(s_v, s_n);
+	return s_n;
+}
+
+// ---- (ADR-181) the moving parts made on a worker on CPU1 while the emulation thread runs the frame ----
+// rbx_neon_kick (the frame's start, main.c) posts the frame's job with the clock read then; rbx_neon_draw takes the
+// vertices it made. The same code and order of the animation's state (the pulses, the dust, the random numbers) as
+// before; the clock is read at the frame's start, not at its drawing (the same intervals). A job the worker has not
+// started is done by the drawing itself (as before ADR-181); one it is doing is waited for. A new layout at the
+// drawing (the picture's width, the theme, a knob) puts the state back as before the job and makes them there, as
+// before. Three vertex buffers of its own (GPU-read): the GPU may still read the last two frames'. The data folder's
+// "neonsync": all on the emulation thread as before
+#define DYN_BYTES ((3 * DYN_MAX * (int)sizeof(Vtx) + 4095) & ~4095)
+static SceUID s_dyn_blk = -1, s_wth = -1, s_wsema = -1;
+static Vtx *s_dyn[3];
+static int s_dyn_k, s_mode = -1;   // (s_mode: -1 not tried, 0 on the emulation thread, 1 on the worker)
+static int s_job;                  // 0 none, 1 posted, 2 being made, 3 made (atomic)
+static uint64_t s_job_now;
+static int s_job_n;
+static Vtx *s_job_v;
+static struct {
+	__typeof__(s_pulse) pulse;
+	__typeof__(s_dust) dust;
+	float travel, time;
+	uint64_t last;
+	uint32_t rand;
+} s_snap;
+
+static void job_run(void)
+{
+	s_job_n = dyn_make(s_job_now, s_job_v, DYN_MAX);
+	__atomic_store_n(&s_job, 3, __ATOMIC_RELEASE);
+}
+static int job_take(int from, int to)
+{
+	return __atomic_compare_exchange_n(&s_job, &from, to, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE);
+}
+static int neon_worker(SceSize args, void *argp)
+{
+	(void)args;
+	(void)argp;
+	for (;;) {   // (lives as long as the app)
+		if (sceKernelWaitSema(s_wsema, 1, NULL) < 0)
+			return sceKernelExitDeleteThread(0);
+		if (job_take(1, 2))
+			job_run();
+	}
+}
+
+#define NEON_PRIORITY 120   // (CPU1: below the sound threads 70-100 and the io worker 72, above the test files' 190)
+static int worker_start(void)
+{
+	SceIoStat st;
+	if (sceIoGetstat(RBX_DATA_DIR "neonsync", &st) >= 0) {
+		RBX_LOG("neon: the corridor on the emulation thread (neonsync)");
+		return 0;
+	}
+	s_dyn_blk = sceKernelAllocMemBlock("rbx_neon_dyn", SCE_KERNEL_MEMBLOCK_TYPE_USER_RW_UNCACHE, DYN_BYTES, NULL);
+	void *p = NULL;
+	if (s_dyn_blk < 0 || sceKernelGetMemBlockBase(s_dyn_blk, &p) < 0 || sceGxmMapMemory(p, DYN_BYTES, SCE_GXM_MEMORY_ATTRIB_READ) < 0) {
+		RBX_LOG("neon: vertex buffers failed 0x%08x (the corridor on the emulation thread)", s_dyn_blk);
+		if (s_dyn_blk >= 0)
+			sceKernelFreeMemBlock(s_dyn_blk);
+		s_dyn_blk = -1;
+		return 0;
+	}
+	for (int k = 0; k < 3; k++)
+		s_dyn[k] = (Vtx *)p + k * DYN_MAX;
+	s_wsema = sceKernelCreateSema("rbx_neon", 0, 0, 1, NULL);
+	s_wth = s_wsema < 0 ? -1 : sceKernelCreateThread("rbx_neon", neon_worker, NEON_PRIORITY, 0x4000, 0, SCE_KERNEL_CPU_MASK_USER_1, NULL);
+	if (s_wth < 0 || sceKernelStartThread(s_wth, 0, NULL) < 0) {
+		RBX_LOG("neon: worker failed 0x%08x (the corridor on the emulation thread)", s_wth);
+		return 0;   // (the buffers stay unused)
+	}
+	RBX_LOG("neon: the corridor's moving parts on CPU1, priority %d", NEON_PRIORITY);
+	return 1;
+}
+
+void rbx_neon_kick(float game_x, float game_w, uint32_t accent)
+{
+	if (s_mode == 0 || !s_static || !s_dust_init || __atomic_load_n(&s_job, __ATOMIC_ACQUIRE) != 0 ||
+		lay_changed(game_x, game_w, accent))
+		return;
+	if (s_mode < 0 && !(s_mode = worker_start()))
+		return;
+	memcpy(s_snap.pulse, s_pulse, sizeof(s_pulse));
+	memcpy(s_snap.dust, s_dust, sizeof(s_dust));
+	s_snap.travel = s_travel;
+	s_snap.time = s_time;
+	s_snap.last = s_last;
+	s_snap.rand = s_rand;
+	s_job_now = rbx_time_us();
+	s_dyn_k = (s_dyn_k + 1) % 3;
+	s_job_v = s_dyn[s_dyn_k];
+	__atomic_store_n(&s_job, 1, __ATOMIC_RELEASE);
+	sceKernelSignalSema(s_wsema, 1);
+}
+
+void rbx_neon_draw(float game_x, float game_w, uint32_t accent)
+{
+	if (!s_dust_init) {
+		s_dust_init = 1;
+		for (int i = 0; i < NDUST_MAX; i++) {
+			s_dust[i].sx = rnd() < 0.5f ? -1.0f : 1.0f;
+			s_dust[i].fx = 0.75f + rnd() * 0.25f;
+			s_dust[i].fy = rnd() * 2 - 1;
+			s_dust[i].t = rnd();
+		}
+	}
+	int have = 0, redo = 0;   // (redo: the job undone for a new layout; made again at its clock)
+	const Vtx *dv = NULL;
+	int dn = 0;
+	if (__atomic_load_n(&s_job, __ATOMIC_ACQUIRE) != 0) {   // (this frame's job: made here if the worker has not begun it)
+		if (job_take(1, 2))
+			job_run();
+		while (__atomic_load_n(&s_job, __ATOMIC_ACQUIRE) != 3)
+			;
+		have = 1;
+		dv = s_job_v;
+		dn = s_job_n;
+		__atomic_store_n(&s_job, 0, __ATOMIC_RELEASE);
+	}
+	if (lay_changed(game_x, game_w, accent)) {
+		if (have) {   // (the state as before the job: the frame made here after the new layout, as before)
+			memcpy(s_pulse, s_snap.pulse, sizeof(s_pulse));
+			memcpy(s_dust, s_snap.dust, sizeof(s_dust));
+			s_travel = s_snap.travel;
+			s_time = s_snap.time;
+			s_last = s_snap.last;
+			s_rand = s_snap.rand;
+			have = 0;
+			redo = 1;
+		}
+		lay_make(game_x, game_w, accent);
+	}
+	if (!s_static)
+		return;
+	if (!have) {
+		Vtx *v = (Vtx *)vita2d_pool_memalign(DYN_MAX * sizeof(Vtx), sizeof(Vtx));
+		dv = v;
+		dn = dyn_make(redo ? s_job_now : rbx_time_us(), v, DYN_MAX);
+	}
+
+	draw_list(s_static, s_nbg);
+	vita2d_set_blend_mode_add(1);
+	draw_list(s_static + s_nbg, s_nstatic - s_nbg);
+	if (dn)
+		draw_list(dv, dn);
+	vita2d_set_blend_mode_add(0);
 }

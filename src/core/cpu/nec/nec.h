@@ -50,6 +50,8 @@ typedef struct nec_t {
 	uint8_t state_end;
 
 	int chip;
+	// set from a handler (V30 / V33): the running nec_run_until returns after this instruction (MAME abort_timeslice)
+	uint8_t stop;
 	// MAME's scheduler slices of this many cycles (0: none): a REP loop stops at a slice's end and pays its 2 cycles again
 	// (the M72 boards' add_quantum for 25 seconds: their boot timing)
 	int rep_q;
@@ -76,6 +78,14 @@ typedef struct nec_t {
 	uint8_t (*port_in)(int port);       // 0..2 P0..P2, 3 PT
 	void (*port_out)(int port, uint8_t v);
 	uint8_t fbuf[64];          // (the bytes of an instruction at a page's end)
+	// the exact skipping of polling loops inside a run (nec_idle_enable; V30 / V33). Not state: only where a run is
+	// split, never its result
+	uint8_t idle_on;
+	uint8_t idle_badn[64];     // (the probes failed at the target idle_bad[] of a slot)
+	uint32_t idle_bad[64];
+	uint32_t idle_tgt;         // (the last taken backward branch's target and how often it came again)
+	int idle_cnt;
+	int (*idle_pure)(uint32_t a);
 } nec_t;
 
 #define NEC_STATE_SIZE ((uint32_t)offsetof(nec_t, state_end))
@@ -90,6 +100,16 @@ void nec_run_until(nec_t *c, int64_t end);
 int64_t nec_now(const nec_t *c);        // total, inside handlers too
 void nec_set_input(nec_t *c, int line, int state);
 void nec_after_load(nec_t *c);          // state bytes back: the bank pointer, the internal area's pages
+// Exact skipping of polling loops inside nec_run_until (V30 / V33; after the board's nec_map). A taken backward branch
+// seen a third time in a row ends the slice; one iteration of the loop is then run an instruction at a time with the
+// writes and the handler reads caught. When it comes back to its first instruction with every register as before,
+// every byte it wrote back to its old value, no write through a handler, no I/O port, no handler read but of the
+// addresses `pure` accepts (side-effect free, their value changed only by this CPU within a run; NULL: none), no
+// interrupt pending and no REP instruction, the next iterations are the same: the whole ones left before the run's
+// end are counted without being run. Rules for the board: nothing but this CPU changes its direct pages or the pure
+// addresses inside nec_run_until, and an abort (stop = 1) comes only from a handler. One CPU probing at a time
+// (static state: the emulation thread's CPUs only).
+void nec_idle_enable(nec_t *c, int (*pure)(uint32_t a));
 
 #ifdef __cplusplus
 }

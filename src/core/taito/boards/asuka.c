@@ -68,7 +68,8 @@ static const machine_t *s_m;
 static int s_vis_h;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x8000];
+static uint8_t (*s_ram_hp)[0x8000];
+#define s_ram (*s_ram_hp)
 static uint16_t s_pcr[0x1000];       // TC0110PCR RAM
 static uint16_t s_pcr_addr;
 static uint8_t s_ioc_regs[8];
@@ -294,6 +295,10 @@ static const machine_t *find_machine(const char *name)
 
 static int asuka_init(const rbx_game *g)
 {
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t scn_size, oj_size;
 	s_m = find_machine(g->machine);
 	if (!s_m) {
@@ -420,6 +425,8 @@ static void asuka_exit(void)
 	s_snap = NULL;
 	s_pri = NULL;
 	tsnd_exit();
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void asuka_frame(void)

@@ -32,7 +32,8 @@ static int s_wc;                         // World Cup Volleyball '95 (wcvol95 ma
 static arm_t s_cpu;
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x8000];             // 0x100000 (32-bit)
+static uint8_t (*s_ram_hp)[0x8000];             // 0x100000 (32-bit)
+#define s_ram (*s_ram_hp)
 static uint32_t s_pal[0x400];             // 0x1c0000 (xBGR_888, 32-bit)
 static uint16_t s_spriteram[0x800];
 static uint16_t s_rowscroll[2][0x400];
@@ -56,7 +57,8 @@ static int32_t *s_ymz_l, *s_ymz_r;
 static int s_ymz_cap, s_ymz_n;            // samples made this frame
 static uint32_t s_ymz_line0, s_ymz_line_n; // samples at the line's start, in the line
 static int64_t s_line_c0, s_line_cn;      // the line's first cycle, its cycles
-static uint8_t s_pri[VIS_W * VIS_H];
+static uint8_t (*s_pri_hp)[VIS_W * VIS_H];
+#define s_pri (*s_pri_hp)
 static struct {
 	deco16ic_t tile;
 	uint16_t rowscroll[2][0x400], spriteram[0x800];
@@ -385,6 +387,14 @@ static int descramble(uint8_t *rom, uint32_t size)
 
 static int hs_init(const rbx_game *g)
 {
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t tsize, ssize, o1s, o2s;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *tiles = rbx_region("tiles", &tsize), *spr = rbx_region("sprites", &ssize);
@@ -507,6 +517,10 @@ static void hs_exit(void)
 	free(s_ymz_l);
 	free(s_ymz_r);
 	s_ymz_l = s_ymz_r = NULL;
+	free(s_pri_hp);
+	s_pri_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void hs_frame(void)

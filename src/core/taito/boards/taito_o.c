@@ -26,7 +26,8 @@
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_nvram[0x10000];
+static uint8_t (*s_nvram_hp)[0x10000];
+#define s_nvram (*s_nvram_hp)
 static uint8_t s_palpage[0x1000];      // 0x500000-0x500fff page; palette at +0x800
 static tc0080vco_t *s_vco, *s_snap;
 static uint8_t s_snap_pal[0x800];
@@ -220,6 +221,10 @@ static void to_exit(void);
 
 static int to_init(const rbx_game *g)
 {
+	if (!s_nvram_hp && !(s_nvram_hp = calloc(1, sizeof(*s_nvram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint32_t gsize;
 	uint8_t *gfx = rbx_region("tc0080vco", &gsize);
@@ -310,6 +315,8 @@ static void to_exit(void)
 	free(s_mix);
 	s_mix = NULL;
 	rbx_ym_exit(0);
+	free(s_nvram_hp);
+	s_nvram_hp = NULL;
 }
 
 static void to_frame(void)

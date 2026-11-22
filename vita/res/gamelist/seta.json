@@ -3,540 +3,1094 @@
 "order":4,
 "games":[
 {
-"rom":"atehate",
+"rompath":"/roms/arbalest.zip",
+"title":"Arbalester",
+"board":"downtown.cpp",
+"publisher":"Jordan I.S.",
+"year":"1989",
+"genre":"Shooter",
+"port":"downtown",
+"marquee":"/marquee/arbalest.png",
+"snap":"/snap/arbalest.png",
+"video":"/video/arbalest.mp4",
+"description":null
+},
+{
+"rompath":"/roms/atehate.zip",
 "title":"Athena no Hatena?",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1993",
-"genre":"Quiz"
+"genre":"Quiz",
+"marquee":"/marquee/atehate.png",
+"snap":"/snap/atehate.png",
+"video":"/video/atehate.mp4",
+"description":null
 },
 {
-"rom":"blandia",
+"rompath":"/roms/blandia.zip",
 "title":"Blandia",
 "board":"Seta Hardware",
 "publisher":"Allumer",
 "year":"1992",
-"genre":"Fighter"
+"genre":"Fighter",
+"marquee":"/marquee/blandia.png",
+"snap":"/snap/blandia.png",
+"video":"/video/blandia.mp4",
+"description":null
 },
 {
-"rom":"blandiap",
+"rompath":"/roms/blandiap.zip",
 "title":"Blandia (prototype)",
 "board":"Seta Hardware",
 "publisher":"Allumer",
 "year":"1992",
-"genre":"Fighter"
+"genre":"Fighter",
+"marquee":"/marquee/blandiap.png",
+"snap":"/snap/blandiap.png",
+"video":"/video/blandiap.mp4",
+"description":null
 },
 {
-"rom":"blockcar",
+"rompath":"/roms/blockcar.zip",
 "title":"Block Carnival / Thunder & Lightning 2",
 "board":"Seta Hardware",
 "publisher":"Visco",
 "year":"1992",
-"genre":"Ball & Paddle"
+"genre":"Ball & Paddle",
+"marquee":"/marquee/blockcar.png",
+"snap":"/snap/blockcar.png",
+"video":"/video/blockcar.mp4",
+"description":null
 },
 {
-"rom":"blockcarb",
+"rompath":"/roms/blockcarb.zip",
 "title":"Block Carnival / Thunder & Lightning 2 (bootleg)",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1992",
-"genre":"Ball & Paddle"
+"genre":"Ball & Paddle",
+"marquee":"/marquee/blockcarb.png",
+"snap":"/snap/blockcarb.png",
+"video":"/video/blockcarb.mp4",
+"description":null
 },
 {
-"rom":"crazyfgt",
+"rompath":"/roms/calibr50.zip",
+"title":"Caliber 50 (Ver. 1.01)",
+"board":"downtown.cpp",
+"publisher":"Seta",
+"year":"1989",
+"genre":"Shooter",
+"port":"downtown",
+"marquee":"/marquee/calibr50.png",
+"snap":"/snap/calibr50.png",
+"video":"/video/calibr50.mp4",
+"description":null
+},
+{
+"rompath":"/roms/champbwl.zip",
+"title":"Championship Bowling",
+"board":"champbwl.cpp",
+"publisher":"Seta",
+"year":"1989",
+"genre":"Sports",
+"port":"champbwl",
+"marquee":"/marquee/champbwl.png",
+"snap":"/snap/champbwl.png",
+"video":"/video/champbwl.mp4",
+"description":null
+},
+{
+"rompath":"/roms/crazyfgt.zip",
 "title":"Crazy Fight",
 "board":"Seta Hardware",
 "publisher":"Subsino",
 "year":"1996",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/crazyfgt.png",
+"snap":"/snap/crazyfgt.png",
+"video":"/video/crazyfgt.mp4",
+"description":null
 },
 {
-"rom":"daioh",
+"rompath":"/roms/daifugo.zip",
+"title":"Daifugo (Japan)",
+"board":"speedatk.cpp",
+"publisher":"Seta Kikaku",
+"year":"1983",
+"genre":"Tabletop",
+"port":"speedatk",
+"marquee":"/marquee/daifugo.png",
+"snap":"/snap/daifugo.png",
+"video":"/video/daifugo.mp4",
+"description":null
+},
+{
+"rompath":"/roms/daioh.zip",
 "title":"Daioh",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1993",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/daioh.png",
+"snap":"/snap/daioh.png",
+"video":"/video/daioh.mp4",
+"description":null
 },
 {
-"rom":"daiohc",
+"rompath":"/roms/daiohc.zip",
 "title":"Daioh (93111A PCB conversion)",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1993",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/daiohc.png",
+"snap":"/snap/daiohc.png",
+"video":"/video/daiohc.mp4",
+"description":null
 },
 {
-"rom":"daioha",
+"rompath":"/roms/daioha.zip",
 "title":"Daioh (earlier)",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1993",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/daioha.png",
+"snap":"/snap/daioha.png",
+"video":"/video/daioha.mp4",
+"description":null
 },
 {
-"rom":"daiohp",
+"rompath":"/roms/daiohp.zip",
 "title":"Daioh (prototype)",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1993",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/daiohp.png",
+"snap":"/snap/daiohp.png",
+"video":"/video/daiohp.mp4",
+"description":null
 },
 {
-"rom":"daiohp2",
+"rompath":"/roms/daiohp2.zip",
 "title":"Daioh (prototype, earlier)",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1993",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/daiohp2.png",
+"snap":"/snap/daiohp2.png",
+"video":"/video/daiohp2.mp4",
+"description":null
 },
 {
-"rom":"daiohp3",
+"rompath":"/roms/daiohp3.zip",
 "title":"Daioh (prototype, earliest)",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1993",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/daiohp3.png",
+"snap":"/snap/daiohp3.png",
+"video":"/video/daiohp3.mp4",
+"description":null
 },
 {
-"rom":"drgnunit",
+"rompath":"/roms/downtown.zip",
+"title":"DownTown / Mokugeki (set 1)",
+"board":"downtown.cpp",
+"publisher":"Seta",
+"year":"1989",
+"genre":"Fighter",
+"port":"downtown",
+"marquee":"/marquee/downtown.png",
+"snap":"/snap/downtown.png",
+"video":"/video/downtown.mp4",
+"description":null
+},
+{
+"rompath":"/roms/drgnunit.zip",
 "title":"Dragon Unit / Castle of Dragon",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1989",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/drgnunit.png",
+"snap":"/snap/drgnunit.png",
+"video":"/video/drgnunit.mp4",
+"description":null
 },
 {
-"rom":"eightfrc",
+"rompath":"/roms/eightfrc.zip",
 "title":"Eight Forces",
 "board":"Seta Hardware",
 "publisher":"Tecmo",
 "year":"1994",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/eightfrc.png",
+"snap":"/snap/eightfrc.png",
+"video":"/video/eightfrc.mp4",
+"description":null
 },
 {
-"rom":"extdwnhl",
+"rompath":"/roms/extdwnhl.zip",
 "title":"Extreme Downhill (v1.5)",
 "board":"Seta Hardware",
 "publisher":"Sammy Industries Japan",
 "year":"1995",
-"genre":"Sports"
+"genre":"Sports",
+"marquee":"/marquee/extdwnhl.png",
+"snap":"/snap/extdwnhl.png",
+"video":"/video/extdwnhl.mp4",
+"description":null
 },
 {
-"rom":"gderby",
+"rompath":"/roms/gderby.zip",
 "title":"Gran Derby (Spanish hack of Jockey Club)",
 "board":"Seta Hardware",
 "publisher":"Hack",
 "year":"1990",
-"genre":"Gambling"
+"genre":"Gambling",
+"marquee":"/marquee/gderby.png",
+"snap":"/snap/gderby.png",
+"video":"/video/gderby.mp4",
+"description":null
 },
 {
-"rom":"gundhara",
+"rompath":"/roms/gundhara.zip",
 "title":"Gundhara",
 "board":"Seta Hardware",
 "publisher":"Banpresto",
 "year":"1995",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/gundhara.png",
+"snap":"/snap/gundhara.png",
+"video":"/video/gundhara.mp4",
+"description":null
 },
 {
-"rom":"gundharac",
+"rompath":"/roms/gundharac.zip",
 "title":"Gundhara (Chinese, bootleg?)",
 "board":"Seta Hardware",
 "publisher":"Banpresto",
 "year":"1995",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/gundharac.png",
+"snap":"/snap/gundharac.png",
+"video":"/video/gundharac.mp4",
+"description":null
 },
 {
-"rom":"inttoote",
+"rompath":"/roms/hanaawas.zip",
+"title":"Hana Awase (set 1)",
+"board":"hanaawas.cpp",
+"publisher":"Seta Kikaku",
+"year":"1982",
+"genre":"Tabletop",
+"port":"hanaawas",
+"marquee":"/marquee/hanaawas.png",
+"snap":"/snap/hanaawas.png",
+"video":"/video/hanaawas.mp4",
+"description":null
+},
+{
+"rompath":"/roms/inttoote.zip",
 "title":"International Toote (Germany, P523.V01)",
 "board":"Seta Hardware",
 "publisher":"Hack",
 "year":"1998",
-"genre":"Gambling"
+"genre":"Gambling",
+"marquee":"/marquee/inttoote.png",
+"snap":"/snap/inttoote.png",
+"video":"/video/inttoote.mp4",
+"description":null
 },
 {
-"rom":"inttoote2",
+"rompath":"/roms/inttoote2.zip",
 "title":"International Toote II (v1.24, P387.V01)",
 "board":"Seta Hardware",
 "publisher":"Hack",
 "year":"1993",
-"genre":"Gambling"
+"genre":"Gambling",
+"marquee":"/marquee/inttoote2.png",
+"snap":"/snap/inttoote2.png",
+"video":"/video/inttoote2.mp4",
+"description":null
 },
 {
-"rom":"jjsquawk",
+"rompath":"/roms/jjsquawk.zip",
 "title":"J. J. Squawkers",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1993",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/jjsquawk.png",
+"snap":"/snap/jjsquawk.png",
+"video":"/video/jjsquawk.mp4",
+"description":null
 },
 {
-"rom":"jjsquawkb",
+"rompath":"/roms/jjsquawkb.zip",
 "title":"J. J. Squawkers (bootleg)",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1999",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/jjsquawkb.png",
+"snap":"/snap/jjsquawkb.png",
+"video":"/video/jjsquawkb.mp4",
+"description":null
 },
 {
-"rom":"jjsquawkb2",
+"rompath":"/roms/jjsquawkb2.zip",
 "title":"J. J. Squawkers (bootleg, Blandia Conversion)",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1999",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/jjsquawkb2.png",
+"snap":"/snap/jjsquawkb2.png",
+"video":"/video/jjsquawkb2.mp4",
+"description":null
 },
 {
-"rom":"jjsquawko",
+"rompath":"/roms/jjsquawko.zip",
 "title":"J. J. Squawkers (older)",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1993",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/jjsquawko.png",
+"snap":"/snap/jjsquawko.png",
+"video":"/video/jjsquawko.mp4",
+"description":null
 },
 {
-"rom":"jockeyc",
+"rompath":"/roms/jockeyc.zip",
 "title":"Jockey Club (v1.18)",
 "board":"Seta Hardware",
 "publisher":"Seta",
 "year":"1990",
-"genre":"Gambling"
+"genre":"Gambling",
+"marquee":"/marquee/jockeyc.png",
+"snap":"/snap/jockeyc.png",
+"video":"/video/jockeyc.mp4",
+"description":null
 },
 {
-"rom":"keroppij",
+"rompath":"/roms/jclub2v112.zip",
+"title":"Jockey Club II (v1.12X, older hardware)",
+"board":"jclub2.cpp",
+"publisher":"Seta",
+"year":"1996",
+"genre":"Gambling",
+"port":"jclub2",
+"marquee":"/marquee/jclub2v112.png",
+"snap":"/snap/jclub2v112.png",
+"video":"/video/jclub2v112.mp4",
+"description":null
+},
+{
+"rompath":"/roms/keroppij.zip",
 "title":"Kero Kero Keroppi no Isshoni Asobou (Japan)",
 "board":"Seta Hardware",
 "publisher":"Sammy Industries",
 "year":"1993",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/keroppij.png",
+"snap":"/snap/keroppij.png",
+"video":"/video/keroppij.mp4",
+"description":null
 },
 {
-"rom":"keroppi",
+"rompath":"/roms/keroppi.zip",
 "title":"Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)",
 "board":"Seta Hardware",
 "publisher":"American Sammy",
 "year":"1995",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/keroppi.png",
+"snap":"/snap/keroppi.png",
+"video":"/video/keroppi.mp4",
+"description":null
 },
 {
-"rom":"krzybowl",
+"rompath":"/roms/krzybowl.zip",
 "title":"Krazy Bowl",
 "board":"Seta Hardware",
 "publisher":"American Sammy",
 "year":"1994",
-"genre":"Sports"
+"genre":"Sports",
+"marquee":"/marquee/krzybowl.png",
+"snap":"/snap/krzybowl.png",
+"video":"/video/krzybowl.mp4",
+"description":null
 },
 {
-"rom":"madshark",
+"rompath":"/roms/madshark.zip",
 "title":"Mad Shark",
 "board":"Seta Hardware",
 "publisher":"Allumer",
 "year":"1993",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/madshark.png",
+"snap":"/snap/madshark.png",
+"video":"/video/madshark.mp4",
+"description":null
 },
 {
-"rom":"madsharkbl",
+"rompath":"/roms/madsharkbl.zip",
 "title":"Mad Shark (bootleg)",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1993",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/madsharkbl.png",
+"snap":"/snap/madsharkbl.png",
+"video":"/video/madsharkbl.mp4",
+"description":null
 },
 {
-"rom":"magspeed",
+"rompath":"/roms/magspeed.zip",
 "title":"Magical Speed",
 "board":"Seta Hardware",
 "publisher":"Allumer",
 "year":"1994",
-"genre":"Tabletop"
+"genre":"Tabletop",
+"marquee":"/marquee/magspeed.png",
+"snap":"/snap/magspeed.png",
+"video":"/video/magspeed.mp4",
+"description":null
 },
 {
-"rom":"kamenrid",
+"rompath":"/roms/kamenrid.zip",
 "title":"Masked Riders Club Battle Race / Kamen Rider Club Battle Racer",
 "board":"Seta Hardware",
 "publisher":"Banpresto",
 "year":"1993",
-"genre":"Driving"
+"genre":"Driving",
+"marquee":"/marquee/kamenrid.png",
+"snap":"/snap/kamenrid.png",
+"video":"/video/kamenrid.mp4",
+"description":null
 },
 {
-"rom":"msgundam",
+"rompath":"/roms/mayjisn2.zip",
+"title":"Mayjinsen 2",
+"board":"simple_st0016.cpp",
+"publisher":"Seta",
+"year":"1994",
+"genre":"Tabletop",
+"port":"simple_st0016",
+"marquee":"/marquee/mayjisn2.png",
+"snap":"/snap/mayjisn2.png",
+"video":"/video/mayjisn2.mp4",
+"description":null
+},
+{
+"rompath":"/roms/metafox.zip",
+"title":"Meta Fox",
+"board":"downtown.cpp",
+"publisher":"Jordan I.S.",
+"year":"1989",
+"genre":"Shooter",
+"port":"downtown",
+"marquee":"/marquee/metafox.png",
+"snap":"/snap/metafox.png",
+"video":"/video/metafox.mp4",
+"description":null
+},
+{
+"rompath":"/roms/msgundam.zip",
 "title":"Mobile Suit Gundam",
 "board":"Seta Hardware",
 "publisher":"Banpresto",
 "year":"1993",
-"genre":"Fighter"
+"genre":"Fighter",
+"marquee":"/marquee/msgundam.png",
+"snap":"/snap/msgundam.png",
+"video":"/video/msgundam.mp4",
+"description":null
 },
 {
-"rom":"msgundamb",
+"rompath":"/roms/msgundamb.zip",
 "title":"Mobile Suit Gundam (bootleg)",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1993",
-"genre":"Fighter"
+"genre":"Fighter",
+"marquee":"/marquee/msgundamb.png",
+"snap":"/snap/msgundamb.png",
+"video":"/video/msgundamb.mp4",
+"description":null
 },
 {
-"rom":"msgundam1",
+"rompath":"/roms/msgundam1.zip",
 "title":"Mobile Suit Gundam (Japan)",
 "board":"Seta Hardware",
 "publisher":"Banpresto",
 "year":"1993",
-"genre":"Fighter"
+"genre":"Fighter",
+"marquee":"/marquee/msgundam1.png",
+"snap":"/snap/msgundam1.png",
+"video":"/video/msgundam1.mp4",
+"description":null
 },
 {
-"rom":"oisipuzl",
+"rompath":"/roms/nratechu.zip",
+"title":"Neratte Chu (ver. 1.10)",
+"board":"simple_st0016.cpp",
+"publisher":"Seta",
+"year":"1996",
+"genre":"Puzzle",
+"port":"simple_st0016",
+"marquee":"/marquee/nratechu.png",
+"snap":"/snap/nratechu.png",
+"video":"/video/nratechu.mp4",
+"description":null
+},
+{
+"rompath":"/roms/oisipuzl.zip",
 "title":"Oishii Puzzle Ha Irimasenka",
 "board":"Seta Hardware",
 "publisher":"Sunsoft",
 "year":"1993",
-"genre":"Puzzle"
+"genre":"Puzzle",
+"marquee":"/marquee/oisipuzl.png",
+"snap":"/snap/oisipuzl.png",
+"video":"/video/oisipuzl.mp4",
+"description":null
 },
 {
-"rom":"orbs",
+"rompath":"/roms/orbs.zip",
 "title":"Orbs (10/7/94 prototype?)",
 "board":"Seta Hardware",
 "publisher":"American Sammy",
 "year":"1994",
-"genre":"Puzzle"
+"genre":"Puzzle",
+"marquee":"/marquee/orbs.png",
+"snap":"/snap/orbs.png",
+"video":"/video/orbs.mp4",
+"description":null
 },
 {
-"rom":"pairlove",
+"rompath":"/roms/pairlove.zip",
 "title":"Pairs Love",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1991",
-"genre":"Puzzle"
+"genre":"Puzzle",
+"marquee":"/marquee/pairlove.png",
+"snap":"/snap/pairlove.png",
+"video":"/video/pairlove.mp4",
+"description":null
 },
 {
-"rom":"qzkklogy",
+"rompath":"/roms/qzkklogy.zip",
 "title":"Quiz Kokology",
 "board":"Seta Hardware",
 "publisher":"Tecmo",
 "year":"1992",
-"genre":"Quiz"
+"genre":"Quiz",
+"marquee":"/marquee/qzkklogy.png",
+"snap":"/snap/qzkklogy.png",
+"video":"/video/qzkklogy.mp4",
+"description":null
 },
 {
-"rom":"qzkklgy2",
+"rompath":"/roms/qzkklgy2.zip",
 "title":"Quiz Kokology 2",
 "board":"Seta Hardware",
 "publisher":"Tecmo",
 "year":"1993",
-"genre":"Quiz"
+"genre":"Quiz",
+"marquee":"/marquee/qzkklgy2.png",
+"snap":"/snap/qzkklgy2.png",
+"video":"/video/qzkklgy2.mp4",
+"description":null
 },
 {
-"rom":"rezon",
+"rompath":"/roms/rezon.zip",
 "title":"Rezon",
 "board":"Seta Hardware",
 "publisher":"Allumer",
 "year":"1992",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/rezon.png",
+"snap":"/snap/rezon.png",
+"video":"/video/rezon.mp4",
+"description":null
 },
 {
-"rom":"rezono",
+"rompath":"/roms/rezono.zip",
 "title":"Rezon (earlier)",
 "board":"Seta Hardware",
 "publisher":"Allumer",
 "year":"1991",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/rezono.png",
+"snap":"/snap/rezono.png",
+"video":"/video/rezono.mp4",
+"description":null
 },
 {
-"rom":"neobattl",
+"rompath":"/roms/neobattl.zip",
 "title":"SD Gundam Neo Battling (Japan)",
 "board":"Seta Hardware",
 "publisher":"Banpresto",
 "year":"1992",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/neobattl.png",
+"snap":"/snap/neobattl.png",
+"video":"/video/neobattl.mp4",
+"description":null
 },
 {
-"rom":"simpsonjr",
+"rompath":"/roms/simpsonjr.zip",
 "title":"Simpson Junior (bootleg of J. J. Squawkers)",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"2003",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/simpsonjr.png",
+"snap":"/snap/simpsonjr.png",
+"video":"/video/simpsonjr.mp4",
+"description":null
 },
 {
-"rom":"sokonuke",
+"rompath":"/roms/sokonuke.zip",
 "title":"Sokonuke Taisen Game (Japan)",
 "board":"Seta Hardware",
 "publisher":"Sammy Industries",
 "year":"1995",
-"genre":"Platform"
+"genre":"Platform",
+"marquee":"/marquee/sokonuke.png",
+"snap":"/snap/sokonuke.png",
+"video":"/video/sokonuke.mp4",
+"description":null
 },
 {
-"rom":"spkings",
+"rompath":"/roms/speedatk.zip",
+"title":"Speed Attack! (Japan)",
+"board":"speedatk.cpp",
+"publisher":"Seta Kikaku",
+"year":"1984",
+"genre":"Gambling",
+"port":"speedatk",
+"marquee":"/marquee/speedatk.png",
+"snap":"/snap/speedatk.png",
+"video":"/video/speedatk.mp4",
+"description":null
+},
+{
+"rompath":"/roms/spkings.zip",
 "title":"Sport of Kings (France, P436.08)",
 "board":"Seta Hardware",
 "publisher":"Hack",
 "year":"1994",
-"genre":"Gambling"
+"genre":"Gambling",
+"marquee":"/marquee/spkings.png",
+"snap":"/snap/spkings.png",
+"video":"/video/spkings.mp4",
+"description":null
 },
 {
-"rom":"stg",
+"rompath":"/roms/stg.zip",
 "title":"Strike Gunner S.T.G",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1991",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/stg.png",
+"snap":"/snap/stg.png",
+"video":"/video/stg.mp4",
+"description":null
 },
 {
-"rom":"triplfunk",
+"rompath":"/roms/triplfunk.zip",
 "title":"Sum-eoitneun Deongdalireul Chat-ara!",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1993",
-"genre":"Puzzle"
+"genre":"Puzzle",
+"marquee":"/marquee/triplfunk.png",
+"snap":"/snap/triplfunk.png",
+"video":"/video/triplfunk.mp4",
+"description":null
 },
 {
-"rom":"superbar",
+"rompath":"/roms/superbar.zip",
 "title":"Super Bar",
 "board":"Seta Hardware",
 "publisher":"Promat",
 "year":"1994",
-"genre":"Ball & Paddle"
+"genre":"Ball & Paddle",
+"marquee":"/marquee/superbar.png",
+"snap":"/snap/superbar.png",
+"video":"/video/superbar.mp4",
+"description":null
 },
 {
-"rom":"setaroula",
+"rompath":"/roms/speglsht.zip",
+"title":"Super Eagle Shot",
+"board":"speglsht.cpp",
+"publisher":"Seta",
+"year":"1994",
+"genre":"Sports",
+"port":"speglsht",
+"marquee":"/marquee/speglsht.png",
+"snap":"/snap/speglsht.png",
+"video":"/video/speglsht.mp4",
+"description":null
+},
+{
+"rompath":"/roms/srmp5.zip",
+"title":"Super Real Mahjong P5",
+"board":"srmp5.cpp",
+"publisher":"Seta",
+"year":"1994",
+"genre":"Tabletop",
+"port":"srmp5",
+"marquee":"/marquee/srmp5.png",
+"snap":"/snap/srmp5.png",
+"video":"/video/srmp5.mp4",
+"description":null
+},
+{
+"rompath":"/roms/srmp6.zip",
+"title":"Super Real Mahjong P6 (Japan)",
+"board":"srmp6.cpp",
+"publisher":"Seta",
+"year":"1995",
+"genre":"Tabletop",
+"port":"srmp6",
+"marquee":"/marquee/srmp6.png",
+"snap":"/snap/srmp6.png",
+"video":"/video/srmp6.mp4",
+"description":null
+},
+{
+"rompath":"/roms/srmp7.zip",
+"title":"Super Real Mahjong P7 (Japan)",
+"board":"ssv.cpp",
+"publisher":"Seta",
+"year":"1997",
+"genre":"Tabletop",
+"port":"ssv",
+"marquee":"/marquee/srmp7.png",
+"snap":"/snap/srmp7.png",
+"video":"/video/srmp7.mp4",
+"description":null
+},
+{
+"rompath":"/roms/srmp1.zip",
+"title":"Super Real Mahjong Part 1 (Japan)",
+"board":"srmp2.cpp",
+"publisher":"Seta",
+"year":"1987",
+"genre":"Tabletop",
+"port":"srmp2",
+"marquee":"/marquee/srmp1.png",
+"snap":"/snap/srmp1.png",
+"video":"/video/srmp1.mp4",
+"description":null
+},
+{
+"rompath":"/roms/srmp2.zip",
+"title":"Super Real Mahjong Part 2 (Japan)",
+"board":"srmp2.cpp",
+"publisher":"Seta",
+"year":"1987",
+"genre":"Tabletop",
+"port":"srmp2",
+"marquee":"/marquee/srmp2.png",
+"snap":"/snap/srmp2.png",
+"video":"/video/srmp2.mp4",
+"description":null
+},
+{
+"rompath":"/roms/srmp3.zip",
+"title":"Super Real Mahjong Part 3 (Japan)",
+"board":"srmp2.cpp",
+"publisher":"Seta",
+"year":"1988",
+"genre":"Tabletop",
+"port":"srmp2",
+"marquee":"/marquee/srmp3.png",
+"snap":"/snap/srmp3.png",
+"video":"/video/srmp3.mp4",
+"description":null
+},
+{
+"rompath":"/roms/srmp4.zip",
+"title":"Super Real Mahjong PIV (Japan)",
+"board":"ssv.cpp",
+"publisher":"Seta",
+"year":"1993",
+"genre":"Tabletop",
+"port":"ssv",
+"marquee":"/marquee/srmp4.png",
+"snap":"/snap/srmp4.png",
+"video":"/video/srmp4.mp4",
+"description":null
+},
+{
+"rompath":"/roms/setaroula.zip",
 "title":"Super Ruleta 36 (Spanish hack of The Roulette)",
 "board":"Seta Hardware",
 "publisher":"Hack",
 "year":"1989?",
-"genre":"Gambling"
+"genre":"Gambling",
+"marquee":"/marquee/setaroula.png",
+"snap":"/snap/setaroula.png",
+"video":"/video/setaroula.mp4",
+"description":null
 },
 {
-"rom":"setaroul",
+"rompath":"/roms/setaroul.zip",
 "title":"The Roulette (Visco)",
 "board":"Seta Hardware",
 "publisher":"Visco",
 "year":"1989?",
-"genre":"Gambling"
+"genre":"Gambling",
+"marquee":"/marquee/setaroul.png",
+"snap":"/snap/setaroul.png",
+"video":"/video/setaroul.mp4",
+"description":null
 },
 {
-"rom":"setaroulm",
+"rompath":"/roms/setaroulm.zip",
 "title":"The Roulette (Visco, medal)",
 "board":"Seta Hardware",
 "publisher":"Visco",
 "year":"1989?",
-"genre":"Gambling"
+"genre":"Gambling",
+"marquee":"/marquee/setaroulm.png",
+"snap":"/snap/setaroulm.png",
+"video":"/video/setaroulm.mp4",
+"description":null
 },
 {
-"rom":"thunderlbl",
+"rompath":"/roms/thunderlbl.zip",
 "title":"Thunder & Lightning (bootleg with Tetris sound, set 1)",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1991",
-"genre":"Ball & Paddle"
+"genre":"Ball & Paddle",
+"marquee":"/marquee/thunderlbl.png",
+"snap":"/snap/thunderlbl.png",
+"video":"/video/thunderlbl.mp4",
+"description":null
 },
 {
-"rom":"thunderlbl2",
+"rompath":"/roms/thunderlbl2.zip",
 "title":"Thunder & Lightning (bootleg with Tetris sound, set 2)",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1990",
-"genre":"Ball & Paddle"
+"genre":"Ball & Paddle",
+"marquee":"/marquee/thunderlbl2.png",
+"snap":"/snap/thunderlbl2.png",
+"video":"/video/thunderlbl2.mp4",
+"description":null
 },
 {
-"rom":"thunderl",
+"rompath":"/roms/thunderl.zip",
 "title":"Thunder & Lightning (set 1)",
 "board":"Seta Hardware",
 "publisher":"Seta",
 "year":"1990",
-"genre":"Ball & Paddle"
+"genre":"Ball & Paddle",
+"marquee":"/marquee/thunderl.png",
+"snap":"/snap/thunderl.png",
+"video":"/video/thunderl.mp4",
+"description":null
 },
 {
-"rom":"thunderla",
+"rompath":"/roms/thunderla.zip",
 "title":"Thunder & Lightning (set 2)",
 "board":"Seta Hardware",
 "publisher":"Seta",
 "year":"1990",
-"genre":"Ball & Paddle"
+"genre":"Ball & Paddle",
+"marquee":"/marquee/thunderla.png",
+"snap":"/snap/thunderla.png",
+"video":"/video/thunderla.mp4",
+"description":null
 },
 {
-"rom":"triplfun",
+"rompath":"/roms/triplfun.zip",
 "title":"Triple Fun",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1993",
-"genre":"Puzzle"
+"genre":"Puzzle",
+"marquee":"/marquee/triplfun.png",
+"snap":"/snap/triplfun.png",
+"video":"/video/triplfun.mp4",
+"description":null
 },
 {
-"rom":"utoukond",
+"rompath":"/roms/twineag2.zip",
+"title":"Twin Eagle II - The Rescue Mission",
+"board":"ssv.cpp",
+"publisher":"Seta",
+"year":"1994",
+"genre":"Shooter",
+"port":"ssv",
+"marquee":"/marquee/twineag2.png",
+"snap":"/snap/twineag2.png",
+"video":"/video/twineag2.mp4",
+"description":null
+},
+{
+"rompath":"/roms/usclssic.zip",
+"title":"U.S. Classic",
+"board":"downtown.cpp",
+"publisher":"Seta",
+"year":"1989",
+"genre":"Sports",
+"port":"downtown",
+"marquee":"/marquee/usclssic.png",
+"snap":"/snap/usclssic.png",
+"video":"/video/usclssic.mp4",
+"description":null
+},
+{
+"rompath":"/roms/utoukond.zip",
 "title":"Ultra Toukon Densetsu (Japan)",
 "board":"Seta Hardware",
 "publisher":"Banpresto",
 "year":"1993",
-"genre":"Fighter"
+"genre":"Fighter",
+"marquee":"/marquee/utoukond.png",
+"snap":"/snap/utoukond.png",
+"video":"/video/utoukond.mp4",
+"description":null
 },
 {
-"rom":"umanclub",
+"rompath":"/roms/ultrax.zip",
+"title":"Ultra X Weapons / Ultra Keibitai",
+"board":"ssv.cpp",
+"publisher":"Banpresto",
+"year":"1995",
+"genre":"Shooter",
+"port":"ssv",
+"marquee":"/marquee/ultrax.png",
+"snap":"/snap/ultrax.png",
+"video":"/video/ultrax.mp4",
+"description":null
+},
+{
+"rompath":"/roms/umanclub.zip",
 "title":"Ultraman Club - Tatakae! Ultraman Kyoudai!!",
 "board":"Seta Hardware",
 "publisher":"Banpresto",
 "year":"1992",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/umanclub.png",
+"snap":"/snap/umanclub.png",
+"video":"/video/umanclub.mp4",
+"description":null
 },
 {
-"rom":"wrofaero",
+"rompath":"/roms/wrofaero.zip",
 "title":"War of Aero - Project MEIOU",
 "board":"Seta Hardware",
 "publisher":"Yang Cheng",
 "year":"1993",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/wrofaero.png",
+"snap":"/snap/wrofaero.png",
+"video":"/video/wrofaero.mp4",
+"description":null
 },
 {
-"rom":"wiggie",
+"rompath":"/roms/wiggie.zip",
 "title":"Wiggie Waggie",
 "board":"Seta Hardware",
 "publisher":"Promat",
 "year":"1994",
-"genre":"Ball & Paddle"
+"genre":"Ball & Paddle",
+"marquee":"/marquee/wiggie.png",
+"snap":"/snap/wiggie.png",
+"video":"/video/wiggie.mp4",
+"description":null
 },
 {
-"rom":"wits",
+"rompath":"/roms/wits.zip",
 "title":"Wit's (Japan)",
 "board":"Seta Hardware",
 "publisher":"Athena",
 "year":"1989",
-"genre":"Maze"
+"genre":"Maze",
+"marquee":"/marquee/wits.png",
+"snap":"/snap/wits.png",
+"video":"/video/wits.mp4",
+"description":null
 },
 {
-"rom":"zingzipbl",
+"rompath":"/roms/zingzipbl.zip",
 "title":"Zing Zing Zip (bootleg)",
 "board":"Seta Hardware",
 "publisher":"Bootleg",
 "year":"1992",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/zingzipbl.png",
+"snap":"/snap/zingzipbl.png",
+"video":"/video/zingzipbl.mp4",
+"description":null
 },
 {
-"rom":"zingzip",
+"rompath":"/roms/zingzip.zip",
 "title":"Zing Zing Zip (World) / Zhen Zhen Ji Pao (China?)",
 "board":"Seta Hardware",
 "publisher":"Allumer",
 "year":"1992",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/zingzip.png",
+"snap":"/snap/zingzip.png",
+"video":"/video/zingzip.mp4",
+"description":null
 },
 {
-"rom":"zombraidpj",
+"rompath":"/roms/zombraidpj.zip",
 "title":"Zombie Raid (9/28/95, Japan, prototype PCB)",
 "board":"Seta Hardware",
 "publisher":"Sammy Industries",
 "year":"1995",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/zombraidpj.png",
+"snap":"/snap/zombraidpj.png",
+"video":"/video/zombraidpj.mp4",
+"description":null
 },
 {
-"rom":"zombraid",
+"rompath":"/roms/zombraid.zip",
 "title":"Zombie Raid (9/28/95, US)",
 "board":"Seta Hardware",
 "publisher":"American Sammy",
 "year":"1995",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/zombraid.png",
+"snap":"/snap/zombraid.png",
+"video":"/video/zombraid.mp4",
+"description":null
 },
 {
-"rom":"zombraidp",
+"rompath":"/roms/zombraidp.zip",
 "title":"Zombie Raid (9/28/95, US, prototype PCB)",
 "board":"Seta Hardware",
 "publisher":"American Sammy",
 "year":"1995",
-"genre":"Shooter"
+"genre":"Shooter",
+"marquee":"/marquee/zombraidp.png",
+"snap":"/snap/zombraidp.png",
+"video":"/video/zombraidp.mp4",
+"description":null
 }
 ]
 }

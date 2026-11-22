@@ -50,7 +50,8 @@ static z80 s_z;
 static const uint8_t *s_zmap[256];
 static k007232_t s_k232;
 static upd7759_t s_upd;
-static uint8_t s_nv[0x8000];
+static uint8_t (*s_nv_hp)[0x8000];
+#define s_nv (*s_nv_hp)
 static char s_nv_path[256];
 static int s_port_sys, s_port_p[3], s_port_dsw[3];
 
@@ -78,7 +79,8 @@ static struct {
 	uint8_t pal8[0x800], gfx_bank[4];
 	uint16_t scrollx[3], scrolly[3], video_register;
 } s_vs;
-static uint8_t s_pri[VIS_H][320];
+static uint8_t (*s_pri_hp)[VIS_H][320];
+#define s_pri (*s_pri_hp)
 
 static void decode_tile(uint8_t *d, uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3, uint32_t r4, uint32_t r5,
                         uint32_t r6, uint32_t r7)
@@ -420,7 +422,8 @@ static void video_register_w(int offset, uint16_t data, uint16_t mask)
 #define Q_MAX 2048
 enum { Q_ADV, Q_LATCH, Q_IRQ };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out_l[2048], s_out_r[2048];
 static int s_out_n, s_out_pos;
@@ -674,6 +677,18 @@ static void tw_reset(void);
 
 static int tw_init(const rbx_game *g)
 {
+	if (!s_nv_hp && !(s_nv_hp = calloc(1, sizeof(*s_nv_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t pcm_size, upd_size, fixed_size, gfx_size;
 	const char *m = g->machine;
 	s_mach = !strcmp(m, "devilw") ? M_DEVILW : !strcmp(m, "miaj") ? M_MIAJ : !strcmp(m, "cuebrickj") ? M_CUEBRICKJ :
@@ -805,6 +820,12 @@ static void tw_exit(void)
 	free(s_fixgfx);
 	free(s_scrgfx);
 	s_fixgfx = s_scrgfx = NULL;
+	free(s_nv_hp);
+	s_nv_hp = NULL;
+	free(s_pri_hp);
+	s_pri_hp = NULL;
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void tw_reset(void)

@@ -290,7 +290,8 @@ static void vid_w(int o, uint8_t v)
 #define Q_MAX 2048
 enum { Q_ADV, Q_LATCH, Q_IRQ };
 typedef struct { uint16_t kind, arg; uint32_t v; } q_ev_t;
-static q_ev_t s_q[2][Q_MAX];
+static q_ev_t (*s_q_hp)[2][Q_MAX];
+#define s_q (*s_q_hp)
 static int s_qn[2], s_qcur;
 static int32_t s_out[2048];
 static int s_out_n, s_out_pos;
@@ -744,6 +745,10 @@ static void k63_reset(void);
 
 static int k63_init(const rbx_game *g)
 {
+	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	s_mach = !strcmp(g->machine, "bottom9") ? M_BOTTOM9 : !strcmp(g->machine, "spy") ? M_SPY
 	       : !strcmp(g->machine, "devstors") ? M_DEVSTORS : M_MAINEVT;
 	const int b9 = s_mach == M_BOTTOM9, spy = s_mach == M_SPY, two = b9 || spy;   // (two K007232s)
@@ -831,6 +836,8 @@ static void k63_exit(void)
 		k051316_exit(&s_k316);
 	if (s_mach == M_SPY || s_mach == M_DEVSTORS)
 		rbx_ym_exit(0);
+	free(s_q_hp);
+	s_q_hp = NULL;
 }
 
 static void map_bank(void) {}   // (the banked ROM read through the handlers)

@@ -22,7 +22,8 @@
 
 static uint8_t *s_rom;
 static uint32_t s_rom_size;
-static uint8_t s_ram[0x4000];
+static uint8_t (*s_ram_hp)[0x4000];
+#define s_ram (*s_ram_hp)
 static uint8_t s_pal[0x1000];
 static pc080sn_t *s_sn;
 static pc090oj_t *s_oj;
@@ -31,7 +32,8 @@ static struct {   // drawing snapshot
 	pc090oj_regs oj;
 	uint8_t pal[0x1000];
 } *s_snap;
-static uint8_t s_pri[SCREEN_W * VIS_H];
+static uint8_t (*s_pri_hp)[SCREEN_W * VIS_H];
+#define s_pri (*s_pri_hp)
 static int s_port[6];   // P1, P2, SPECIAL, SYSTEM, DSWA, DSWB
 static uint64_t s_cpu_frac;
 // ADPCM: MSM5205 + LS157
@@ -146,6 +148,14 @@ static void rastan_exit(void);
 
 static int rastan_init(const rbx_game *g)
 {
+	if (!s_pri_hp && !(s_pri_hp = calloc(1, sizeof(*s_pri_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
+	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t sn_size, oj_size;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *sn_gfx = rbx_region("pc080sn", &sn_size);
@@ -221,6 +231,10 @@ static void rastan_exit(void)
 	s_oj = NULL;
 	s_snap = NULL;
 	tsnd_exit();
+	free(s_pri_hp);
+	s_pri_hp = NULL;
+	free(s_ram_hp);
+	s_ram_hp = NULL;
 }
 
 static void rastan_frame(void)

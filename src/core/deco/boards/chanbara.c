@@ -28,7 +28,8 @@ static int s_scroll, s_flip, s_bank;
 static m6809_t s_cpu;
 static rbx_gfx s_gfx8, s_gfx16, s_gfxspr;
 static uint32_t s_palette[256];
-static uint8_t s_pri_buf[VIS_W * VIS_H];
+static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
+#define s_pri_buf (*s_pri_buf_hp)
 static int s_port_dsw, s_port_sys, s_port_p[2];
 static int s_line;
 static uint64_t s_cpu_frac, s_ym_frac;
@@ -211,6 +212,10 @@ static void cb_exit(void);
 
 static int cb_init(const rbx_game *g)
 {
+	if (!s_pri_buf_hp && !(s_pri_buf_hp = calloc(1, sizeof(*s_pri_buf_hp)))) {
+		rbx_fail("%s: out of memory", g->set);
+		return -1;
+	}
 	uint32_t csize, tsize, t2size, ssize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_bank_rom = rbx_region("user1", &s_bank_size);
@@ -309,6 +314,8 @@ static void cb_exit(void)
 	rbx_gfx_free(&s_gfxspr);
 	free(s_snap);
 	s_snap = NULL;
+	free(s_pri_buf_hp);
+	s_pri_buf_hp = NULL;
 }
 
 static void cb_frame(void)

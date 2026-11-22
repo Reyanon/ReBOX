@@ -5,7 +5,8 @@
 #include <stdint.h>
 
 // keys an area can press: RBX_KEY_* (Cross .. Start), then the d-pad
-enum { RBX_TKEY_UP = 8, RBX_TKEY_DOWN, RBX_TKEY_LEFT, RBX_TKEY_RIGHT, RBX_TKEY_COUNT };
+// RBX_TKEY_MENU (as ReST-V): opens the menu, as SELECT+START (no key goes to the game)
+enum { RBX_TKEY_UP = 8, RBX_TKEY_DOWN, RBX_TKEY_LEFT, RBX_TKEY_RIGHT, RBX_TKEY_MENU, RBX_TKEY_COUNT };
 // a touch button can also press two keys together (its own, apart from Controls > Combo keys):
 // key = RBX_TKEY_COMBO + bit mask (1 << RBX_KEY_*) of the two (as in ReST-V)
 #define RBX_TKEY_COMBO 256
@@ -33,5 +34,9 @@ const char *rbx_touch_key_name(int key);
 int rbx_touch_read(int *x, int *y);
 // SCE_CTRL_* bits of the areas touched now
 uint32_t rbx_touch_buttons(void);
+// 1 once when a menu touch button was touched (in rbx_touch_buttons since the last call)
+int rbx_touch_menu_take(void);
+// the areas touched in the last rbx_touch_buttons (bit i = area i, the first 64); 0 while the buttons wait for a release
+uint64_t rbx_touch_pressed(void);
 
 #endif
