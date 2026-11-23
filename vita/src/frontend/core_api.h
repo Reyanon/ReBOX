@@ -39,6 +39,8 @@ const char *rbx_core_game_name(void);   // running game
 const char *rbx_core_set_name(void);
 int rbx_core_button_count(void);
 void rbx_core_screen(int *w, int *h, int *flags);
+static inline uint32_t rbx_core_frame_mhz(void) { return rbx_frame_mhz(); }
+static inline void rbx_core_set_native_pace(int on) { rbx_set_native_pace(on); }
 
 // run one frame: fb (pitch in bytes) receives the screen, audio up to max stereo samples; returns the samples written
 int rbx_core_run_frame(void *fb, int pitch, int16_t *audio, int max);

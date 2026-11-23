@@ -1705,6 +1705,11 @@ static uint32_t s_rs_pos;      // 16.16 position into the current frame's input
 static uint32_t s_auto_frames;          // (frames and samples the driver gave since rbx_audio_setup: its frame rate when it
 static uint64_t s_auto_samples;         // sets none, see audio_out)
 static int16_t s_rs_prev, s_rs_prev_r;  // last input samples of the previous frame
+static uint32_t s_frame_mhz = 60000;    // the board's frame rate as audio_out last used it (rbx_frame_mhz)
+static int s_native_pace;               // (ADR-211) the frontend runs the board's frames at their own rate
+
+uint32_t rbx_frame_mhz(void) { return s_frame_mhz; }
+void rbx_set_native_pace(int on) { s_native_pace = on; }
 
 int rbx_audio_setup(uint32_t rate)
 {
@@ -1764,7 +1769,10 @@ static int audio_out(int16_t *out, int max)
 				fmhz = (uint32_t)est;
 		}
 	}
-	uint32_t step = (uint32_t)(((uint64_t)rbx_audio.rate << 16) * 60000 / ((uint64_t)s_cfg.sample_rate * fmhz));
+	s_frame_mhz = fmhz;
+	// (ADR-211) frames run at the board's own rate: its sound at its own speed
+	const uint32_t play_mhz = s_native_pace ? fmhz : 60000;
+	uint32_t step = (uint32_t)(((uint64_t)rbx_audio.rate << 16) * play_mhz / ((uint64_t)s_cfg.sample_rate * fmhz));
 	int n = 0;
 	int cnt = rbx_audio.count;
 	while (n < max) {

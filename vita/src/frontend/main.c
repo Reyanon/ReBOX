@@ -9,6 +9,7 @@
 
 #include <psp2/appmgr.h>
 #include <psp2/ctrl.h>
+#include <psp2/display.h>
 #include <psp2/io/fcntl.h>
 #include <psp2/io/stat.h>
 #include <psp2/kernel/cpu.h>
@@ -367,6 +368,46 @@ static void load_state(const fe_config *cfg, uint64_t *emu_frames, int slot)
 // keep the system from auto-suspending or turning the screen off while running without input (demo viewing, remote
 // measurement); same as PSP
 // scePowerTick. Without it the system paused the app after ~10s of no input
+// (ADR-211) a board more than 5% slower than the display (Midway T / Y units 54.7 Hz, Irem 55 Hz) runs at its own
+// rate: at a vblank with no board frame due, the last frame is shown again and its sound is not stretched. A board
+// closer to the display's rate runs a frame per vblank, its sound stretched to it (ADR-009), as smooth as the display.
+typedef struct {
+	uint32_t vcount, disp_mhz;
+	int64_t acc;   // milli-Hz-vblanks: a board frame is due when it reaches disp_mhz
+} pace_t;
+
+static void pace_start(pace_t *p)
+{
+	float hz = 0.0f;
+	p->disp_mhz = sceDisplayGetRefreshRate(&hz) >= 0 && hz > 50.0f && hz < 70.0f ? (uint32_t)(hz * 1000.0f + 0.5f) : 60000;
+	p->vcount = (uint32_t)sceDisplayGetVcount();
+	p->acc = p->disp_mhz;
+}
+
+// 1: a board frame is due at this vblank
+static int pace_run(pace_t *p)
+{
+	const uint32_t fmhz = rbx_core_frame_mhz();
+	const int native = fmhz < p->disp_mhz / 100 * 95;
+	rbx_core_set_native_pace(native);
+	const uint32_t vc = (uint32_t)sceDisplayGetVcount();
+	uint32_t d = vc - p->vcount;
+	p->vcount = vc;
+	if (!native) {
+		p->acc = p->disp_mhz;
+		return 1;
+	}
+	if (d > 4)
+		d = 4;   // (after a long frame or the menu: no catching up)
+	p->acc += (int64_t)d * fmhz;
+	if (p->acc < (int64_t)p->disp_mhz)
+		return 0;
+	p->acc -= p->disp_mhz;
+	if (p->acc > (int64_t)p->disp_mhz)
+		p->acc = p->disp_mhz;   // (a board slower than its own rate here: one frame per loop, no debt)
+	return 1;
+}
+
 static void power_tick(void)
 {
 	static unsigned tick;
@@ -470,6 +511,9 @@ static int run_game(const rbx_game_found *game)
 	uint32_t frame = 0;
 	uint64_t emu_frames = 0;
 	int menu_open = 0, result = GAME_LIST;
+	pace_t pace;
+	pace_start(&pace);
+	RBX_LOG("pace: display %.3f Hz", pace.disp_mhz / 1000.0);
 #ifdef RBX_ENABLE_LOG
 	uint64_t tframes = 0; // (switchtest: frames of this game, a state load included)
 #endif
@@ -576,11 +620,30 @@ static int run_game(const rbx_game_found *game)
 		const uint64_t t_pre = rbx_time_us();   // (a stall's breakdown: the frame's sections, below)
 #endif
 
-		int pitch = 0;
-		void *fb = cfg.render_threaded ? NULL : rbx_video_target(&pitch);
 		const int present = rbx_present_running();   // (ADR-195: the present thread draws and swaps)
 		if (!present)
 			rbx_video_kick_border();   // (ADR-181: the corridor's moving parts made on CPU1 while the frame runs)
+		const int ran = pace_run(&pace);
+#ifdef RBX_ENABLE_LOG
+		{	// (the game's frames per second against the display's)
+			static uint32_t n, nr;
+			static uint64_t t;
+			n++;
+			nr += ran;
+			if (!t)
+				t = t0;
+			if (n == 600) {
+				RBX_LOG("pace: %u game frames in %u display frames, %.2f fps (board %.3f Hz)", nr, n,
+					nr * 1e6 / (double)(t0 - t), rbx_core_frame_mhz() / 1000.0);
+				n = nr = 0;
+				t = t0;
+			}
+		}
+#endif
+		if (!ran)
+			goto show;   // (ADR-211: no board frame due at this vblank, the last one is shown again)
+		int pitch = 0;
+		void *fb = cfg.render_threaded ? NULL : rbx_video_target(&pitch);
 		{
 			const int n = rbx_core_run_frame(fb, pitch, audio, alen);
 			rbx_prof_set(RBX_PA_FE_AUDIO);
@@ -645,6 +708,7 @@ static int run_game(const rbx_game_found *game)
 			while (rbx_render_help_one(1))
 				;
 		}
+	show:;
 		const uint64_t tf0 = rbx_time_us();
 		rbx_prof_set(RBX_PA_DRAW);
 		rbx_touch_overlay_update(0);
@@ -692,7 +756,7 @@ static int run_game(const rbx_game_found *game)
 		const uint64_t t_swap = rbx_time_us();
 #endif
 		rbx_prof_set(RBX_PA_FE_TICKS);
-		rbx_fps_tick();
+		rbx_fps_tick(ran, rbx_core_frame_mhz() < pace.disp_mhz ? rbx_core_frame_mhz() / 1000.0f : 60.0f);
 		rbx_threads_tick();
 		rbx_medal_tick();
 		rbx_menu_shot_poll();

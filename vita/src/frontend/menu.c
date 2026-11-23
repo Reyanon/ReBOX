@@ -4028,14 +4028,14 @@ void rbx_fps_hide(void)
 
 static uint32_t s_fps_frame_no; // frames shown since the game started (test builds show it)
 void rbx_fps_reset_frames(void) { s_fps_frame_no = 0; }
-void rbx_fps_tick(void)
+void rbx_fps_tick(int ran, float target_hz)
 {
-	// presented frames per second, over the last 0.5 s
+	// game frames per second, over the last 0.5 s (a game slower than the display: its own rate, ADR-211)
 	const uint64_t now = rbx_time_us();
 	if (!s_fps_t0)
 		s_fps_t0 = now;
-	s_fps_frames++;
-	s_fps_frame_no++;
+	s_fps_frames += ran ? 1 : 0;
+	s_fps_frame_no += ran ? 1 : 0;
 	if (now - s_fps_t0 >= 500000) {
 		s_fps = s_fps_frames * 1000000.0f / (float)(now - s_fps_t0);
 		s_fps_frames = 0;
@@ -4058,7 +4058,7 @@ void rbx_fps_tick(void)
 #else
 	snprintf(buf, sizeof(buf), T("%d FPS"), (int)(s_fps + 0.5f)); // release builds round (59.8 -> 60)
 #endif
-	const uint32_t col = s_fps >= 59.0f ? UI_RGBA(0x60, 0xFF, 0x60, 0xFF) : UI_RGBA(0xFF, 0xC0, 0x40, 0xFF);
+	const uint32_t col = s_fps >= (target_hz < 60.0f ? target_hz : 60.0f) - 1.0f ? UI_RGBA(0x60, 0xFF, 0x60, 0xFF) : UI_RGBA(0xFF, 0xC0, 0x40, 0xFF);
 	{   // (ADR-181) the same text, colour and place as the box shown: not drawn and sent again (release builds: "60 FPS"
 		// most of the time; test builds' frame number changes it every time)
 		static char last[48];

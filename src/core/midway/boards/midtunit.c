@@ -113,6 +113,27 @@ static uint16_t *s_maincpu;
 static uint32_t *s_pal;
 static uint16_t *s_fb;         // 512 x 512
 static char s_nv_path[512];
+// (the CMOS written to its file a moment after the game changes it, not only at the game's end: the app closed from
+// the system menu skips the end, and the game said "CMOS invalid -- errors detected" at every start)
+static uint32_t s_nv_hash, s_nv_tick;
+static uint32_t nv_hash(const uint16_t *p, uint32_t n)
+{
+	uint32_t h = 2166136261u;
+	for (uint32_t i = 0; i < n; i++)
+		h = (h ^ p[i]) * 16777619u;
+	return h;
+}
+static void nv_save(void)
+{
+	if (!s_nv_path[0] || !s_cmos)
+		return;
+	FILE *f = fopen(s_nv_path, "wb");
+	if (f) {
+		fwrite(s_cmos, 2, s_cmos_words, f);
+		fclose(f);
+	}
+	s_nv_hash = nv_hash(s_cmos, s_cmos_words);
+}
 static int s_port[4];
 
 // a blit's parameters (dma_state_t)
@@ -1168,6 +1189,8 @@ static int tu_init(const rbx_game *g)
 					memset(s_cmos, 0, s_cmos_words * 2);
 				fclose(f);
 			}
+			s_nv_hash = nv_hash(s_cmos, s_cmos_words);
+			s_nv_tick = 0;
 		}
 	}
 	s_dq_on = !(getenv("RBX_TU_NODMATHREAD") && atoi(getenv("RBX_TU_NODMATHREAD")));
@@ -1194,13 +1217,7 @@ static void tu_exit(void)
 		rbx_aux2_set_job(NULL);   // (syncs first: the queued blits drawn)
 		s_dq_on = 0;
 	}
-	if (s_nv_path[0] && s_cmos) {
-		FILE *f = fopen(s_nv_path, "wb");
-		if (f) {
-			fwrite(s_cmos, 2, s_cmos_words, f);
-			fclose(f);
-		}
-	}
+	nv_save();
 	if (s_dcs)
 		dcs_exit();
 	else
@@ -1264,6 +1281,11 @@ static void run_main(uint64_t target)
 
 static void tu_frame(void)
 {
+	if (s_nv_path[0] && ++s_nv_tick >= 120) {   // (every 2 s: the CMOS changed since its file was written)
+		s_nv_tick = 0;
+		if (nv_hash(s_cmos, s_cmos_words) != s_nv_hash)
+			nv_save();
+	}
 	tms34010_screen_t *scr = &tms34010_screen;
 	do {
 		int len = tms34010_line_start();

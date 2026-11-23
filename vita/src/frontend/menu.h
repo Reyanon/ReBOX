@@ -58,7 +58,8 @@ void rbx_osd_show(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 void rbx_osd_tick(void); // every frame (hides it after 2 s)
 
 // FPS box in the game picture's top-right corner (when the setting is on): once per presented game frame
-void rbx_fps_tick(void);
+// once per display frame: ran = a new game frame in it, target_hz = the game's own rate (ADR-211)
+void rbx_fps_tick(int ran, float target_hz);
 void rbx_menu_shot_poll(void); // test: screen capture while a game runs (log builds)
 void rbx_fps_reset_frames(void); // frame number shown in test builds back to 0 (new game)
 void rbx_fps_hide(void); // while the menu is open

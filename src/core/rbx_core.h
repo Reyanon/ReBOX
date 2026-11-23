@@ -71,6 +71,11 @@ int rbx_running_game(void);            // index of the running game (-1 = none)
 
 // visible size of the unrotated screen. Rotation is rbx_game_rot()
 void rbx_screen(int *w, int *h);
+// the running board's frame rate in milli-Hz (its own, or the rate its sound shows; 60000 until known)
+uint32_t rbx_frame_mhz(void);
+// on: the frontend runs the board's frames at their own rate (a display frame without one shows the last again), so
+// a frame's sound is played in 1 / its rate, not stretched to a 60 Hz frame (ADR-211)
+void rbx_set_native_pace(int on);
 // frames per second of the board (60.0 for most)
 double rbx_fps(void);
 

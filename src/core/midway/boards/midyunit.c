@@ -53,6 +53,16 @@ static uint16_t *s_maindata;
 static uint32_t *s_pal;        // the palette in RGB
 static uint16_t *s_fb;         // the screen's visible lines (512 x 512)
 static char s_nv_path[512];
+// (the CMOS written to its file a moment after the game changes it, not only at the game's end: the app closed from
+// the system menu skips the end, and the game said "CMOS invalid -- errors detected" at every start)
+static uint32_t s_nv_hash, s_nv_tick;
+static uint32_t nv_hash(const uint16_t *p, uint32_t n)
+{
+	uint32_t h = 2166136261u;
+	for (uint32_t i = 0; i < n; i++)
+		h = (h ^ p[i]) * 16777619u;
+	return h;
+}
 
 // state (saved)
 static struct {
@@ -455,6 +465,7 @@ static void nv_save(void)
 		fwrite(s_cmos, 2, 0x4000, f);
 		fclose(f);
 	}
+	s_nv_hash = nv_hash(s_cmos, 0x4000);
 }
 
 static int yu_init(const rbx_game *g)
@@ -581,6 +592,8 @@ static int yu_init(const rbx_game *g)
 					memset(s_cmos, 0, 0x4000 * 2);
 				fclose(f);
 			}
+			s_nv_hash = nv_hash(s_cmos, 0x4000);
+			s_nv_tick = 0;
 		}
 	}
 	yu_reset();
@@ -639,6 +652,11 @@ static void run_main(uint64_t target)
 
 static void yu_frame(void)
 {
+	if (s_nv_path[0] && ++s_nv_tick >= 120) {   // (every 2 s: the CMOS changed since its file was written)
+		s_nv_tick = 0;
+		if (nv_hash(s_cmos, 0x4000) != s_nv_hash)
+			nv_save();
+	}
 	tms34010_screen_t *scr = &tms34010_screen;
 	do {
 		if (S.ae_pending) {   // (m_autoerase_line_timer: the line after the last visible one)
