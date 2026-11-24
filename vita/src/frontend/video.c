@@ -8,7 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <psp2/gxm.h>
 #include <psp2/kernel/cpu.h>
+#include <psp2/kernel/sysmem.h>
 #include <psp2/kernel/threadmgr.h>
 #include <vita2d.h>
 
@@ -555,18 +557,46 @@ uint32_t rbx_video_color(int r, int g, int b)
 }
 
 // --- overlay layers ---
+// the small layers' pool (user 11-25: snap videos gave no frame). A texture of its own takes a memory block, and blocks
+// come in big steps (CDRAM 256 KB): the list's many small layers (rows, bars, 8-pixel edges) took ~15 MB of CDRAM.
+// 11-23 moved them to uncached main memory blocks instead: the video decoder then gave no frame for every video of
+// High profile (found by bisecting on the device). Now they share CDRAM blocks of 4 MB, cut in order (these textures
+// live for the whole run)
+#define TEX_POOL (4u * 1024 * 1024)
+static uint8_t *s_pool;
+static uint32_t s_pool_used = TEX_POOL;
+static vita2d_texture *pool_texture(int w, int h)
+{
+	const uint32_t stride = (uint32_t)((w + 7) & ~7) * 4, size = (stride * (uint32_t)h + 255) & ~255u;
+	if (size > TEX_POOL / 8)
+		return NULL;   // (a big one: a block of its own)
+	if (s_pool_used + size > TEX_POOL) {   // another pool block
+		const SceUID uid = sceKernelAllocMemBlock("rbx_texpool", SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW, TEX_POOL, NULL);
+		void *base = NULL;
+		if (uid < 0 || sceKernelGetMemBlockBase(uid, &base) < 0)
+			return NULL;
+		if (sceGxmMapMemory(base, TEX_POOL, SCE_GXM_MEMORY_ATTRIB_RW) < 0) {
+			sceKernelFreeMemBlock(uid);
+			return NULL;
+		}
+		s_pool = (uint8_t *)base;
+		s_pool_used = 0;
+	}
+	vita2d_texture *t = (vita2d_texture *)calloc(1, sizeof(vita2d_texture));
+	if (!t)
+		return NULL;
+	if (sceGxmTextureInitLinear(&t->gxm_tex, s_pool + s_pool_used, SCE_GXM_TEXTURE_FORMAT_A8B8G8R8, (unsigned)w, (unsigned)h, 0) < 0) {
+		free(t);
+		return NULL;
+	}
+	t->data_UID = t->palette_UID = t->depth_UID = -1;   // (not vita2d's blocks: never given to vita2d_free_texture)
+	s_pool_used += size;
+	return t;
+}
+
 ReiTex *rbx_video_tex(int w, int h)
 {
-	// (user 11-23, snap videos gave no frame: CDRAM is given out in 256 KB blocks, so each small layer (the list's
-	// rows, bars, the 8-pixel edges) took 256 KB of it, about 15 MB in the list, and the video decoder found too little.
-	// The small ones in uncached main memory, as CPU-written CDRAM is uncached too)
-	vita2d_texture *t = NULL;
-	if ((size_t)((w + 7) & ~7) * h * 4 < 192 * 1024) {
-		const SceKernelMemBlockType prev = vita2d_texture_get_alloc_memblock_type();
-		vita2d_texture_set_alloc_memblock_type(SCE_KERNEL_MEMBLOCK_TYPE_USER_RW_UNCACHE);
-		t = vita2d_create_empty_texture(w, h);
-		vita2d_texture_set_alloc_memblock_type(prev);
-	}
+	vita2d_texture *t = pool_texture(w, h);
 	if (!t)
 		t = vita2d_create_empty_texture(w, h);
 	if (!t)
@@ -574,7 +604,8 @@ ReiTex *rbx_video_tex(int w, int h)
 	vita2d_texture_set_filters(t, SCE_GXM_TEXTURE_FILTER_POINT, SCE_GXM_TEXTURE_FILTER_POINT);
 	ReiTex *r = (ReiTex *)calloc(1, sizeof(ReiTex));
 	if (!r) {
-		vita2d_free_texture(t);
+		if (t->data_UID >= 0)
+			vita2d_free_texture(t);   // (a pool texture's memory stays in its pool)
 		return NULL;
 	}
 	r->tex = t;

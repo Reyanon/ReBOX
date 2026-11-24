@@ -95,14 +95,27 @@ static void mem_free(void *arg, void *p)
 }
 // memory the GPU reads: CDRAM, else physically contiguous main memory (user 11-23: with the list's layers in CDRAM
 // the decoder's frames did not fit, no frame came; the contiguous memory was unused). *uid: its block
-static void *gpu_alloc(uint32_t size, SceUID *uid_out)
+// align (user 11-25): the decoder asks its frames of High profile videos 1 MB aligned, and gives no frame when the
+// block does not start on that (blocks come 256 KB aligned: before 11-23 the CDRAM's layout happened to put them on
+// 1 MB). The block itself is asked at that alignment (a pointer moved inside a larger block was refused as well)
+static void *gpu_alloc(uint32_t size, uint32_t align, SceUID *uid_out)
 {
 	*uid_out = -1;
-	SceUID uid = sceKernelAllocMemBlock("rbx_avsnap", SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW, (size + 0x3ffff) & ~0x3ffffu, NULL);
+	SceKernelAllocMemBlockOpt opt, *po = NULL;
+	if (align > 0x40000 && !(align & (align - 1))) {
+		memset(&opt, 0, sizeof(opt));
+		opt.size = sizeof(opt);
+		opt.attr = SCE_KERNEL_ALLOC_MEMBLOCK_ATTR_HAS_ALIGNMENT;
+		opt.alignment = align;
+		po = &opt;
+	}
 	uint32_t got = (size + 0x3ffff) & ~0x3ffffu;
+	if (po)
+		got = (size + align - 1) & ~(align - 1);
+	SceUID uid = sceKernelAllocMemBlock("rbx_avsnap", SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW, got, po);
 	if (uid < 0) {
 		got = (size + 0xfffff) & ~0xfffffu;
-		uid = sceKernelAllocMemBlock("rbx_avsnap_pc", SCE_KERNEL_MEMBLOCK_TYPE_USER_MAIN_PHYCONT_NC_RW, got, NULL);
+		uid = sceKernelAllocMemBlock("rbx_avsnap_pc", SCE_KERNEL_MEMBLOCK_TYPE_USER_MAIN_PHYCONT_NC_RW, got, po);
 	}
 	void *p = NULL;
 	if (uid < 0)
@@ -140,11 +153,10 @@ static void gpu_free(void *p, SceUID uid)
 static void *frame_alloc(void *arg, uint32_t alignment, uint32_t size)
 {
 	(void)arg;
-	(void)alignment;
 	SceUID uid;
-	void *p = gpu_alloc(size, &uid);
+	void *p = gpu_alloc(size, alignment, &uid);
 	if (!p) {
-		RBX_LOG("avsnap: frame memory %u failed", (unsigned)size);
+		RBX_LOG("avsnap: frame memory %u (aligned %u) failed", (unsigned)size, (unsigned)alignment);
 		return NULL;
 	}
 	fb_lock();
@@ -429,7 +441,7 @@ vita2d_texture *rbx_snap_frame(void)
 				const int next = !s_cur;
 				if (!s_buf[next]) {
 					SceUID uid;   // (kept for the run)
-					s_buf[next] = gpu_alloc(FRAME_BLOCK, &uid);
+					s_buf[next] = gpu_alloc(FRAME_BLOCK, 0, &uid);
 				}
 				if (s_buf[next]) {
 					memcpy(s_buf[next], f.pData, size);
