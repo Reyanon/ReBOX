@@ -899,7 +899,7 @@ void gx_pre_sprites_051960(const uint8_t *buffer, int control, int shadow_config
 				// (prio_transtable, or prio_zoom_transtable at (zw << 16) / 16: the plain one when that is 1:1)
 				const uint32_t scx = nozoom ? 0x10000 : (uint32_t)((zw << 16) / 16), scy = nozoom ? 0x10000 : (uint32_t)((zh << 16) / 16);
 				pre_drawgfx((uint32_t)c, (uint32_t)color, flipx != 0, flipy != 0, (sx & 0x1ff) - 96, sy, scx, scy,
-				            !(scx == 0x10000 && scy == 0x10000), max_priority == -1 ? (uint32_t)pri : 0, drawmode_table);
+				            !(scx == 0x10000 && scy == 0x10000), max_priority == -1 ? (uint32_t)pri : PRE_NOPRI, drawmode_table);
 			}
 		}
 	}

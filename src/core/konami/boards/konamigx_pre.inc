@@ -2,6 +2,9 @@
     worker of the pre-GX bands (konamigx_v.c: the names of the copies renamed). Part of konamigx_v.c.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#ifndef PRE_NOPRI
+#define PRE_NOPRI 0xffffffffu   // (pre_drawgfx: drawn without the priority bitmap)
+#endif
 static int s_pby0 = 0, s_pby1 = VIS_H_MAX + 512;   // (pre_sprites_core's band: its first and last row)
 
 // PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY (the shadow table: pen + entries)
@@ -52,7 +55,9 @@ static void pre_drawgfx(uint32_t code, uint32_t color, int flipx, int flipy, int
 	const int cl = s_pclip[0], cr = s_pclip[1], ct = s_pclip[2], cb = s_pclip[3];
 	if (cl > cr || ct > cb)
 		return;
-	pmask |= 1u << 31;
+	// (PRE_NOPRI: gfx_element::transtable / zoom_transtable, no priority bitmap: k051960_sprites_draw with a priority
+	// range draws back to front over everything; with 1 << 31 an earlier, farther sprite hid the nearer ones, issue #2)
+	pmask = pmask == PRE_NOPRI ? 0 : pmask | 1u << 31;
 	const uint32_t ncolors = (uint32_t)s_pal_n / (uint32_t)s_spr_gran;
 	color = (uint32_t)s_spr_gran * (ncolors ? color % ncolors : 0);
 	const uint8_t *src = s_sprites + (size_t)(s_nsprites ? code % s_nsprites : 0) * 256;
