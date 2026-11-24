@@ -90,6 +90,7 @@ void rbx_video_layer_rot(int slot, int rot);   // turned clockwise by rot * 90 d
 #define RBX_NSTRIP 48
 typedef struct { const ReiTex *t; int x, y; } ReiStrip;
 void rbx_video_strips(const ReiStrip *s, int n, int y0, int y1);
+void rbx_video_strips_keep(int save);   // save: the strips set aside; 0: put back (a screen over the list or the menu)
 // the game list's opaque background under slot 0, the list's still preview between them (t: SCREEN_H rows, stretched
 // across). Set while slot 0 holds the list with a see-through background (its text stays opaque); NULL: the preview over
 // slot 0 as before

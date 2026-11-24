@@ -937,6 +937,89 @@ static int stream_rom_file(const rbx_rom_load *l, uint8_t *reg, uint32_t rsize)
 	return -1;
 }
 
+// ---- system BIOS choice (MAME's ROM_SYSTEM_BIOS, user 11-25): the Neo Geo's mainbios load replaced by the BIOS chosen in
+// the frontend's settings when its file is in the set's zips (neogeo.zip), else MAME's default is kept. The 512KB MV1C
+// BIOSes are left out (the driver maps 128KB of the BIOS)
+typedef struct { const char *name, *desc, *file; uint32_t crc; } bios_opt;
+static const bios_opt k_neogeo_bios[] = {
+	{ "euro", "Europe MVS (Ver. 2)", "sp-s2.sp1", 0x9036d879 },
+	{ "euro-s1", "Europe MVS (Ver. 1)", "sp-s.sp1", 0xc7f2fa45 },
+	{ "asia-mv1b", "Asia MV1B", "sp-s3.sp1", 0x91b64be3 },
+	{ "us", "US MVS (Ver. 2?)", "sp-u2.sp1", 0xe72943de },
+	{ "us-e", "US MVS (Ver. 1)", "sp-e.sp1", 0x2723a5b5 },
+	{ "us-v2", "US MVS (4 slot, Ver 2)", "sp1-u2", 0x62f021f4 },
+	{ "us-u4", "US MVS (U4)", "sp1-u4.bin", 0x1179a30f },
+	{ "us-u3", "US MVS (U3)", "sp1-u3.bin", 0x2025b7a2 },
+	{ "japan", "Japan MVS (Ver. 3)", "vs-bios.rom", 0xf0e8f27d },
+	{ "japan-s2", "Japan MVS (Ver. 2)", "sp-j2.sp1", 0xacede59c },
+	{ "japan-s1", "Japan MVS (Ver. 1)", "sp1.jipan.1024", 0x9fb0abe4 },
+	{ "japan-mv1b", "Japan MV1B", "japan-j3.bin", 0xdff6d41f },
+	{ "japan-j3a", "Japan MVS (J3, alt)", "sp1-j3.bin", 0xfbc6d469 },
+	{ "japan-hotel", "Custom Japanese Hotel", "sp-1v1_3db8c.bin", 0x162f0ebe },
+	{ "unibios40", "Universe BIOS 4.0", "uni-bios_4_0.rom", 0xa7aab458 },
+	{ "unibios33", "Universe BIOS 3.3", "uni-bios_3_3.rom", 0x24858466 },
+	{ "unibios32", "Universe BIOS 3.2", "uni-bios_3_2.rom", 0xa4e8b9b3 },
+	{ "unibios31", "Universe BIOS 3.1", "uni-bios_3_1.rom", 0x0c58093f },
+	{ "unibios30", "Universe BIOS 3.0", "uni-bios_3_0.rom", 0xa97c89a9 },
+	{ "unibios23", "Universe BIOS 2.3", "uni-bios_2_3.rom", 0x27664eb5 },
+	{ "unibios23o", "Universe BIOS 2.3 (older?)", "uni-bios_2_3o.rom", 0x601720ae },
+	{ "unibios22", "Universe BIOS 2.2", "uni-bios_2_2.rom", 0x2d50996a },
+	{ "unibios21", "Universe BIOS 2.1", "uni-bios_2_1.rom", 0x8dabf76b },
+	{ "unibios20", "Universe BIOS 2.0", "uni-bios_2_0.rom", 0x0c12c2ad },
+	{ "unibios13", "Universe BIOS 1.3", "uni-bios_1_3.rom", 0xb24b44a0 },
+	{ "unibios12", "Universe BIOS 1.2", "uni-bios_1_2.rom", 0x4fa698e9 },
+	{ "unibios12o", "Universe BIOS 1.2 (older)", "uni-bios_1_2o.rom", 0xe19d3ce9 },
+	{ "unibios11", "Universe BIOS 1.1", "uni-bios_1_1.rom", 0x5dda0d84 },
+	{ "unibios10", "Universe BIOS 1.0", "uni-bios_1_0.rom", 0x0ce453a0 },
+};
+#define NEOGEO_BIOS_N ((int)(sizeof(k_neogeo_bios) / sizeof(k_neogeo_bios[0])))
+static int s_neogeo_bios;   // (the choice: 0 = MAME's default)
+static char s_bios_note[96];
+
+int rbx_bios_count(void) { return NEOGEO_BIOS_N; }
+const char *rbx_bios_name(int i) { return i >= 0 && i < NEOGEO_BIOS_N ? k_neogeo_bios[i].name : NULL; }
+const char *rbx_bios_desc(int i) { return i >= 0 && i < NEOGEO_BIOS_N ? k_neogeo_bios[i].desc : NULL; }
+int rbx_bios_get(void) { return s_neogeo_bios; }
+void rbx_bios_set(const char *name)
+{
+	s_neogeo_bios = 0;
+	for (int i = 0; name && i < NEOGEO_BIOS_N; i++)
+		if (!strcmp(name, k_neogeo_bios[i].name))
+			s_neogeo_bios = i;
+}
+const char *rbx_bios_note(void) { return s_bios_note; }
+
+// the game's loads with the BIOS chosen in place of the default (a copy, freed by the caller), else NULL
+static rbx_rom_load *bios_loads(const rbx_game *g)
+{
+	s_bios_note[0] = 0;
+	if (!s_neogeo_bios)
+		return NULL;
+	const bios_opt *b = &k_neogeo_bios[s_neogeo_bios];
+	int n = 0, at = -1;
+	for (const rbx_rom_load *l = g->loads; l->op != RBX_ROM_END; l++, n++)
+		if (l->op == RBX_ROM_LOAD && !strcmp(g->regions[l->region].name, "mainbios") && l->crc == k_neogeo_bios[0].crc)
+			at = n;
+	if (at < 0)
+		return NULL;   // (not a Neo Geo set with MAME's default BIOS)
+	int found = 0;
+	for (int z = 0; z < s_nzips && !found; z++)
+		found = rbx_zip_find(s_zips[z], b->file, b->crc, 0x20000) >= 0;
+	if (!found) {
+		snprintf(s_bios_note, sizeof(s_bios_note), "%s not found: %s used", b->file, k_neogeo_bios[0].desc);
+		rbx_log("%s: %s", g->set, s_bios_note);
+		return NULL;
+	}
+	rbx_rom_load *c = (rbx_rom_load *)malloc((size_t)(n + 1) * sizeof(*c));
+	if (!c)
+		return NULL;
+	memcpy(c, g->loads, (size_t)(n + 1) * sizeof(*c));
+	c[at].file = b->file;
+	c[at].crc = b->crc;
+	rbx_log("%s: BIOS %s (%s)", g->set, b->desc, b->file);
+	return c;
+}
+
 static int load_roms(const rbx_game *g, const rbx_driver *drv)
 {
 	// zips: the set, then its parent chain
@@ -984,14 +1067,19 @@ static int load_roms(const rbx_game *g, const rbx_driver *drv)
 		s_reg_size[s_nreg] = r->size;
 		s_nreg++;
 	}
+	// (the chosen BIOS in place of the default: kept until the next game, s_reg_missing may point into it)
+	static rbx_rom_load *bl;
+	free(bl);
+	bl = bios_loads(g);
+	const rbx_rom_load *const loads = bl ? bl : g->loads;
 	int total = 0, done = 0;
-	for (const rbx_rom_load *l = g->loads; l->op != RBX_ROM_END; l++)
+	for (const rbx_rom_load *l = loads; l->op != RBX_ROM_END; l++)
 		total++;
 	uint8_t *file = NULL;
 	uint32_t flen = 0, fpos = 0;
 	const rbx_rom_load *last = NULL;
 	int rc = 0, fin = 0;   // (the regions before fin are done: their post-processing applied, as MAME region_post_process)
-	for (const rbx_rom_load *l = g->loads; l->op != RBX_ROM_END; l++, done++) {
+	for (const rbx_rom_load *l = loads; l->op != RBX_ROM_END; l++, done++) {
 		for (; fin < l->region; fin++)
 			region_post(g, fin);
 		uint8_t *reg = s_reg_data[l->region];
@@ -2002,6 +2090,7 @@ void rbx_exit(void)
 {
 	rbx_render_stop();
 	s_rt_on = 0;
+	rbx_cheat_clear();
 	if (s_drv)
 		s_drv->exit();
 	s_drv = NULL;
@@ -2031,6 +2120,7 @@ int rbx_run_frame(void *fb, int pitch, int16_t *audio, int max_samples)
 		out_offer(fb, pitch);
 	rbx_prof_set(RBX_PA_DRIVER);
 	s_drv->run_frame();
+	rbx_cheat_frame();
 	if (direct) {
 		rbx_prof_set(RBX_PA_VIDEO_OUT);
 		rbx_video.out = NULL;
@@ -2048,7 +2138,13 @@ int rbx_run_frame(void *fb, int pitch, int16_t *audio, int max_samples)
 }
 
 // ---- save states ----
-typedef struct { uint8_t *buf; uint32_t size, pos; int load, err, check; } state_ctx;   // check: headers compared only
+typedef struct {
+	uint8_t *buf; uint32_t size, pos; int load, err, check;   // check: headers compared only
+	int (*sink)(void *user, const void *p, uint32_t n);      // save straight to a writer, no buffer (rbx_state_stream)
+	void *user;
+	int (*src)(void *user, void *p, uint32_t n);             // load (or check) from a reader (rbx_state_unstream)
+	int (*skip)(void *user, uint32_t n);                     // check: the block's data passed over
+} state_ctx;
 
 int rbx_state_io(void *vctx, const char *tag, void *data, uint32_t size)
 {
@@ -2056,6 +2152,32 @@ int rbx_state_io(void *vctx, const char *tag, void *data, uint32_t size)
 	uint8_t hdr[12] = { 0 };
 	strncpy((char *)hdr, tag, 8);
 	hdr[8] = (uint8_t)size; hdr[9] = (uint8_t)(size >> 8); hdr[10] = (uint8_t)(size >> 16); hdr[11] = (uint8_t)(size >> 24);
+	if (c->src) {
+		uint8_t got[12];
+		if (c->src(c->user, got, 12)) {
+			c->err = 1;
+			return -1;
+		}
+		if (memcmp(got, hdr, 12)) {
+			rbx_log("state: block %.8s size %u does not match the file's %.8s", tag, size, (const char *)got);
+			c->err = 1;
+			return -1;
+		}
+		if (c->load ? c->src(c->user, data, size) : c->skip(c->user, size)) {
+			c->err = 1;
+			return -1;
+		}
+		c->pos += 12 + size;
+		return 0;
+	}
+	if (c->sink) {
+		if (c->sink(c->user, hdr, 12) || c->sink(c->user, data, size)) {
+			c->err = 1;
+			return -1;
+		}
+		c->pos += 12 + size;
+		return 0;
+	}
 	if (!c->buf) {           // size pass
 		c->pos += 12 + size;
 		return 0;
@@ -2089,6 +2211,10 @@ void *rbx_state_var(void *vctx, const char *tag, uint32_t *size, int load)
 	state_ctx *c = (state_ctx *)vctx;
 	uint8_t hdr[12] = { 0 };
 	strncpy((char *)hdr, tag, 8);
+	if (c->sink || c->src) {  // (a block filled in place needs the buffer)
+		c->err = 1;
+		return NULL;
+	}
 	if (!load && !c->buf) {   // size pass
 		c->pos += 12 + *size;
 		return NULL;
@@ -2151,6 +2277,33 @@ int rbx_state_write(void *buf, uint32_t size)
 	if (!s_drv || !s_drv->state_save)
 		return -1;
 	state_ctx c = { (uint8_t *)buf, size, 0, 0, 0, 0 };
+	return state_run(&c);
+}
+
+int rbx_state_stream(int (*write)(void *user, const void *p, uint32_t n), void *user)
+{
+	rbx_video_wait_idle();
+	if (!s_drv || !s_drv->state_save)
+		return -1;
+	state_ctx c = { NULL, 0, 0, 0, 0, 0, write, user };
+	return state_run(&c);
+}
+
+int rbx_state_unstream(int (*read)(void *user, void *p, uint32_t n), int (*skip)(void *user, uint32_t n),
+                       int (*rewind)(void *user), void *user, uint32_t size)
+{
+	rbx_video_wait_idle();
+	if (!s_drv || !s_drv->state_load)
+		return -1;
+	// (as rbx_state_read: every block's name and size checked first, then loaded)
+	state_ctx k = { NULL, size, 0, 0, 0, 1, NULL, user, read, skip };
+	if (state_run(&k) || k.pos != size) {
+		rbx_log("state: size %u, this build's layout %u", size, k.pos);
+		return -1;
+	}
+	if (rewind(user))
+		return -1;
+	state_ctx c = { NULL, size, 0, 1, 0, 0, NULL, user, read, skip };
 	return state_run(&c);
 }
 

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <malloc.h>
 
 #include <psp2/appmgr.h>
@@ -52,6 +53,28 @@
 static const char *k_rom_dirs[ROM_DIRS_MAX] = { ROM_DIR, RBX_DATA_DIR };
 static int s_rom_dirs = 2;
 #define ROM_DIRS s_rom_dirs
+// the ROM folders again: roms/, the data folder, the two chosen in Settings, then the game lists' (menu.c calls it
+// when a chosen folder changes). Returns how many
+int rbx_rom_dirs_refresh(void)
+{
+	int n = 2;
+	for (int k = RBX_FOLDER_ROM1; k <= RBX_FOLDER_ROM2; k++) {
+		const char *d = rbx_folder(k);
+		int known = !d[0];
+		for (int i = 0; i < n && !known; i++)
+			known = !strcasecmp(k_rom_dirs[i], d);
+		if (!known) {
+			k_rom_dirs[n++] = d;
+			RBX_LOG("roms: also in %s (Settings)", d);
+		}
+	}
+	const int m = n;
+	n += rbx_gamelist_rom_dirs(k_rom_dirs, m, k_rom_dirs + m, ROM_DIRS_MAX - m);
+	for (int i = m; i < n; i++)
+		RBX_LOG("roms: also in %s (game list)", k_rom_dirs[i]);
+	s_rom_dirs = n;
+	return n;
+}
 static int s_kctrl_restarted;   // started again by rbx_kctrl_init (the first start after boot)
 
 #ifndef RBX_INTERLEAVE_MUL
@@ -1002,6 +1025,7 @@ int main(int argc, char *argv[])
 	rbx_states_move_old();                      // the save states in states/
 	rbx_touch_init();
 	rbx_settings_load();
+	rbx_bios_set(g_settings.bios_neogeo);   // (the Neo Geo BIOS chosen in Settings > BIOS)
 	rbx_lang_init();   // (the menus' language: its files installed when missing, then read)
 	// input engine (setting): RePad = the Bluetooth controller plugin from the app, unless it already runs (ur0:tai, or
 	// another Re app); Native = whatever the system has
@@ -1012,9 +1036,8 @@ int main(int argc, char *argv[])
 	g_settings.input_engine = re_pad_engine_init(g_settings.input_engine, "ux0:app/RBOX00001/module/repad.skprx"); // (the kernel cannot open app0:)
 	RBX_LOG("input engine: %s, RePad %s", re_pad_engine_name(g_settings.input_engine), re_pad_plugin() ? "running" : "not running");
 	rbx_gamelist_load();   // (the lists' ROM folders join the scan)
-	s_rom_dirs = 2 + rbx_gamelist_rom_dirs(k_rom_dirs, 2, k_rom_dirs + 2, ROM_DIRS_MAX - 2);
-	for (int i = 2; i < s_rom_dirs; i++)
-		RBX_LOG("roms: also in %s (game list)", k_rom_dirs[i]);
+	rbx_folders_load();
+	rbx_rom_dirs_refresh();
 	rbx_menu_init();
 	rbx_loading_prepare(); // (the loading screen's background, decoded once now rather than when a game is chosen)
 #ifdef RBX_ENABLE_LOG

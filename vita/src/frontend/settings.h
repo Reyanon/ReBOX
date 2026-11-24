@@ -131,6 +131,7 @@ typedef struct {
 	int dip_count;                      // number of saved DIP bytes (0 = driver defaults). Per-game file <set>.cfg
 	uint8_t dip[RBX_DIP_BYTES_MAX];
 	char language[8];                   // the menus' language (lang.h: "eng", "kor", ...)
+	char bios_neogeo[16];               // the Neo Geo BIOS by MAME's name ("" / "euro" = the default; rbx_bios_set)
 	char last_game[16];                 // set name of the last game played (game list cursor)
 	int list_filter;                    // game list filter: RBX_LIST_*
 	int list_group;                     // game list grouping: RBX_GROUP_*

@@ -11,6 +11,7 @@
 
 #include <psp2/appmgr.h>
 #include <psp2/ctrl.h>
+#include <psp2/io/dirent.h>
 #include <psp2/io/fcntl.h>
 #include <psp2/io/stat.h>
 #include <psp2/kernel/processmgr.h>
@@ -487,14 +488,25 @@ static char s_set[32], s_title[96];
 static UiCanvas *s_cv, *s_osd_cv, *s_fps_cv;
 static int s_changed; // settings changed since the menu opened (saved on close only then)
 enum { PAGE_MAIN, PAGE_STATES, PAGE_DISPLAY, PAGE_CONTROLS, PAGE_DIPS, PAGE_CHEATS, PAGE_ABOUT, PAGE_COMBO, PAGE_TURBO,
-	PAGE_TOUCH, PAGE_TEDIT, PAGE_PORT, PAGE_STICK, PAGE_SETTINGS };
-enum { SET_LANG, SET_BACK, SET_COUNT };   // (the Settings page, user 11-22)
+	PAGE_TOUCH, PAGE_TEDIT, PAGE_PORT, PAGE_STICK, PAGE_SETTINGS, PAGE_FOLDERS, PAGE_BIOS, PAGE_BIOSLIST, PAGE_CONTENT };
+// the Settings page (user 11-22) and its sub-pages (user 11-25): Folders (ROM, snap, marquee: 11-24), BIOS (Neo Geo: its
+// list of BIOSes)
+enum { SET_LANG, SET_FOLDERS, SET_BIOS, SET_BACK, SET_COUNT };
+enum { FD_ROM1, FD_ROM2, FD_SNAP, FD_MARQ, FD_BACK, FD_COUNT };
+enum { BI_NEOGEO, BI_BACK, BI_COUNT };
+// Content Download (user 11-25): the files of the GitHub content release, each to the folder the app reads it from
+enum { CT_CHEAT, CT_BACK, CT_COUNT };
+#define CHEAT_ZIP RBX_DATA_DIR "cheats/cheat.zip"
+static void content_get(int row);   // (below: the download, its progress window)
+static char s_ct_msg[128];          // (the last download's result: the page's help line)
+// the folder rows: RBX_FOLDER_* of a Folders row, else -1
+static int set_folder(int row) { return row >= FD_ROM1 && row <= FD_MARQ ? RBX_FOLDER_ROM1 + (row - FD_ROM1) : -1; }
 static int s_page;
 static int s_mt_wait_up; // the finger that left the touch layout editor: not a tap on the page it came back to
 // rows in groups (a gap before M_STATES, M_DISPLAY and M_ABOUT): game, states, settings, about / leave.
 // M_REFRESH (read the ROM folders again) only in the game list options
 enum { M_RESUME, M_RESET, M_STATES, M_DISPLAY, M_CONTROLS, M_DIPS, M_CHEATS, M_GAME_SAVE, M_GAME_DEL, M_ABOUT, M_SELECT_GAME,
-	M_EXIT, M_BACK, M_REFRESH, M_GROUP, M_SETTINGS, M_COUNT };
+	M_EXIT, M_BACK, M_REFRESH, M_GROUP, M_SETTINGS, M_CONTENT, M_COUNT };
 #define GROUP_GAP 10
 // game list options (START in the list): no game. Only Display / Controls / Refresh / Back, global settings only
 static int s_list_mode;
@@ -506,6 +518,7 @@ static int main_list(int *k)
 		k[n++] = M_DISPLAY;
 		k[n++] = M_CONTROLS;
 		k[n++] = M_SETTINGS;
+		k[n++] = M_CONTENT;   // (Content Download: the list's options only, user 11-25)
 		k[n++] = M_GROUP;
 		k[n++] = M_REFRESH;
 		k[n++] = M_ABOUT;
@@ -824,7 +837,7 @@ static void warn_clash(int key, int func)
 }
 
 // DIP switch page: the groups, Restore defaults, Back. Cheat page: (nbbatman family) two built-in cheats, the user cheat
-// file's cheats (cheats/<set>.ini), Back
+// file's cheats (cheats/<set>.xml), Back
 static int dip_items(void) { return rbx_core_dip_count() + 2; }
 enum { HK_STAGE, HK_HEALTH, HK_FILE, HK_BACK };
 static int cheat_rows(void) { return (rbx_core_has_cheats() ? 2 : 0) + rbx_core_cheat_count() + 1; }
@@ -889,9 +902,10 @@ static const char *page_row_help(void)
 		case M_STATES: return "Save the game at this point or load it again";
 		case M_DISPLAY: return "Screen size, rotation, filter, scanlines, border, FPS and menu colors";
 		case M_SETTINGS: return "The app's language and its other settings";
+		case M_CONTENT: return "Download extra files from ReBOX's GitHub (cheats ...)";
 		case M_CONTROLS: return "Controllers, input engine, buttons, analog stick, turbo, combo keys and touch buttons";
 		case M_DIPS: return "The board's DIP switches: difficulty, lives, coins and the game's other settings";
-		case M_CHEATS: return "Start stage, infinite health and the cheats of cheats/<set>.ini";
+		case M_CHEATS: return "Start stage, infinite health and the cheats of cheats/<set>.xml";
 		case M_GAME_SAVE: return "Keep the display and control settings as they are now for this game only";
 		case M_GAME_DEL: return "This game uses the global settings again";
 		case M_ABOUT: return "Version, credits and licenses";
@@ -921,7 +935,27 @@ static const char *page_row_help(void)
 			return "The game list's neon background (for now: to be fixed once set)";
 		return NULL;
 	case PAGE_SETTINGS:
+		if (s_sel == SET_FOLDERS)
+			return "Other folders for ROMs, snaps and marquees (e.g. RetroArch's)";
+		if (s_sel == SET_BIOS)
+			return "The system BIOS a board starts with (Neo Geo: the Universe BIOS ...)";
 		return s_sel == SET_LANG ? "The language of the menus and messages" : NULL;
+	case PAGE_FOLDERS:
+		if (s_sel == FD_ROM1 || s_sel == FD_ROM2)
+			return "Another folder searched for ROM zips (after roms/), e.g. RetroArch's";
+		if (s_sel == FD_SNAP)
+			return "Snaps looked for here first: <set>.png / .jpg, or RetroArch's thumbnail names";
+		if (s_sel == FD_MARQ)
+			return "Marquees looked for here first: <set>.png / .jpg, or RetroArch's thumbnail names";
+		return NULL;
+	case PAGE_BIOS:
+		return s_sel == BI_NEOGEO ? "The Neo Geo BIOS (its file in the game's zip or neogeo.zip). From the next game start" : NULL;
+	case PAGE_BIOSLIST:
+		return s_sel < rbx_bios_count() ? "Used from the next game start; a BIOS not in the zip: Europe MVS instead" : NULL;
+	case PAGE_CONTENT:
+		if (s_sel == CT_CHEAT && s_ct_msg[0])
+			return s_ct_msg;
+		return s_sel == CT_CHEAT ? "MAME cheats for every game (cheat.zip, about 4 MB) into cheats/: Cheats in the game's menu" : NULL;
 	case PAGE_STATES:
 		switch (s_sel) {
 		case S_SLOT: return "The slot to save to or load from";
@@ -940,7 +974,7 @@ static const char *page_row_help(void)
 		switch (cheat_kind(s_sel, &ci)) {
 		case HK_STAGE: return "The stage a new game starts at (it applies when a new game starts)";
 		case HK_HEALTH: return "1P never loses health";
-		case HK_FILE: return "A cheat of cheats/<set>.ini: off, or one of its values";
+		case HK_FILE: return "A cheat of cheats/<set>.xml: off, or one of its values";
 		default: return NULL;
 		}
 	}
@@ -1262,6 +1296,10 @@ static int page_items(void)
 	case PAGE_CHEATS: return cheat_rows();
 	case PAGE_STATES: return S_COUNT;
 	case PAGE_SETTINGS: return SET_COUNT;
+	case PAGE_FOLDERS: return FD_COUNT;
+	case PAGE_BIOS: return BI_COUNT;
+	case PAGE_BIOSLIST: return rbx_bios_count() + 1;
+	case PAGE_CONTENT: return CT_COUNT;
 	case PAGE_ABOUT: return ABOUT_VISIBLE;
 	default: return main_rows();
 	}
@@ -1301,6 +1339,16 @@ static void page_back(void)
 	if (from == PAGE_TOUCH || from == PAGE_PORT) {
 		go_page(PAGE_CONTROLS);
 		s_sel = ctrl_row_of(from == PAGE_PORT ? (s_kp ? CK_PORT2 : CK_PORT1) : CK_TOUCH);
+		return;
+	}
+	if (from == PAGE_FOLDERS || from == PAGE_BIOS) {   // (Settings' sub-pages: back to their row)
+		go_page(PAGE_SETTINGS);
+		s_sel = from == PAGE_FOLDERS ? SET_FOLDERS : SET_BIOS;
+		return;
+	}
+	if (from == PAGE_BIOSLIST) {
+		go_page(PAGE_BIOS);
+		s_sel = BI_NEOGEO;
 		return;
 	}
 	go_page(PAGE_MAIN);
@@ -1400,6 +1448,8 @@ static int combo_pick(int i)
 	return -1;
 }
 static int s_choice_kind; // the last item_choices() listed (drawn that way)
+
+static int folder_browse(int k);   // (folderbrowse.inc: the Settings' folder rows)
 static int item_choices(const char **out, int *cur, const char **title)
 {
 	static char num[MAX_CHOICES][24];
@@ -2070,6 +2120,7 @@ static rbx_menu_result confirm(void)
 		case M_STATES: go_page(PAGE_STATES); break;
 		case M_DISPLAY: go_page(PAGE_DISPLAY); break;
 		case M_SETTINGS: go_page(PAGE_SETTINGS); break;
+		case M_CONTENT: go_page(PAGE_CONTENT); break;
 		case M_CONTROLS: go_page(PAGE_CONTROLS); break;
 		case M_DIPS:
 			if (rbx_core_dip_count() > 0)
@@ -2081,7 +2132,7 @@ static rbx_menu_result confirm(void)
 			if (any_cheats())
 				go_page(PAGE_CHEATS);
 			else
-				rbx_osd_show(T("No cheats: put %s.ini in cheats/"), s_set);
+				rbx_osd_show(T("No cheats: put %s.xml in cheats/"), s_set);
 			break;
 		case M_GAME_SAVE: // this game only (the global settings file is not written)
 			if (rbx_settings_save_game())
@@ -2187,7 +2238,36 @@ static rbx_menu_result confirm(void)
 		break;
 	case PAGE_SETTINGS:
 		if (s_sel == SET_BACK) go_page(PAGE_MAIN);
+		else if (s_sel == SET_FOLDERS) go_page(PAGE_FOLDERS);
+		else if (s_sel == SET_BIOS) go_page(PAGE_BIOS);
 		else change(+1);
+		break;
+	case PAGE_FOLDERS:
+		if (s_sel == FD_BACK) page_back();
+		else if (set_folder(s_sel) >= 0 && folder_browse(set_folder(s_sel)))
+			s_changed = 1;
+		break;
+	case PAGE_BIOS:
+		if (s_sel == BI_BACK) page_back();
+		else {
+			go_page(PAGE_BIOSLIST);
+			s_sel = rbx_bios_get();   // (at the one in use)
+		}
+		break;
+	case PAGE_CONTENT:
+		if (s_sel == CT_BACK) page_back();
+		else
+			content_get(s_sel);
+		break;
+	case PAGE_BIOSLIST:
+		if (s_sel >= rbx_bios_count()) page_back();
+		else if (s_sel != rbx_bios_get()) {
+			rbx_bios_set(rbx_bios_name(s_sel));
+			snprintf(g_settings.bios_neogeo, sizeof(g_settings.bios_neogeo), "%s", rbx_bios_name(s_sel));
+			s_changed = 1;
+			if (!s_list_mode)
+				rbx_osd_show("%s", T("The BIOS is used from the next game start"));
+		}
 		break;
 	case PAGE_STATES:
 		if (s_sel == S_SAVE) return RBX_MENU_SAVE;
@@ -2976,6 +3056,56 @@ static int text_keys(UiCanvas *c, int x, int ty, uint32_t col, const char *s) //
 	return x;
 }
 
+// ---- Content Download: the file downloaded with a progress window over the menu
+static const char *s_ct_name;
+static uint32_t *s_ct_under;
+static void content_progress(const char *stage, int pct)
+{
+	UiCanvas *c = s_cv;
+	const int mw = 640, mh = 130, mx = (SCREEN_W - mw) / 2, my = (SCREEN_H - mh) / 2;
+	if (s_ct_under)   // (the menu under the window put back first: the shadow does not darken)
+		ui_blit(c, s_ct_under);
+	window_box(c, mx, my, mw, mh, COL_SEL, COL_PANEL);
+	char t[96];
+	if (pct >= 0)
+		snprintf(t, sizeof(t), "%s %s  %d%%", T(stage), T(s_ct_name), pct);
+	else
+		snprintf(t, sizeof(t), "%s %s ...", T(stage), T(s_ct_name));
+	ui_text(c, mx + 24, my + 46, COL_TEXT, 1.0f, t);
+	rrect(c, mx + 24, my + 70, mw - 48, 14, 6, UI_RGBA(0xFF, 0xFF, 0xFF, 0x20));
+	if (pct > 0)
+		rrect(c, mx + 24, my + 70, (mw - 48) * (pct > 100 ? 100 : pct) / 100, 14, 6, COL_SEL);
+	ui_text(c, mx + 24, my + mh - 18, COL_DIM, 0.8f, "Do not turn the Vita off");
+	ui_commit(c);
+	rbx_video_present();
+}
+static void content_get(int row)
+{
+	static const struct { const char *name, *file, *dest; } k_ct[CT_COUNT - 1] = {
+		{ "Cheats", "cheat.zip", CHEAT_ZIP } };
+	if (row < 0 || row >= CT_COUNT - 1)
+		return;
+	ensure_canvases();
+	focus_off();
+	s_ct_name = k_ct[row].name;
+	s_ct_under = (uint32_t *)malloc((size_t)SCREEN_W * SCREEN_H * 4);
+	if (s_ct_under)
+		memcpy(s_ct_under, ui_pixels(s_cv), (size_t)SCREEN_W * SCREEN_H * 4);
+	char url[256];
+	snprintf(url, sizeof(url), "%s%s", RBX_CONTENT_URL, k_ct[row].file);
+	const char *err = rbx_content_download(url, k_ct[row].dest, content_progress);
+	free(s_ct_under);
+	s_ct_under = NULL;
+	if (err)
+		snprintf(s_ct_msg, sizeof(s_ct_msg), T("Download failed: %s"), T(err));
+	else
+		snprintf(s_ct_msg, sizeof(s_ct_msg), T("%s downloaded: %s"), T(k_ct[row].name), k_ct[row].dest);
+	s_drawn_h = 0;
+	s_dirty = 1;
+}
+
+#include "frontend/folderbrowse.inc"
+
 // Draw the menu panel to the canvas (caller uploads). overlay = over the game list (the dimmed list kept in s_under)
 static int s_paint_x0, s_paint_y0, s_paint_x1, s_paint_y1;
 static const uint32_t *s_under; // game list options: the dimmed list under the window (NULL: just drawn in full)
@@ -3149,10 +3279,22 @@ static void menu_paint(UiCanvas *c, int overlay)
 		break;
 	case PAGE_CHEATS:
 		title = "CHEATS";
-		foot = rbx_core_has_cheats() ? "Start stage applies when a new game starts" : "Left/Right: change   Cheat files: cheats/<set>.ini";
+		foot = rbx_core_has_cheats() ? "Start stage applies when a new game starts" : "Left/Right: change   Cheat files: cheats/<set>.xml";
 		break;
 	case PAGE_SETTINGS:
 		title = "SETTINGS";
+		break;
+	case PAGE_FOLDERS:
+		title = "FOLDERS";
+		break;
+	case PAGE_BIOS:
+		title = "BIOS";
+		break;
+	case PAGE_BIOSLIST:
+		title = "NEO GEO BIOS";
+		break;
+	case PAGE_CONTENT:
+		title = "CONTENT DOWNLOAD";
 		break;
 	case PAGE_STATES:
 		title = "SAVE / LOAD STATE";
@@ -3227,7 +3369,7 @@ static void menu_paint(UiCanvas *c, int overlay)
 		case PAGE_MAIN: {
 			static const char *const names[M_COUNT] = { "Resume game", "Reset game", "Save / Load state  >", "Display  >",
 				"Controls  >", "DIP switches  >", "Cheats  >", "Save game settings", "Delete game settings", "About  >",
-				"Select game", "Exit", "Back", "Refresh ROM list", "Group games by", "Settings  >" };
+				"Select game", "Exit", "Back", "Refresh ROM list", "Group games by", "Settings  >", "Content Download  >" };
 			const int k = main_kind(i);
 			const char *name = names[k];
 			char rbuf[64];
@@ -3412,7 +3554,51 @@ static void menu_paint(UiCanvas *c, int overlay)
 			const int li = rbx_lang_index(g_settings.language);
 			if (i == SET_LANG)
 				item(c, px, ty, i, s_sel, "Language", li >= 0 ? rbx_lang_at(li)->name : "English");
+			else if (i == SET_FOLDERS)
+				item(c, px, ty, i, s_sel, "Folders  >", NULL);
+			else if (i == SET_BIOS)
+				item(c, px, ty, i, s_sel, "BIOS  >", NULL);
 			else
+				item(c, px, ty, i, s_sel, "Back", NULL);
+			break;
+		}
+		case PAGE_BIOS:
+			if (i == BI_NEOGEO) {   // (the BIOS in use at the right, as a folder row)
+				item(c, px, ty, i, s_sel, "Neo Geo  >", NULL);
+				ui_text_clip(c, px + VALUE_X, ty, i == s_sel ? COL_SEL : COL_TEXT, 0.9f, rbx_bios_desc(rbx_bios_get()),
+				             px + VALUE_X, px + PANEL_W - 32);
+			} else
+				item(c, px, ty, i, s_sel, "Back", NULL);
+			break;
+		case PAGE_CONTENT:
+			if (i == CT_CHEAT) {   // (installed: its size)
+				SceIoStat st;
+				char v[48];
+				if (sceIoGetstat(CHEAT_ZIP, &st) >= 0)
+					snprintf(v, sizeof(v), T("Installed (%.1f MB)"), (double)st.st_size / (1024.0 * 1024.0));
+				else
+					snprintf(v, sizeof(v), "%s", T("Not installed"));
+				item(c, px, ty, i, s_sel, "Cheats", NULL);
+				ui_text_clip(c, px + VALUE_X, ty, i == s_sel ? COL_SEL : COL_TEXT, 0.9f, v, px + VALUE_X, px + PANEL_W - 32);
+			} else
+				item(c, px, ty, i, s_sel, "Back", NULL);
+			break;
+		case PAGE_BIOSLIST:
+			if (i < rbx_bios_count())   // (the one in use: its switch on)
+				item(c, px, ty, i, s_sel, rbx_bios_desc(i), i == rbx_bios_get() ? VAL_ON : VAL_OFF);
+			else
+				item(c, px, ty, i, s_sel, "Back", NULL);
+			break;
+		case PAGE_FOLDERS: {
+			static const char *const fname[4] = { "ROM folder 1", "ROM folder 2", "Snap folder", "Marquee folder" };
+			if (set_folder(i) >= 0) {
+				const char *f = rbx_folder(set_folder(i));   // (the folder, not a "< >" value: its end when long)
+				item(c, px, ty, i, s_sel, fname[i - FD_ROM1], NULL);
+				const size_t fl = strlen(f);
+				char fb[48];
+				snprintf(fb, sizeof(fb), fl > 30 ? "...%s" : "%s", f[0] ? f + (fl > 30 ? fl - 27 : 0) : T("Not set"));
+				ui_text_clip(c, px + VALUE_X, ty, i == s_sel ? COL_SEL : COL_TEXT, 0.9f, fb, px + VALUE_X, px + PANEL_W - 32);
+			} else
 				item(c, px, ty, i, s_sel, "Back", NULL);
 			break;
 		}
@@ -5082,6 +5268,10 @@ const rbx_game_found *rbx_game_select(const char *const *dirs, int ndirs, const 
 	// the ROM folders are read at the first list only (~0.3 s for 700 zips on the device: the app stopped that long on
 	// each Select game). ROMs copied later: Refresh ROM list
 	static int scanned, nplay_kept;
+	if (rbx_folders_rom_changed()) {   // (a ROM folder chosen in the game's menu: the folders read again)
+		ndirs = rbx_rom_dirs_refresh();
+		scanned = 0;
+	}
 	if (!scanned || !s_gl_n) {
 		nplay_kept = gl_scan(dirs, ndirs);
 		scanned = 1;
@@ -5451,7 +5641,12 @@ const rbx_game_found *rbx_game_select(const char *const *dirs, int ndirs, const 
 				rbx_video_set_preview(NULL, NULL);
 				return NULL;
 			}
-			if (mr == RBX_MENU_REFRESH) { // ROMs copied while the app runs
+			int folders = 0;   // (a ROM folder chosen in Settings: read as Refresh does)
+			if (mr != RBX_MENU_STAY && rbx_folders_rom_changed()) {
+				ndirs = rbx_rom_dirs_refresh();
+				folders = 1;
+			}
+			if (mr == RBX_MENU_REFRESH || folders) { // ROMs copied while the app runs
 				char cur[24] = "";
 				if (n)
 					snprintf(cur, sizeof(cur), "%s", gl_set(idx[sel]));

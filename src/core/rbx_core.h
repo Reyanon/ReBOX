@@ -37,6 +37,15 @@ const char *rbx_game_group(int i);
 int rbx_game_group_order(int i);
 int rbx_board_order(const char *board);   // the board's place in the module order
 
+// ---- the Neo Geo system BIOS (MAME's ROM_SYSTEM_BIOS choices): used from the next game loaded; a BIOS whose file is not
+// in neogeo.zip falls back to MAME's default (rbx_bios_note says so, "" else). 0 = the default, Europe MVS Ver. 2
+int rbx_bios_count(void);
+const char *rbx_bios_name(int i);   // MAME's name ("unibios40")
+const char *rbx_bios_desc(int i);   // "Universe BIOS 4.0"
+int rbx_bios_get(void);
+void rbx_bios_set(const char *name);   // by MAME's name (unknown: the default)
+const char *rbx_bios_note(void);
+
 // ---- running a game ----
 typedef uint32_t (*rbx_color_fn)(int r, int g, int b);
 typedef struct {
@@ -165,6 +174,12 @@ int rbx_state_load(const char *path);
 // raw state in memory (size, then fill); for the frontends' quick save
 uint32_t rbx_state_size(void);
 int rbx_state_write(void *buf, uint32_t size);
+// the same state given to write in parts (0 = ok), without a buffer of its size: for a game that leaves too little
+// memory for one (a driver part that fills its block in place, rbx_state_var, refuses it)
+int rbx_state_stream(int (*write)(void *user, const void *p, uint32_t n), void *user);
+// rbx_state_read from a reader (0 = ok): read n bytes, skip n bytes, back to the start; size = the file's
+int rbx_state_unstream(int (*read)(void *user, void *p, uint32_t n), int (*skip)(void *user, uint32_t n),
+                       int (*rewind)(void *user), void *user, uint32_t size);
 extern uint32_t rbx_state_load_us[4];   // the last rbx_state_load's parts (us): open, read, size + check, load
 int rbx_state_read(const void *buf, uint32_t size);
 
@@ -179,6 +194,18 @@ void rbx_medal_reset(void);            // clear the medal counters and the NVRAM
 // memory peek/poke on the main CPU (cheats)
 uint8_t rbx_peek(uint32_t addr);
 void rbx_poke(uint32_t addr, uint8_t v);
+
+// MAME cheat XML (cheat.c): a set's cheats from its <set>.xml text (after rbx_init; the count, 0 = none usable). Each
+// cheat has options: 0 off, then "On" or its parameter's values; they run every frame (rbx_run_frame), until rbx_exit
+int rbx_cheat_load_xml(const char *xml, size_t len);
+void rbx_cheat_clear(void);
+int rbx_cheat_count(void);
+const char *rbx_cheat_name(int i);
+int rbx_cheat_options(int i);
+const char *rbx_cheat_option_name(int i, int o);
+int rbx_cheat_get(int i);
+void rbx_cheat_set(int i, int o);
+void rbx_cheat_frame(void);
 
 #ifdef __cplusplus
 }

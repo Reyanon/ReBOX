@@ -18,6 +18,7 @@ void rbx_menu_set_game(const char *set, const char *title, int buttons);
 // options (Display, Controls, Refresh ROM list; global settings), Triangle About; a newer release is offered once:
 // Update / Close / Skip). Scans dirs for the ROM zips; the cursor starts on g_settings.last_game. notice: shown in a box
 // first (NULL = none). Returns the picked game (a playable one; the pointer stays valid until the next call)
+int rbx_rom_dirs_refresh(void);   // (main.c: the ROM folders again after Settings changed one; returns how many)
 const rbx_game_found *rbx_game_select(const char *const *dirs, int ndirs, const char *rom_dir, const char *notice);
 
 // Loading screen: the app's background, game name, stage, moving bar. The loader thread sets the progress

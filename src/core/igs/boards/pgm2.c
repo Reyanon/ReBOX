@@ -82,6 +82,14 @@ static int s_port[2];
 static int s_lores, s_hires, s_ramrom;
 static uint32_t s_frame_mhz;
 static char s_nv_path[256];
+// the IC cards (MAME pgm2_memcard: 0x100 data, 4 protection, 4 security bytes; its 264-byte card file). A card is
+// in each player's reader, kept in the NVRAM folder as <set>_card<n>.pg2: made from the set's blank card, or (a set
+// MAME has no blank card for: orleg2 Oversea / Japan) only a card file put there (a MAME card)
+typedef struct { uint8_t data[0x100], prot[4], sec[4]; } pgm2_card;
+static pgm2_card s_card[4];
+static uint8_t s_card_auth[4];
+static uint8_t s_card_in[4];   // (the reader has a card)
+static uint32_t s_nv_hash, s_nv_tick;   // (the SRAM and the cards written when they change, every 120 frames)
 static int s_line;
 static uint32_t s_line_end;   // (the ARM's cycles of the frame where the current line ends)
 static int64_t s_frame_start;
@@ -219,7 +227,12 @@ static void aic_w(uint32_t o, uint32_t d, uint32_t mask)
 	}
 }
 
-// ---- MCU (MAME's HLE: no card present) ----
+// ---- MCU (MAME's HLE) ----
+static void card_write(pgm2_card *c, int auth, uint8_t a, uint8_t v)
+{
+	if (auth && (a >= 0x20 || (c->prot[a >> 3] & (1 << (a & 7)))))
+		c->data[a] = v;
+}
 static void mcu_timer_after_us(uint32_t us)
 {
 	s->mcu_timer = s_arm->total_cycles + (s_arm->running ? (s_arm->slice - s_arm->icount) : 0) +
@@ -252,15 +265,60 @@ static void mcu_command(int is_command)
 			s->mcu_result1 = 0;
 			break;
 		}
-		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: case 0xc8: case 0xc9:
-			// IC card commands: no card in the reader (MAME memcard present() == -1)
-			if (cmd == 0xc2 || cmd == 0xc3) {
-				if ((uint8_t)(s->mcu_regs[0] >> 24))
-					status = 0xf4;
-			} else
-				status = 0xf4;
+		// C0-C9: the IC card reader (MAME pgm2_state::mcu_command, pgm2_memcard_device)
+		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: case 0xc8: case 0xc9: {
+			const uint8_t arg1 = (uint8_t)(s->mcu_regs[0] >> 8), arg2 = (uint8_t)(s->mcu_regs[0] >> 16);
+			const uint8_t arg3 = (uint8_t)(s->mcu_regs[0] >> 24);
+			pgm2_card *c = &s_card[arg1 & 3];
+			uint8_t *auth = &s_card_auth[arg1 & 3];
+			uint8_t *share = &s->shareram[(~s->share_bank & 1) * 128];
 			s->mcu_result0 = cmd;
+			if (!s_card_in[arg1 & 3]) {   // (no card: as MAME without one, the reads and writes of 0 bytes accepted)
+				if (!((cmd == 0xc2 || cmd == 0xc3) && !arg3))
+					status = 0xf4;
+				break;
+			}
+			switch (cmd) {
+			case 0xc2:   // read data to the shared RAM
+				for (int i = 0; i < arg3; i++)
+					share[i] = c->data[(uint8_t)(arg2 + i)];
+				break;
+			case 0xc3:   // write data from the shared RAM
+				for (int i = 0; i < arg3; i++)
+					card_write(c, *auth, (uint8_t)(arg2 + i), share[i]);
+				break;
+			case 0xc4:   // read the security memory
+				s->mcu_result1 = *auth ? (uint32_t)c->sec[1] | (uint32_t)c->sec[2] << 8 | (uint32_t)c->sec[3] << 16 : 0xffffffu;
+				break;
+			case 0xc5:   // write the security memory
+				if (*auth)
+					c->sec[arg2 & 3] = arg3;
+				break;
+			case 0xc6:   // write the protection memory
+				if (*auth)
+					c->prot[arg2 & 3] &= arg3;
+				break;
+			case 0xc7:   // read the protection memory
+				s->mcu_result1 = (uint32_t)c->prot[0] | (uint32_t)c->prot[1] << 8 | (uint32_t)c->prot[2] << 16 |
+				                 (uint32_t)c->prot[3] << 24;
+				break;
+			case 0xc8:   // write data
+				card_write(c, *auth, arg2, arg3);
+				break;
+			case 0xc9:   // authentication (the password; a wrong one counts down the tries, MAME's "hacky" shift)
+				if (c->sec[0] & 7) {
+					if (c->sec[1] == arg2 && c->sec[2] == arg3 && c->sec[3] == (uint8_t)s->mcu_regs[1]) {
+						*auth = 1;
+						c->sec[0] = 7;
+					} else {
+						*auth = 0;
+						c->sec[0] >>= 1;
+					}
+				}
+				break;
+			}
 			break;
+		}
 		default:
 			status = 0xf4;   // error
 			break;
@@ -816,6 +874,47 @@ static void screen_vblank(void)
 // ---- machine ----
 static void pgm2_exit(void);
 
+// the NVRAM file and the card files: the folder's <set>.nv and <set>_card<n>.pg2
+static void card_path(char *out, int n, int i)
+{
+	snprintf(out, (size_t)n, "%.*s_card%d.pg2", (int)strlen(s_nv_path) - 3, s_nv_path, i + 1);
+}
+
+static uint32_t nv_hash(void)
+{
+	uint32_t h = 2166136261u;
+	const uint8_t *p = (const uint8_t *)s->sram;
+	for (uint32_t i = 0; i < sizeof(s->sram); i++)
+		h = (h ^ p[i]) * 16777619u;
+	p = (const uint8_t *)s_card;
+	for (uint32_t i = 0; i < sizeof(s_card); i++)
+		h = (h ^ p[i]) * 16777619u;
+	return h;
+}
+
+static void nv_save(void)
+{
+	if (!s || !s_nv_path[0])
+		return;
+	FILE *f = fopen(s_nv_path, "wb");
+	if (f) {
+		fwrite(s->sram, 1, sizeof(s->sram), f);
+		fclose(f);
+	}
+	for (int i = 0; i < 4; i++) {
+		if (!s_card_in[i])
+			continue;
+		char p[272];
+		card_path(p, sizeof(p), i);
+		f = fopen(p, "wb");
+		if (f) {
+			fwrite(&s_card[i], 1, sizeof(s_card[i]), f);
+			fclose(f);
+		}
+	}
+	s_nv_hash = nv_hash();
+}
+
 // the sound ROM kept in a file (rbx_driver.file_regions): its pages read when the chip needs them
 static int ymz_fetch(void *user, uint32_t offset, void *dst, uint32_t len)
 {
@@ -998,6 +1097,35 @@ static int pgm2_init(const rbx_game *g)
 			}
 		}
 	}
+	// the cards: each player's file, else the set's blank card (MAME call_create)
+	{
+		uint32_t blank_size = 0;
+		const uint8_t *blank = rbx_region_opt("default_card", &blank_size);
+		if (blank_size < sizeof(pgm2_card))
+			blank = NULL;
+		memset(s_card_auth, 0, sizeof(s_card_auth));
+		memset(s_card, 0, sizeof(s_card));
+		for (int i = 0; i < 4; i++) {
+			s_card_in[i] = blank != NULL;
+			if (blank)
+				memcpy(&s_card[i], blank, sizeof(s_card[i]));
+			if (!s_nv_path[0])
+				continue;
+			char p[272];
+			card_path(p, sizeof(p), i);
+			FILE *f = fopen(p, "rb");
+			if (f) {
+				pgm2_card c;
+				if (fread(&c, 1, sizeof(c), f) == sizeof(c)) {
+					s_card[i] = c;
+					s_card_in[i] = 1;
+				}
+				fclose(f);
+			}
+		}
+	}
+	s_nv_hash = nv_hash();
+	s_nv_tick = 0;
 	if (rbx_video_setup(SCR_W, 240, PAL_N) || rbx_audio_setup_stereo(ymz774_rate(s_ymz))) {
 		pgm2_exit();
 		return -1;
@@ -1024,13 +1152,7 @@ static void pgm2_exit(void)
 {
 	if (s_romboard_ram)
 		rbx_log("pgm2: program RAM writes after its decryption: %u", (unsigned)s_romram_writes);
-	if (s && s_nv_path[0]) {
-		FILE *f = fopen(s_nv_path, "wb");
-		if (f) {
-			fwrite(s->sram, 1, sizeof(s->sram), f);
-			fclose(f);
-		}
-	}
+	nv_save();
 	s_nv_path[0] = 0;
 	if (s_ymz)
 		ymz774_exit(s_ymz);
@@ -1099,6 +1221,12 @@ static void pgm2_frame(void)
 	}
 	s->frames++;
 	snd_sync(1);
+	// the SRAM and the cards written when they change (not only at exit: the app closed from the system menu, ADR-211)
+	if (s_nv_path[0] && ++s_nv_tick >= 120) {
+		s_nv_tick = 0;
+		if (nv_hash() != s_nv_hash)
+			nv_save();
+	}
 }
 
 // ---- the inverse of igs036_decrypt_rom (the reset's encrypted program ROM) ----

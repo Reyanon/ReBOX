@@ -435,7 +435,8 @@ void rbx_fav_toggle(const char *set)
 	fclose(f);
 }
 
-// the games' files, once in the data folder itself, to cfg/ (the app's own settings.cfg, favorites.cfg, touch.cfg stay)
+// the games' files, once in the data folder itself, to cfg/ (the app's own settings.cfg, favorites.cfg, touch.cfg,
+// folders.cfg stay)
 void rbx_settings_move_game_files(void)
 {
 	sceIoMkdir(GAME_CFG_DIR, 0777);
@@ -450,7 +451,7 @@ void rbx_settings_move_game_files(void)
 			break;
 		const size_t l = strlen(de.d_name);
 		if (l < 5 || strcmp(de.d_name + l - 4, ".cfg") || SCE_S_ISDIR(de.d_stat.st_mode) || !strcmp(de.d_name, "settings.cfg") ||
-		    !strcmp(de.d_name, "favorites.cfg") || !strcmp(de.d_name, "touch.cfg"))
+		    !strcmp(de.d_name, "favorites.cfg") || !strcmp(de.d_name, "touch.cfg") || !strcmp(de.d_name, "folders.cfg"))
 			continue;
 		char from[128], to[128];
 		snprintf(from, sizeof(from), RBX_DATA_DIR "%s", de.d_name);
@@ -482,6 +483,7 @@ void rbx_settings_load(void)
 		else if (!strcmp(key, "menu_confirm")) g_settings.menu_confirm = clampi(val, 0, RBX_CONFIRM_COUNT - 1);
 		else if (!strcmp(key, "last_game")) snprintf(g_settings.last_game, sizeof(g_settings.last_game), "%s", sval);
 		else if (!strcmp(key, "language")) snprintf(g_settings.language, sizeof(g_settings.language), "%s", sval);
+		else if (!strcmp(key, "bios_neogeo")) snprintf(g_settings.bios_neogeo, sizeof(g_settings.bios_neogeo), "%s", sval);
 		else if (!strcmp(key, "show_list")) g_settings.show_list = val != 0;
 #ifdef RBX_ENABLE_LOG
 		else if (!strcmp(key, "neon_list_gap"))
@@ -584,6 +586,8 @@ void rbx_settings_save(void)
 	fprintf(f, "neon_list_gap=%d\n", g_settings.neon_list_gap);
 #endif
 	fprintf(f, "language=%s\n", g_settings.language);
+	if (g_settings.bios_neogeo[0])
+		fprintf(f, "bios_neogeo=%s\n", g_settings.bios_neogeo);
 	fprintf(f, "pad_p1=%d\npad_p2=%d\ninput_engine=%d\n", g_settings.pad_src[0], g_settings.pad_src[1], g_settings.input_engine);
 	fprintf(f, "pad_p2_added=%d\n", g_settings.p2_added);
 	fclose(f);

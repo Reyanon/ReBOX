@@ -12,6 +12,10 @@ void rbx_update_skip(void);           // do not offer this version again
 // download, unpack and hand over to the kernel helper (does not return then). progress(stage, percent) is called
 // while it runs (percent -1: unknown, -2: the stage text alone). Returns a message on failure
 const char *rbx_update_install(void (*progress)(const char *stage, int percent));
+// Content Download (user 11-25): a file of the content release (GitHub Reyanon/ReBOX, tag "resources") downloaded to path
+// (written beside it first, then put in place). NULL = done, else a message
+#define RBX_CONTENT_URL "https://github.com/Reyanon/ReBOX/releases/download/resources/"
+const char *rbx_content_download(const char *url, const char *path, void (*progress)(const char *stage, int percent));
 // called just before the install exits the app (the PS button back to the system)
 extern void (*rbx_update_before_exit)(void);
 

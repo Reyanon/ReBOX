@@ -434,6 +434,146 @@ int rbx_gamelist_rom_dirs(const char *const *dirs, int ndirs, const char **out, 
 	return n;
 }
 
+// ---- the folders chosen in Settings ----
+#define FOLDERS_PATH RBX_DATA_DIR "folders.cfg"
+static char s_folder[RBX_FOLDERS][160];
+static int s_rom_changed;
+static const char *const k_folder_key[RBX_FOLDERS] = { "rom1", "rom2", "snap", "marquee" };
+
+void rbx_folders_load(void)
+{
+	FILE *f = fopen(FOLDERS_PATH, "r");
+	if (!f)
+		return;
+	char line[256];
+	while (fgets(line, sizeof(line), f)) {
+		line[strcspn(line, "\r\n")] = 0;
+		char *eq = strchr(line, '=');
+		if (!eq)
+			continue;
+		*eq = 0;
+		for (int k = 0; k < RBX_FOLDERS; k++)
+			if (!strcmp(line, k_folder_key[k]))
+				snprintf(s_folder[k], sizeof(s_folder[k]), "%s", eq + 1);
+	}
+	fclose(f);
+	for (int k = 0; k < RBX_FOLDERS; k++)
+		if (s_folder[k][0])
+			RBX_LOG("folders: %s %s", k_folder_key[k], s_folder[k]);
+}
+
+const char *rbx_folder(int k) { return k >= 0 && k < RBX_FOLDERS ? s_folder[k] : ""; }
+
+void rbx_folder_set(int k, const char *path)
+{
+	if (k < 0 || k >= RBX_FOLDERS)
+		return;
+	char p[160];
+	snprintf(p, sizeof(p), "%s", path ? path : "");
+	const size_t l = strlen(p);
+	if (l && p[l - 1] != '/' && p[l - 1] != ':' && l + 1 < sizeof(p))
+		strcat(p, "/");   // (a folder ends in "/", as the ROM folders)
+	if (!strcmp(p, s_folder[k]))
+		return;
+	memcpy(s_folder[k], p, sizeof(p));
+	if (k == RBX_FOLDER_ROM1 || k == RBX_FOLDER_ROM2)
+		s_rom_changed = 1;
+	FILE *f = fopen(FOLDERS_PATH, "w");
+	if (!f) {
+		RBX_LOG("folders: save failed %s", FOLDERS_PATH);
+		return;
+	}
+	for (int i = 0; i < RBX_FOLDERS; i++)
+		fprintf(f, "%s=%s\n", k_folder_key[i], s_folder[i]);
+	fclose(f);
+	RBX_LOG("folders: %s %s", k_folder_key[k], s_folder[k]);
+}
+
+int rbx_folders_rom_changed(void)
+{
+	const int c = s_rom_changed;
+	s_rom_changed = 0;
+	return c;
+}
+
+
+int rbx_folder_list(const char *dir, char (*names)[64], int max, const char *const *exts, int *files)
+{
+	if (files)
+		*files = 0;
+	if (!dir || !dir[0]) {   // (the devices that are there)
+		static const char *const dev[] = { "ux0:", "uma0:", "ur0:", "imc0:", "xmc0:", "grw0:" };
+		int n = 0;
+		for (int i = 0; i < (int)(sizeof(dev) / sizeof(dev[0])) && n < max; i++) {
+			const SceUID d = sceIoDopen(dev[i]);
+			if (d < 0)
+				continue;
+			sceIoDclose(d);
+			snprintf(names[n++], 64, "%s", dev[i]);
+		}
+		return n;
+	}
+	int n = 0;
+	const SceUID d = sceIoDopen(dir);
+	if (d < 0)
+		return 0;
+	SceIoDirent de;
+	for (;;) {
+		memset(&de, 0, sizeof(de));
+		if (sceIoDread(d, &de) <= 0)
+			break;
+		const size_t l = strlen(de.d_name);
+		if (SCE_S_ISDIR(de.d_stat.st_mode)) {
+			if (n < max && l < 64 && de.d_name[0] != '.')
+				strcpy(names[n++], de.d_name);
+		} else if (files && exts) {
+			const char *dot = strrchr(de.d_name, '.');
+			for (int i = 0; dot && exts[i]; i++)
+				if (!strcasecmp(dot + 1, exts[i])) {
+					(*files)++;
+					break;
+				}
+		}
+	}
+	sceIoDclose(d);
+	qsort(names, (size_t)n, 64, cmp_name);
+	return n;
+}
+
+static int exists(const char *p)
+{
+	SceIoStat st;
+	return sceIoGetstat(p, &st) >= 0 && !SCE_S_ISDIR(st.st_mode);
+}
+
+// a picture in a chosen folder: <set>.png / .jpg, else the title as RetroArch names thumbnails (&*/:`<>?\|" made _)
+static int folder_media(int k, const char *set, const char *title, char *out, int size)
+{
+	const char *dir = s_folder[k];
+	if (!dir[0])
+		return 0;
+	static const char *const ext[2] = { "png", "jpg" };
+	for (int e = 0; e < 2; e++) {
+		snprintf(out, (size_t)size, "%s%s.%s", dir, set, ext[e]);
+		if (exists(out))
+			return 1;
+	}
+	if (title && title[0]) {
+		char t[160];
+		snprintf(t, sizeof(t), "%s", title);
+		for (char *q = t; *q; q++)
+			if (strchr("&*/:`<>?\|\"", *q))
+				*q = '_';
+		for (int e = 0; e < 2; e++) {
+			snprintf(out, (size_t)size, "%s%s.%s", dir, t, ext[e]);
+			if (exists(out))
+				return 1;
+		}
+	}
+	out[0] = 0;
+	return 0;
+}
+
 const char *rbx_gamelist_media(const char *set, int kind, char *out, int size)
 {
 	static const char *const dir[3] = { "marquee", "snap", "video" }, *const ext[3] = { "png", "png", "mp4" };
@@ -442,6 +582,8 @@ const char *rbx_gamelist_media(const char *set, int kind, char *out, int size)
 		return NULL;
 	}
 	const rbx_list_entry *e = rbx_gamelist_find(set);
+	if (kind < 2 && folder_media(kind ? RBX_FOLDER_SNAP : RBX_FOLDER_MARQUEE, set, e ? e->title : NULL, out, size))
+		return out;
 	const char *p = !e ? NULL : kind == 0 ? e->marquee : kind == 1 ? e->snap : e->video;
 	if (p && p[0])
 		return rbx_gamelist_path(p, out, size);

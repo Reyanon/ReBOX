@@ -6,6 +6,7 @@ set(RBX_CORE_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(RBX_CORE_SOURCES
   ${RBX_CORE_DIR}/core.c
   ${RBX_CORE_DIR}/zip.c
+  ${RBX_CORE_DIR}/cheat.c
   ${RBX_CORE_DIR}/rbx_games.c
   ${RBX_CORE_DIR}/cpu/m68k_bus.c
   ${RBX_CORE_DIR}/cpu/m68k_spin.c

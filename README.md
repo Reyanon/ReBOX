@@ -267,6 +267,11 @@ zips. Files inside a zip are matched by CRC32, so their names do not matter.
 put the BIOS zip in the same folder as the games, as in MAME: `neogeo.zip` (Neo Geo), `pgm.zip` (IGS PGM),
 `konamigx.zip` (Konami GX), `decocass.zip` (DECO Cassette).
 
+**Neo Geo BIOS.** Settings > BIOS > Neo Geo picks the BIOS a Neo Geo game starts with: the Europe, US, Asia and Japan
+MVS BIOSes or the Universe BIOS 1.0 to 4.0 (MAME's list). It is used from the next game start. The BIOS file comes
+from the game's zip (non-merged sets have them all) or `neogeo.zip`; when it is missing, the default Europe MVS BIOS
+is used.
+
 **CPS3 and CHD.** CPS3 uses the "no CD" sets, for example `sfiii3n`, `jojoban` and `redearthn`. CHD images are not
 used.
 
@@ -279,6 +284,11 @@ used.
 | Snaps shown in the game list | `ux0:data/rebox/snap/<set>.png` (or `.jpg`) |
 | Videos shown in the game list | `ux0:data/rebox/video/<set>.mp4` |
 | Marquees (*Marquee* border) | `ux0:data/rebox/marquee/<set>.png` (or `.jpg`) |
+| MAME cheats | `ux0:data/rebox/cheats/cheat.zip`, or `ux0:data/rebox/cheats/<set>.xml` (see [Cheats](#cheats)) |
+
+**Other folders.** Settings > Folders adds two more ROM folders (for example RetroArch's) and a snap and a marquee
+folder. Pictures there are found by set name (`<set>.png` / `.jpg`) or by RetroArch's thumbnail names (the game's
+title). The game lists' paths do not need to change.
 
 **Game list entries.** Each game in a list names its files:
 
@@ -297,6 +307,35 @@ used.
   - Every `.json` in `gamelist/` and in its folders is read.
   - Lists with the same tab name are merged.
   - ReBOX adds the lists it ships when they are missing and never overwrites a list already there.
+
+### Cheats
+
+ReBOX reads MAME's cheat files (the XML format of MAME's `cheat.7z`). Cheats work on boards whose main CPU is a 68000
+(Neo Geo, CPS1, CPS2, Cave, Toaplan, Taito and others). In a game, open the menu (SELECT + START) and choose *Cheats*.
+
+**Automatic install**
+
+1. In the game list, press START to open the options.
+2. Choose *Content Download* > *Cheats*.
+3. ReBOX downloads `cheat.zip` (about 4 MB) from the
+   [resources release](https://github.com/Reyanon/ReBOX/releases/tag/resources) and puts it in place. The Vita needs
+   a network connection.
+
+**Manual install**
+
+1. Download `cheat.zip` from the
+   [resources release](https://github.com/Reyanon/ReBOX/releases/tag/resources) on a PC.
+2. Copy it, without unpacking it, to this path on the Vita (VitaShell, FTP or USB):
+
+   ```
+   ux0:data/rebox/cheats/cheat.zip
+   ```
+
+3. Start the game again.
+
+The zip holds one `<set>.xml` per game. A single game's file can also be copied by itself to
+`ux0:data/rebox/cheats/<set>.xml` (for example `ux0:data/rebox/cheats/kof98.xml`); it is used before the one in the
+zip. A clone without its own file uses its parent's.
 
 Files written by the emulator:
 

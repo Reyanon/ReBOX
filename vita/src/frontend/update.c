@@ -678,6 +678,40 @@ static void unzip_lists(const char *path)
 	rbx_zip_close(z);
 }
 
+const char *rbx_content_download(const char *url, const char *path, void (*progress)(const char *stage, int percent))
+{
+	if (!net_up())
+		return "No network";
+	progress("Downloading", 0);
+	Buf b = { 0 };
+	b.progress = progress;
+	if (!http_get(url, &b, 600)) {
+		free(b.p);
+		return "Download failed";
+	}
+	if (b.n < 22 || memcmp(b.p, "PK", 2)) {   // (a zip: not an error page)
+		free(b.p);
+		return "Not a zip file";
+	}
+	char tmp[256];
+	snprintf(tmp, sizeof(tmp), "%s.tmp", path);
+	mkdirs(path);
+	FILE *f = fopen(tmp, "wb");
+	const int wrote = f && fwrite(b.p, 1, b.n, f) == b.n;
+	if (f)
+		fclose(f);
+	RBX_LOG("content: %s: %u bytes to %s", url, (unsigned)b.n, path);
+	free(b.p);
+	if (!wrote) {
+		sceIoRemove(tmp);
+		return "Could not write the file";
+	}
+	sceIoRemove(path);
+	if (sceIoRename(tmp, path) < 0)
+		return "Could not write the file";
+	return NULL;
+}
+
 const char *rbx_update_install(void (*progress)(const char *stage, int percent))
 {
 	SceIoStat st;

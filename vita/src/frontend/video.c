@@ -683,6 +683,20 @@ void rbx_video_strips(const ReiStrip *s, int n, int y0, int y1)
 	s_strip_y1 = y1;
 }
 
+void rbx_video_strips_keep(int save)
+{
+	static ReiStrip kept[RBX_NSTRIP];
+	static int kn, ky0, ky1;
+	if (save) {
+		memcpy(kept, s_strip, sizeof(kept));
+		kn = s_nstrip;
+		ky0 = s_strip_y0;
+		ky1 = s_strip_y1;
+		s_nstrip = 0;
+	} else
+		rbx_video_strips(kept, kn, ky0, ky1);
+}
+
 static const ReiTex *s_list_under;
 void rbx_video_list_under(const ReiTex *t) { s_list_under = t; }
 static int s_list_neon;   // (the game list: the neon corridor under its see-through background, user 11-22)
