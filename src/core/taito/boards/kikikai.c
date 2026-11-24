@@ -4,6 +4,7 @@
     sprite-only video (both screen_update variants) follow MAME. Sound: YM2203 (rbx_ym).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
 #include "../../cpu/m6800/m6801.h"
@@ -446,6 +447,7 @@ static void kk_exit(void)
 
 static int kk_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("z80");   // (the cheats' main CPU: another CPU is set up first)
 	s_kind = kind_of(g->machine);
 	if (s_kind < 0) {
 		rbx_fail("%s: machine %s is not emulated", g->set, g->machine);

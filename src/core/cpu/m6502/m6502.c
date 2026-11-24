@@ -2,6 +2,7 @@
     om6502.lst, ow65c02.lst, dm6502.lst, dr65c02.lst; BSD-3-Clause, copyright-holders: Olivier Galibert). See m6502.h.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "m6502.h"
 
 #include <string.h>
@@ -307,8 +308,26 @@ static uint8_t do_rol(m6502_t *c, uint8_t v)
 }
 #include "m6502_ops.inc"
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a)   // (as the CPU: its direct pages, else the callbacks)
+{
+	m6502_t *c = (m6502_t *)x;
+	const uint8_t *p = c->rpage[(a >> 8) & 0xff];
+	return p ? p[a & 0xff] : c->read ? c->read(c->ctx, (uint16_t)a) : 0;
+}
+static void cheat_wr(void *x, uint32_t a, uint8_t v)
+{
+	m6502_t *c = (m6502_t *)x;
+	uint8_t *p = c->wpage[(a >> 8) & 0xff];
+	if (p)
+		p[a & 0xff] = v;
+	else if (c->write)
+		c->write(c->ctx, (uint16_t)a, v);
+}
+
 void m6502_init(m6502_t *c, int type)
 {
+	rbx_cheat_offer("m6502", cheat_rd, cheat_wr, c, 0, 1);
 	memset(c, 0, sizeof(*c));
 	c->type = type;
 	c->x = 0x80;

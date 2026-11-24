@@ -5,6 +5,7 @@
     Not done: the EEPROM of World PK Soccer (MACHINE_NOT_WORKING in MAME, not mapped there).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/nec/nec.h"
 #include "../../cpu/nec/irem_cpu.h"
@@ -430,6 +431,7 @@ static void m107_reset(void)
 	memset(&s_vs, 0, sizeof(s_vs));
 	pic8259_reset(&s_pic);
 	nec_init(&s_cpu, NEC_V33, NULL);
+	rbx_cheat_prefer_cpu(&s_cpu);   // (the cheats' main CPU: the sound CPU is a NEC too)
 	s_cpu.read8 = main_r8;
 	s_cpu.read16 = main_r16;
 	s_cpu.in8 = main_in8;

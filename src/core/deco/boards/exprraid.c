@@ -8,6 +8,7 @@
     the 6502's vectors).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/m6502/m6502.h"
 #include "../../cpu/m6809/m6809.h"
@@ -302,6 +303,7 @@ static void er_exit(void);
 
 static int er_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("m6502");   // (the cheats' main CPU: another CPU is set up first)
 	s_var = !strcmp(g->machine, "wexpressb2") ? V_B2 : !strcmp(g->machine, "wexpressb3") ? V_B3 : V_DECO16;
 	uint32_t csize, tsize, ssize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);

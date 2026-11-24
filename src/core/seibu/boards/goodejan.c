@@ -7,6 +7,7 @@
 
     The CPUs interleaved by the Seibu scheduler (sched.h) as the other Seibu Sound System boards.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/nec/nec.h"
 #include "../../sound/rbx_ym.h"
@@ -274,6 +275,7 @@ static const uint32_t tl_y[16] = { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 
 
 static int gj_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("nec");   // (the cheats' main CPU: another CPU is set up first)
 	s_totmejan = !strcmp(g->machine, "totmejan");
 	uint32_t snd_size, bgs, mds, fgs, txs, sps, okis = 0;
 	s_rom = rbx_region("maincpu", &s_rom_size);

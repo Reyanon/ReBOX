@@ -1,3 +1,4 @@
+#include "../../cheat_cpu.h"
 #include "z80.h"
 
 // MARK: timings
@@ -725,7 +726,12 @@ static inline __attribute__((always_inline)) void process_interrupts(z80* const 
 // MARK: interface
 // initialises a z80 struct. Note that read_byte, write_byte, port_in, port_out
 // and userdata must be manually set by the user afterwards.
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *c, uint32_t a) { z80 *z = (z80 *)c; return z->read_byte(z->userdata, (uint16_t)a); }
+static void cheat_wr(void *c, uint32_t a, uint8_t v) { z80 *z = (z80 *)c; z->write_byte(z->userdata, (uint16_t)a, v); }
+
 void z80_init(z80* const z) {
+	rbx_cheat_offer("z80", cheat_rd, cheat_wr, z, 0, 1);
   z->read_byte = NULL;
   z->write_byte = NULL;
   z->port_in = NULL;

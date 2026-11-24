@@ -5,6 +5,7 @@
     (H6280_LAZY_FLAGS 0, as MAME builds it).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "h6280.h"
 
 #include <string.h>
@@ -995,8 +996,30 @@ void h6280_reset(h6280_t *c)
 	c->irq_pending = 0;
 }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+// (a cheat's address is logical, as MAME's debugger translates it: through the MPR of its 8K bank)
+static uint32_t cheat_pa(const h6280_t *c, uint32_t a) { return (uint32_t)c->mmr[(a >> 13) & 7] << 13 | (a & 0x1fff); }
+static uint8_t cheat_rd(void *x, uint32_t a)
+{
+	h6280_t *c = (h6280_t *)x;
+	const uint32_t pa = cheat_pa(c, a);
+	const uint8_t *p = c->rpage[pa >> H6280_PAGE_SHIFT];
+	return p ? p[pa & 0x1fff] : c->read ? c->read(c->ctx, pa) : 0;
+}
+static void cheat_wr(void *x, uint32_t a, uint8_t v)
+{
+	h6280_t *c = (h6280_t *)x;
+	const uint32_t pa = cheat_pa(c, a);
+	uint8_t *p = c->wpage[pa >> H6280_PAGE_SHIFT];
+	if (p)
+		p[pa & 0x1fff] = v;
+	else if (c->write)
+		c->write(c->ctx, pa, v);
+}
+
 void h6280_init(h6280_t *c)
 {
+	rbx_cheat_offer("h6280", cheat_rd, cheat_wr, c, 0, 1);
 	memset(c, 0, sizeof(*c));
 	c->timer_scale = 1;
 	c->clocks_per_cycle = 4;

@@ -6,6 +6,7 @@
     screen: 58 Hz, 256x256 with a 2.5 ms vblank (here 300 lines, 240 .. 283 the vblank), 256x224 shown.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/m6502/m6502.h"
 #include "../../cpu/m6809/m6809.h"
@@ -252,6 +253,7 @@ static void sp_exit(void);
 
 static int sp_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("m6809");   // (the cheats' main CPU: another CPU is set up first)
 	s_boot = !strcmp(g->machine, "sidepcktb");
 	uint32_t csize, ssize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);

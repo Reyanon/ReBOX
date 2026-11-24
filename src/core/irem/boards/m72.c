@@ -7,6 +7,7 @@
     Not done: flip screen, Pound for Pound (trackballs), imgfightjb (i80c31 bootleg), the lohtb sets (MAME: not working).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/mcs51/mcs51.h"
 #include "../../cpu/nec/nec.h"
@@ -639,6 +640,7 @@ static const m72_cfg *find_cfg(const char *m)
 
 static int m72_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("nec");   // (the cheats' main CPU: another CPU is set up first)
 	if (!s_m82_front_hp && !(s_m82_front_hp = calloc(1, sizeof(*s_m82_front_hp)))) {
 		rbx_fail("%s: out of memory", g->set);
 		return -1;

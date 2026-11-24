@@ -7,6 +7,7 @@
     with their members as fields of one state struct (I.x for m_x) and their throws as longjmps (*.inc).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "i386.h"
 #include "../../rbx.h"
 
@@ -524,8 +525,13 @@ static void build_opcode_table(uint32_t features)
 	}
 }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a) { (void)x; return prog_r8(a); }
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { (void)x; prog_w8(a, v); }
+
 int i386_init(const i386_bus *bus)
 {
+	rbx_cheat_offer("i386", cheat_rd, cheat_wr, NULL, 0, 1);
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
 	static const int regs16[8] = {AX,CX,DX,BX,SP,BP,SI,DI};
 	static const int regs32[8] = {EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI};

@@ -16,6 +16,7 @@
     frame itself (rbx_video.out). Not done: the flip screen, the coin counters, the sprite key uploads' effect (MAME
     keeps them only), the V33 board's OKI sound timed within the frame (its samples are made at the frame's end).
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/nec/nec.h"
 #include "../../sound/rbx_ym.h"
@@ -1015,6 +1016,7 @@ static const uint32_t sp_y[16] = { 0, 64, 128, 192, 256, 320, 384, 448, 512, 576
 
 static int r2_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("nec");   // (the cheats' main CPU: another CPU is set up first)
 	const char *mc = g->machine;
 	s_m = !strcmp(mc, "raidendx") ? M_RAIDENDX : !strcmp(mc, "zeroteam") ? M_ZEROTEAM : !strcmp(mc, "xsedae") ? M_XSEDAE :
 	      !strcmp(mc, "rdx_v33") ? M_RDX_V33 : !strcmp(mc, "nzerotea") ? M_NZEROTEA : !strcmp(mc, "zerotm2k") ? M_ZEROTM2K :

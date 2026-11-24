@@ -5,6 +5,7 @@
     34010ops.hxx and 34010gfx.hxx put into C by a script (member functions to static functions, the 34020 parts out).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "tms34010.h"
 #include "../../rbx.h"
 
@@ -206,8 +207,19 @@ static int s_mm_fast = 1;   // (MMFM / MMTM straight to a memory page; RBX_TMS_N
 void tms34010_release(void) { tj_release(); }
 
 // ---- reset / run (MAME device_reset, execute_set_input, execute_run) ----
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+// (bit addresses: a byte is the low or high half of the word at a & ~15)
+static uint8_t cheat_rd(void *x, uint32_t a) { (void)x; return (uint8_t)(TMS34010_RDMEM_WORD(a & ~15u) >> (a & 8)); }
+static void cheat_wr(void *x, uint32_t a, uint8_t v)
+{
+	(void)x;
+	const uint32_t w = TMS34010_RDMEM_WORD(a & ~15u), sh = a & 8;
+	TMS34010_WRMEM_WORD(a & ~15u, (w & ~(0xffu << sh)) | (uint32_t)v << sh);
+}
+
 void tms34010_init(const tms34010_config *cfg)
 {
+	rbx_cheat_offer("tms34010", cheat_rd, cheat_wr, NULL, 0, 8);
 	s_cfg = *cfg;
 	m_to_shiftreg_cb = cfg->to_shiftreg;
 	m_from_shiftreg_cb = cfg->from_shiftreg;

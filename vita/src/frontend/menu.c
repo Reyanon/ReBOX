@@ -488,7 +488,7 @@ static char s_set[32], s_title[96];
 static UiCanvas *s_cv, *s_osd_cv, *s_fps_cv;
 static int s_changed; // settings changed since the menu opened (saved on close only then)
 enum { PAGE_MAIN, PAGE_STATES, PAGE_DISPLAY, PAGE_CONTROLS, PAGE_DIPS, PAGE_CHEATS, PAGE_ABOUT, PAGE_COMBO, PAGE_TURBO,
-	PAGE_TOUCH, PAGE_TEDIT, PAGE_PORT, PAGE_STICK, PAGE_SETTINGS, PAGE_FOLDERS, PAGE_BIOS, PAGE_BIOSLIST, PAGE_CONTENT };
+	PAGE_TOUCH, PAGE_TEDIT, PAGE_PORT, PAGE_STICK, PAGE_SETTINGS, PAGE_FOLDERS, PAGE_BIOS, PAGE_CONTENT };
 // the Settings page (user 11-22) and its sub-pages (user 11-25): Folders (ROM, snap, marquee: 11-24), BIOS (Neo Geo: its
 // list of BIOSes)
 enum { SET_LANG, SET_FOLDERS, SET_BIOS, SET_BACK, SET_COUNT };
@@ -950,8 +950,6 @@ static const char *page_row_help(void)
 		return NULL;
 	case PAGE_BIOS:
 		return s_sel == BI_NEOGEO ? "The Neo Geo BIOS (its file in the game's zip or neogeo.zip). From the next game start" : NULL;
-	case PAGE_BIOSLIST:
-		return s_sel < rbx_bios_count() ? "Used from the next game start; a BIOS not in the zip: Europe MVS instead" : NULL;
 	case PAGE_CONTENT:
 		if (s_sel == CT_CHEAT && s_ct_msg[0])
 			return s_ct_msg;
@@ -974,7 +972,7 @@ static const char *page_row_help(void)
 		switch (cheat_kind(s_sel, &ci)) {
 		case HK_STAGE: return "The stage a new game starts at (it applies when a new game starts)";
 		case HK_HEALTH: return "1P never loses health";
-		case HK_FILE: return "A cheat of cheats/<set>.xml: off, or one of its values";
+		case HK_FILE: return rbx_core_cheat_name(ci);   // (its whole name: the row cuts a long one)
 		default: return NULL;
 		}
 	}
@@ -1130,6 +1128,10 @@ void rbx_menu_states_changed(void)
 	s_dirty = 1;
 }
 
+static int s_pop_top = -1;   // (the choice window's scroll: -1 = put around the current value when it opens)
+// (user 11-25: the dropdown scrolls by pixels, eased; a drag moves it with the finger, a flick goes on and slows)
+static float s_pop_pos, s_pop_tgt, s_pop_vel;
+static int s_pop_drag, s_pop_seen = -1, s_pop_n, s_pop_vis;
 static int s_keep_place, s_pop, s_pop_sel; // menu closed with SELECT+START (keep its page); choice window open, its row
 // The PS button belongs to the app everywhere (locked for the system from the start). One press opens the menu (in a
 // game) or the options (in the game list) and closes them again like SELECT+START; nothing while loading. Only a
@@ -1298,9 +1300,8 @@ static int page_items(void)
 	case PAGE_SETTINGS: return SET_COUNT;
 	case PAGE_FOLDERS: return FD_COUNT;
 	case PAGE_BIOS: return BI_COUNT;
-	case PAGE_BIOSLIST: return rbx_bios_count() + 1;
 	case PAGE_CONTENT: return CT_COUNT;
-	case PAGE_ABOUT: return ABOUT_VISIBLE;
+	case PAGE_ABOUT: return ABOUT_LINES;   // (all its lines: the page scrolls as the others, user 11-25)
 	default: return main_rows();
 	}
 }
@@ -1344,11 +1345,6 @@ static void page_back(void)
 	if (from == PAGE_FOLDERS || from == PAGE_BIOS) {   // (Settings' sub-pages: back to their row)
 		go_page(PAGE_SETTINGS);
 		s_sel = from == PAGE_FOLDERS ? SET_FOLDERS : SET_BIOS;
-		return;
-	}
-	if (from == PAGE_BIOSLIST) {
-		go_page(PAGE_BIOS);
-		s_sel = BI_NEOGEO;
 		return;
 	}
 	go_page(PAGE_MAIN);
@@ -1433,7 +1429,8 @@ static void engine_pick(int engine);
 static int engine_list(int *e);
 // an item with several values opens a window listing them all on the confirm button. The values of the selected item:
 // names, count (0 = not such an item), current index
-#define MAX_CHOICES 24
+#define MAX_CHOICES 64   // (the choice window scrolls: POP_VIS rows on screen)
+#define POP_VIS 9
 enum { CH_TEXT, CH_KEYS, CH_COMBO }; // how the choice window draws the values: names, button icons, key pairs
 // the combo page's window: -1 = its first step (None or the first key), else the first key picked (the second step)
 static int s_combo_first = -1, s_pop_keep;
@@ -1541,6 +1538,12 @@ static int item_choices(const char **out, int *cur, const char **title)
 		}
 		*cur = s_state_slot;
 		*title = "Save slot";
+	} else if (s_page == PAGE_BIOS && s_sel == BI_NEOGEO) {   // (the Neo Geo BIOS: a dropdown, user 11-25)
+		n = rbx_bios_count() < MAX_CHOICES ? rbx_bios_count() : MAX_CHOICES;
+		for (int i = 0; i < n; i++)
+			out[i] = rbx_bios_desc(i);
+		*cur = rbx_bios_get();
+		*title = "Neo Geo BIOS";
 	} else if (s_page == PAGE_SETTINGS && s_sel == SET_LANG && rbx_lang_count() > 0) {
 		// the languages by their own names (user 11-23: the row's choice window, as the other rows)
 		n = rbx_lang_count() < MAX_CHOICES ? rbx_lang_count() : MAX_CHOICES;
@@ -1619,6 +1622,15 @@ static void set_choice(int idx)
 		const int ne = engine_list(e);
 		if (idx >= 0 && idx < ne && e[idx] != g_settings.input_engine)
 			engine_pick(e[idx]);
+		return;
+	}
+	if (s_page == PAGE_BIOS && s_sel == BI_NEOGEO) {
+		if (idx >= 0 && idx < rbx_bios_count() && idx != rbx_bios_get()) {
+			rbx_bios_set(rbx_bios_name(idx));
+			snprintf(g_settings.bios_neogeo, sizeof(g_settings.bios_neogeo), "%s", rbx_bios_name(idx));
+			if (!s_list_mode)
+				rbx_osd_show("%s", T("The BIOS is used from the next game start"));
+		}
 		return;
 	}
 	if (s_page == PAGE_SETTINGS && s_sel == SET_LANG) {
@@ -1764,6 +1776,14 @@ static void change(int dir)
 	case PAGE_STATES:
 		if (s_sel == S_SLOT)
 			s_state_slot = wrap(s_state_slot + dir, RBX_STATE_SLOTS);
+		break;
+	case PAGE_BIOS:
+		if (s_sel == BI_NEOGEO) {   // (the next / previous BIOS)
+			const int b = wrap(rbx_bios_get() + dir, rbx_bios_count());
+			rbx_bios_set(rbx_bios_name(b));
+			snprintf(g_settings.bios_neogeo, sizeof(g_settings.bios_neogeo), "%s", rbx_bios_name(b));
+			s_changed = 1;
+		}
 		break;
 	case PAGE_SETTINGS:
 		if (s_sel == SET_LANG && rbx_lang_count() > 0) {   // (the next language: every text drawn again in it)
@@ -2247,27 +2267,13 @@ static rbx_menu_result confirm(void)
 		else if (set_folder(s_sel) >= 0 && folder_browse(set_folder(s_sel)))
 			s_changed = 1;
 		break;
-	case PAGE_BIOS:
+	case PAGE_BIOS:   // (the Neo Geo row: its dropdown, item_choices)
 		if (s_sel == BI_BACK) page_back();
-		else {
-			go_page(PAGE_BIOSLIST);
-			s_sel = rbx_bios_get();   // (at the one in use)
-		}
 		break;
 	case PAGE_CONTENT:
 		if (s_sel == CT_BACK) page_back();
 		else
 			content_get(s_sel);
-		break;
-	case PAGE_BIOSLIST:
-		if (s_sel >= rbx_bios_count()) page_back();
-		else if (s_sel != rbx_bios_get()) {
-			rbx_bios_set(rbx_bios_name(s_sel));
-			snprintf(g_settings.bios_neogeo, sizeof(g_settings.bios_neogeo), "%s", rbx_bios_name(s_sel));
-			s_changed = 1;
-			if (!s_list_mode)
-				rbx_osd_show("%s", T("The BIOS is used from the next game start"));
-		}
 		break;
 	case PAGE_STATES:
 		if (s_sel == S_SAVE) return RBX_MENU_SAVE;
@@ -2442,28 +2448,21 @@ static uint32_t menu_touch(int o_ok)
 			x0 = tx[0];
 			y0 = last = ty[0];
 			moved = 0;
-			stopped = s_mvel != 0.0f; // (a touch that stops the rows is not a tap)
+			stopped = s_mvel != 0.0f || (s_pop && s_pop_vel != 0.0f); // (a touch that stops the rows is not a tap)
 			s_mvel = 0;
+			s_pop_vel = 0;
 		} else {
 			if (abs(ty[0] - y0) > 12 || abs(tx[0] - x0) > 12)
 				moved = 1;
-			if (moved && !s_pop && s_page == PAGE_ABOUT) {   // (About: a drag scrolls its lines, user 11-15)
-				static float acc;
-				acc -= (float)(ty[0] - last) / ABOUT_LH;
-				const int max = ABOUT_LINES > ABOUT_VISIBLE ? ABOUT_LINES - ABOUT_VISIBLE : 0;
-				while (acc >= 1.0f) {
-					acc -= 1.0f;
-					if (s_about_scroll < max)
-						s_about_scroll++;
-				}
-				while (acc <= -1.0f) {
-					acc += 1.0f;
-					if (s_about_scroll > 0)
-						s_about_scroll--;
-				}
+			if (moved && s_pop && x0 >= s_mt_wx && x0 < s_mt_wx + s_mt_ww && y0 >= s_mt_wy + 60 && y0 < s_mt_wy + s_mt_wh) {
+				const float d = (float)(ty[0] - last);   // (the dropdown follows the finger)
+				s_pop_tgt -= d;
+				s_pop_pos = s_pop_tgt;
+				s_pop_vel = s_pop_vel * 0.5f - d * 0.5f;
+				s_pop_drag = 1;
 				s_dirty = 1;
 			}
-			if (moved && !s_pop && s_page != PAGE_ABOUT && x0 >= s_mt_px && x0 < s_mt_px + PANEL_W && y0 >= s_mt_ra && y0 < s_mt_rb) {
+			if (moved && !s_pop && x0 >= s_mt_px && x0 < s_mt_px + PANEL_W && y0 >= s_mt_ra && y0 < s_mt_rb) {
 				const float d = (float)(ty[0] - last);
 				s_mtgt -= d;
 				if (!s_touch_held)
@@ -2476,6 +2475,13 @@ static uint32_t menu_touch(int o_ok)
 		return 0;
 	}
 	if (!down) {
+		if (s_pop_vel != 0.0f) {   // the dropdown after a flick
+			s_pop_tgt += s_pop_vel;
+			s_pop_vel *= 0.95f;
+			if (fabsf(s_pop_vel) < 0.6f)
+				s_pop_vel = 0;
+			s_dirty = 1;
+		}
 		if (s_mvel != 0.0f) { // after a flick the rows go on, slowing down
 			s_mtgt += s_mvel;
 			s_mvel *= 0.95f;
@@ -2488,6 +2494,9 @@ static uint32_t menu_touch(int o_ok)
 	down = 0;
 	if (moved) {
 		s_mvel = flick_boost(s_mvel / LINE_H) * LINE_H;
+		if (s_pop_drag)
+			s_pop_vel = flick_boost(s_pop_vel / LINE_H) * LINE_H;
+		s_pop_drag = 0;
 		return 0;
 	}
 	if (stopped)
@@ -2496,7 +2505,7 @@ static uint32_t menu_touch(int o_ok)
 	if (s_pop) { // the choice window: a value picks it, outside closes
 		if (x0 < s_mt_wx || x0 >= s_mt_wx + s_mt_ww || y0 < s_mt_wy || y0 >= s_mt_wy + s_mt_wh)
 			return back;
-		const int i = s_mt_plh > 0 ? (y0 - (s_mt_wy + 60)) / s_mt_plh : -1;
+		const int i = s_mt_plh > 0 ? (int)floorf(((float)(y0 - (s_mt_wy + 60)) + s_pop_pos) / s_mt_plh) : -1;
 		if (y0 >= s_mt_wy + 60 && i >= 0 && i < s_mt_nc) {
 			s_pop_sel = i;
 			return ok;
@@ -2769,16 +2778,21 @@ rbx_menu_result rbx_menu_update(uint32_t buttons)
 		if ((pressed & ok) && nc && !ps_closed) {
 			s_pop = 1;
 			s_pop_sel = cur;
+			s_pop_top = -1;
 			s_drawn_h = 0;
 			return RBX_MENU_STAY;
 		}
 	}
-	if (s_page == PAGE_ABOUT) { // up/down scroll
-		const int max = ABOUT_LINES > ABOUT_VISIBLE ? ABOUT_LINES - ABOUT_VISIBLE : 0;
-		if ((pressed & SCE_CTRL_UP) && s_about_scroll > 0)
-			s_about_scroll--;
-		if ((pressed & SCE_CTRL_DOWN) && s_about_scroll < max)
-			s_about_scroll++;
+	if (s_page == PAGE_ABOUT) { // up/down: the text moves (eased; held keys repeat), L/R a page
+		if (pressed & SCE_CTRL_UP) s_mtgt -= ABOUT_LH * 2;
+		if (pressed & SCE_CTRL_DOWN) s_mtgt += ABOUT_LH * 2;
+		if (pressed & SCE_CTRL_LTRIGGER) s_mtgt -= ABOUT_LH * (ABOUT_VISIBLE - 1);
+		if (pressed & SCE_CTRL_RTRIGGER) s_mtgt += ABOUT_LH * (ABOUT_VISIBLE - 1);
+		if (pressed & (SCE_CTRL_UP | SCE_CTRL_DOWN | SCE_CTRL_LTRIGGER | SCE_CTRL_RTRIGGER)) {
+			s_mvel = 0;
+			s_mdrag = 0;
+			s_dirty = 1;
+		}
 		pressed &= ~REPEAT_KEYS;
 	}
 	if (pressed & SCE_CTRL_UP) {
@@ -2859,24 +2873,50 @@ static void sel_bar(UiCanvas *c, int x, int by, int w, int h)
 	else
 		focus_at(c, x, by, w, h);
 }
+// a toggle switch from x (TOGGLE_W wide), centred on cy: a pill with the knob on the right (on, accent colour) or left
+#define TOGGLE_W 46
+static void toggle_switch(UiCanvas *c, int x, int cy_i, int on)
+{
+	const float r = 10.0f, x0 = (float)x + r, x1 = x0 + 26.0f, cy = (float)cy_i;
+	const uint32_t track = on ? theme()->toggle_on : theme()->toggle_off;
+	ui_circle(c, x0, cy, r, track);
+	ui_circle(c, x1, cy, r, track);
+	ui_rect(c, (int)x0, (int)(cy - r), (int)(x1 - x0), (int)(2 * r), track);
+	ui_circle(c, on ? x1 : x0, cy, r - 3.0f, UI_RGBA(0xF4, 0xF4, 0xF4, 0xFF));
+}
+
+// s (translated) cut to fit w pixels at scale sc, "..." at its end when cut (UTF-8: whole characters)
+static const char *fit_text(const char *s, float sc, int w, char *buf, int n)
+{
+	s = T(s);
+	if (ui_text_width(sc, s) <= w)
+		return s;
+	snprintf(buf, (size_t)n, "%s", s);
+	for (int l = (int)strlen(buf); l > 0;) {
+		do
+			l--;
+		while (l > 0 && ((unsigned char)buf[l] & 0xc0) == 0x80);
+		memcpy(buf + l, "...", 4);
+		if (ui_text_width(sc, buf) <= w)
+			break;
+	}
+	return buf;
+}
+
 static void item(UiCanvas *c, int px, int ty, int i, int sel, const char *name, const char *value)
 {
 	const uint32_t col = (i == sel) ? COL_SEL : COL_TEXT;
 	if (i == sel)
 		sel_bar(c, px + 12, ty - 7 - (LINE_H - 6) / 2, PANEL_W - 40, LINE_H - 6); // bar centred on the text
-	ui_text(c, px + 40, ty, i == sel ? COL_TEXT : COL_ITEM, 1.0f, name);
-	if (value && value[0] == 1) {
-		// two-state item as a toggle switch: a pill with the knob on the right (on, accent colour) or left (off, grey)
-		const int on = value[2] == 'n';
-		const float r = 10.0f, x0 = (float)(px + VALUE_X) + r, x1 = x0 + 26.0f, cy = (float)ty - 7.0f;
-		const uint32_t track = on ? theme()->toggle_on : theme()->toggle_off;
-		ui_circle(c, x0, cy, r, track);
-		ui_circle(c, x1, cy, r, track);
-		ui_rect(c, (int)x0, (int)(cy - r), (int)(x1 - x0), (int)(2 * r), track);
-		ui_circle(c, on ? x1 : x0, cy, r - 3.0f, UI_RGBA(0xF4, 0xF4, 0xF4, 0xFF));
-	} else if (value) {
-		char buf[96];
-		snprintf(buf, sizeof(buf), "< %s >", value);
+	char nb[160];
+	// (user 11-25: a long name, a cheat's, ran over its value: cut before the value's column)
+	ui_text(c, px + 40, ty, i == sel ? COL_TEXT : COL_ITEM, 1.0f,
+	        value ? fit_text(name, 1.0f, VALUE_X - 40 - 16, nb, sizeof(nb)) : name);
+	if (value && value[0] == 1)   // two-state item as a toggle switch
+		toggle_switch(c, px + VALUE_X, ty - 7, value[2] == 'n');
+	else if (value) {
+		char buf[96], vb[96];   // (a long value, a cheat's option: cut at the panel's edge, the arrows kept)
+		snprintf(buf, sizeof(buf), "< %s >", fit_text(value, 1.0f, PANEL_W - 40 - VALUE_X - ui_text_width(1.0f, "<  >"), vb, sizeof(vb)));
 		ui_text(c, px + VALUE_X, ty, col, 1.0f, buf);
 	}
 }
@@ -3109,7 +3149,7 @@ static void content_get(int row)
 // Draw the menu panel to the canvas (caller uploads). overlay = over the game list (the dimmed list kept in s_under)
 static int s_paint_x0, s_paint_y0, s_paint_x1, s_paint_y1;
 static const uint32_t *s_under; // game list options: the dimmed list under the window (NULL: just drawn in full)
-static int menu_anim(void) { return s_mscr != s_mtgt; } // (the menu is still moving: draw again)
+static int menu_anim(void) { return s_mscr != s_mtgt || (s_pop && (s_pop_pos != s_pop_tgt || s_pop_vel != 0.0f)); } // (the menu or its dropdown still moving: draw again)
 
 // A footer help longer than its line scrolls: 1 s, then 60 px/s to its end, 1 s, from the start. Between paints of the
 // menu only its band is drawn again: the band as the paint left it before the text (kept here), the text moved over it
@@ -3176,8 +3216,10 @@ static void menu_paint(UiCanvas *c, int overlay)
 		static int last_page = -1, last_n = -1;
 		const float maxs = (float)(content - view);
 		const int sy = s_sel * lh + (s_page == PAGE_MAIN && !s_list_mode && s_sel < n ? gap_at[s_sel] : 0);
-		if (s_page == PAGE_ABOUT)
-			s_mtgt = 0;
+		if (s_page == PAGE_ABOUT) {   // (no cursor: the keys and the finger move it; from its top when it opens)
+			if (last_page != PAGE_ABOUT)
+				s_mtgt = 0;
+		}
 		else if (!s_mdrag) {
 			if (sy - lh < s_mtgt)
 				s_mtgt = (float)(sy - lh);
@@ -3290,9 +3332,6 @@ static void menu_paint(UiCanvas *c, int overlay)
 	case PAGE_BIOS:
 		title = "BIOS";
 		break;
-	case PAGE_BIOSLIST:
-		title = "NEO GEO BIOS";
-		break;
 	case PAGE_CONTENT:
 		title = "CONTENT DOWNLOAD";
 		break;
@@ -3302,7 +3341,7 @@ static void menu_paint(UiCanvas *c, int overlay)
 		break;
 	case PAGE_ABOUT:
 		title = "ABOUT";
-		snprintf(foot_buf, sizeof(foot_buf), T("Up/Down: scroll (%d/%d)   %s: back"), s_about_scroll + 1,
+		snprintf(foot_buf, sizeof(foot_buf), T("Up/Down: scroll (%d/%d)   %s: back"), (int)(s_mscr / ABOUT_LH + 0.5f) + 1,
 			ABOUT_LINES > ABOUT_VISIBLE ? ABOUT_LINES - ABOUT_VISIBLE + 1 : 1, back_name);
 		break;
 	default:
@@ -3525,8 +3564,23 @@ static void menu_paint(UiCanvas *c, int overlay)
 			else if (k == HK_HEALTH)
 				item(c, px, ty, i, s_sel, "Infinite health (1P)", g_settings.cheat_health ? VAL_ON : VAL_OFF);
 			else if (k == HK_FILE) {
-				const char *v = rbx_core_cheat_option_name(ci, rbx_core_cheat_get(ci));
-				item(c, px, ty, i, s_sel, rbx_core_cheat_name(ci), v ? v : "?");
+				// (user 11-25: a switch at the window's right edge, the name in all the width before it; a cheat with
+				// values shows the one chosen, small, before its switch: its dropdown on the button)
+				const int o = rbx_core_cheat_get(ci), sx = px + PANEL_W - 40 - TOGGLE_W;
+				if (i == s_sel)
+					sel_bar(c, px + 12, ty - 7 - (LINE_H - 6) / 2, PANEL_W - 40, LINE_H - 6);
+				toggle_switch(c, sx, ty - 7, o > 0);
+				int nx1 = sx - 16;
+				if (o > 0 && rbx_core_cheat_options(ci) > 2) {
+					char vb[64];
+					const char *v = fit_text(rbx_core_cheat_option_name(ci, o), 0.85f, 200, vb, sizeof(vb));
+					const int vw = ui_text_width(0.85f, v);
+					ui_text(c, nx1 - vw, ty, i == s_sel ? COL_SEL : COL_DIM, 0.85f, v);
+					nx1 -= vw + 16;
+				}
+				char nb[160];
+				ui_text(c, px + 40, ty, i == s_sel ? COL_TEXT : COL_ITEM, 1.0f,
+				        fit_text(rbx_core_cheat_name(ci), 1.0f, nx1 - (px + 40), nb, sizeof(nb)));
 			} else
 				item(c, px, ty, i, s_sel, "Back", NULL);
 			break;
@@ -3563,11 +3617,9 @@ static void menu_paint(UiCanvas *c, int overlay)
 			break;
 		}
 		case PAGE_BIOS:
-			if (i == BI_NEOGEO) {   // (the BIOS in use at the right, as a folder row)
-				item(c, px, ty, i, s_sel, "Neo Geo  >", NULL);
-				ui_text_clip(c, px + VALUE_X, ty, i == s_sel ? COL_SEL : COL_TEXT, 0.9f, rbx_bios_desc(rbx_bios_get()),
-				             px + VALUE_X, px + PANEL_W - 32);
-			} else
+			if (i == BI_NEOGEO)   // (a value row as the others: its dropdown on the button)
+				item(c, px, ty, i, s_sel, "Neo Geo", rbx_bios_desc(rbx_bios_get()));
+			else
 				item(c, px, ty, i, s_sel, "Back", NULL);
 			break;
 		case PAGE_CONTENT:
@@ -3583,12 +3635,6 @@ static void menu_paint(UiCanvas *c, int overlay)
 			} else
 				item(c, px, ty, i, s_sel, "Back", NULL);
 			break;
-		case PAGE_BIOSLIST:
-			if (i < rbx_bios_count())   // (the one in use: its switch on)
-				item(c, px, ty, i, s_sel, rbx_bios_desc(i), i == rbx_bios_get() ? VAL_ON : VAL_OFF);
-			else
-				item(c, px, ty, i, s_sel, "Back", NULL);
-			break;
 		case PAGE_FOLDERS: {
 			static const char *const fname[4] = { "ROM folder 1", "ROM folder 2", "Snap folder", "Marquee folder" };
 			if (set_folder(i) >= 0) {
@@ -3602,12 +3648,10 @@ static void menu_paint(UiCanvas *c, int overlay)
 				item(c, px, ty, i, s_sel, "Back", NULL);
 			break;
 		}
-		case PAGE_ABOUT: {
-			const int k = s_about_scroll + i;
-			if (k < ABOUT_LINES)
-				about_line(c, px + 24, ty, s_about[k]);
+		case PAGE_ABOUT:
+			if (i < ABOUT_LINES)
+				about_line(c, px + 24, ty, s_about[i]);
 			break;
-		}
 		}
 	}
 	if (content > view) { // fades where rows are cut (towards the panel colour)
@@ -3683,9 +3727,38 @@ static void menu_paint(UiCanvas *c, int overlay)
 		int cur;
 		const int nc = item_choices(names, &cur, &ptitle);
 		if (nc) {
-			// rows of LINE_H; many values (the combo pairs, long DIP lists) get shorter rows so the window fits the screen
-			const int plh = 64 + nc * LINE_H + 12 <= SCREEN_H - 24 ? LINE_H : (SCREEN_H - 24 - 76) / nc;
-			const int ww = 420, wh = 64 + nc * plh + 12, wx = (SCREEN_W - ww) / 2, wy = (SCREEN_H - wh) / 2;
+			// (user 11-25: a dropdown that scrolls: POP_VIS rows of LINE_H at most, the cursor kept in view, a scroll bar
+			// when there are more; no longer shorter rows for long lists)
+			const int plh = LINE_H, vis = nc < POP_VIS ? nc : POP_VIS;
+			const float maxp = (float)((nc - vis) * plh);
+			if (s_pop_top < 0) {   // (opened: the current value in the middle, no animation)
+				s_pop_tgt = (float)((s_pop_sel - vis / 2) * plh);
+				s_pop_tgt = s_pop_tgt < 0 ? 0 : s_pop_tgt > maxp ? maxp : s_pop_tgt;
+				s_pop_pos = s_pop_tgt;
+				s_pop_vel = 0;
+				s_pop_drag = 0;
+				s_pop_seen = s_pop_sel;
+				s_pop_top = 0;
+			}
+			if (s_pop_sel != s_pop_seen) {   // the keys moved the cursor: the view eases to keep it a row inside
+				const float sy = (float)(s_pop_sel * plh);
+				if (sy - plh < s_pop_tgt) s_pop_tgt = sy - plh;
+				if (sy + 2 * plh > s_pop_tgt + vis * plh) s_pop_tgt = sy + 2 * plh - vis * plh;
+				s_pop_vel = 0;
+				s_pop_seen = s_pop_sel;
+			}
+			if (!s_pop_drag) {   // (past an end: back inside softly)
+				if (s_pop_tgt < 0) s_pop_tgt += (0 - s_pop_tgt) * 0.35f;
+				if (s_pop_tgt > maxp) s_pop_tgt += (maxp - s_pop_tgt) * 0.35f;
+				if (fabsf(s_pop_tgt) < 0.5f && s_pop_tgt < 0) s_pop_tgt = 0;
+				if (s_pop_tgt > maxp && s_pop_tgt - maxp < 0.5f) s_pop_tgt = maxp;
+				s_pop_pos += (s_pop_tgt - s_pop_pos) * 0.3f;
+				if (fabsf(s_pop_tgt - s_pop_pos) < 0.5f)
+					s_pop_pos = s_pop_tgt;
+			}
+			s_pop_n = nc;
+			s_pop_vis = vis;
+			const int ww = 520, wh = 64 + vis * plh + 12, wx = (SCREEN_W - ww) / 2, wy = (SCREEN_H - wh) / 2;
 			s_mt_wx = wx;
 			s_mt_wy = wy;
 			s_mt_ww = ww;
@@ -3715,14 +3788,26 @@ static void menu_paint(UiCanvas *c, int overlay)
 				}
 			}
 			ui_rect(c, wx + 20, wy + 50, ww - 40, 1, COL_DIM);
-			const float ts = plh < 30 ? 0.8f : 1.0f; // (short rows: smaller text)
-			for (int i = 0; i < nc; i++) {
-				const int ty = wy + 60 + i * plh + plh / 2 + 7, by = ty - 7 - (plh - 6) / 2;
+			const float ts = 1.0f;
+			if (nc > vis) {   // the scroll bar: its track, the part shown
+				const int tx = wx + ww - 14, t0 = wy + 62, th = vis * plh - 4;
+				rrect(c, tx, t0, 5, th, 2, theme()->bar_track);
+				const float pp = s_pop_pos < 0 ? 0 : s_pop_pos > maxp ? maxp : s_pop_pos;
+				const int bh = th * vis / nc < 16 ? 16 : th * vis / nc, by0 = t0 + (int)((float)(th - bh) * pp / maxp);
+				rrect(c, tx, by0, 5, bh, 2, COL_THUMB);
+			}
+			const int ra = wy + 60, rb = wy + 60 + vis * plh, scr = (int)floorf(s_pop_pos + 0.5f);
+			ui_clip_y(c, ra, rb);   // (the rows scroll under the title line and the window's bottom)
+			for (int i = scr / plh - 1; i <= (scr + vis * plh) / plh && i < nc; i++) {
+				if (i < 0)
+					continue;
+				const int ty = ra + i * plh - scr + plh / 2 + 7, by = ty - 7 - (plh - 6) / 2;
 				const uint32_t col = i == s_pop_sel ? COL_SEL : COL_TEXT;
 				if (i == s_pop_sel) {
 					rrect(c, wx + 12, by + 3, ww - 24, plh - 6, 6, theme()->shade);
 					rrect(c, wx + 12, by, ww - 24, plh - 6, 6, COL_HILITE);
-					focus_at(c, wx + 12, by, ww - 24, plh - 6);
+					if (by >= ra && by + plh - 6 <= rb)   // (its outline only while the row is all in view)
+						focus_at(c, wx + 12, by, ww - 24, plh - 6);
 				}
 				if (s_choice_kind == CH_KEYS) // button icons as in the item, not their names
 					draw_key(c, wx + 44, ty - 7, ty, i, col);
@@ -3738,6 +3823,7 @@ static void menu_paint(UiCanvas *c, int overlay)
 				if (i == cur)
 					ui_circle(c, (float)(wx + 28), (float)(ty - 7), 5.0f, col);
 			}
+			ui_clip_y(c, 0, SCREEN_H);
 		}
 	}
 }

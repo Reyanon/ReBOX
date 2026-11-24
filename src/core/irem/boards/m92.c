@@ -7,6 +7,7 @@
     Not done: flip screen (MACHINE_NO_COCKTAIL), the bootlegs ppan and nbbatman2bl (other hardware).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/nec/nec.h"
 #include "../../cpu/nec/irem_cpu.h"
@@ -512,6 +513,7 @@ static void m92_reset(void)
 	memset(&s_vs, 0, sizeof(s_vs));
 	pic8259_reset(&s_pic);
 	nec_init(&s_cpu, NEC_V33, NULL);
+	rbx_cheat_prefer_cpu(&s_cpu);   // (the cheats' main CPU: the sound CPU is a NEC too)
 	s_cpu.read8 = main_r8;
 	s_cpu.read16 = main_r16;
 	s_cpu.write8 = main_w8;

@@ -7,6 +7,7 @@
     the V30 (BRKEM), the trap flag: no Irem game uses them.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "nec.h"
 
 #include <stddef.h>
@@ -741,8 +742,29 @@ static uint16_t def_r16(uint32_t a) { (void)a; return 0; }
 static void def_w8(uint32_t a, uint8_t v) { (void)a; (void)v; }
 static void def_w16(uint32_t a, uint16_t v) { (void)a; (void)v; }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+// (as the CPU reads and writes data: its direct pages, else the internal area or the handlers)
+static uint8_t cheat_rd(void *x, uint32_t a)
+{
+	nec_t *c = (nec_t *)x;
+	a &= 0xfffff;
+	const uint8_t *p = c->rmap[a >> 12];
+	return p ? p[a & 0xfff] : prog_r8(c, a);
+}
+static void cheat_wr(void *x, uint32_t a, uint8_t v)
+{
+	nec_t *c = (nec_t *)x;
+	a &= 0xfffff;
+	uint8_t *p = c->wmap[a >> 12];
+	if (p)
+		p[a & 0xfff] = v;
+	else
+		prog_w8(c, a, v);
+}
+
 void nec_init(nec_t *c, int chip, const uint8_t *dec)
 {
+	rbx_cheat_offer("nec", cheat_rd, cheat_wr, c, 0, 1);
 	memset(c, 0, sizeof(*c));
 	if (!nec_parity[0])
 		for (int i = 0; i < 256; i++) {

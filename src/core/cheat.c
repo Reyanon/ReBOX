@@ -11,6 +11,7 @@
 #include "rbx.h"
 #include "cpu/m68k_bus.h"
 #include "cpu/m68k/m68k.h"
+#include "cheat_cpu.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -43,19 +44,65 @@ static int s_nitem, s_item_cap;
 static uint64_t s_frame;
 static cheat_t *s_cur;   // (the cheat whose expression runs: its temps and param)
 
-// ---- memory: the main 68000's space ----
+// ---- memory: the main CPU's space (cheat_cpu.h): a 68000 on the shared bus, else the first CPU set up ----
+typedef struct { const char *name; rbx_cheat_rd rd; rbx_cheat_wr wr; void *ctx; int big, unit; } cheat_cpu;
+static cheat_cpu s_offer[8];     // (the CPUs set up for this game, in order)
+static int s_noffer;
+static cheat_cpu s_cpu;          // (the main CPU: picked at load, cpu_pick)
+static const char *s_prefer;     // (rbx_cheat_prefer)
+static m68k_bus_t *s_mbus;       // (rbx_cheat_m68k_bus: the main 68000's bus, NULL = m68k_bus)
+
+static const void *s_prefer_ctx;   // (rbx_cheat_prefer_cpu)
+void rbx_cheat_prefer(const char *cpu) { s_prefer = cpu; }
+void rbx_cheat_prefer_cpu(const void *ctx) { s_prefer_ctx = ctx; s_prefer = ""; }
+void rbx_cheat_m68k_bus(void *bus) { s_mbus = (m68k_bus_t *)bus; }
+
+void rbx_cheat_offer(const char *cpu, rbx_cheat_rd rd, rbx_cheat_wr wr, void *ctx, int big, int unit)
+{
+	for (int i = 0; i < s_noffer; i++)
+		if (s_offer[i].ctx == ctx && s_offer[i].rd == rd)
+			return;   // (the same CPU set up again)
+	if (s_noffer < 8)
+		s_offer[s_noffer++] = (cheat_cpu){ cpu, rd, wr, ctx, big, unit > 0 ? unit : 1 };
+}
+
+// the main CPU: the first of the kind the driver named, else the first set up
+static int cpu_pick(void)
+{
+	memset(&s_cpu, 0, sizeof(s_cpu));
+	for (int i = 0; i < s_noffer && !s_cpu.rd; i++)
+		if (s_prefer_ctx ? s_offer[i].ctx == s_prefer_ctx : !s_prefer || !strcmp(s_offer[i].name, s_prefer))
+			s_cpu = s_offer[i];
+	return s_cpu.rd != NULL;
+}
+
+void rbx_cheat_cpu_reset(void)
+{
+	memset(&s_cpu, 0, sizeof(s_cpu));
+	s_noffer = 0;
+	s_prefer = NULL;
+	s_prefer_ctx = NULL;
+	s_mbus = NULL;
+}
+
+static int m68k_main(void);
+const char *rbx_cheat_cpu_name(void) { return m68k_main() ? "68000" : cpu_pick() ? s_cpu.name : ""; }
+
 static int m68k_main(void)
 {
+	if (s_prefer)
+		return 0;   // (the driver named another main CPU)
+	const m68k_bus_t *b = s_mbus ? s_mbus : &m68k_bus;
 	for (int i = 0; i < M68K_PAGES; i++)
-		if (m68k_bus.rd[i] || m68k_bus.wr[i])
+		if (b->rd[i] || b->wr[i])
 			return 1;
-	return m68k_bus.nparts > 0;
+	return b->nparts > 0;
 }
 
 static uint8_t mem_rd8(uint32_t a)
 {
 	m68k_bus_t *const was = m68k_bus_cur;
-	m68k_bus_cur = &m68k_bus;
+	m68k_bus_cur = s_mbus ? s_mbus : &m68k_bus;
 	const uint8_t v = (uint8_t)m68k_read_memory_8(a & 0xffffff);
 	m68k_bus_cur = was;
 	return v;
@@ -64,30 +111,46 @@ static uint8_t mem_rd8(uint32_t a)
 static void mem_wr8(uint32_t a, uint8_t v, int direct)
 {
 	a &= 0xffffff;
-	m68k_bus_t *const was = m68k_bus_cur;
-	m68k_bus_cur = &m68k_bus;
-	uint8_t *p = direct ? m68k_bus.rd[a >> M68K_PAGE_BITS] : NULL;
+	m68k_bus_t *const was = m68k_bus_cur, *const b = s_mbus ? s_mbus : &m68k_bus;
+	m68k_bus_cur = b;
+	uint8_t *p = direct ? b->rd[a >> M68K_PAGE_BITS] : NULL;
 	if (p) {   // (the memory itself: a ROM patch too; the decrypted opcodes as well when the CPU fetches from them)
 		p[(a & ((1u << M68K_PAGE_BITS) - 1)) ^ M68K_BYTE_XOR] = v;
-		if (m68k_bus.op && a < m68k_bus.op_size)
-			((uint8_t *)m68k_bus.op)[a ^ M68K_BYTE_XOR] = v;
+		if (b->op && a < b->op_size)
+			((uint8_t *)b->op)[a ^ M68K_BYTE_XOR] = v;
 	} else
 		m68k_write_memory_8(a, v);
 	m68k_bus_cur = was;
 }
 
+static int s_m68k;   // (the main CPU is the 68000 on the shared bus: set at load)
+
 static uint64_t mem_read(uint32_t a, int size)
 {
 	uint64_t v = 0;
-	for (int i = 0; i < size; i++)
-		v = v << 8 | mem_rd8(a + (uint32_t)i);
+	if (s_m68k) {
+		for (int i = 0; i < size; i++)
+			v = v << 8 | mem_rd8(a + (uint32_t)i);
+		return v;
+	}
+	for (int i = 0; i < size; i++) {   // (the CPU's own byte order)
+		const uint8_t b = s_cpu.rd(s_cpu.ctx, a + (uint32_t)(i * s_cpu.unit));
+		v = s_cpu.big ? v << 8 | b : v | (uint64_t)b << (8 * i);
+	}
 	return v;
 }
 
 static void mem_write(uint32_t a, int size, uint64_t v, int direct)
 {
-	for (int i = size - 1; i >= 0; i--, v >>= 8)
-		mem_wr8(a + (uint32_t)i, (uint8_t)v, direct);
+	if (s_m68k) {
+		for (int i = size - 1; i >= 0; i--, v >>= 8)
+			mem_wr8(a + (uint32_t)i, (uint8_t)v, direct);
+		return;
+	}
+	for (int i = 0; i < size; i++) {   // (other CPUs: through their bus, a ROM patch reaches RAM only)
+		const int k = s_cpu.big ? size - 1 - i : i;
+		s_cpu.wr(s_cpu.ctx, a + (uint32_t)(i * s_cpu.unit), (uint8_t)(v >> (8 * k)));
+	}
 }
 
 // ---- expressions (MAME debugger syntax) ----
@@ -127,7 +190,7 @@ static int name(ex_t *e, char *out, int max)
 {
 	ws(e);
 	int n = 0;
-	while (isalnum((unsigned char)e->p[n]) || e->p[n] == '_' || e->p[n] == '.') {
+	while (isalnum((unsigned char)e->p[n]) || e->p[n] == '_' || e->p[n] == '.' || e->p[n] == ':') {
 		if (n < max - 1)
 			out[n] = e->p[n];
 		n++;
@@ -144,7 +207,9 @@ static int memref(const char *nm, int *direct)
 {
 	const char *dot = strrchr(nm, '.');
 	const char *spec = dot ? dot + 1 : nm;
-	if (dot && ((size_t)(dot - nm) != 7 || strncasecmp(nm, "maincpu", 7)))
+	// (the main CPU: "maincpu", or a path ending in it, "mainpcb:maincpu" of Sega System 32)
+	const size_t cl = dot ? (size_t)(dot - nm) : 0;
+	if (dot && !((cl == 7 || (cl > 7 && nm[cl - 8] == ':')) && !strncasecmp(dot - 7, "maincpu", 7)))
 		return -1;   // (another CPU: not reached)
 	char t = 'p', s;
 	if (strlen(spec) == 2) {
@@ -528,8 +593,9 @@ int rbx_cheat_load_xml(const char *xml, size_t len)
 	rbx_cheat_clear();
 	if (!xml || !len)
 		return 0;
-	if (!m68k_main()) {
-		rbx_log("cheats: the main CPU of this board is not reached yet (68000 boards only)");
+	s_m68k = m68k_main();
+	if (!s_m68k && !cpu_pick()) {
+		rbx_log("cheats: no main CPU known for this board");
 		return 0;
 	}
 	s_xml = (char *)malloc(len + 1);
@@ -634,7 +700,8 @@ int rbx_cheat_load_xml(const char *xml, size_t len)
 	}
 	if (s_n == 0)
 		rbx_cheat_clear();
-	rbx_log("cheats: %d (%d left out%s)", s_n, skipped, other_cpu ? ", some for another CPU" : "");
+	rbx_log("cheats: %d (%d left out%s), main CPU %s", s_n, skipped, other_cpu ? ", some for another CPU" : "",
+	        rbx_cheat_cpu_name());
 	return s_n;
 }
 
@@ -649,6 +716,9 @@ static void run_script(cheat_t *c, int k)
 		ex_run(a->expr, 1, NULL);
 	}
 }
+
+// (testing: memory as a cheat reads it, after rbx_cheat_load_xml)
+uint64_t rbx_cheat_read(uint32_t a, int size) { return (s_m68k || s_cpu.rd) ? mem_read(a, size) : 0; }
 
 int rbx_cheat_count(void) { return s_n; }
 const char *rbx_cheat_name(int i) { return i >= 0 && i < s_n ? s_cheat[i].desc : NULL; }

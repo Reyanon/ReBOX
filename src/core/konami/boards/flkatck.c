@@ -4,6 +4,7 @@
     K007452, a frame behind on the worker.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/hd6309/hd6309.h"
 #include "../../cpu/z80/z80.h"
@@ -370,6 +371,7 @@ static void fk_reset(void);
 
 static int fk_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("hd6309");   // (the cheats' main CPU: another CPU is set up first)
 	if (!s_q_hp && !(s_q_hp = calloc(1, sizeof(*s_q_hp)))) {
 		rbx_fail("%s: out of memory", g->set);
 		return -1;

@@ -5,6 +5,7 @@
     See sh2.h for the scope and the differences from MAME.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "sh2.h"
 #include <string.h>
 
@@ -2027,8 +2028,13 @@ static void dummy_w8(void *u, uint32_t a, uint8_t d) { (void)u; (void)a; (void)d
 static void dummy_w16(void *u, uint32_t a, uint16_t d) { (void)u; (void)a; (void)d; }
 static void dummy_w32(void *u, uint32_t a, uint32_t d) { (void)u; (void)a; (void)d; }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a) { return sh2_read8((sh2_t *)x, a); }   // (as the CPU: page table, callbacks)
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { sh2_write8((sh2_t *)x, a, v); }
+
 void sh2_init(sh2_t *c)
 {
+	rbx_cheat_offer("sh2", cheat_rd, cheat_wr, c, 1, 1);
 	memset(c, 0, sizeof(*c));
 	c->read8 = dummy_r8; c->read16 = dummy_r16; c->read32 = dummy_r32;
 	c->write8 = dummy_w8; c->write16 = dummy_w16; c->write32 = dummy_w32;

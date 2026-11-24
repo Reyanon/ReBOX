@@ -5,6 +5,7 @@
     See sh3.h for the scope.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "sh3.h"
 #include "../../rbx_prof.h"
 #include <string.h>
@@ -2736,8 +2737,29 @@ static void dummy_w8(void *u, uint32_t a, uint8_t d) { (void)u; (void)a; (void)d
 static void dummy_w16(void *u, uint32_t a, uint16_t d) { (void)u; (void)a; (void)d; }
 static void dummy_w32(void *u, uint32_t a, uint32_t d) { (void)u; (void)a; (void)d; }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+// (as the CPU: the physical address's page, byte lane ^ 3, else the callbacks)
+static uint8_t cheat_rd(void *x, uint32_t a)
+{
+	sh3_t *c = (sh3_t *)x;
+	const uint32_t pa = a & 0x1fffffff;
+	const uint8_t *p = c->rd[pa >> SH3_PAGE_SHIFT];
+	return p ? p[(pa & 0xfff) ^ 3] : c->read8(c->user, a);
+}
+static void cheat_wr(void *x, uint32_t a, uint8_t v)
+{
+	sh3_t *c = (sh3_t *)x;
+	const uint32_t pa = a & 0x1fffffff;
+	uint8_t *p = c->wr[pa >> SH3_PAGE_SHIFT];
+	if (p)
+		p[(pa & 0xfff) ^ 3] = v;
+	else
+		c->write8(c->user, a, v);
+}
+
 void sh3_init(sh3_t *c)
 {
+	rbx_cheat_offer("sh3", cheat_rd, cheat_wr, c, 1, 1);
 	memset(c, 0, sizeof(*c));
 	rbx_prof_name(RBX_PA_CPU, s_sh3_pa_names, SH3_PA_END - RBX_PA_CPU);
 	s_idle_bytes = getenv("RBX_SH3_SPINOLD") && atoi(getenv("RBX_SH3_SPINOLD"));

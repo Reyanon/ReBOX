@@ -10,6 +10,7 @@
     VCK's IRQ, a banked sound ROM.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/m6502/m6502.h"
 #include "../../cpu/m6809/m6809.h"
@@ -429,6 +430,7 @@ static void d8_exit(void);
 
 static int d8_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("m6809");   // (the cheats' main CPU: another CPU is set up first)
 	s_var = !strcmp(g->machine, "shackled") ? V_SHACKLED : !strcmp(g->machine, "csilver") ? V_CSILVER : V_LASTMISN;
 	uint32_t csize, tsize, ssize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -661,6 +663,7 @@ static const rbx_driver *s_other;
 
 static int dx_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("m6809");   // (the cheats' main CPU: another CPU is set up first)
 	s_other = NULL;
 	for (int i = 0; i < (int)(sizeof(s_others) / sizeof(s_others[0])); i++)
 		if (s_others[i]->supported(g->machine))

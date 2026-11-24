@@ -7,6 +7,7 @@
     Not carried over: SCI data shifting (registers only), OS3 / SC2 output, standby and NVRAM, HD6301X/Y/HD6303.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "m6801.h"
 
 #include <string.h>
@@ -2814,8 +2815,13 @@ static void execute_one(m6801 *m)
 	}
 }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a) { m6801 *m = (m6801 *)x; return m->read(m->user, (uint16_t)a); }
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { m6801 *m = (m6801 *)x; m->write(m->user, (uint16_t)a, v); }
+
 void m6801_init(m6801 *m)
 {
+	rbx_cheat_offer("m6801", cheat_rd, cheat_wr, m, 1, 1);
 	memset(&m->ppc, 0, m6801_state_size());
 }
 

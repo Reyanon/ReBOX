@@ -3,6 +3,7 @@
     sprites, its last quarter still; the sound board of machine/irem_audio.c.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
 #include "../../video/gfxlayout.h"
@@ -211,6 +212,7 @@ static inline uint8_t bits8(uint8_t v, int b7, int b6, int b5, int b4, int b3, i
 
 static int tr_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("z80");   // (the cheats' main CPU: another CPU is set up first)
 	uint32_t ts, ss, ps;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	const uint8_t *tiles = rbx_region("tiles", &ts), *spr = rbx_region("sprites", &ss), *prom = rbx_region("proms", &ps);

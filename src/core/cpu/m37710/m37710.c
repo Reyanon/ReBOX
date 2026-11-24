@@ -6,6 +6,7 @@
     then the interrupts are evaluated (MAME: the next execute_run).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "m37710.h"
 #include <string.h>
 
@@ -1057,8 +1058,13 @@ static inline void account(m37710_t *cpu)
 	}
 }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a) { m37710_t *c = (m37710_t *)x; return c->read ? c->read(c->ctx, a) : 0; }
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { m37710_t *c = (m37710_t *)x; if (c->write) c->write(c->ctx, a, v); }
+
 void m37710_init(m37710_t *c)
 {
+	rbx_cheat_offer("m37710", cheat_rd, cheat_wr, c, 0, 1);
 	memset(c, 0, sizeof(*c));
 	c->next_due = INT64_MAX;
 	set_execution_mode(c, EXECUTION_MODE_M0X0);

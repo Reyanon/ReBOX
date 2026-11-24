@@ -6,6 +6,7 @@
     Not done: dynablstb's interrupt of the Z80 runs on every 4th line (MAME: 64 * 60 Hz of 240 lines' 14400).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/nec/nec.h"
 #include "../../cpu/nec/irem_cpu.h"
@@ -308,6 +309,7 @@ static void bomblord_decrypt(void)   // (init_bomblord)
 
 static int m90_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("nec");   // (the cheats' main CPU: another CPU is set up first)
 	uint32_t gs = 0, ms = 0;
 	const int ci = cfg_index(g->machine);
 	s_rom = rbx_region("maincpu", &s_rom_size);

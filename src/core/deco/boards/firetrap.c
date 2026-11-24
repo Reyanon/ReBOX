@@ -8,6 +8,7 @@
     74LS157 (the IRQ on every second VCK when enabled), the latch on its NMI, a banked ROM.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/m6502/m6502.h"
 #include "../../cpu/mcs51/mcs51.h"
@@ -355,6 +356,7 @@ static void ft_exit(void);
 
 static int ft_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("z80");   // (the cheats' main CPU: another CPU is set up first)
 	s_boot = !strcmp(g->machine, "firetrapbl");
 	uint32_t csize, t1size, t2size, ssize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);

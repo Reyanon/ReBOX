@@ -6,6 +6,7 @@
 #include "rbx_core.h"
 #include "rbx_module.h"
 #include "zip.h"
+#include "cheat_cpu.h"
 #include "cpu/tms57002/tms57002.h"
 
 #include <stdarg.h>
@@ -974,6 +975,7 @@ static const bios_opt k_neogeo_bios[] = {
 };
 #define NEOGEO_BIOS_N ((int)(sizeof(k_neogeo_bios) / sizeof(k_neogeo_bios[0])))
 static int s_neogeo_bios;   // (the choice: 0 = MAME's default)
+static rbx_rom_load *s_bios_loads;   // (the running game's loads with the chosen BIOS, load_roms)
 static char s_bios_note[96];
 
 int rbx_bios_count(void) { return NEOGEO_BIOS_N; }
@@ -1067,10 +1069,10 @@ static int load_roms(const rbx_game *g, const rbx_driver *drv)
 		s_reg_size[s_nreg] = r->size;
 		s_nreg++;
 	}
-	// (the chosen BIOS in place of the default: kept until the next game, s_reg_missing may point into it)
-	static rbx_rom_load *bl;
-	free(bl);
-	bl = bios_loads(g);
+	// (the chosen BIOS in place of the default: kept until the game ends, s_reg_missing may point into it; freed by
+	// release: a static here was reset by the next game's fresh core before it was freed, a leak each game)
+	free(s_bios_loads);
+	rbx_rom_load *const bl = s_bios_loads = bios_loads(g);
 	const rbx_rom_load *const loads = bl ? bl : g->loads;
 	int total = 0, done = 0;
 	for (const rbx_rom_load *l = loads; l->op != RBX_ROM_END; l++)
@@ -1935,6 +1937,8 @@ static int early_make(const rbx_game *g, const rbx_driver *drv)
 
 static void release(void)
 {
+	free(s_bios_loads);
+	s_bios_loads = NULL;
 	free_regions();
 	early_free();
 	free(rbx_video.bitmap);
@@ -2027,6 +2031,8 @@ size_t rbx_fresh_range(void)
 int rbx_init(const rbx_config *cfg)
 {
 	fresh_core();
+	rbx_bios_set(cfg->neogeo_bios);   // (after fresh_core: the choice is the frontend's, not the first game's)
+	rbx_cheat_cpu_reset();   // (the CPUs the driver sets up offer their spaces again: the first is the main one)
 	s_cfg = *cfg;
 	for (unsigned i = RBX_PA_CPU; i < RBX_PROF_IDS; i++)   // (the last game's CPU and driver names gone)
 		s_prof_names[i] = NULL;

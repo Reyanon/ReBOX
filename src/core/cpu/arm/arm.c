@@ -9,6 +9,7 @@
     without hardware division (the Vita's Cortex-A9 has none); the results are the same as MAME's / and %.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "arm.h"
 #include <stdio.h>
 
@@ -806,8 +807,28 @@ ARM_INLINE int exec_one(arm_t *c)
 
 /* ---- API ---- */
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a)   // (as the CPU: its pages, the byte lane of its bus, else the callbacks)
+{
+	arm_t *c = (arm_t *)x;
+	a &= 0x3ffffff;
+	const uint8_t *p = c->rpage[a >> ARM_PAGE_SHIFT];
+	return p ? p[(a & 0xfff) ^ (c->big_endian ? 3u : 0u)] : c->read8(c->ctx, a);
+}
+static void cheat_wr(void *x, uint32_t a, uint8_t v)
+{
+	arm_t *c = (arm_t *)x;
+	a &= 0x3ffffff;
+	uint8_t *p = c->wpage[a >> ARM_PAGE_SHIFT];
+	if (p)
+		p[(a & 0xfff) ^ (c->big_endian ? 3u : 0u)] = v;
+	else
+		c->write8(c->ctx, a, v);
+}
+
 void arm_init(arm_t *c)
 {
+	rbx_cheat_offer("arm", cheat_rd, cheat_wr, c, 0, 1);
 	build_cond_table();
 	memset(c, 0, sizeof(*c));
 	c->bank_mode = MODE_SVC;

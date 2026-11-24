@@ -3,6 +3,7 @@
     tools/v60conv.py (v60_ops.inc). See v60.h.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "v60.h"
 
 #include <math.h>
@@ -465,8 +466,13 @@ static inline uint32_t v60_update_psw_for_exception(int is_interrupt, int target
 #include "v60_ops.inc"
 
 // ---- device ----
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a) { (void)x; return V60_RB(a); }
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { (void)x; V60_WB(a, v); }
+
 void v60_init(void)
 {
+	rbx_cheat_offer("v60", cheat_rd, cheat_wr, NULL, 0, 1);
 	m_stall_io = 0;
 	m_irq_line = 0;
 	m_nmi_line = 0;

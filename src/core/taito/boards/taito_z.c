@@ -13,6 +13,7 @@
     centerdelta; Space Gun's crosshair stays). Analog pedals: B1 / up = gas, B2 / down = brake.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/m68k_bus.h"
 #include "../../cpu/m68k/m68k.h"
@@ -1017,6 +1018,7 @@ static int tz_init(const rbx_game *g)
 		rbx_fail("%s: out of memory", g->set);
 		return -1;
 	}
+	rbx_cheat_m68k_bus(&s_bus[0]);   // (the cheats: the main 68000's bus, CPU A)
 	if (!s_share_hp && !(s_share_hp = calloc(1, sizeof(*s_share_hp)))) {
 		rbx_fail("%s: out of memory", g->set);
 		return -1;

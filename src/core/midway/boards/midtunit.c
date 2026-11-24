@@ -9,6 +9,7 @@
     copyright-holders: Aaron Giles).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/tms34010/tms34010.h"
 #include "../../cpu/pic16c5x/pic16c5x.h"
@@ -1072,6 +1073,7 @@ static void tu_reset(void);
 
 static int tu_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("tms34010");   // (the cheats' main CPU: another CPU is set up first)
 	const char *init = strchr(g->machine, ':');
 	init = init ? init + 1 : "";
 	memset(&S, 0, sizeof(S));

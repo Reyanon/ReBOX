@@ -5,6 +5,7 @@
     sound board of machine/irem_audio.c.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
 #include "../../video/gfxlayout.h"
@@ -633,6 +634,7 @@ static void palette(const uint8_t *spr, const uint8_t *chr, const uint8_t *fgp)
 
 static int m62_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("z80");   // (the cheats' main CPU: another CPU is set up first)
 	static const struct { const char *m; int k; } kinds[] = {
 		{ "kungfum", K_KUNGFUM }, { "battroad", K_BATTROAD }, { "ldrun", K_LDRUN }, { "ldrun2", K_LDRUN2 }, { "ldrun3", K_LDRUN3 },
 		{ "ldrun4", K_LDRUN4 }, { "lotlot", K_LOTLOT }, { "kidniki", K_KIDNIKI }, { "spelunkr", K_SPELUNKR },

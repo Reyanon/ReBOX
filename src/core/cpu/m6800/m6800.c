@@ -4,6 +4,7 @@
     instruction; after CLI (with I set before) and TAP one more instruction runs first, as in MAME.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "m6800.h"
 
 #include <string.h>
@@ -327,8 +328,26 @@ static void execute(m6800_t *c, uint8_t op)
 	// illegal 1-byte opcodes: nothing
 }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a)   // (as the CPU: its direct pages, else the callbacks)
+{
+	m6800_t *c = (m6800_t *)x;
+	const uint8_t *p = c->rpage[(a >> 8) & 0xff];
+	return p ? p[a & 0xff] : c->read(c->ctx, (uint16_t)a);
+}
+static void cheat_wr(void *x, uint32_t a, uint8_t v)
+{
+	m6800_t *c = (m6800_t *)x;
+	uint8_t *p = c->wpage[(a >> 8) & 0xff];
+	if (p)
+		p[a & 0xff] = v;
+	else
+		c->write(c->ctx, (uint16_t)a, v);
+}
+
 void m6800_init(m6800_t *c)
 {
+	rbx_cheat_offer("m6800", cheat_rd, cheat_wr, c, 1, 1);
 	memset(c, 0, sizeof(*c));
 }
 

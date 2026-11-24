@@ -6,6 +6,7 @@
     latch on its NMI.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/h6280/h6280.h"
 #include "../../cpu/m6502/m6502.h"
@@ -290,6 +291,7 @@ static void af_exit(void);
 
 static int af_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("h6280");   // (the cheats' main CPU: another CPU is set up first)
 	s_trio = !strcmp(g->machine, "triothep");
 	uint32_t csize, tsize, ssize, osize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
@@ -478,6 +480,7 @@ static int af_supported(const char *machine) { return !strcmp(machine, "actfancr
 
 static int af_init_ack(const rbx_game *g)
 {
+	rbx_cheat_prefer("h6280");   // (the cheats' main CPU: another CPU is set up first)
 	if (!s_ram_hp && !(s_ram_hp = calloc(1, sizeof(*s_ram_hp)))) {
 		rbx_fail("%s: out of memory", g->set);
 		return -1;

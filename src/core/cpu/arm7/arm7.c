@@ -19,6 +19,7 @@
     them to R0). The Thumb encodings MAME stops on with fatalerror only advance the PC.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "arm7.h"
 
 #include <string.h>
@@ -1306,8 +1307,13 @@ static void build_cond_table(void)
 
 /* ---- API ---- */
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a) { return (uint8_t)RD8((arm7_t *)x, a); }   // (as the CPU: pages, callbacks)
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { WR8((arm7_t *)x, a, v); }
+
 void arm7_init(arm7_t *c)
 {
+	rbx_cheat_offer("arm7", cheat_rd, cheat_wr, c, 0, 1);
 	memset(c, 0, sizeof(*c));
 	build_cond_table();
 	for (int k = 0; k < 4; k++)

@@ -8,6 +8,7 @@
     The CPUs interleaved by the Seibu scheduler (sched.h). Not done: the NVRAM kept across runs (cleared at the start),
     the coin lockout / counter.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/nec/nec.h"
 #include "../../sound/rbx_ym.h"
@@ -273,6 +274,7 @@ static const uint32_t tl_y[16] = { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 
 
 static int sm_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("nec");   // (the cheats' main CPU: another CPU is set up first)
 	uint32_t snd_size, bgs, mds, fgs, txs, sps, okis = 0;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	uint8_t *snd = rbx_region("audiocpu", &snd_size);

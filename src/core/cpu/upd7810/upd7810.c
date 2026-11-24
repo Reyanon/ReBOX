@@ -4,6 +4,7 @@
     execute loop (MAME execute_run) and the C interface.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "upd7810.h"
 #include "../../rbx.h"
 
@@ -60,8 +61,13 @@ static inline void upd_wm(uint16_t a, uint8_t v)
 		s_cfg.write(a, v);
 }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a) { (void)x; return upd_rm((uint16_t)a); }
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { (void)x; upd_wm((uint16_t)a, v); }
+
 void upd7810_init(const upd7810_config *cfg)
 {
+	rbx_cheat_offer("upd7810", cheat_rd, cheat_wr, NULL, 0, 1);
 	s_cfg = *cfg;
 	// configure_ops (uPD7810 family)
 	m_opXX = s_opXX_7810;

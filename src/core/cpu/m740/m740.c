@@ -3,6 +3,7 @@
     m3745x.cpp; BSD-3-Clause, copyright-holders: R. Belmont, Olivier Galibert). See m740.h.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "m740.h"
 
 #include <string.h>
@@ -437,8 +438,13 @@ static void do_adct(m740_t *c, uint8_t val)
 #include "m740_ops.inc"
 
 // ---- API ----
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a) { m740_t *c = (m740_t *)x; return c->read ? c->read(c->ctx, (uint16_t)a) : 0; }
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { m740_t *c = (m740_t *)x; if (c->write) c->write(c->ctx, (uint16_t)a, v); }
+
 void m740_init(m740_t *c)
 {
+	rbx_cheat_offer("m740", cheat_rd, cheat_wr, c, 0, 1);
 	memset(c, 0, sizeof(*c));
 	// (m6502_device::init)
 	c->x = 0x80;

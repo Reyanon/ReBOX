@@ -6,6 +6,7 @@
 
     The CPUs interleaved a scanline at a time. Not done: the flip screen, the coin counters.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
 #include "../../cpu/m6800/m6801.h"
@@ -200,6 +201,7 @@ static void kj_exit(void);
 
 static int kj_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("z80");   // (the cheats' main CPU: another CPU is set up first)
 	uint32_t rs, ss, ts, s1, s2, ps;
 	s_rom = rbx_region("maincpu", &rs);
 	s_srom = rbx_region("soundcpu", &ss);

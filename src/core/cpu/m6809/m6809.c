@@ -5,6 +5,7 @@
     are those of MAME. Dummy (VMA and opcode-argument) reads are counted but not sent to the bus.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "m6809.h"
 
 #include <string.h>
@@ -688,8 +689,26 @@ fetch:
 }
 
 // ---- public ----
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a)   // (as the CPU: its direct pages, else the callbacks)
+{
+	m6809_t *c = (m6809_t *)x;
+	const uint8_t *p = c->rpage[(a >> 8) & 0xff];
+	return p ? p[a & 0xff] : c->read ? c->read(c->ctx, (uint16_t)a) : 0;
+}
+static void cheat_wr(void *x, uint32_t a, uint8_t v)
+{
+	m6809_t *c = (m6809_t *)x;
+	uint8_t *p = c->wpage[(a >> 8) & 0xff];
+	if (p)
+		p[a & 0xff] = v;
+	else if (c->write)
+		c->write(c->ctx, (uint16_t)a, v);
+}
+
 void m6809_init(m6809_t *c)
 {
+	rbx_cheat_offer("m6809", cheat_rd, cheat_wr, c, 1, 1);
 	memset(c, 0, sizeof(*c));
 	c->cc = CC_I | CC_F;
 }

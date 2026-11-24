@@ -68,6 +68,9 @@ typedef struct {
 	void *(*jit_alloc)(unsigned size);
 	void (*jit_write_begin)(void);
 	void (*jit_write_end)(void *code, unsigned size);
+	// the Neo Geo BIOS by MAME's name (rbx_bios_set), NULL / "" = the default. Given here: the core's static data is
+	// the first game's again at each rbx_init, a choice made with rbx_bios_set between games would be lost
+	const char *neogeo_bios;
 } rbx_config;
 
 int rbx_init(const rbx_config *cfg);   // 0 = ok, else see rbx_error(). Every call after the first starts from the

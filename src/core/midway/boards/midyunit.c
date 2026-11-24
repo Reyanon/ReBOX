@@ -5,6 +5,7 @@
     (machine/williams_snd.c).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/tms34010/tms34010.h"
 #include "../machine/williams_snd.h"
@@ -470,6 +471,7 @@ static void nv_save(void)
 
 static int yu_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("tms34010");   // (the cheats' main CPU: another CPU is set up first)
 	const char *m = g->machine;
 	const char *init = strchr(m, ':');
 	init = init ? init + 1 : "";

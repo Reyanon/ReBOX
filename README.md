@@ -310,8 +310,9 @@ title). The game lists' paths do not need to change.
 
 ### Cheats
 
-ReBOX reads MAME's cheat files (the XML format of MAME's `cheat.7z`). Cheats work on boards whose main CPU is a 68000
-(Neo Geo, CPS1, CPS2, Cave, Toaplan, Taito and others). In a game, open the menu (SELECT + START) and choose *Cheats*.
+ReBOX reads MAME's cheat files (the XML format of MAME's `cheat.7z`) for every board: the cheats act on the main CPU
+(68000, Z80, 6809, 6502, SH-2, SH-3, ARM, V30 / V33, V60, i386, TMS34010 and the others). Cheats for a game's other
+CPUs (sound CPUs, MCUs) are left out. In a game, open the menu (SELECT + START) and choose *Cheats*.
 
 **Automatic install**
 

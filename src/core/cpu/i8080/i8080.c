@@ -8,6 +8,7 @@
     execute_clocks_to_cycles).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "i8080.h"
 
 #include <string.h>
@@ -352,8 +353,18 @@ static void check_for_interrupts(i8080_t *cpu)
 	}
 }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a)   // (as the CPU: its direct pages, else the read callback)
+{
+	i8080_t *c = (i8080_t *)x;
+	const uint8_t *p = c->rpage[(a >> 8) & 0xff];
+	return p ? p[a & 0xff] : c->read(c->user, (uint16_t)a);
+}
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { i8080_t *c = (i8080_t *)x; c->write(c->user, (uint16_t)a, v); }
+
 void i8080_init(i8080_t *cpu, int is_8085)
 {
+	rbx_cheat_offer("i8080", cheat_rd, cheat_wr, cpu, 0, 1);
 	if (!s_tables)
 		init_tables();
 	memset(&cpu->s, 0, sizeof(cpu->s));

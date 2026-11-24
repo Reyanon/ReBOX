@@ -10,6 +10,7 @@
     - a HALT with nothing to wake it skips ahead to the next timer tick or the end of the slice (same result
       as running the halted NOP loop one step at a time).
 */
+#include "../../cheat_cpu.h"
 #include "tlcs90.h"
 
 #include <string.h>
@@ -2366,8 +2367,13 @@ void tlcs90_reset(tlcs90 *t)
 	// the timer 4 callback does not check TRUN)
 }
 
+// (the cheats' access to this CPU's program space: cheat_cpu.h)
+static uint8_t cheat_rd(void *x, uint32_t a) { tlcs90 *t = (tlcs90 *)x; return t->read8 ? t->read8(t->userdata, a) : 0; }
+static void cheat_wr(void *x, uint32_t a, uint8_t v) { tlcs90 *t = (tlcs90 *)x; if (t->write8) t->write8(t->userdata, a, v); }
+
 void tlcs90_init(tlcs90 *t, int type)
 {
+	rbx_cheat_offer("tlcs90", cheat_rd, cheat_wr, t, 0, 1);
 	// internal ROM size, internal RAM start, SFR end, TMP90844 layout (MAME tmp9xxxx_mem maps)
 	static const struct { uint32_t rom, ram, sfr_end; int r844; } info[] = {
 		{ 0x2000, 0xfec0, 0xffef, 0 },   // TMP90840

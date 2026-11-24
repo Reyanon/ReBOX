@@ -9,6 +9,7 @@
     The CPUs interleaved as MAME's scheduler does it (sched.h: the 1/12000 s quantum; main, sub, Z80 in that order;
     the screen's and the sound manager's timers, the synchronizes). Not done: the flip screen, the coin counters.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/nec/nec.h"
 #include "../../sound/rbx_ym.h"
@@ -422,6 +423,7 @@ static void rd_exit(void);
 
 static int rd_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("nec");   // (the cheats' main CPU: another CPU is set up first)
 	s_bp = calloc(1, sizeof(board_t));
 	s_snapp = calloc(1, sizeof(snap_t));
 	if (!s_bp || !s_snapp) {

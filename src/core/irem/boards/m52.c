@@ -3,6 +3,7 @@
     three 256x128 background pictures under it, 16x16 sprites over it; the sound board of machine/irem_audio.c.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/z80/z80.h"
 #include "../../video/gfxlayout.h"
@@ -275,6 +276,7 @@ static void palette(const uint8_t *tx, const uint8_t *bg, const uint8_t *sp, con
 
 static int m52_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("z80");   // (the cheats' main CPU: another CPU is set up first)
 	uint32_t txs, sps, bgs[3], tps, bps, sps2, cps;
 	static const char *const bgn[3] = { "bg0", "bg1", "bg2" };
 	s_rom = rbx_region("maincpu", &s_rom_size);

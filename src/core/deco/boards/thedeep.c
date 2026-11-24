@@ -8,6 +8,7 @@
     256x248 without a vblank.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
+#include "../../cheat_cpu.h"
 #include "../../rbx.h"
 #include "../../cpu/m6502/m6502.h"
 #include "../../cpu/mcs51/mcs51.h"
@@ -272,6 +273,7 @@ static void td_exit(void);
 
 static int td_init(const rbx_game *g)
 {
+	rbx_cheat_prefer("z80");   // (the cheats' main CPU: another CPU is set up first)
 	uint32_t bsize, tsize, ssize, psize;
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("audiocpu", &s_zrom_size);

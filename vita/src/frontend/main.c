@@ -472,6 +472,7 @@ static int run_game(const rbx_game_found *game)
 			.jit_alloc = jit_alloc,
 			.jit_write_begin = jit_write_begin,
 			.jit_write_end = jit_write_end,
+			.neogeo_bios = g_settings.bios_neogeo,   // (Settings > BIOS > Neo Geo)
 		},
 		.render_threaded = 1, // drawing on CPU2 (video.c render thread)
 	};
