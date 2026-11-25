@@ -96,7 +96,7 @@ static const rbx_ipt_field stingnet_ipf_stingnet[] = {
 	{ 0x10000000, 0x10000000, RBX_IPT_BUTTON1, 1, 0, 0, "", 26, 0, 255, 0, 0x0, 0x0 },
 	{ 0x20000000, 0x20000000, RBX_IPT_BUTTON6, 1, 0, 0, "", 26, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40000000, 0x40000000, RBX_IPT_GAMBLE_HALF, 1, 0, 0, "", 26, 0, 255, 0, 0x0, 0x0 },
-	{ 0x80000000, 0x80000000, RBX_IPT_BUTTON1, 1, 0, 0, "", 26, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80000000, 0x80000000, RBX_IPT_BUTTON1, 1, 0, 0, "Help", 26, 0, 255, 0, 0x0, 0x0 },
 	{ 0x10000, 0x10000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 26, 2, 255, 0, 0x0, 0x0 },
 	{ 0x20000, 0x20000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 28, 2, 255, 0, 0x0, 0x0 },
 	{ 0x40000, 0x40000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 30, 2, 255, 0, 0x0, 0x0 },

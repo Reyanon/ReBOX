@@ -155,7 +155,7 @@ static const rbx_ipt_field changela_ipf_changela[] = {
 	{ 0x20, 0x20, RBX_IPT_TILT, 1, 0, 0, "", 82, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 82, 0, 0, 1, 0x20, 0x0 },
 	{ 0x3, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 82, 0, 0, 1, 0x20, 0x0 },
-	{ 0x1, 0x1, RBX_IPT_BUTTON2, 1, 0, 1, "", 82, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON2, 1, 0, 1, "Gear Shift", 82, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port changela_ipp_changela[] = {
 	{ "DSWA", 0, 6 },

@@ -5893,7 +5893,7 @@ static const rbx_ipt_field nmk16_ipf_tdragonb2[] = {
 	{ 0x2, 0x2, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "Button 1 / P2 Start", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x20, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },

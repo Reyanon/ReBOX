@@ -70,11 +70,11 @@ static const rbx_ipt_setting lemmings_ips_lemmings[] = {
 };
 static const rbx_ipt_field lemmings_ipf_lemmings[] = {
 	{ 0x1, 0x1, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x4, 0x4, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "Select", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON2, 1, 0, 0, "Hurry", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x10, 0x10, RBX_IPT_BUTTON1, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x20, 0x20, RBX_IPT_BUTTON2, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 2, 0, 0, "Select", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_BUTTON2, 2, 0, 0, "Hurry", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x100, 0x100, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },

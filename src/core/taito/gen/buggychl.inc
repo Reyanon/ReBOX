@@ -147,7 +147,7 @@ static const rbx_ipt_field buggychl_ipf_buggychl[] = {
 	{ 0x1, 0x0, RBX_IPT_START1, 1, 0, 0, "", 64, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 64, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 64, 0, 255, 0, 0x0, 0x0 },
-	{ 0x8, 0x0, RBX_IPT_BUTTON2, 1, 0, 1, "", 64, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_BUTTON2, 1, 0, 1, "Gear Shift", 64, 0, 255, 0, 0x0, 0x0 },
 	{ 0x10, 0x0, RBX_IPT_OTHER, 1, 0, 0, "", 64, 0, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 64, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 64, 0, 255, 0, 0x0, 0x0 },

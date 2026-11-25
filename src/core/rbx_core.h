@@ -26,7 +26,7 @@ int rbx_game_find(const char *set);   // index or -1
 int rbx_game_players(int i);          // players with controls
 int rbx_game_buttons(int i);          // buttons of player 1
 int rbx_game_twin_stick(int i);       // the game has a second joystick (MAME JOYSTICKRIGHT_*: RBX_IN_RUP ..)
-const char *rbx_game_button_label(int i, int b);   // what button b (0..) works besides a button ("Pedal"), or NULL
+const char *rbx_game_button_label(int i, int b);   // button b's (0..5) name ("R Paddle Forward"), or the pedal it works ("Pedal"), or NULL
 
 // ---- core modules (rbx_module.h: a maker's boards, src/core/<id>/) ----
 int rbx_module_count(void);

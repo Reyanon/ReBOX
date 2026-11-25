@@ -311,7 +311,7 @@ static const rbx_ipt_field wiz_ipf_kungfut[] = {
 	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x10, 0x0, RBX_IPT_BUTTON3, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_BUTTON3, 1, 0, 0, "Microphone Input", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },

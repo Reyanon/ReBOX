@@ -228,10 +228,10 @@ static const rbx_ipt_setting konmedal_ips_chusenoh[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field konmedal_ipf_chusenoh[] = {
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x4, 0x4, RBX_IPT_BUTTON3, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x8, 0x8, RBX_IPT_BUTTON4, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "Red", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "Blue", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON3, 1, 0, 0, "Yellow", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON4, 1, 0, 0, "White", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x10, 0x0, RBX_IPT_START1, 1, 0, 1, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x20, RBX_IPT_SERVICE, 1, 0, 1, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_BUTTON7, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },

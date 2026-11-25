@@ -49,8 +49,8 @@ static const rbx_ipt_setting m14_ips_m14[] = {
 };
 static const rbx_ipt_field m14_ipf_m14[] = {
 	{ 0xff, 0x0, RBX_IPT_PADDLE, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "Fire / Discard", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "Ron", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 0, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 2, 2, 255, 0, 0x0, 0x0 },
 	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
@@ -58,7 +58,7 @@ static const rbx_ipt_field m14_ipf_m14[] = {
 	{ 0x40, 0x40, RBX_IPT_START1, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 6, 2, 255, 0, 0x0, 0x0 },
 	{ 0x7f, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0x80, 0x80, RBX_IPT_BUTTON3, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_BUTTON3, 1, 0, 0, "Reach", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Show available tiles", 8, 2, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 10, 2, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 12, 2, 255, 0, 0x0, 0x0 },

@@ -2423,13 +2423,13 @@ static const rbx_ipt_field taito_b_ipf_realpunc[] = {
 	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "Safety switch", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x2, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x10, 0x10, RBX_IPT_BUTTON2, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x20, 0x20, RBX_IPT_BUTTON3, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x40, 0x40, RBX_IPT_BUTTON4, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON2, 1, 0, 0, "Pad Photosensor 1 (N)", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_BUTTON3, 1, 0, 0, "Pad Photosensor 2 (U)", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_BUTTON4, 1, 0, 0, "Pad Photosensor 3 (D)", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port taito_b_ipp_realpunc[] = {
@@ -2594,10 +2594,10 @@ static const rbx_ipt_field taito_b_ipf_sbm[] = {
 	{ 0x2, 0x2, RBX_IPT_SERVICE1, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_COIN1, 1, 2, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_COIN2, 1, 2, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x20, 0x0, RBX_IPT_BUTTON2, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x40, 0x0, RBX_IPT_BUTTON3, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x80, 0x80, RBX_IPT_BUTTON4, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "Pad Photosensor 1", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_BUTTON2, 1, 0, 0, "Pad Photosensor 2", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_BUTTON3, 1, 0, 0, "Pad Photosensor 3", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_BUTTON4, 1, 0, 0, "Pad Photosensor 4", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port taito_b_ipp_sbm[] = {
 	{ "DSWA", 0, 7 },
@@ -2675,10 +2675,10 @@ static const rbx_ipt_field taito_b_ipf_sbmj[] = {
 	{ 0x2, 0x2, RBX_IPT_SERVICE1, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_COIN1, 1, 2, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_COIN2, 1, 2, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x20, 0x0, RBX_IPT_BUTTON2, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x40, 0x0, RBX_IPT_BUTTON3, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0x80, 0x80, RBX_IPT_BUTTON4, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "Pad Photosensor 1", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_BUTTON2, 1, 0, 0, "Pad Photosensor 2", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_BUTTON3, 1, 0, 0, "Pad Photosensor 3", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_BUTTON4, 1, 0, 0, "Pad Photosensor 4", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port taito_b_ipp_sbmj[] = {
 	{ "DSWA", 0, 6 },

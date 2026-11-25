@@ -87,7 +87,7 @@ static const rbx_ipt_field crbaloon_ipf_crbaloon[] = {
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 22, 2, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 24, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 26, 2, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "", 28, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "Name Reset", 28, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_SERVICE1, 1, 0, 0, "", 28, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_TILT, 1, 0, 0, "", 28, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 28, 0, 255, 0, 0x0, 0x0 },

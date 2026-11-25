@@ -3243,8 +3243,8 @@ static const rbx_ipt_setting segas32_ips_f1en[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field segas32_ipf_f1en[] = {
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "mainpcb:Gear Up", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "mainpcb:Gear Down", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xfc, 0xfc, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
@@ -3267,8 +3267,8 @@ static const rbx_ipt_field segas32_ipf_f1en[] = {
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON2, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 2, 0, 0, "subpcb:Gear Up", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON2, 2, 0, 0, "subpcb:Gear Down", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0xfc, 0xfc, RBX_IPT_UNUSED, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_UNKNOWN, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
@@ -3323,9 +3323,9 @@ static const rbx_ipt_setting segas32_ips_f1lap[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field segas32_ipf_f1lap[] = {
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x4, 0x4, RBX_IPT_BUTTON3, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "mainpcb:Gear Up", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "mainpcb:Gear Down", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON3, 1, 0, 0, "mainpcb:Overtake", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf8, 0xf8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
@@ -3945,8 +3945,8 @@ static const rbx_ipt_setting segas32_ips_radm[] = {
 };
 static const rbx_ipt_field segas32_ipf_radm[] = {
 	{ 0x1, 0x1, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x4, 0x4, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "mainpcb:Light", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON2, 1, 0, 0, "mainpcb:Wiper", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf8, 0xf8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
@@ -3993,7 +3993,7 @@ static const rbx_ipt_setting segas32_ips_radr[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field segas32_ipf_radr[] = {
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 1, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 1, "mainpcb:Gear Change", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xfe, 0xfe, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
@@ -4119,7 +4119,7 @@ static const rbx_ipt_setting segas32_ips_slipstrm[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field segas32_ipf_slipstrm[] = {
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 1, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 1, "mainpcb:Gear Change", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xfe, 0xfe, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },

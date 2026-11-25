@@ -120,6 +120,7 @@ shows the other working MAME boards that are not ported yet, greyed out.
 |  | Classic boards (22 drivers: circusc, finalizr, gberet, gyruss, ...) | 75 | 82% |
 |  | Single-game boards (36 drivers: 88games, ajax, aliens, asterix, ...) | 177 | 93% |
 | **Sega** | System 16 | 210 | 89% |
+|  | Out Run | 27 | 100% |
 |  | System 24 | 27 | 100% |
 |  | System 32 | 54 | 86% |
 |  | X-Board | 39 | 91% |

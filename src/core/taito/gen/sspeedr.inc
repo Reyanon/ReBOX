@@ -42,7 +42,7 @@ static const rbx_ipt_field sspeedr_ipf_sspeedr[] = {
 	{ 0xe0, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Service Mode", 10, 3, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_UNUSED, 1, 0, 0, "", 13, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 13, 0, 255, 0, 0x0, 0x0 },
-	{ 0x4, 0x4, RBX_IPT_BUTTON1, 1, 0, 1, "", 13, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON1, 1, 0, 1, "Shifter", 13, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_COIN1, 1, 0, 0, "", 13, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port sspeedr_ipp_sspeedr[] = {

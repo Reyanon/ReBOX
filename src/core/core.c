@@ -283,13 +283,13 @@ int rbx_game_twin_stick(int i)
 					return 1;
 	return 0;
 }
-// what a game button does when it is not a button of the game's own (b = 0..): button 1, 2, 3 work its pedal,
-// pedal 2, pedal 3 when it has no such button (field_pressed and the drivers: no analog pedal, button N = pressed)
+// what a game button does (b = 0..5): its MAME name, or button 1, 2, 3 work the game's pedal, pedal 2, pedal 3 when
+// it has no such button (field_pressed and the drivers: no analog pedal, button N = pressed)
 const char *rbx_game_button_label(int i, int b)
 {
 	static const char *const ped[3] = { "Pedal", "Pedal 2", "Pedal 3" };
 	const rbx_game *g = game_at(i, NULL);
-	if (!g || b < 0 || b > 2)
+	if (!g || b < 0 || b > 5)
 		return NULL;
 	int button = 0, pedal = 0;
 	for (const rbx_ipt_port *p = g->ports; p->tag; p++)
@@ -297,8 +297,12 @@ const char *rbx_game_button_label(int i, int b)
 			const rbx_ipt_field *fd = &g->fields[f];
 			if (fd->player != 1)
 				continue;
-			button |= fd->type == RBX_IPT_BUTTON1 + b;
-			pedal |= fd->type == RBX_IPT_PEDAL + b;
+			if (fd->type == RBX_IPT_BUTTON1 + b) {
+				if (fd->name && fd->name[0])   // (MAME's PORT_NAME: Toobin's paddles, Street Fighter's punches)
+					return fd->name;
+				button = 1;
+			}
+			pedal |= b <= 2 && fd->type == RBX_IPT_PEDAL + b;
 		}
 	return pedal && !button ? ped[b] : NULL;
 }
@@ -1472,12 +1476,17 @@ static rbx_rom_load *bios_loads(const rbx_game *g)
 
 static int load_roms(const rbx_game *g, const rbx_driver *drv)
 {
-	// zips: the set, then its parent chain
+	// zips: the set, then its parent chain; a parent that is no game of ours is a BIOS set (neogeo, pgm): its zip too,
+	// the chain's end (split sets: the BIOS files only there, issue #9)
 	s_nzips = 0;
-	for (const rbx_game *p = g; p && s_nzips < MAX_ZIPS; p = p->parent ? find_game(p->parent) : NULL) {
+	for (const rbx_game *p = g; p && s_nzips < MAX_ZIPS;) {
 		rbx_zip *z = open_set_zip(p->set);
 		if (z)
 			s_zips[s_nzips++] = z;
+		const rbx_game *up = p->parent ? find_game(p->parent) : NULL;
+		if (p->parent && !up && s_nzips < MAX_ZIPS && (z = open_set_zip(p->parent)) != NULL)
+			s_zips[s_nzips++] = z;
+		p = up;
 	}
 	if (!s_nzips) {
 		rbx_fail("%s.zip not found", g->set);

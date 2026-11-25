@@ -745,11 +745,11 @@ static const char *act_name(int act)
 {
 	static const char *const n[RBX_ACT_COUNT] = { "Button 1", "Button 2", "Coin", "Start", "Button 3", "Button 4", "Button 5",
 		"Button 6", "2nd stick Up", "2nd stick Down", "2nd stick Left", "2nd stick Right" };
-	// a button that works the running game's pedal (Power Drift's accelerator): "Button 1 (Pedal)"
-	const int b = act == RBX_ACT_ATTACK ? 0 : act == RBX_ACT_JUMP ? 1 : act == RBX_ACT_B3 ? 2 : -1;
+	// a button's name in the running game: MAME's ("Button 2 (R Paddle Forward)") or a pedal it works ("Button 1 (Pedal)")
+	const int b = act == RBX_ACT_ATTACK ? 0 : act == RBX_ACT_JUMP ? 1 : act >= RBX_ACT_B3 && act <= RBX_ACT_B6 ? act - RBX_ACT_B3 + 2 : -1;
 	const char *what = b >= 0 && !s_list_mode ? rbx_core_button_label(b) : NULL;
 	if (what) {
-		static char nb[3][64];
+		static char nb[6][64];
 		snprintf(nb[b], sizeof(nb[b]), "%s (%s)", T(n[act]), T(what));
 		return nb[b];
 	}

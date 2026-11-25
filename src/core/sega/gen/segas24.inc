@@ -613,10 +613,10 @@ static const rbx_ipt_setting segas24_ips_dcclub[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field segas24_ipf_dcclub[] = {
-	{ 0x1, 0x1, RBX_IPT_BUTTON3, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x4, 0x4, RBX_IPT_BUTTON4, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x8, 0x8, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON3, 1, 0, 0, "Angle Left", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "Club", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON4, 1, 0, 0, "Angle Right", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON2, 1, 0, 0, "Stance", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
@@ -701,8 +701,8 @@ static const rbx_ipt_setting segas24_ips_dcclubj[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field segas24_ipf_dcclubj[] = {
-	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x8, 0x8, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "Club", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON2, 1, 0, 0, "Stance", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
@@ -1735,10 +1735,10 @@ static const rbx_ipt_setting segas24_ips_sgmast[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field segas24_ipf_sgmast[] = {
-	{ 0x1, 0x1, RBX_IPT_BUTTON3, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x4, 0x4, RBX_IPT_BUTTON4, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x8, 0x8, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON3, 1, 0, 0, "Angle Left", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "Club", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON4, 1, 0, 0, "Angle Right", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON2, 1, 0, 0, "Stance", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
@@ -1824,8 +1824,8 @@ static const rbx_ipt_setting segas24_ips_sgmastj[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field segas24_ipf_sgmastj[] = {
-	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x8, 0x8, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "Club", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON2, 1, 0, 0, "Stance", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },

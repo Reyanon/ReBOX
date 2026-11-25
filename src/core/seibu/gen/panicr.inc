@@ -114,15 +114,15 @@ static const rbx_ipt_setting panicr_ips_panicr[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field panicr_ipf_panicr[] = {
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x4, 0x4, RBX_IPT_BUTTON3, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x8, 0x8, RBX_IPT_BUTTON4, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "Left Flipper", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "Right Flipper", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON3, 1, 0, 0, "Left Shake", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON4, 1, 0, 0, "Right Shake", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x1, 0x1, RBX_IPT_BUTTON1, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x2, 0x2, RBX_IPT_BUTTON2, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x4, 0x4, RBX_IPT_BUTTON3, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x8, 0x8, RBX_IPT_BUTTON4, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 2, 0, 0, "Left Flipper", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON2, 2, 0, 0, "Right Flipper", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON3, 2, 0, 0, "Left Shake", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON4, 2, 0, 0, "Right Shake", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x10, 0x10, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
