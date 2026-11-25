@@ -728,24 +728,63 @@ static inline void sprite_chunk(const pgm2_snap *v, uint32_t *palette_offset, in
 			const int x0 = x + *realxdraw, x31 = x0 + 31 * realdraw_inc;
 			const int lo = x0 < x31 ? x0 : x31, hi = x0 < x31 ? x31 : x0;
 			const uint32_t po = *palette_offset, n = rbx_popcount(maskdata), in = po & RBX_BLK_MASK;
-			if (lo >= 0 && hi < v->vis_w && hi < 0x8000 &&
+			if (lo == (int16_t)lo && hi == (int16_t)hi &&   // (no s16 wrap of MAME's realx)
 			    (palette_inc > 0 ? in + n - 1 <= RBX_BLK_MASK && po + n - 1 <= cmask : in >= n - 1)) {
-				const uint8_t *c = s_colour[po >> RBX_BLK_SHIFT] + in;
-				uint16_t *d = s_spr[s_spr_front ^ 1] + realy * SCR_W + x0;
-				const uint16_t pb = (uint16_t)(pal * 0x40);
-				uint32_t m = maskdata;
-				if (palette_inc == -1)   // (xchunk k = bit k: the lowest set bit first)
-					while (m) {
-						const int k = __builtin_ctz(m);
-						m &= m - 1;
-						d[k * realdraw_inc] = (uint16_t)((*c-- & 0x3f) + pb);
+				if (hi >= 0 && lo < v->vis_w) {
+					const uint8_t *c = s_colour[po >> RBX_BLK_SHIFT] + in;
+					uint16_t *row = s_spr[s_spr_front ^ 1] + realy * SCR_W;
+					const uint16_t pb = (uint16_t)(pal * 0x40);
+					uint32_t m = maskdata;
+					if (lo >= 0 && hi < v->vis_w && m == 0xffffffffu) {   // (all 32 columns drawn: the colours in a run)
+						uint16_t *d = row + x0;
+						if (palette_inc > 0 && realdraw_inc > 0)
+							for (int k = 0; k < 32; k++)
+								d[k] = (uint16_t)((c[k] & 0x3f) + pb);
+						else if (palette_inc > 0)
+							for (int k = 0; k < 32; k++)
+								d[-k] = (uint16_t)((c[k] & 0x3f) + pb);
+						else if (realdraw_inc > 0)
+							for (int k = 0; k < 32; k++)
+								d[k] = (uint16_t)((c[-k] & 0x3f) + pb);
+						else
+							for (int k = 0; k < 32; k++)
+								d[-k] = (uint16_t)((c[-k] & 0x3f) + pb);
+					} else if (lo >= 0 && hi < v->vis_w) {   // (all 32 columns on the screen)
+						uint16_t *d = row + x0;
+						if (palette_inc == -1)   // (xchunk k = bit k: the lowest set bit first)
+							while (m) {
+								const int k = __builtin_ctz(m);
+								m &= m - 1;
+								d[k * realdraw_inc] = (uint16_t)((*c-- & 0x3f) + pb);
+							}
+						else   // (xchunk k = bit 31 - k: the highest set bit first)
+							while (m) {
+								const int k = __builtin_clz(m);
+								m &= ~(0x80000000u >> k);
+								d[k * realdraw_inc] = (uint16_t)((*c++ & 0x3f) + pb);
+							}
+					} else {   // (across an edge of the screen: the columns past it left out, their colours still used)
+						const unsigned w = (unsigned)v->vis_w;
+						if (palette_inc == -1)
+							while (m) {
+								const int k = __builtin_ctz(m);
+								m &= m - 1;
+								const int xx = x0 + k * realdraw_inc;
+								const uint8_t cc = *c--;
+								if ((unsigned)xx < w)
+									row[xx] = (uint16_t)((cc & 0x3f) + pb);
+							}
+						else
+							while (m) {
+								const int k = __builtin_clz(m);
+								m &= ~(0x80000000u >> k);
+								const int xx = x0 + k * realdraw_inc;
+								const uint8_t cc = *c++;
+								if ((unsigned)xx < w)
+									row[xx] = (uint16_t)((cc & 0x3f) + pb);
+							}
 					}
-				else   // (xchunk k = bit 31 - k: the highest set bit first)
-					while (m) {
-						const int k = __builtin_clz(m);
-						m &= ~(0x80000000u >> k);
-						d[k * realdraw_inc] = (uint16_t)((*c++ & 0x3f) + pb);
-					}
+				}
 				*palette_offset = (po + (uint32_t)palette_inc * n) & cmask;
 				*realxdraw += realdraw_inc * 32;
 				return;
@@ -834,9 +873,17 @@ static void sprite_line(const pgm2_snap *v, uint32_t *mask_offset, uint32_t *pal
 	}
 }
 
+// a sprite band's start (y0) reached by a sprite from above: its lines there only move the offsets (sprite_line),
+// the same each frame for the same sprite words at the same distance (the background's sprites, ROM fixed). The loop's
+// state at the last source line starting above y0, kept per band (each band its own thread: no sharing)
+#define SBANDS 4   // (the sprites' bands, first: the longest pieces)
+#define SKC_N 1024
+typedef struct { uint32_t w1, w2, w3, zb; int32_t dy; uint32_t mo, po; int32_t realy, sourceline, ydraw; } skc_t;
+static skc_t *s_skc;   // (SBANDS x SKC_N, calloc'd at init: dy 0 = empty)
+
 // the sprites' lines [y0, y1) of the visible area (a band: the pixels of each line are drawn as the whole list draws
 // them, so bands drawn apart give the same bitmap)
-static void draw_sprites(const pgm2_snap *v, int y0, int y1)
+static void draw_sprites(const pgm2_snap *v, int y0, int y1, int band)
 {
 	for (int y = y0; y < y1; y++)
 		for (int x = 0; x < v->vis_w; x++)
@@ -877,10 +924,46 @@ static void draw_sprites(const pgm2_snap *v, int y0, int y1)
 		palette_offset &= s_colour_len - 1;
 		pal |= (uint16_t)(pri << 6);   // encode priority with the palette for manual mixing later
 		int realy = y;
-		int sourceline = 0;
+		int sourceline = 0, ydraw = 0;
 		if (realy >= y1)   // (it starts below the band: its lines only go down)
 			continue;
-		for (int ydraw = 0; ydraw < sizey && realy < y1; sourceline++) {
+		skc_t *ce = NULL;   // (the cache entry to fill: the sprite starts above the band)
+		skc_t st = { 0 };
+		int have = 0;
+		if (s_skc && realy < y0) {
+			const uint32_t dy = (uint32_t)(y0 - realy);
+			const uint32_t h = (sv[i + 1] * 0x9e3779b1u ^ sv[i + 2] * 0x85ebca6bu ^ sv[i + 3] ^ dy * 0xc2b2ae35u) >> 22;
+			skc_t *e = &s_skc[band * SKC_N + (h & (SKC_N - 1))];
+			if (e->dy == (int32_t)dy && e->w1 == sv[i + 1] && e->w2 == sv[i + 2] && e->w3 == sv[i + 3] && e->zb == zoomy_bits) {
+				mask_offset = e->mo;   // (the same lines above: their offsets as before)
+				palette_offset = e->po;
+				realy = y + e->realy;
+				sourceline = e->sourceline;
+				ydraw = e->ydraw;
+			} else {
+				ce = e;
+				st.w1 = sv[i + 1];
+				st.w2 = sv[i + 2];
+				st.w3 = sv[i + 3];
+				st.zb = zoomy_bits;
+				st.dy = (int32_t)dy;
+			}
+		}
+		for (; ydraw < sizey && realy < y1; sourceline++) {
+			if (ce) {   // (the last source line starting above the band: kept when the band is reached)
+				if (realy < y0) {
+					st.mo = mask_offset;
+					st.po = palette_offset;
+					st.realy = realy - y;
+					st.sourceline = sourceline;
+					st.ydraw = ydraw;
+					have = 1;
+				} else {
+					if (have)
+						*ce = st;
+					ce = NULL;
+				}
+			}
 			const uint32_t zoomy_bit = (zoomy_bits >> (sourceline & 0x1f)) & 1;
 			const uint32_t pre_palette_offset = palette_offset, pre_mask_offset = mask_offset;
 			if (yrepeats != 0) {   // grow
@@ -902,6 +985,14 @@ static void draw_sprites(const pgm2_snap *v, int y0, int y1)
 					realy++;
 			}
 			ydraw++;
+		}
+		if (ce) {   // (all its lines above the band: kept as ended)
+			st.mo = mask_offset;
+			st.po = palette_offset;
+			st.realy = realy - y;
+			st.sourceline = sourceline;
+			st.ydraw = ydraw;
+			*ce = st;
 		}
 	}
 }
@@ -1037,14 +1128,13 @@ static void compose_lines(const pgm2_snap *v, int y0, int y1)
 // the render's pieces: 0 = the new sprites (the longest, first), 1..BANDS = bands of the screen. The render thread takes
 // them, and the threads waiting for it help (pgm2_render_help: the emulation thread, the frontend's helper core)
 #define BANDS 6
-#define SBANDS 4   // (the sprites' bands, first: the longest pieces)
 static volatile int s_piece_next, s_piece_left, s_piece_active, s_piece_helpers;
 static void run_piece(int k)
 {
 	const pgm2_snap *v = s_snap;
 	const int h = v->vis_h;
 	if (k < SBANDS) {   // (screen_vblank: the new sprites, shown the next frame)
-		draw_sprites(v, h * k / SBANDS, h * (k + 1) / SBANDS);
+		draw_sprites(v, h * k / SBANDS, h * (k + 1) / SBANDS, k);
 		return;
 	}
 	k -= SBANDS;
@@ -1334,6 +1424,8 @@ static int pgm2_init(const rbx_game *g)
 	s_snd = (int16_t *)calloc(4096 * 2, sizeof(int16_t));
 	s_snap = (pgm2_snap *)calloc(1, sizeof(pgm2_snap));
 	s_spr[1] = (uint16_t *)calloc(SCR_W * SCR_H, sizeof(uint16_t));
+	free(s_skc);
+	s_skc = (skc_t *)calloc((size_t)SBANDS * SKC_N, sizeof(skc_t));   // (none: drawn without it)
 	if (s_ramrom) {
 		s_romboard_size = 0x200000;
 		s_romboard_ram = (uint8_t *)calloc(1, s_romboard_size);
@@ -1455,6 +1547,8 @@ static void pgm2_exit(void)
 	s_snap = NULL;
 	free(s_spr[1]);
 	s_spr[0] = s_spr[1] = NULL;
+	free(s_skc);
+	s_skc = NULL;
 	s_ymz = NULL;
 	s_arm = NULL;
 	s = NULL;

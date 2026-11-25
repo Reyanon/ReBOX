@@ -129,6 +129,7 @@ static const io_range *s_io;
 static uint8_t *s_rom, *s_user1, *s_zrom;
 static uint32_t s_rom_size, s_user1_size, s_zrom_size;
 static int s_port_in0, s_port_in1, s_port_dsw;
+static uint32_t s_in1_eep;   // IN1's IPT_CUSTOM bits (the EEPROM's data out; gaia has none, its coins there)
 static char s_nv_path[256];
 
 typedef struct {
@@ -337,7 +338,8 @@ static uint16_t in1_r(void)
 {
 	if (s_port_in1 < 0)
 		return 0xffff;
-	rbx_port_custom(s_port_in1, 0xffffffffu, eeprom_do(&s_eeprom) ? 0xffffffffu : 0);
+	if (s_in1_eep)
+		rbx_port_custom(s_port_in1, s_in1_eep, eeprom_do(&s_eeprom) ? s_in1_eep : 0);
 	return (uint16_t)rbx_port_read(s_port_in1);
 }
 
@@ -1640,6 +1642,11 @@ static int cave_init(const rbx_game *g)
 	s_port_in0 = rbx_port_find("IN0");
 	s_port_in1 = rbx_port_find("IN1");
 	s_port_dsw = rbx_port_find("DSW");
+	s_in1_eep = 0;
+	if (s_port_in1 >= 0)
+		for (int i = g->ports[s_port_in1].first; i < g->ports[s_port_in1].first + g->ports[s_port_in1].count; i++)
+			if (g->fields[i].type == RBX_IPT_CUSTOM)
+				s_in1_eep |= g->fields[i].mask;
 	// the EEPROM: its region's contents first, then the saved file
 	s_nv_path[0] = 0;
 	eeprom_init(&s_eeprom);
