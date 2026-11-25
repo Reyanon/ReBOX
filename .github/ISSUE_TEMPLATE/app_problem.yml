@@ -1,0 +1,38 @@
+name: App problem
+description: The game list, menus, settings, videos, cheats or updates do not work
+labels: ["app"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to see it
+      placeholder: |
+        1. Open ...
+        2. Press ...
+  - type: input
+    id: version
+    attributes:
+      label: ReBOX version
+      description: Shown in Options > About (for example v0.15.38)
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - PS Vita 1000 (OLED)
+        - PS Vita 2000 (Slim)
+        - PS TV
+    validations:
+      required: true
+  - type: textarea
+    id: shots
+    attributes:
+      label: Screenshot or video (optional)

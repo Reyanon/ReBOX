@@ -1,0 +1,62 @@
+name: Game problem
+description: A game does not start, looks or sounds wrong, runs slow, or its controls do not work
+labels: ["game"]
+body:
+  - type: input
+    id: set
+    attributes:
+      label: ROM set name
+      description: The zip name without .zip (for example sailormn, 1942)
+    validations:
+      required: true
+  - type: dropdown
+    id: romset
+    attributes:
+      label: ROM set version
+      options:
+        - MAME 0.260 non-merged
+        - MAME 0.289 non-merged
+        - Other / not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Problem
+      options:
+        - Does not start / crashes
+        - Graphics
+        - Sound
+        - Speed (below 60 fps)
+        - Controls
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you see, and when (attract mode, a stage, after a save state ...)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: ReBOX version
+      description: Shown in Options > About (for example v0.15.38)
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - PS Vita 1000 (OLED)
+        - PS Vita 2000 (Slim)
+        - PS TV
+    validations:
+      required: true
+  - type: textarea
+    id: shots
+    attributes:
+      label: Screenshot or video (optional)

@@ -1,0 +1,11 @@
+name: Request
+description: A game or board to add, or a feature
+labels: ["request"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What you would like
+      description: For a game, its MAME set name (for example outrun)
+    validations:
+      required: true
