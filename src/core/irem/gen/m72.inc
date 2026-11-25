@@ -3038,10 +3038,10 @@ static const rbx_ipt_field m72_ipf_poundfor[] = {
 	{ 0xf000, 0xf000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 23, 16, 2, 2, 0x800, 0x0 },
 	{ 0x3000, 0x3000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin A", 39, 4, 2, 1, 0x800, 0x0 },
 	{ 0xc000, 0xc000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 43, 4, 2, 1, 0x800, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port m72_ipp_poundfor[] = {
 	{ "IN0", 0, 5 },

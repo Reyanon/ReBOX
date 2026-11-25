@@ -48,7 +48,7 @@ static const rbx_ipt_setting m14_ips_m14[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field m14_ipf_m14[] = {
-	{ 0xff, 0xff, RBX_IPT_PADDLE, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PADDLE, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 0, 2, 255, 0, 0x0, 0x0 },

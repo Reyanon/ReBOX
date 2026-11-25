@@ -342,6 +342,13 @@
   "CONTROLS": "KONTROLLER",
   "DISPLAY": "SKÆRM",
   "OPTIONS": "VALGMULIGHEDER",
-  "SETTINGS": "INDSTILLINGER"
+  "SETTINGS": "INDSTILLINGER",
+  "2nd stick Up": "Pind 2 op",
+  "2nd stick Down": "Pind 2 ned",
+  "2nd stick Left": "Pind 2 venstre",
+  "2nd stick Right": "Pind 2 højre",
+  "Pedal": "Pedal",
+  "Pedal 2": "Pedal 2",
+  "Pedal 3": "Pedal 3"
  }
 }

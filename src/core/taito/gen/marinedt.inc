@@ -98,10 +98,10 @@ static const rbx_ipt_field marinedt_ipf_marinedt[] = {
 	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Number of Coin Chutes", 40, 2, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Year Display", 42, 2, 255, 0, 0x0, 0x0 },
 	{ 0xc0, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 44, 4, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port marinedt_ipp_marinedt[] = {
 	{ "SYSTEM", 0, 8 },

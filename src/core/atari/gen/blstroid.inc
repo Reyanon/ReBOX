@@ -183,9 +183,9 @@ static const rbx_ipt_setting blstroid_ips_blstroid[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field blstroid_ipf_blstroid[] = {
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff00, 0xff00, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff00, 0xff00, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },

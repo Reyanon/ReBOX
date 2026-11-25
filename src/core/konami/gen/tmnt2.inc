@@ -1135,10 +1135,10 @@ static const rbx_ipt_field tmnt2_ipf_glfgreat[] = {
 	{ 0x2000, 0x2000, RBX_IPT_BUTTON2, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x4000, RBX_IPT_BUTTON3, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_UNUSED, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 2, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 3, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 2, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 3, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port tmnt2_ipp_glfgreat[] = {
 	{ "DSW1_DSW2", 0, 7 },
@@ -1268,10 +1268,10 @@ static const rbx_ipt_field tmnt2_ipf_glfgreatj[] = {
 	{ 0x1000, 0x1000, RBX_IPT_BUTTON2, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2000, 0x2000, RBX_IPT_BUTTON3, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x4000, RBX_IPT_BUTTON4, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 2, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 3, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 2, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 3, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port tmnt2_ipp_glfgreatj[] = {
 	{ "DSW1_DSW2", 0, 7 },
@@ -1401,10 +1401,10 @@ static const rbx_ipt_field tmnt2_ipf_glfgreatu[] = {
 	{ 0x2000, 0x2000, RBX_IPT_BUTTON2, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x4000, RBX_IPT_BUTTON3, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_UNUSED, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 2, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 3, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 2, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 3, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 4, 0, 0, "", 58, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port tmnt2_ipp_glfgreatu[] = {
 	{ "DSW1_DSW2", 0, 7 },

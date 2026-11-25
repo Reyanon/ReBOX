@@ -1770,10 +1770,10 @@ static const rbx_ipt_field dec0_ipf_bandit[] = {
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "DSUNK F", 30, 2, 255, 0, 0x0, 0x0 },
 	{ 0xffff, 0xffff, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xffff, 0xffff, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port dec0_ipp_bandit[] = {
 	{ "INPUTS", 0, 14 },
@@ -1857,10 +1857,10 @@ static const rbx_ipt_field dec0_ipf_birdtry[] = {
 	{ 0xc000, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Control Panel Type", 28, 4, 255, 0, 0x0, 0x0 },
 	{ 0xffff, 0xffff, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xffff, 0xffff, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port dec0_ipp_birdtry[] = {
 	{ "INPUTS", 0, 14 },
@@ -2267,8 +2267,8 @@ static const rbx_ipt_field dec0_ipf_hbarrel[] = {
 	{ 0x3000, 0x3000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 24, 4, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Allow Continue", 28, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 30, 2, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port dec0_ipp_hbarrel[] = {
 	{ "INPUTS", 0, 14 },
@@ -2429,8 +2429,8 @@ static const rbx_ipt_field dec0_ipf_midres[] = {
 	{ 0x2000, 0x2000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 26, 2, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Allow Continue", 28, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 30, 2, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port dec0_ipp_midres[] = {
 	{ "INPUTS", 0, 16 },
@@ -2512,8 +2512,8 @@ static const rbx_ipt_field dec0_ipf_midres2[] = {
 	{ 0x2000, 0x2000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 26, 2, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Allow Continue", 28, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 30, 2, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port dec0_ipp_midres2[] = {
 	{ "INPUTS", 0, 16 },
@@ -2592,8 +2592,8 @@ static const rbx_ipt_field dec0_ipf_midresb[] = {
 	{ 0x2000, 0x2000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 26, 2, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Allow Continue", 28, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 30, 2, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port dec0_ipp_midresb[] = {
 	{ "INPUTS", 0, 14 },

@@ -342,6 +342,13 @@
   "CONTROLS": "STEUERUNG",
   "DISPLAY": "ANZEIGE",
   "OPTIONS": "OPTIONEN",
-  "SETTINGS": "EINSTELLUNGEN"
+  "SETTINGS": "EINSTELLUNGEN",
+  "2nd stick Up": "2. Stick hoch",
+  "2nd stick Down": "2. Stick runter",
+  "2nd stick Left": "2. Stick links",
+  "2nd stick Right": "2. Stick rechts",
+  "Pedal": "Pedal",
+  "Pedal 2": "Pedal 2",
+  "Pedal 3": "Pedal 3"
  }
 }

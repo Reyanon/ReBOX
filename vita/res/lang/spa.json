@@ -342,6 +342,13 @@
   "CONTROLS": "CONTROLES",
   "DISPLAY": "PANTALLA",
   "OPTIONS": "OPCIONES",
-  "SETTINGS": "AJUSTES"
+  "SETTINGS": "AJUSTES",
+  "2nd stick Up": "2.º stick arriba",
+  "2nd stick Down": "2.º stick abajo",
+  "2nd stick Left": "2.º stick izquierda",
+  "2nd stick Right": "2.º stick derecha",
+  "Pedal": "Pedal",
+  "Pedal 2": "Pedal 2",
+  "Pedal 3": "Pedal 3"
  }
 }

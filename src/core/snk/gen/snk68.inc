@@ -625,8 +625,8 @@ static const rbx_ipt_field snk68_ipf_ikari3[] = {
 	{ 0xc00, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 20, 4, 255, 0, 0x0, 0x0 },
 	{ 0x3000, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Game Mode", 24, 4, 255, 0, 0x0, 0x0 },
 	{ 0xc000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 28, 4, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port snk68_ipp_ikari3[] = {
 	{ "P1", 0, 8 },
@@ -875,8 +875,8 @@ static const rbx_ipt_field snk68_ipf_searchar[] = {
 	{ 0xc00, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 20, 4, 255, 0, 0x0, 0x0 },
 	{ 0x3000, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Game Mode", 24, 4, 255, 0, 0x0, 0x0 },
 	{ 0xc000, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 28, 4, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_POSITIONAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port snk68_ipp_searchar[] = {
 	{ "P1", 0, 8 },

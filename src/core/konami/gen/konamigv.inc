@@ -202,10 +202,10 @@ static const rbx_ipt_field konamigv_ipf_btchamp[] = {
 	{ 0x1, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port konamigv_ipp_btchamp[] = {
 	{ "P1", 0, 17 },
@@ -406,8 +406,8 @@ static const rbx_ipt_field konamigv_ipf_simpbowl[] = {
 	{ 0x1, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port konamigv_ipp_simpbowl[] = {
 	{ "P1", 0, 17 },
@@ -448,7 +448,7 @@ static const rbx_ipt_field konamigv_ipf_tmosh[] = {
 	{ 0xff, 0x1f, RBX_IPT_PADDLE_V, 1, 0, 0, "", 0, 0, 7, 1, 0x1, 0x1 },
 	{ 0xff, 0xff, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 7, 1, 0x1, 0x0 },
 	{ 0x100, 0x0, RBX_IPT_BUTTON4, 1, 0, 0, "", 0, 0, 7, 1, 0x1, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_POSITIONAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_CONFIG, 1, 0, 0, "Printer Paper Empty", 0, 2, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x2, RBX_IPT_CONFIG, 1, 0, 0, "Printer Malfunction", 2, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_CONFIG, 1, 0, 0, "Heartbeat Input", 4, 2, 255, 0, 0x0, 0x0 },

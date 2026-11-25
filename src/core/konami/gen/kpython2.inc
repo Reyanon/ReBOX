@@ -821,11 +821,11 @@ static const rbx_ipt_field kpython2_ipf_thrild3[] = {
 	{ 0x200, 0x200, RBX_IPT_BUTTON1, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0x400, 0x400, RBX_IPT_BUTTON2, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0xffff0000, 0xffffffff, RBX_IPT_UNKNOWN, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_DIAL, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0xffff0000, 0xffffffff, RBX_IPT_UNKNOWN, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_PEDAL, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0xffff0000, 0xffffffff, RBX_IPT_UNKNOWN, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_PEDAL, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0xffffffff, 0xffffffff, RBX_IPT_UNKNOWN, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port kpython2_ipp_thrild3[] = {

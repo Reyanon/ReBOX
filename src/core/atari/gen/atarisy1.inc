@@ -1549,10 +1549,10 @@ static const rbx_ipt_setting atarisy1_ips_marble[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field atarisy1_ipf_marble[] = {
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x2, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
@@ -1661,8 +1661,8 @@ static const rbx_ipt_setting atarisy1_ips_roadblst[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field atarisy1_ipf_roadblst[] = {
-	{ 0x7f, 0x7f, RBX_IPT_AD_STICK_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7f, 0x0, RBX_IPT_AD_STICK_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_BUTTON3, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },

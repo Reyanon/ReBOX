@@ -334,9 +334,9 @@ static const rbx_ipt_field gticlub_ipf_gticlub[] = {
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP3", 4, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP4", 6, 2, 255, 0, 0x0, 0x0 },
 	{ 0x3ff, 0x200, RBX_IPT_PADDLE, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0x3ff, 0x3ff, RBX_IPT_PEDAL, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0x3ff, 0x3ff, RBX_IPT_PEDAL2, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0x3ff, 0x3ff, RBX_IPT_PEDAL3, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3ff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3ff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3ff, 0x0, RBX_IPT_PEDAL3, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port gticlub_ipp_gticlub[] = {
 	{ "IN0", 0, 6 },

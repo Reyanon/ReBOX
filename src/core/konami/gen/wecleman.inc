@@ -390,7 +390,7 @@ static const rbx_ipt_field wecleman_ipf_hotchase[] = {
 	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin A", 16, 16, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 32, 15, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port wecleman_ipp_hotchase[] = {
@@ -476,7 +476,7 @@ static const rbx_ipt_field wecleman_ipf_wecleman[] = {
 	{ 0x20, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 42, 2, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown B-6", 44, 2, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown B-7", 46, 2, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port wecleman_ipp_wecleman[] = {

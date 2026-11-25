@@ -2080,10 +2080,10 @@ static const rbx_ipt_field taito_b_ipf_rambo3[] = {
 	{ 0x20, 0x20, RBX_IPT_JOYSTICK_DOWN, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port taito_b_ipp_rambo3[] = {
 	{ "DSWA", 0, 6 },
@@ -2260,10 +2260,10 @@ static const rbx_ipt_field taito_b_ipf_rambo3u[] = {
 	{ 0x20, 0x20, RBX_IPT_JOYSTICK_DOWN, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port taito_b_ipp_rambo3u[] = {
 	{ "DSWA", 0, 6 },

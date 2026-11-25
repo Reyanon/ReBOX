@@ -3566,9 +3566,9 @@ static const rbx_ipt_field taito_z_ipf_chasehq[] = {
 	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
-	{ 0xffff, 0xffff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x2, 0x0 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x2, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x2, 0x0 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x2, 0x0 },
 };
 static const rbx_ipt_port taito_z_ipp_chasehq[] = {
 	{ "DSWA", 0, 5 },
@@ -3680,9 +3680,9 @@ static const rbx_ipt_field taito_z_ipf_chasehqj[] = {
 	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
-	{ 0xffff, 0xffff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x2, 0x0 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x2, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x2, 0x0 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x2, 0x0 },
 };
 static const rbx_ipt_port taito_z_ipp_chasehqj[] = {
 	{ "DSWA", 0, 5 },
@@ -3763,9 +3763,9 @@ static const rbx_ipt_field taito_z_ipf_contcirc[] = {
 	{ 0xe0, 0xe0, RBX_IPT_BUTTON2, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 32, 0, 1, 1, 0x10, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 1, 1, 0x10, 0x10 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
+	{ 0xffff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 1, 1, 0x10, 0x10 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
 };
 static const rbx_ipt_port taito_z_ipp_contcirc[] = {
 	{ "DSWA", 0, 6 },
@@ -3842,9 +3842,9 @@ static const rbx_ipt_field taito_z_ipf_contcrcj[] = {
 	{ 0xe0, 0xe0, RBX_IPT_BUTTON2, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 32, 0, 1, 1, 0x10, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 1, 1, 0x10, 0x10 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
+	{ 0xffff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 1, 1, 0x10, 0x10 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
 };
 static const rbx_ipt_port taito_z_ipp_contcrcj[] = {
 	{ "DSWA", 0, 6 },
@@ -3921,9 +3921,9 @@ static const rbx_ipt_field taito_z_ipf_contcrcu[] = {
 	{ 0xe0, 0xe0, RBX_IPT_BUTTON2, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 32, 0, 1, 1, 0x10, 0x0 },
-	{ 0xffff, 0xffff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 1, 1, 0x10, 0x10 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
+	{ 0xffff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 1, 1, 0x10, 0x10 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 1, 0x1, 0x1 },
 };
 static const rbx_ipt_port taito_z_ipp_contcrcu[] = {
 	{ "DSWA", 0, 6 },
@@ -6238,7 +6238,7 @@ static const rbx_ipt_field taito_z_ipf_racingb[] = {
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 32, 0, 1, 1, 0x8, 0x8 },
-	{ 0xffff, 0xffff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 1, 1, 0x8, 0x0 },
+	{ 0xffff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 1, 1, 0x8, 0x0 },
 };
 static const rbx_ipt_port taito_z_ipp_racingb[] = {
 	{ "DSWA", 0, 6 },

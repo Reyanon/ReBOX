@@ -342,6 +342,13 @@
   "CONTROLS": "CONTROLS",
   "DISPLAY": "DISPLAY",
   "OPTIONS": "OPTIONS",
-  "SETTINGS": "SETTINGS"
+  "SETTINGS": "SETTINGS",
+  "2nd stick Up": "2nd stick Up",
+  "2nd stick Down": "2nd stick Down",
+  "2nd stick Left": "2nd stick Left",
+  "2nd stick Right": "2nd stick Right",
+  "Pedal": "Pedal",
+  "Pedal 2": "Pedal 2",
+  "Pedal 3": "Pedal 3"
  }
 }

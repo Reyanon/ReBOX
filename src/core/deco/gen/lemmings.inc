@@ -98,10 +98,10 @@ static const rbx_ipt_field lemmings_ipf_lemmings[] = {
 	{ 0x3800, 0x3800, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 24, 8, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x4000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 32, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 34, 2, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port lemmings_ipp_lemmings[] = {
 	{ "INPUTS", 0, 16 },

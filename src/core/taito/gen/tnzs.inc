@@ -782,8 +782,8 @@ static const rbx_ipt_field tnzs_ipf_arknid2u[] = {
 	{ 0xfc, 0xfc, RBX_IPT_UNUSED, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x0, RBX_IPT_COIN2, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port tnzs_ipp_arknid2u[] = {
 	{ "DSWA", 0, 6 },
@@ -858,8 +858,8 @@ static const rbx_ipt_field tnzs_ipf_arknoid2[] = {
 	{ 0xfc, 0xfc, RBX_IPT_UNUSED, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x0, RBX_IPT_COIN2, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port tnzs_ipp_arknoid2[] = {
 	{ "DSWA", 0, 6 },
@@ -1514,8 +1514,8 @@ static const rbx_ipt_field tnzs_ipf_jpopnics[] = {
 	{ 0x20, 0x20, RBX_IPT_OTHER, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_COIN2, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_START2, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port tnzs_ipp_jpopnics[] = {
 	{ "DSWA", 0, 8 },
@@ -2010,8 +2010,8 @@ static const rbx_ipt_field tnzs_ipf_plumppop[] = {
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x0, RBX_IPT_COIN2, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port tnzs_ipp_plumppop[] = {
 	{ "DSWA", 0, 6 },

@@ -632,8 +632,8 @@ static const rbx_ipt_field alpha68k_ipf_btlfield[] = {
 	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 19, 2, 255, 0, 0x0, 0x0 },
 	{ 0x30, 0x30, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 21, 4, 255, 0, 0x0, 0x0 },
 	{ 0xc0, 0xc0, RBX_IPT_UNUSED, 1, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_POSITIONAL, 1, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_POSITIONAL, 2, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_POSITIONAL, 2, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port alpha68k_ipp_btlfield[] = {
 	{ "IN0", 0, 8 },
@@ -1323,8 +1323,8 @@ static const rbx_ipt_field alpha68k_ipf_timesold[] = {
 	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 19, 2, 255, 0, 0x0, 0x0 },
 	{ 0x30, 0x30, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 21, 4, 255, 0, 0x0, 0x0 },
 	{ 0xc0, 0xc0, RBX_IPT_UNUSED, 1, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_POSITIONAL, 1, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_POSITIONAL, 2, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_POSITIONAL, 2, 0, 0, "", 25, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port alpha68k_ipp_timesold[] = {
 	{ "IN0", 0, 8 },

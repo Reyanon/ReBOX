@@ -9,11 +9,13 @@
     is MAME's HLE (commands only; no card inserted).
     Timing: MAME's screen (512 x 256 lines at 59.08 Hz, vblank from the end of the visible area); the ARM runs a line
     at a time, the MCU timer cuts a line where it expires.
-    Not done (yet): KOV3's program module (kov3 sets refused), the memory cards, the speedup handlers (the core's idle
-    loop skip instead), the TCMs (arm7.h tcm_use).
+    KOV3's program module (MAME pgm2_module_rom_map: the serial key exchange on the PIO, the checksum reads, the
+    address / data xor of the program once the key is written; the keys are MAME's).
+    Not done (yet): the speedup handlers (the core's idle loop skip instead), the TCMs (arm7.h tcm_use).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "../../rbx.h"
+#include "../../rbx_prof.h"
 
 #include "../../cpu/arm7/arm7.h"
 #include "../machine/igs036crypt.h"
@@ -22,6 +24,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(__ARM_NEON) || defined(__ARM_NEON__)
+#include <arm_neon.h>
+#endif
 
 #define CPU_CLOCK 100000000u
 #define LINES 256
@@ -76,7 +81,10 @@ static arm7_t *s_arm;
 static ymz774_t *s_ymz;
 static uint8_t *s_irom, *s_mainrom, *s_romboard_ram;
 static uint32_t s_irom_size, s_mainrom_size, s_romboard_size;
-static const uint8_t *s_mask, *s_colour, *s_tiles, *s_bgtile;
+static const uint8_t *s_tiles;
+static uint8_t **s_bgtile;   // (a block region too: a 1 KB tile lies in one chunk)
+// the sprite mask and colour ROMs as blocks (ADR-222: rbx_region_blocks; kof98umh's 640 MB of regions hold ~200 MB)
+static uint8_t **s_mask, **s_colour;
 static uint32_t s_mask_len, s_colour_len, s_tiles_size, s_bgtile_size;
 static int s_port[2];
 static int s_lores, s_hires, s_ramrom;
@@ -98,7 +106,63 @@ static uint32_t s_snd_frac;
 static int s_snd_n, s_snd_done;   // (the frame's samples, those made so far)
 static uint32_t s_frame_cycles;   // (the ARM's cycles in this frame)
 
-// the sound up to the ARM's time (MAME's stream update before a chip access)
+// the emulation thread's activities for the sampled profile (ADR-155)
+enum { P2_PA_ARM = RBX_PA_DRV, P2_PA_SND, P2_PA_VBL, P2_PA_HELP, P2_PA_END };
+static const char *const s_p2_pa_names[] = { "arm", "ymz774", "vblank copy", "render help" };
+
+// The YMZ774 on the worker thread (rbx_aux, ADR-225: its MPEG decoding took 13-21% of the emulation thread): the
+// emulation thread queues "the sound up to sample n" and the chip writes in their order; the job does them in the same
+// order, so the samples are the same. A chip read, the frame's end, a state, a reset wait for the queue to empty
+#define SQ_N 4096
+static struct { int32_t want; int16_t reg; uint8_t val, pad; } s_sq[SQ_N];
+static volatile unsigned s_sq_head, s_sq_tail;
+
+static void snd_gen(int want)   // (the job's side)
+{
+	while (s_snd_done < want) {
+		const int k = want - s_snd_done > 4096 ? 4096 : want - s_snd_done;
+		ymz774_render(s_ymz, s_snd, k);
+		for (int i = 0; i < k; i++)
+			rbx_audio_put_stereo(s_snd[i * 2], s_snd[i * 2 + 1]);
+		s_snd_done += k;
+	}
+}
+static void snd_job(void)
+{
+	unsigned t = s_sq_tail;
+	const unsigned h = __atomic_load_n(&s_sq_head, __ATOMIC_ACQUIRE);
+	for (; t != h; t++) {
+		const int i = (int)(t % SQ_N);
+		if (s_sq[i].reg < 0)
+			snd_gen(s_sq[i].want);
+		else
+			ymz774_write(s_ymz, (uint32_t)s_sq[i].reg, s_sq[i].val);
+	}
+	__atomic_store_n(&s_sq_tail, t, __ATOMIC_RELEASE);
+}
+// all queued done (the emulation thread may touch the chip and the sound buffer)
+static void snd_wait(void)
+{
+	if (!s_ymz)
+		return;
+	const unsigned pa = rbx_prof_enter(P2_PA_SND);
+	rbx_aux_kick();
+	rbx_aux_sync();
+	ymz77x_prefetch(s_ymz);   // (the worker idle: the sound ROM's reads ahead in place, more asked for)
+	rbx_prof_leave(pa);
+}
+static void sq_push(int reg, uint8_t val, int want)
+{
+	const unsigned h = s_sq_head;
+	if (h - __atomic_load_n(&s_sq_tail, __ATOMIC_ACQUIRE) >= SQ_N)
+		snd_wait();
+	const int i = (int)(h % SQ_N);
+	s_sq[i].want = want;
+	s_sq[i].reg = (int16_t)reg;
+	s_sq[i].val = val;
+	__atomic_store_n(&s_sq_head, h + 1, __ATOMIC_RELEASE);
+}
+// the sound up to the ARM's time (MAME's stream update before a chip access): queued
 static void snd_sync(int all)
 {
 	if (!s_ymz)
@@ -110,13 +174,7 @@ static void snd_sync(int all)
 		if (want > s_snd_n)
 			want = s_snd_n;
 	}
-	while (s_snd_done < want) {
-		const int k = want - s_snd_done > 4096 ? 4096 : want - s_snd_done;
-		ymz774_render(s_ymz, s_snd, k);
-		for (int i = 0; i < k; i++)
-			rbx_audio_put_stereo(s_snd[i * 2], s_snd[i * 2 + 1]);
-		s_snd_done += k;
-	}
+	sq_push(-1, 0, want);
 }
 
 // ---- AIC (atmel_arm_aic) ----
@@ -358,6 +416,114 @@ static void decrypt_all(void)
 // so that the ARM's code there is translated (arm7_jit.inc translates read-only pages only); a write still lands, through
 // the callbacks, and throws the translated code away
 static uint32_t s_romram_writes;
+// ---- KOV3's program module (MAME module_*, pio_*) ----
+typedef struct { uint8_t key[8], sum[8]; uint32_t addr_xor; uint16_t data_xor; } kov3_key;
+static const kov3_key k_kov3_104 = { { 0x40, 0xac, 0x30, 0x00, 0x47, 0x49, 0x00, 0x00 },
+                                     { 0xeb, 0x7d, 0x8d, 0x90, 0x2c, 0xf4, 0x09, 0x82 }, 0x18ec71, 0xb89d };
+static const kov3_key k_kov3_102 = { { 0x49, 0xac, 0xb0, 0xec, 0x47, 0x49, 0x95, 0x38 },
+                                     { 0x09, 0xbd, 0xf1, 0x31, 0xe6, 0xf0, 0x65, 0x2b }, 0x021d37, 0x81d0 };
+static const kov3_key k_kov3_101 = { { 0xc1, 0x2c, 0xc1, 0xe5, 0x3c, 0xc1, 0x59, 0x9e },
+                                     { 0xf2, 0xb2, 0xf0, 0x89, 0x37, 0xf2, 0xc7, 0x0b }, 0, 0xffff };
+static const kov3_key k_kov3_100 = { { 0x40, 0xac, 0x30, 0x00, 0x47, 0x49, 0x00, 0x00 },
+                                     { 0x96, 0xf0, 0x91, 0xe1, 0xb3, 0xf1, 0xef, 0x90 }, 0x3e8aa8, 0xc530 };
+static const kov3_key *s_mkey;   // (NULL: no module)
+// (saved as its own part "module": the board's part keeps its layout for the other sets' states)
+static struct {
+	uint8_t decrypted, sum_read, in_latch, out_latch;
+	int32_t prev_state, clk_cnt;
+	uint8_t rcv[10], snd[9], pad[1];
+	uint32_t pio_out;
+} s_mod;
+
+// decrypt_kov3_module: word i = word (i ^ addr_xor) ^ data_xor, its own inverse (the pairs swapped in place)
+static void module_xor(void)
+{
+	uint16_t *w = (uint16_t *)s_mainrom;
+	const uint32_t n = s_mainrom_size / 2, ax = s_mkey->addr_xor;
+	const uint16_t dx = s_mkey->data_xor;
+	for (uint32_t i = 0; i < n; i++) {
+		const uint32_t j = i ^ ax;
+		if (j == i)
+			w[i] ^= dx;
+		else if (j > i && j < n) {
+			const uint16_t t = w[i];
+			w[i] = (uint16_t)(w[j] ^ dx);
+			w[j] = (uint16_t)(t ^ dx);
+		}
+	}
+	arm7_jit_reset();
+}
+static void module_decrypt(void)
+{
+	if (!s_mod.decrypted)
+		module_xor();
+	s_mod.decrypted = 1;
+}
+// the checksum read mode: the first 1 KB page of the program ROM read through the callbacks
+static void module_sum_mode(int on)
+{
+	s_mod.sum_read = (uint8_t)on;
+	arm7_map(s_arm, 0x10000000, 0x100003ff, on ? NULL : s_mainrom, 0);
+}
+static void module_clk(int state)
+{
+	if (s_mod.prev_state != state && !state) {
+		if (s_mod.clk_cnt < 80) {
+			const int offs = s_mod.clk_cnt / 8, bit = (s_mod.clk_cnt & 7) ^ 7;
+			s_mod.rcv[offs] = (uint8_t)((s_mod.rcv[offs] & ~(1 << bit)) | (s_mod.in_latch << bit));
+			if (++s_mod.clk_cnt >= 80) {
+				switch (s_mod.rcv[0]) {
+				case 0x0d:   // init or status check
+					memset(s_mod.snd, 0xa3, 4);
+					memset(s_mod.snd + 4, 0x6d, 4);
+					break;
+				case 0x25:   // get key
+					for (int i = 0; i < 8; i++)
+						s_mod.snd[i] = (uint8_t)(s_mkey->key[i ^ 3] ^ s_mod.rcv[i + 1]);
+					break;
+				default:
+					break;
+				}
+				s_mod.snd[8] = 0;
+				for (int i = 0; i < 8; i++)
+					s_mod.snd[8] = (uint8_t)(s_mod.snd[8] + s_mod.snd[i]);
+			}
+		} else {
+			const int offs = (s_mod.clk_cnt - 80) / 8, bit = (s_mod.clk_cnt & 7) ^ 7;
+			s_mod.out_latch = (uint8_t)((s_mod.snd[offs] >> bit) & 1);
+			if (++s_mod.clk_cnt >= 152)
+				s_mod.clk_cnt = 0;
+		}
+	}
+	s_mod.prev_state = state;
+}
+static void pio_out(void)
+{
+	s_mod.in_latch = (uint8_t)((s_mod.pio_out >> 8) & 1);   // module_data_w
+	module_clk((s_mod.pio_out & 0x200) != 0);
+}
+// a 16-bit read of the module's ROM (offset in words), the first page only (in the checksum mode)
+static uint16_t module_rom_r(uint32_t offset)
+{
+	if (s_mod.sum_read && offset > 0 && offset < 5) {
+		const uint32_t o = ((offset - 1) * 2) ^ 2;
+		const uint16_t v = (uint16_t)((s_mkey->sum[o] ^ s_mkey->key[o]) | (s_mkey->sum[o + 1] ^ s_mkey->key[o + 1]) << 8);
+		if (offset == 4)
+			module_sum_mode(0);
+		return v;
+	}
+	return ((const uint16_t *)s_mainrom)[offset];
+}
+static void module_rom_w(uint32_t offset, uint16_t data)
+{
+	const uint32_t dec = ((s_mkey->key[0] | s_mkey->key[1] << 8 | (uint32_t)s_mkey->key[2] << 16) >> 6) & 0xffff;
+	(void)offset;
+	if (data == dec)
+		module_decrypt();
+	else if (data == 0x00c2)   // checksum read mode enable, steps 1 and 4
+		module_sum_mode(1);
+}
+
 static void romram_protect(int on)
 {
 	if (s_romboard_ram)
@@ -370,6 +536,13 @@ static void wr32(void *u, uint32_t a, uint32_t d) ;
 
 static uint32_t io_r32(uint32_t a)
 {
+	if (s_mkey && a >= 0x10000000u && a <= 0x100003ffu) {   // (the checksum mode's page)
+		const uint32_t o = (a - 0x10000000u) >> 1;
+		const uint16_t lo = module_rom_r(o);
+		return lo | (uint32_t)module_rom_r(o + 1) << 16;
+	}
+	if (s_mkey && a == 0xfffff43cu)   // pio_pdsr_r: the module's data line (bit 8; bit 7, busy, 0)
+		return (uint32_t)s_mod.out_latch << 8;
 	if (a >= 0x03600000u && a <= 0x036bffffu)
 		return s->mcu_regs[((a - 0x03600000u) >> 17) & 7];
 	if (a == 0x03900000u)
@@ -385,8 +558,10 @@ static uint32_t io_r32(uint32_t a)
 	if (a == 0x30120000u) return s->bgscroll;
 	if (a == 0x30120008u) return s->fgscroll;
 	if (a == 0x3012000cu) return s->vidmode;
-	if (a == 0x40000000u && s_ymz)
+	if (a == 0x40000000u && s_ymz) {
 		snd_sync(0);
+		snd_wait();   // (the chip's status: after the queue)
+	}
 	if (a == 0x40000000u)
 		return s_ymz ? (uint32_t)ymz774_read(s_ymz, 0) | (uint32_t)ymz774_read(s_ymz, 1) << 8 |
 		               (uint32_t)ymz774_read(s_ymz, 2) << 16 | (uint32_t)ymz774_read(s_ymz, 3) << 24 : 0;
@@ -412,6 +587,22 @@ static void io_w32(uint32_t a, uint32_t d, uint32_t mask)
 			s_romram_writes++;
 			arm7_jit_reset();
 		}
+		return;
+	}
+	if (s_mkey && a >= 0x10000000u && a <= 0x107fffffu) {   // module_rom_w (16-bit)
+		const uint32_t o = (a - 0x10000000u) >> 1;
+		if (mask & 0xffffu)
+			module_rom_w(o, (uint16_t)d);
+		if (mask & 0xffff0000u)
+			module_rom_w(o + 1, (uint16_t)(d >> 16));
+		return;
+	}
+	if (s_mkey && (a == 0xfffff430u || a == 0xfffff434u)) {   // pio_sodr_w / pio_codr_w
+		if (a == 0xfffff430u)
+			s_mod.pio_out |= d & mask;
+		else
+			s_mod.pio_out &= ~(d & mask);
+		pio_out();
 		return;
 	}
 	if (a >= 0x03600000u && a <= 0x036bffffu) { mcu_w(a, d, mask); return; }
@@ -448,10 +639,12 @@ static void io_w32(uint32_t a, uint32_t d, uint32_t mask)
 	}
 	case 0x40000000u:
 		snd_sync(0);
-		if (s_ymz)
+		if (s_ymz) {
 			for (int i = 0; i < 4; i++)
 				if (mask & (0xffu << (i * 8)))
-					ymz774_write(s_ymz, (uint32_t)i, (uint8_t)(d >> (i * 8)));
+					sq_push(i, (uint8_t)(d >> (i * 8)), 0);
+			rbx_aux_kick();
+		}
 		return;
 	case 0xfffffa08u:   // encryption_do_w
 		decrypt_all();
@@ -469,7 +662,13 @@ static void io_w32(uint32_t a, uint32_t d, uint32_t mask)
 }
 
 static uint32_t rd32(void *u, uint32_t a) { (void)u; return io_r32(a); }
-static uint16_t rd16(void *u, uint32_t a) { (void)u; return (uint16_t)(io_r32(a & ~3u) >> ((a & 2) * 8)); }
+static uint16_t rd16(void *u, uint32_t a)
+{
+	(void)u;
+	if (s_mkey && a >= 0x10000000u && a <= 0x100003ffu)
+		return module_rom_r((a - 0x10000000u) >> 1);
+	return (uint16_t)(io_r32(a & ~3u) >> ((a & 2) * 8));
+}
 static uint8_t rd8(void *u, uint32_t a) { (void)u; return (uint8_t)(io_r32(a & ~3u) >> ((a & 3) * 8)); }
 static void wr32(void *u, uint32_t a, uint32_t d) { (void)u; io_w32(a, d, 0xffffffffu); }
 static void wr16(void *u, uint32_t a, uint16_t d)
@@ -507,7 +706,7 @@ static inline void sprite_pixel(const pgm2_snap *v, uint32_t palette_offset, int
 {
 	realx = (int16_t)realx;   // (MAME: an s16 parameter)
 	if (realx >= 0 && realx < v->vis_w && realy >= 0 && realy < v->vis_h) {
-		const uint16_t pix = s_colour[palette_offset] & 0x3f;   // there are some stray 0xff bytes in some roms
+		const uint16_t pix = s_colour[palette_offset >> RBX_BLK_SHIFT][palette_offset & RBX_BLK_MASK] & 0x3f;   // there are some stray 0xff bytes in some roms
 		s_spr[s_spr_front ^ 1][realy * SCR_W + realx] = (uint16_t)(pix + pal * 0x40);
 	}
 }
@@ -519,8 +718,38 @@ static inline void sprite_chunk(const pgm2_snap *v, uint32_t *palette_offset, in
 	const uint32_t cmask = s_colour_len - 1;
 	if (repeats == 0) {   // shrink
 		if (!maskdata) {   // (no pixel: the zoom bits move the position only)
-			*realxdraw += realdraw_inc * __builtin_popcount(zoomx_bits);
+			*realxdraw += realdraw_inc * (int)rbx_popcount(zoomx_bits);
 			return;
+		}
+		// the common case fast (the same pixels): no zoom, the 32 columns and the line on the screen, the chunk's
+		// colours in one block of the colour ROM. Column k (xchunk) is drawn when its mask bit is set, the colours one
+		// after another from palette_offset
+		if (zoomx_bits == 0xffffffffu && realy >= 0 && realy < v->vis_h) {
+			const int x0 = x + *realxdraw, x31 = x0 + 31 * realdraw_inc;
+			const int lo = x0 < x31 ? x0 : x31, hi = x0 < x31 ? x31 : x0;
+			const uint32_t po = *palette_offset, n = rbx_popcount(maskdata), in = po & RBX_BLK_MASK;
+			if (lo >= 0 && hi < v->vis_w && hi < 0x8000 &&
+			    (palette_inc > 0 ? in + n - 1 <= RBX_BLK_MASK && po + n - 1 <= cmask : in >= n - 1)) {
+				const uint8_t *c = s_colour[po >> RBX_BLK_SHIFT] + in;
+				uint16_t *d = s_spr[s_spr_front ^ 1] + realy * SCR_W + x0;
+				const uint16_t pb = (uint16_t)(pal * 0x40);
+				uint32_t m = maskdata;
+				if (palette_inc == -1)   // (xchunk k = bit k: the lowest set bit first)
+					while (m) {
+						const int k = __builtin_ctz(m);
+						m &= m - 1;
+						d[k * realdraw_inc] = (uint16_t)((*c-- & 0x3f) + pb);
+					}
+				else   // (xchunk k = bit 31 - k: the highest set bit first)
+					while (m) {
+						const int k = __builtin_clz(m);
+						m &= ~(0x80000000u >> k);
+						d[k * realdraw_inc] = (uint16_t)((*c++ & 0x3f) + pb);
+					}
+				*palette_offset = (po + (uint32_t)palette_inc * n) & cmask;
+				*realxdraw += realdraw_inc * 32;
+				return;
+			}
 		}
 		uint32_t po = *palette_offset;
 		int rx = *realxdraw;
@@ -560,11 +789,16 @@ static inline void sprite_chunk(const pgm2_snap *v, uint32_t *palette_offset, in
 static inline uint32_t mask_word(const pgm2_snap *v, uint32_t mo)
 {
 	const uint32_t m = s_mask_len - 1;
-	if (mo + 3 <= m)
-		return ((uint32_t)s_mask[mo] << 24 | (uint32_t)s_mask[mo + 1] << 16 | (uint32_t)s_mask[mo + 2] << 8 |
-		        s_mask[mo + 3]) ^ v->key;
-	return ((uint32_t)s_mask[mo] << 24 | (uint32_t)s_mask[(mo + 1) & m] << 16 | (uint32_t)s_mask[(mo + 2) & m] << 8 |
-	        s_mask[(mo + 3) & m]) ^ v->key;
+	if ((mo & RBX_BLK_MASK) <= RBX_BLK_MASK - 3) {   // (the four bytes in one chunk)
+		const uint8_t *a = s_mask[mo >> RBX_BLK_SHIFT] + (mo & RBX_BLK_MASK);
+		return ((uint32_t)a[0] << 24 | (uint32_t)a[1] << 16 | (uint32_t)a[2] << 8 | a[3]) ^ v->key;
+	}
+	uint32_t w = 0;
+	for (int k = 0; k < 4; k++) {
+		const uint32_t o = (mo + (uint32_t)k) & m;
+		w = w << 8 | s_mask[o >> RBX_BLK_SHIFT][o & RBX_BLK_MASK];
+	}
+	return w ^ v->key;
 }
 
 static void sprite_line(const pgm2_snap *v, uint32_t *mask_offset, uint32_t *palette_offset, int x, int realy,
@@ -574,7 +808,7 @@ static void sprite_line(const pgm2_snap *v, uint32_t *mask_offset, uint32_t *pal
 	if (realy < band_y0 || realy >= band_y1) {   // (nothing drawn: the offsets move as the drawing moves them)
 		uint32_t mo = *mask_offset, po = *palette_offset;
 		for (int xdraw = 0; xdraw < sizex; xdraw++) {
-			const uint32_t n = (uint32_t)__builtin_popcount(mask_word(v, mo));
+			const uint32_t n = rbx_popcount(mask_word(v, mo));
 			po = (reverse ? po - n : po + n) & (s_colour_len - 1);
 			mo = (reverse ? mo - 4 : mo + 4) & (s_mask_len - 1);
 		}
@@ -584,7 +818,7 @@ static void sprite_line(const pgm2_snap *v, uint32_t *mask_offset, uint32_t *pal
 	}
 	int realxdraw = 0;
 	if (flipx ^ reverse)
-		realxdraw = (int16_t)(__builtin_popcount(zoomx_bits) * sizex - 1);
+		realxdraw = (int16_t)((int)rbx_popcount(zoomx_bits) * sizex - 1);
 	for (int xdraw = 0; xdraw < sizex; xdraw++) {
 		const uint32_t mo = *mask_offset;
 		const uint32_t maskdata = mask_word(v, mo);
@@ -694,8 +928,10 @@ static void bg_line(const pgm2_snap *v, int y, uint16_t *out)
 		}
 		const uint32_t code = (t & 0x3ffff) % ntiles;
 		const uint16_t base = (uint16_t)(PAL_BG + ((t >> 18) & 0xf) * 0x80);
-		const uint32_t flip = (t >> 23) & 3;
-		const uint8_t *src = s_bgtile + code * 1024 + ((flip & 2) ? (sy & 31) ^ 31 : (sy & 31)) * 32;
+		// (MAME TILE_FLIPXY: bit 24 = flip x, bit 23 = flip y)
+		const uint32_t flip = ((t >> 24) & 1) | ((t >> 22) & 2);   // (bit 0 x, bit 1 y)
+		const uint8_t *src = s_bgtile[(code * 1024) >> RBX_BLK_SHIFT] + ((code * 1024) & RBX_BLK_MASK) +
+		                     ((flip & 2) ? (sy & 31) ^ 31 : (sy & 31)) * 32;
 		if (flip & 1)
 			for (int k = 0; k < n; k++) {
 				const uint8_t p = src[(px + (uint32_t)k) ^ 31] & 0x7f;
@@ -730,16 +966,22 @@ static void fg_line(const pgm2_snap *v, int y, uint16_t *out)
 		}
 		const uint32_t code = (t & 0x3ffff) % ntiles;
 		const uint16_t base = (uint16_t)(PAL_TX + ((t >> 18) & 0x1f) * 16);
-		const uint32_t flip = (t >> 23) & 3;
+		const uint32_t flip = ((t >> 24) & 1) | ((t >> 22) & 2);   // (MAME TILE_FLIPXY: bit 24 x, bit 23 y)
 		const uint8_t *src = s_tiles + code * 32 + ((flip & 2) ? (sy & 7) ^ 7 : (sy & 7)) * 4;
-		for (int k = 0; k < n; k++) {
-			uint32_t q = px + (uint32_t)k;
-			if (flip & 1)
-				q ^= 7;
-			const uint8_t b = src[q >> 1];
-			const uint8_t p = (q & 1) ? (b >> 4) : (b & 0xf);
-			out[x + k] = p ? (uint16_t)(base + p) : 0;
+		const uint32_t w = (uint32_t)src[0] | (uint32_t)src[1] << 8 | (uint32_t)src[2] << 16 | (uint32_t)src[3] << 24;
+		if (!w) {   // (a blank row of the tile: the text layer is mostly blank)
+			memset(out + x, 0, (size_t)n * 2);
+			x += n;
+			continue;
 		}
+		uint16_t row8[8];   // (the row's 8 pixels, nibble q = pixel q)
+		for (int q = 0; q < 8; q++) {
+			const uint32_t p = (w >> (q * 4)) & 0xf;
+			row8[q] = p ? (uint16_t)(base + p) : 0;
+		}
+		const uint32_t fx7 = (flip & 1) ? 7 : 0;
+		for (int k = 0; k < n; k++)
+			out[x + k] = row8[(px + (uint32_t)k) ^ fx7];
 		x += n;
 	}
 }
@@ -756,7 +998,25 @@ static void compose_lines(const pgm2_snap *v, int y0, int y1)
 		fg_line(v, y, fgl);
 		const uint16_t *sp = front + y * SCR_W;
 		uint16_t *dst = bm + y * pitch;
-		for (int x = 0; x < v->vis_w; x++) {
+		int x = 0;
+#if defined(__ARM_NEON) || defined(__ARM_NEON__)
+		{	// (8 pixels a step, the same choice: the text layer, the sprites of priority 0, the background, those of
+			// priority 1, the bg pen)
+			const uint16x8_t none = vdupq_n_u16(0x8000), pri = vdupq_n_u16(0x1000), m12 = vdupq_n_u16(0xfff);
+			const uint16x8_t palsp = vdupq_n_u16(PAL_SP), palbg = vdupq_n_u16(PAL_BG);
+			for (; x + 8 <= v->vis_w; x += 8) {
+				const uint16x8_t f = vld1q_u16(fgl + x), sx = vld1q_u16(sp + x), b = vld1q_u16(bgl + x);
+				const uint16x8_t nosp = vceqq_u16(sx, none), lo = vtstq_u16(sx, pri);
+				const uint16x8_t pen = vaddq_u16(palsp, vandq_u16(sx, m12));
+				uint16x8_t o = vbslq_u16(nosp, palbg, pen);                                   // (no background)
+				o = vbslq_u16(vceqq_u16(b, vdupq_n_u16(0)), o, b);                           // the background
+				o = vbslq_u16(vbicq_u16(vmvnq_u16(nosp), lo), pen, o);                       // sprites of priority 0
+				o = vbslq_u16(vceqq_u16(f, vdupq_n_u16(0)), o, f);                           // the text layer
+				vst1q_u16(dst + x, o);
+			}
+		}
+#endif
+		for (; x < v->vis_w; x++) {
 			uint16_t o;
 			const uint16_t spx = sp[x];
 			if (fgl[x])
@@ -826,6 +1086,7 @@ static int pgm2_render_help(int helper)
 	if (helper < 1 || helper > 2 || !__atomic_load_n(&s_piece_active, __ATOMIC_SEQ_CST))
 		return 0;
 	__atomic_add_fetch(&s_piece_helpers, 1, __ATOMIC_SEQ_CST);
+	const unsigned pa = helper == 1 ? rbx_prof_enter(P2_PA_HELP) : 0;   // (marks: the emulation thread's only)
 	int did = 0;
 	if (__atomic_load_n(&s_piece_active, __ATOMIC_SEQ_CST))
 		for (;;) {
@@ -839,6 +1100,8 @@ static int pgm2_render_help(int helper)
 				break;
 		}
 	__atomic_sub_fetch(&s_piece_helpers, 1, __ATOMIC_SEQ_CST);
+	if (helper == 1)
+		rbx_prof_leave(pa);
 	return did;
 }
 
@@ -846,6 +1109,7 @@ static int pgm2_render_help(int helper)
 static void screen_vblank(void)
 {
 	rbx_video_wait_idle();
+	const unsigned pa = rbx_prof_enter(P2_PA_VBL);
 	switch ((s->vidmode >> 16) & 3) {
 	default:
 	case 0: s->vis_w = 320; s->vis_h = 240; break;
@@ -868,6 +1132,7 @@ static void screen_vblank(void)
 	v->vis_h = s->vis_h;
 	rbx_video.width = s->vis_w;
 	rbx_video.height = s->vis_h;
+	rbx_prof_leave(pa);
 	rbx_video_frame_done();
 }
 
@@ -892,25 +1157,20 @@ static uint32_t nv_hash(void)
 	return h;
 }
 
-static void nv_save(void)
+// now: at the exit (written here, after the queued ones); else handed to the io worker (ADR-224: written here, an SD
+// card write stopped the frame for 125-160 ms every 2 s in kov3, whose SRAM changes all the time)
+static void nv_save(int now)
 {
 	if (!s || !s_nv_path[0])
 		return;
-	FILE *f = fopen(s_nv_path, "wb");
-	if (f) {
-		fwrite(s->sram, 1, sizeof(s->sram), f);
-		fclose(f);
-	}
+	int (*put)(const char *, const void *, uint32_t) = now ? rbx_file_put_now : rbx_file_put;
+	put(s_nv_path, s->sram, sizeof(s->sram));
 	for (int i = 0; i < 4; i++) {
 		if (!s_card_in[i])
 			continue;
 		char p[272];
 		card_path(p, sizeof(p), i);
-		f = fopen(p, "wb");
-		if (f) {
-			fwrite(&s_card[i], 1, sizeof(s_card[i]), f);
-			fclose(f);
-		}
+		put(p, &s_card[i], sizeof(s_card[i]));
 	}
 	s_nv_hash = nv_hash();
 }
@@ -922,6 +1182,55 @@ static int ymz_fetch(void *user, uint32_t offset, void *dst, uint32_t len)
 	return rbx_region_read("ymz774", offset, dst, len);
 }
 static const char *const s_file_regions[] = { "ymz774", NULL };
+static const char *const s_block_regions[] = { "sprites_mask", "sprites_colour", "bgtile", NULL };
+
+static uint16_t rev8x2(uint16_t v);
+// a mask chunk: its word w is the region's word i = chunk * 4096 + w; the even words iga_u12_decode, the odd
+// iga_u16_decode, by (i >> 1) & 0x7ff = w >> 1 (the place in the chunk only)
+static void mask_decode(uint8_t *chunk, void *user)
+{
+	(void)user;
+	uint16_t *rom = (uint16_t *)chunk;
+	for (int w = 0; w < 4096; w++) {
+		const int j = w >> 1;
+		uint16_t x = 0;
+		if (!(w & 1)) {   // iga_u12_decode
+			if (j & 0x000001) x ^= 0x9004;
+			if (j & 0x000002) x ^= 0x0028;
+			if (j & 0x000004) x ^= 0x0182;
+			if (j & 0x000008) x ^= 0x0010;
+			if (j & 0x000010) x ^= 0x2040;
+			if (j & 0x000020) x ^= 0x0801;
+			if (j & 0x000100) x ^= 0x4000;
+			if (j & 0x000200) x ^= 0x0600;
+		} else {   // iga_u16_decode
+			if (j & 0x000001) x ^= 0x0010;
+			if (j & 0x000002) x ^= 0x2004;
+			if (j & 0x000004) x ^= 0x0801;
+			if (j & 0x000008) x ^= 0x0300;
+			if (j & 0x000010) x ^= 0x0080;
+			if (j & 0x000020) x ^= 0x0020;
+			if (j & 0x000040) x ^= 0x4008;
+			if (j & 0x000080) x ^= 0x1002;
+			if (j & 0x000100) x ^= 0x0400;
+			if (j & 0x000200) x ^= 0x0040;
+			if (j & 0x000400) x ^= 0x8000;
+		}
+		rom[w] = rev8x2((uint16_t)(rom[w] ^ x));   // bitswap<16>(8..15, 0..7): each byte's bits reversed
+	}
+}
+// sprite_colour_decode: bitswap<16>(15, 14, 13, 12, 11, 5, 4, 3, 7, 6, 10, 9, 8, 2, 1, 0) of each word
+static void colour_decode(uint8_t *chunk, void *user)
+{
+	(void)user;
+	uint16_t *c = (uint16_t *)chunk;
+	for (int i = 0; i < 4096; i++) {
+		const uint16_t v = c[i];
+		c[i] = (uint16_t)((v & 0xf800) | ((v >> 5) & 1) << 10 | ((v >> 4) & 1) << 9 | ((v >> 3) & 1) << 8 |
+		                  ((v >> 7) & 1) << 7 | ((v >> 6) & 1) << 6 | ((v >> 10) & 1) << 5 | ((v >> 9) & 1) << 4 |
+		                  ((v >> 8) & 1) << 3 | (v & 7));
+	}
+}
 
 static uint8_t s_rev8[256];   // (each byte's bits reversed: the start's decoding by table)
 static uint16_t rev8x2(uint16_t v)
@@ -967,22 +1276,34 @@ static void pgm2_reset(void)
 	if (s->has_decrypted)
 		encrypt_back();
 	s->has_decrypted = 0;
+	if (s_mkey) {   // (the module's scrambling back, its lines as at power on)
+		if (s_mod.decrypted)
+			module_xor();
+		memset(&s_mod, 0, sizeof(s_mod));
+		s_mod.clk_cnt = 151;   // (MAME: a "false" clock pulse at the GPIO init)
+		module_sum_mode(0);
+	}
 	romram_protect(0);
 	s->mcu_timer = -1;
 	aic_reset();
 	arm7_reset(s_arm);
 	arm7_jit_reset();
-	if (s_ymz)
+	if (s_ymz) {
+		snd_wait();
 		ymz774_reset(s_ymz);
+	}
 	s->frac = 0;
 	s_snd_frac = 0;
 }
 
 static int pgm2_init(const rbx_game *g)
 {
+	rbx_prof_name(RBX_PA_DRV, s_p2_pa_names, P2_PA_END - RBX_PA_DRV);
 	const char *init = strchr(g->machine, ':');
 	init = init ? init + 1 : "";
-	if (!strncmp(init, "kov3", 4) || !strcmp(init, "bubucar")) {
+	s_mkey = !strcmp(init, "kov3_104") ? &k_kov3_104 : !strcmp(init, "kov3_102") ? &k_kov3_102 :
+	         !strcmp(init, "kov3_101") ? &k_kov3_101 : !strcmp(init, "kov3_100") ? &k_kov3_100 : NULL;
+	if (!strcmp(init, "bubucar")) {
 		rbx_fail("%s: not emulated yet", g->set);
 		return -1;
 	}
@@ -992,10 +1313,10 @@ static int pgm2_init(const rbx_game *g)
 	s_frame_mhz = s_lores ? FRAME_MHZ_LORES : FRAME_MHZ;
 	s_irom = rbx_region("maincpu", &s_irom_size);
 	s_mainrom = rbx_region("mainrom", &s_mainrom_size);
-	uint8_t *mask = rbx_region("sprites_mask", &s_mask_len);
-	uint8_t *colour = rbx_region("sprites_colour", &s_colour_len);
+	uint8_t **mask = rbx_region_blocks("sprites_mask", &s_mask_len);
+	uint8_t **colour = rbx_region_blocks("sprites_colour", &s_colour_len);
 	s_tiles = rbx_region("tiles", &s_tiles_size);
-	s_bgtile = rbx_region("bgtile", &s_bgtile_size);
+	s_bgtile = rbx_region_blocks("bgtile", &s_bgtile_size);
 	uint32_t ymz_size = rbx_region_file("ymz774"), sram_size = 0;
 	uint8_t *ymz_rom = ymz_size ? NULL : rbx_region("ymz774", &ymz_size);
 	const uint8_t *sram = rbx_region_opt("sram", &sram_size);
@@ -1030,48 +1351,14 @@ static int pgm2_init(const rbx_game *g)
 		pgm2_exit();
 		return -1;
 	}
-	// common_encryption_init: the sprite mask and colour data decoded once
-	{
-		uint16_t *rom = (uint16_t *)mask;
-		const int len = (int)s_mask_len;
-		for (int i = 0; i < len / 2; i += 2) {   // iga_u12_decode
-			uint16_t x = 0;
-			if ((i >> 1) & 0x000001) x ^= 0x9004;
-			if ((i >> 1) & 0x000002) x ^= 0x0028;
-			if ((i >> 1) & 0x000004) x ^= 0x0182;
-			if ((i >> 1) & 0x000008) x ^= 0x0010;
-			if ((i >> 1) & 0x000010) x ^= 0x2040;
-			if ((i >> 1) & 0x000020) x ^= 0x0801;
-			if ((i >> 1) & 0x000100) x ^= 0x4000;
-			if ((i >> 1) & 0x000200) x ^= 0x0600;
-			rom[i] ^= x;
-			rom[i] = rev8x2(rom[i]);   // bitswap<16>(8..15, 0..7): each byte's bits reversed
-		}
-		for (int i = 1; i < len / 2; i += 2) {   // iga_u16_decode
-			uint16_t x = 0;
-			if ((i >> 1) & 0x000001) x ^= 0x0010;
-			if ((i >> 1) & 0x000002) x ^= 0x2004;
-			if ((i >> 1) & 0x000004) x ^= 0x0801;
-			if ((i >> 1) & 0x000008) x ^= 0x0300;
-			if ((i >> 1) & 0x000010) x ^= 0x0080;
-			if ((i >> 1) & 0x000020) x ^= 0x0020;
-			if ((i >> 1) & 0x000040) x ^= 0x4008;
-			if ((i >> 1) & 0x000080) x ^= 0x1002;
-			if ((i >> 1) & 0x000100) x ^= 0x0400;
-			if ((i >> 1) & 0x000200) x ^= 0x0040;
-			if ((i >> 1) & 0x000400) x ^= 0x8000;
-			rom[i] ^= x;
-			rom[i] = rev8x2(rom[i]);
-		}
-		uint16_t *c = (uint16_t *)colour;
-		for (uint32_t i = 0; i < s_colour_len / 2; i++) {   // sprite_colour_decode
-			const uint16_t v = c[i];
-			// bitswap<16>(15, 14, 13, 12, 11, 5, 4, 3, 7, 6, 10, 9, 8, 2, 1, 0)
-			c[i] = (uint16_t)((v & 0xf800) | ((v >> 5) & 1) << 10 | ((v >> 4) & 1) << 9 | ((v >> 3) & 1) << 8 |
-			                  ((v >> 7) & 1) << 7 | ((v >> 6) & 1) << 6 | ((v >> 10) & 1) << 5 | ((v >> 9) & 1) << 4 |
-			                  ((v >> 8) & 1) << 3 | (v & 7));
-		}
-	}
+	if (!ymz_rom)
+		ymz77x_prefetch_init(s_ymz, "ymz774");
+	s_sq_head = s_sq_tail = 0;
+	rbx_aux_set_job(snd_job);   // (the chip on the worker thread)
+	// common_encryption_init: the sprite mask and colour data decoded once (each distinct block: the decoding of a
+	// block depends on its lane and its place in it only, the same for every chunk sharing it)
+	rbx_region_blocks_each("sprites_mask", mask_decode, NULL);
+	rbx_region_blocks_each("sprites_colour", colour_decode, NULL);
 	s_mask = mask;
 	s_colour = colour;
 	s_spr[0] = s->sprite_bitmap;
@@ -1152,8 +1439,11 @@ static void pgm2_exit(void)
 {
 	if (s_romboard_ram)
 		rbx_log("pgm2: program RAM writes after its decryption: %u", (unsigned)s_romram_writes);
-	nv_save();
+	if (s_arm && s)
+		rbx_log("pgm2: %u frames, idle loop skips %u", (unsigned)s->frames, (unsigned)s_arm->idle_hits);
+	nv_save(1);
 	s_nv_path[0] = 0;
+	rbx_aux_set_job(NULL);   // (synced first)
 	if (s_ymz)
 		ymz774_exit(s_ymz);
 	free(s_ymz);
@@ -1182,8 +1472,11 @@ static void run_until(uint32_t until)
 		int64_t end = until;
 		if (s->mcu_timer >= 0 && s->mcu_timer - s_frame_start < end)
 			end = s->mcu_timer - s_frame_start;
-		if (end > now)
+		if (end > now) {
+			const unsigned pa = rbx_prof_enter(P2_PA_ARM);
 			arm7_run(s_arm, (int)(end - now));
+			rbx_prof_leave(pa);
+		}
 		if (s->mcu_timer >= 0 && s_arm->total_cycles >= s->mcu_timer) {
 			s->mcu_timer = -1;
 			aic_set_irq(3, 1);   // mcu_interrupt
@@ -1191,7 +1484,19 @@ static void run_until(uint32_t until)
 	}
 }
 
+static void pgm2_frame_(void);
+// (the log: a frame of the emulation over 30 ms, with the ARM blocks made in it: a first run of new code)
 static void pgm2_frame(void)
+{
+	const uint64_t t0 = rbx_clock_us();
+	pgm2_frame_();
+	const uint32_t t = (uint32_t)(rbx_clock_us() - t0);
+	uint32_t nb, us;
+	arm7_jit_stats(&nb, &us);
+	if (t > 30000 && t0)
+		rbx_log("pgm2: frame %u took %u us, %u ARM blocks made in %u us", (unsigned)s->frames, t, nb, us);
+}
+static void pgm2_frame_(void)
 {
 	rbx_audio.count = 0;
 	s_frame_start = s_arm->total_cycles;
@@ -1218,14 +1523,27 @@ static void pgm2_frame(void)
 		t += (uint32_t)rbx_line_cycles(&s->frac, CPU_CLOCK, s_frame_mhz, LINES);
 		s_line_end = t;
 		run_until(t);
+		if ((line & 31) == 31 && s_ymz) {   // (the worker decodes the sound so far while the ARM goes on: a frame
+			snd_sync(0);                    // without chip writes left it all to the frame's end, on this thread)
+			rbx_aux_kick();
+		}
 	}
 	s->frames++;
 	snd_sync(1);
+	snd_wait();   // (the frame's sound in rbx_audio)
+	if (s_ymz && !s_ymz->rom && s->frames % 600 == 0) {   // (the sound ROM's card reads, for the log: the worker is idle)
+		static uint32_t last;
+		if (s_ymz->page_misses != last)
+			rbx_log("pgm2: ymz774 %u page misses in 600 frames, reads %u us avg, %u max", s_ymz->page_misses - last,
+			        s_ymz->fetch_us / (s_ymz->page_misses - last), s_ymz->fetch_max_us);
+		last = s_ymz->page_misses;
+		s_ymz->fetch_us = s_ymz->fetch_max_us = 0;
+	}
 	// the SRAM and the cards written when they change (not only at exit: the app closed from the system menu, ADR-211)
 	if (s_nv_path[0] && ++s_nv_tick >= 120) {
 		s_nv_tick = 0;
 		if (nv_hash() != s_nv_hash)
-			nv_save();
+			nv_save(0);
 	}
 }
 
@@ -1243,7 +1561,9 @@ static int pgm2_state(void *ctx, int load)
 {
 	pgm2_t *tmp = NULL;
 	rbx_video_wait_idle();   // (the render owns the sprite bitmap while it runs)
+	snd_wait();   // (the chip's queue done)
 	uint8_t was = s->has_decrypted;
+	const uint8_t mwas = s_mod.decrypted;
 	uint8_t key[0x100];
 	memcpy(key, s->encryption_table, sizeof(key));
 	int rc = 0;
@@ -1255,6 +1575,8 @@ static int pgm2_state(void *ctx, int load)
 	rc |= rbx_state_io(ctx, "spr", s_spr[s_spr_front], sizeof(s->sprite_bitmap));
 	if (s_romboard_ram)
 		rc |= rbx_state_io(ctx, "romram", s_romboard_ram, s_romboard_size);
+	if (s_mkey)
+		rc |= rbx_state_io(ctx, "module", &s_mod, sizeof(s_mod));
 	if (s_ymz)
 		rc |= ymz77x_state(s_ymz, ctx, load, "ymz");
 	(void)tmp;
@@ -1265,6 +1587,18 @@ static int pgm2_state(void *ctx, int load)
 		s_arm->cp15_dtcm_reg = s->tcm[1];
 		arm7_set_cpsr(s_arm, s_arm->cpsr);
 		// the program ROM as the loaded state has it (MAME device_post_load)
+		if (s_mkey && mwas != s_mod.decrypted) {   // (KOV3, the module's step changed: back to its bytes, then the state's steps)
+			uint8_t now[0x100];
+			memcpy(now, s->encryption_table, sizeof(now));
+			memcpy(s->encryption_table, key, sizeof(key));
+			if (was)
+				encrypt_back();
+			memcpy(s->encryption_table, now, sizeof(now));
+			was = 0;
+			module_xor();
+		}
+		if (s_mkey)
+			module_sum_mode(s_mod.sum_read);
 		if (was && (!s->has_decrypted || memcmp(key, s->encryption_table, sizeof(key)))) {
 			uint8_t now[0x100];
 			memcpy(now, s->encryption_table, sizeof(now));
@@ -1292,8 +1626,9 @@ static int pgm2_supported(const char *machine)
 {
 	const char *init = strchr(machine, ':');
 	init = init ? init + 1 : "";
-	return strncmp(init, "kov3", 4) && strcmp(init, "bubucar");
+	return strcmp(init, "bubucar") != 0;
 }
 
 const rbx_driver rbx_drv_pgm2 = { "IGS PGM2", pgm2_init, pgm2_exit, pgm2_reset, pgm2_frame, pgm2_save, pgm2_load,
-                                  pgm2_supported, pgm2_render, pgm2_render_help, s_file_regions };
+                                  pgm2_supported, pgm2_render, pgm2_render_help, s_file_regions, NULL,
+                                  s_block_regions };

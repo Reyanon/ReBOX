@@ -177,9 +177,9 @@ static const rbx_ipt_field topspeed_ipf_fullthrl[] = {
 	{ 0xe0, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
 	{ 0x20, 0x20, RBX_IPT_BUTTON1, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
-	{ 0xffff, 0xffff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
+	{ 0xffff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
 };
 static const rbx_ipt_port topspeed_ipp_fullthrl[] = {
 	{ "DSWA", 0, 5 },
@@ -253,9 +253,9 @@ static const rbx_ipt_field topspeed_ipf_topspeed[] = {
 	{ 0xe0, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
 	{ 0x20, 0x20, RBX_IPT_BUTTON1, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
-	{ 0xffff, 0xffff, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
-	{ 0x7, 0x7, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
+	{ 0xffff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 32, 0, 0, 1, 0x3, 0x2 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
+	{ 0x7, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 32, 0, 0, 2, 0x3, 0x2 },
 };
 static const rbx_ipt_port topspeed_ipp_topspeed[] = {
 	{ "DSWA", 0, 5 },

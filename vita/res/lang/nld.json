@@ -342,6 +342,13 @@
   "CONTROLS": "BEDIENING",
   "DISPLAY": "WEERGAVE",
   "OPTIONS": "OPTIES",
-  "SETTINGS": "INSTELLINGEN"
+  "SETTINGS": "INSTELLINGEN",
+  "2nd stick Up": "2e stick omhoog",
+  "2nd stick Down": "2e stick omlaag",
+  "2nd stick Left": "2e stick links",
+  "2nd stick Right": "2e stick rechts",
+  "Pedal": "Pedaal",
+  "Pedal 2": "Pedaal 2",
+  "Pedal 3": "Pedaal 3"
  }
 }

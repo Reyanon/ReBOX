@@ -342,6 +342,13 @@
   "CONTROLS": "COMMANDES",
   "DISPLAY": "AFFICHAGE",
   "OPTIONS": "OPTIONS",
-  "SETTINGS": "PARAMÈTRES"
+  "SETTINGS": "PARAMÈTRES",
+  "2nd stick Up": "2e stick haut",
+  "2nd stick Down": "2e stick bas",
+  "2nd stick Left": "2e stick gauche",
+  "2nd stick Right": "2e stick droite",
+  "Pedal": "Pédale",
+  "Pedal 2": "Pédale 2",
+  "Pedal 3": "Pédale 3"
  }
 }

@@ -2100,8 +2100,8 @@ static const rbx_ipt_field hornet_ipf_thrilld[] = {
 	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP7", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP8", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0x7ff, 0x3ff, RBX_IPT_PADDLE, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port hornet_ipp_thrilld[] = {
 	{ "IN0", 0, 6 },
@@ -2157,10 +2157,10 @@ static const rbx_ipt_field hornet_ipf_thrilld_ge[] = {
 	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP7", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP8", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0x7ff, 0x3ff, RBX_IPT_PADDLE, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL3, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL3, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port hornet_ipp_thrilld_ge[] = {
 	{ "IN0", 0, 6 },
@@ -2218,9 +2218,9 @@ static const rbx_ipt_field hornet_ipf_thrilld_gk[] = {
 	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP7", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP8", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0x7ff, 0x3ff, RBX_IPT_PADDLE, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL3, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL3, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port hornet_ipp_thrilld_gk[] = {
 	{ "IN0", 0, 6 },
@@ -2275,9 +2275,9 @@ static const rbx_ipt_field hornet_ipf_thrilld_gm[] = {
 	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP7", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP8", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0x7ff, 0x3ff, RBX_IPT_PADDLE, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL3, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL3, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port hornet_ipp_thrilld_gm[] = {
 	{ "IN0", 0, 4 },
@@ -2334,9 +2334,9 @@ static const rbx_ipt_field hornet_ipf_thrilld_gn[] = {
 	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP7", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP8", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0x7ff, 0x3ff, RBX_IPT_PADDLE, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL3, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL3, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port hornet_ipp_thrilld_gn[] = {
 	{ "IN0", 0, 6 },
@@ -2391,8 +2391,8 @@ static const rbx_ipt_field hornet_ipf_thrilld_gp[] = {
 	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP7", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "DIP8", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0x7ff, 0x3ff, RBX_IPT_PADDLE, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0x7ff, 0x7ff, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7ff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port hornet_ipp_thrilld_gp[] = {
 	{ "IN0", 0, 4 },

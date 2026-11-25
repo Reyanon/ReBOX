@@ -342,6 +342,13 @@
   "CONTROLS": "CONTROLLI",
   "DISPLAY": "SCHERMO",
   "OPTIONS": "OPZIONI",
-  "SETTINGS": "IMPOSTAZIONI"
+  "SETTINGS": "IMPOSTAZIONI",
+  "2nd stick Up": "2° stick su",
+  "2nd stick Down": "2° stick giù",
+  "2nd stick Left": "2° stick sinistra",
+  "2nd stick Right": "2° stick destra",
+  "Pedal": "Pedale",
+  "Pedal 2": "Pedale 2",
+  "Pedal 3": "Pedale 3"
  }
 }

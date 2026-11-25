@@ -342,6 +342,13 @@
   "CONTROLS": "STEROWANIE",
   "DISPLAY": "EKRAN",
   "OPTIONS": "OPCJE",
-  "SETTINGS": "USTAWIENIA"
+  "SETTINGS": "USTAWIENIA",
+  "2nd stick Up": "2. drążek góra",
+  "2nd stick Down": "2. drążek dół",
+  "2nd stick Left": "2. drążek lewo",
+  "2nd stick Right": "2. drążek prawo",
+  "Pedal": "Pedał",
+  "Pedal 2": "Pedał 2",
+  "Pedal 3": "Pedał 3"
  }
 }

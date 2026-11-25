@@ -3239,8 +3239,8 @@ static const rbx_ipt_field namcos1_ipf_quester[] = {
 	{ 0x20, 0x20, RBX_IPT_SERVICE2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_SERVICE1, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port namcos1_ipp_quester[] = {
 	{ "CONTROL0", 0, 5 },

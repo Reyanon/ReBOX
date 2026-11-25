@@ -1682,8 +1682,8 @@ static const rbx_ipt_field segaybd_ipf_pdrift[] = {
 	{ 0xc0, 0xc0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 11, 4, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin A", 15, 16, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 31, 16, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL2, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segaybd_ipp_pdrift[] = {
@@ -1770,8 +1770,8 @@ static const rbx_ipt_field segaybd_ipf_pdrifte[] = {
 	{ 0xc0, 0xc0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 11, 4, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin A", 15, 16, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 31, 16, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL2, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segaybd_ipp_pdrifte[] = {
@@ -1858,8 +1858,8 @@ static const rbx_ipt_field segaybd_ipf_pdriftj[] = {
 	{ 0xc0, 0xc0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 11, 4, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin A", 15, 16, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 31, 16, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL2, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 47, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segaybd_ipp_pdriftj[] = {
@@ -1987,8 +1987,8 @@ static const rbx_ipt_field segaybd_ipf_pdriftl[] = {
 	{ 0xe0, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 9, 8, 255, 0, 0x0, 0x0 },
 	{ 0xf, 0xf, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin A", 17, 16, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0xf0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 33, 16, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL2, 1, 0, 0, "", 49, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 49, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 49, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 49, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 49, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 49, 2, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 51, 2, 255, 0, 0x0, 0x0 },

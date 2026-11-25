@@ -1,0 +1,54 @@
+{
+"name":"IGS",
+"order":6,
+"games":[
+{
+"rompath":"/roms/kov3_100.zip",
+"title":"Knights of Valour 3 / Sanguo Zhan Ji 3 (V100, China, Hong Kong, Taiwan)",
+"board":"PGM2",
+"publisher":"IGS",
+"year":"2011",
+"genre":"Fighter",
+"marquee":"/marquee/kov3_100.png",
+"snap":"/snap/kov3_100.png",
+"video":"/video/kov3_100.mp4",
+"description":null
+},
+{
+"rompath":"/roms/kov3_101.zip",
+"title":"Knights of Valour 3 / Sanguo Zhan Ji 3 (V101, China, Hong Kong, Taiwan)",
+"board":"PGM2",
+"publisher":"IGS",
+"year":"2011",
+"genre":"Fighter",
+"marquee":"/marquee/kov3_101.png",
+"snap":"/snap/kov3_101.png",
+"video":"/video/kov3_101.mp4",
+"description":null
+},
+{
+"rompath":"/roms/kov3_102.zip",
+"title":"Knights of Valour 3 / Sanguo Zhan Ji 3 (V102, China, Hong Kong, Taiwan)",
+"board":"PGM2",
+"publisher":"IGS",
+"year":"2011",
+"genre":"Fighter",
+"marquee":"/marquee/kov3_102.png",
+"snap":"/snap/kov3_102.png",
+"video":"/video/kov3_102.mp4",
+"description":null
+},
+{
+"rompath":"/roms/kov3.zip",
+"title":"Knights of Valour 3 / Sanguo Zhan Ji 3 (V104, China, Hong Kong, Taiwan)",
+"board":"PGM2",
+"publisher":"IGS",
+"year":"2011",
+"genre":"Fighter",
+"marquee":"/marquee/kov3.png",
+"snap":"/snap/kov3.png",
+"video":"/video/kov3.mp4",
+"description":null
+}
+]
+}

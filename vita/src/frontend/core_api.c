@@ -27,6 +27,10 @@ void rbx_core_set_input(int index, int pressed)
 		int k = index - RBX_IN_P1_B3;
 		p = k / 4;
 		bit = RBX_IN_B3 << (k % 4);
+	} else if (index >= RBX_IN_P1_RUP && index <= RBX_IN_P2_RRIGHT) {
+		int k = index - RBX_IN_P1_RUP;
+		p = k / 4;
+		bit = RBX_IN_RUP << (k % 4);
 	}
 	if (p < 0)
 		return;
@@ -48,6 +52,22 @@ const char *rbx_core_game_board(int i) { return rbx_game_board(i); }
 int rbx_core_game_count(void) { return rbx_game_count(); }
 const char *rbx_core_game_name(void) { int g = rbx_running_game(); return g >= 0 ? rbx_game_title(g) : ""; }
 const char *rbx_core_set_name(void) { int g = rbx_running_game(); return g >= 0 ? rbx_game_set(g) : ""; }
+const char *rbx_core_button_label(int b)
+{
+	const int g = rbx_running_game();
+	return g >= 0 ? rbx_game_button_label(g, b) : NULL;
+}
+
+int rbx_core_twin_stick(void)   // (each frame: the answer kept for the game)
+{
+	static int last = -2, twin;
+	const int g = rbx_running_game();
+	if (g != last) {
+		last = g;
+		twin = g >= 0 && rbx_game_twin_stick(g);
+	}
+	return twin;
+}
 int rbx_core_button_count(void) { int g = rbx_running_game(); return g >= 0 ? rbx_game_buttons(g) : 2; }
 
 void rbx_core_screen(int *w, int *h, int *flags)

@@ -667,10 +667,10 @@ static const rbx_ipt_field qix_ipf_slither[] = {
 	{ 0x20, 0x20, RBX_IPT_START2, 2, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_START1, 2, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_BUTTON1, 2, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port qix_ipp_slither[] = {
 	{ "P1", 0, 5 },

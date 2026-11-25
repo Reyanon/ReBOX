@@ -25,9 +25,13 @@ enum {
 	RBX_IN_X_RESET, RBX_IN_X_SERVICE,
 	RBX_IN_P1_B3, RBX_IN_P1_B4, RBX_IN_P1_B5, RBX_IN_P1_B6,
 	RBX_IN_P2_B3, RBX_IN_P2_B4, RBX_IN_P2_B5, RBX_IN_P2_B6,
+	RBX_IN_P1_RUP, RBX_IN_P1_RDOWN, RBX_IN_P1_RLEFT, RBX_IN_P1_RRIGHT,   // (a twin-stick game's second joystick)
+	RBX_IN_P2_RUP, RBX_IN_P2_RDOWN, RBX_IN_P2_RLEFT, RBX_IN_P2_RRIGHT,
 	RBX_IN_DIGITAL_COUNT
 };
 void rbx_core_set_input(int index, int pressed);
+int rbx_core_twin_stick(void);   // the running game has a second joystick (Smash TV): the right stick is it
+const char *rbx_core_button_label(int b);   // what the running game's button b (0..) works besides a button ("Pedal"), or NULL
 void rbx_core_set_service(int test, int coin);   // test switch, service coin
 
 const char *rbx_core_game_set(int i);

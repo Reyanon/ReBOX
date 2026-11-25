@@ -646,8 +646,8 @@ static const rbx_ipt_field sf_ipf_sfan[] = {
 	{ 0x8000, 0x8000, RBX_IPT_UNKNOWN, 1, 0, 0, "", 68, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 68, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff00, 0xff00, RBX_IPT_PEDAL, 2, 0, 0, "", 68, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL2, 1, 0, 0, "", 68, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff00, 0xff00, RBX_IPT_PEDAL2, 2, 0, 0, "", 68, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 68, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff00, 0x0, RBX_IPT_PEDAL2, 2, 0, 0, "", 68, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port sf_ipp_sfan[] = {
 	{ "DSW1", 0, 12 },

@@ -132,6 +132,8 @@ int arm7_map(arm7_t *c, uint32_t start, uint32_t end, void *mem, int writable);
 void arm7_end_timeslice(arm7_t *c);
 // the translated code thrown away (a game start, ROM contents changed): arm7_jit.inc
 void arm7_jit_reset(void);
+// the blocks made and the time it took (rbx_clock_us) since the last call (a driver's log of a slow frame)
+void arm7_jit_stats(uint32_t *builds, uint32_t *us);
 // MAME eat_cycles: remove n clocks from the current slice (they count as used)
 void arm7_eat_cycles(arm7_t *c, int n);
 // MAME pc() (STATE_GENPC = R15): inside a memory handler, the address of the executing instruction

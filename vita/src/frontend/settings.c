@@ -32,9 +32,9 @@ rbx_settings g_settings = {
 	.start_stage = 0,
 	.port = {
 		{ .keymap = { RBX_KEY_SQUARE, RBX_KEY_CROSS, RBX_KEY_SELECT, RBX_KEY_START, RBX_KEY_CIRCLE, RBX_KEY_TRIANGLE, RBX_KEY_L,
-			RBX_KEY_R }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
+			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
 		{ .keymap = { RBX_KEY_SQUARE, RBX_KEY_CROSS, RBX_KEY_SELECT, RBX_KEY_START, RBX_KEY_CIRCLE, RBX_KEY_TRIANGLE, RBX_KEY_L,
-			RBX_KEY_R }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
+			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
 	},
 	.cheat_health = 0,
 	.dip_count = 2,
@@ -53,9 +53,9 @@ rbx_settings g_settings = {
 };
 
 static const char *const s_keymap_keys[RBX_ACT_COUNT] = { "key_attack", "key_jump", "key_coin", "key_start",
-	"key_b3", "key_b4", "key_b5", "key_b6" };
+	"key_b3", "key_b4", "key_b5", "key_b6", "key_rup", "key_rdown", "key_rleft", "key_rright" };
 static const char *const s_keymap2_keys[RBX_ACT_COUNT] = { "key2_attack", "key2_jump", "key2_coin", "key2_start",
-	"key2_b3", "key2_b4", "key2_b5", "key2_b6" };
+	"key2_b3", "key2_b4", "key2_b5", "key2_b6", "key2_rup", "key2_rdown", "key2_rleft", "key2_rright" };
 
 // a stick as the d-pad, or pressing nothing
 void rbx_stick_preset(rbx_port *p, int st, int dpad)
@@ -77,6 +77,8 @@ void rbx_settings_default_port(int port)
 	p->keymap[RBX_ACT_B4] = RBX_KEY_TRIANGLE;
 	p->keymap[RBX_ACT_B5] = RBX_KEY_L;
 	p->keymap[RBX_ACT_B6] = RBX_KEY_R;
+	for (int d = 0; d < 4; d++)   // (the second joystick: the right stick)
+		p->keymap[RBX_ACT_R_UP + d] = RBX_KEY_RUP + d;
 	p->turbo_key = RBX_KEY_NONE;
 	p->turbo_btn = 1;
 	p->turbo_speed = RBX_TURBO_FAST;
@@ -280,11 +282,24 @@ static void parse_end_turbo(void)
 	} else if (s_old_turbo[0] >= 0 || s_old_turbo[1] >= 0)
 		g_settings.port[0].turbo_key = RBX_KEY_NONE;
 }
+// "<action>_<which>" of a keyx_ line (actions past 9 have two digits)
+static int keyx_name(const char *k, int *a, int *x)
+{
+	int v = 0, n = 0;
+	while (k[n] >= '0' && k[n] <= '9' && n < 3)
+		v = v * 10 + (k[n++] - '0');
+	if (!n || v >= RBX_ACT_COUNT || k[n] != '_' || k[n + 1] < '0' || k[n + 1] >= '0' + RBX_KEY_EXTRA || k[n + 2])
+		return 0;
+	*a = v;
+	*x = k[n + 1] - '0';
+	return 1;
+}
 // One port line: Port 1 keeps the names from before ports (stick, turbo_*, combo_*, key_*), Port 2 has "p2_" before
 // them (its keys: key2_*). Returns 1 if recognized
 static int read_port(const char *key, int val)
 {
 	rbx_port *p = &g_settings.port[0];
+	int xa, xx;
 	const char *dot = strchr(key, '.');
 	if (dot) { // a device's profile: "<profile>.<item>"
 		int i = 0;
@@ -310,9 +325,8 @@ static int read_port(const char *key, int val)
 	} else if (!strncmp(key, "smap_", 5) && (key[5] == '0' || key[5] == '1') && key[6] >= '0' &&
 		key[6] < '0' + RBX_SDIR_COUNT && !key[7])
 		p->smap[key[5] - '0'][key[6] - '0'] = clampi(val, 0, RBX_STGT_COUNT - 1);
-	else if (!strncmp(key, "keyx_", 5) && key[5] >= '0' && key[5] < '0' + RBX_ACT_COUNT && key[6] == '_' && key[7] >= '0' &&
-		key[7] < '0' + RBX_KEY_EXTRA && !key[8])
-		p->keyx[key[5] - '0'][key[7] - '0'] = key_val(val, RBX_KEY_NONE);
+	else if (!strncmp(key, "keyx_", 5) && keyx_name(key + 5, &xa, &xx))   // keyx_<action>_<which more key>
+		p->keyx[xa][xx] = key_val(val, RBX_KEY_NONE);
 	else if (!strncmp(key, "combo_", 6)) { // combo_<key>=<mask of two keys>
 		for (int k = 0; k < RBX_KEY_COUNT; k++)
 			if (s_combo_keys[k] && !strcmp(key + 6, s_combo_keys[k])) {

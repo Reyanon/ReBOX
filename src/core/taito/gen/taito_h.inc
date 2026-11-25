@@ -679,10 +679,10 @@ static const rbx_ipt_field taito_h_ipf_syvalion[] = {
 	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port taito_h_ipp_syvalion[] = {
 	{ "DSWA", 0, 6 },
@@ -760,10 +760,10 @@ static const rbx_ipt_field taito_h_ipf_syvalionp[] = {
 	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port taito_h_ipp_syvalionp[] = {
 	{ "DSWA", 0, 6 },

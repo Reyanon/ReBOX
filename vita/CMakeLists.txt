@@ -215,7 +215,8 @@ endforeach()
 set(RBX_SFO "${CMAKE_BINARY_DIR}/param.sfo")
 set(RBX_VPK "${CMAKE_BINARY_DIR}/rebox.vpk")
 add_custom_command(OUTPUT "${RBX_SFO}"
-  COMMAND vita-mksfoex -s APP_VER=${VITA_VERSION} -s TITLE_ID=${VITA_TITLEID}
+  # ATTRIBUTE2 12: the enlarged memory mode (~109 MB more for the app, ADR-222: kof98umh's sprite chunks)
+  COMMAND vita-mksfoex -s APP_VER=${VITA_VERSION} -s TITLE_ID=${VITA_TITLEID} -d ATTRIBUTE2=12
           "${VITA_APP_NAME}" "${RBX_SFO}"
   VERBATIM)
 add_custom_command(OUTPUT "${RBX_VPK}"

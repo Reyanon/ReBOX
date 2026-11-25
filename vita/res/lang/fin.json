@@ -342,6 +342,13 @@
   "CONTROLS": "OHJAIMET",
   "DISPLAY": "NÄYTTÖ",
   "OPTIONS": "VALINNAT",
-  "SETTINGS": "ASETUKSET"
+  "SETTINGS": "ASETUKSET",
+  "2nd stick Up": "2. sauva ylös",
+  "2nd stick Down": "2. sauva alas",
+  "2nd stick Left": "2. sauva vasemmalle",
+  "2nd stick Right": "2. sauva oikealle",
+  "Pedal": "Poljin",
+  "Pedal 2": "Poljin 2",
+  "Pedal 3": "Poljin 3"
  }
 }

@@ -24,10 +24,10 @@ static const rbx_ipt_setting ultrsprt_ips_ultrsprt[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field ultrsprt_ipf_ultrsprt[] = {
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x2, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },

@@ -210,3 +210,89 @@ done:
 	free(out);
 	return rc;
 }
+
+struct rbx_zip_stream {
+	rbx_zip *z;
+	const rbx_zip_entry *e;
+	long pos;            // the next compressed byte in the file
+	uint32_t left_in, total, crc;
+	int end;
+	z_stream s;
+	uint8_t in[0x10000];
+};
+
+rbx_zip_stream *rbx_zip_stream_open(rbx_zip *z, int i)
+{
+	if (!z || i < 0 || i >= z->count)
+		return NULL;
+	const rbx_zip_entry *e = &z->e[i];
+	uint8_t lh[30];
+	if (e->method != 0 && e->method != 8)
+		return NULL;
+	if (fseek(z->fp, e->offset, SEEK_SET) || fread(lh, 1, 30, z->fp) != 30 || le32(lh) != 0x04034b50)
+		return NULL;
+	rbx_zip_stream *s = (rbx_zip_stream *)calloc(1, sizeof(rbx_zip_stream));
+	if (!s)
+		return NULL;
+	s->z = z;
+	s->e = e;
+	s->pos = (long)e->offset + 30 + le16(lh + 26) + le16(lh + 28);
+	s->left_in = e->method == 8 ? e->csize : e->size;
+	if (e->method == 8 && inflateInit2(&s->s, -MAX_WBITS) != Z_OK) {
+		free(s);
+		return NULL;
+	}
+	return s;
+}
+
+int rbx_zip_stream_read(rbx_zip_stream *s, uint8_t *dst, uint32_t len)
+{
+	if (!s)
+		return -1;
+	if (len > s->e->size - s->total)
+		len = s->e->size - s->total;
+	uint32_t got = 0;
+	if (s->e->method == 0) {   // (stored)
+		if (len && (fseek(s->z->fp, s->pos, SEEK_SET) || fread(dst, 1, len, s->z->fp) != len))
+			return -1;
+		s->pos += (long)len;
+		got = len;
+	} else {
+		s->s.next_out = dst;
+		s->s.avail_out = len;
+		while (s->s.avail_out && !s->end) {
+			if (!s->s.avail_in) {
+				const uint32_t n = s->left_in < sizeof(s->in) ? s->left_in : (uint32_t)sizeof(s->in);
+				if (n && (fseek(s->z->fp, s->pos, SEEK_SET) || fread(s->in, 1, n, s->z->fp) != n))
+					return -1;
+				s->pos += (long)n;
+				s->left_in -= n;
+				s->s.next_in = s->in;
+				s->s.avail_in = n;
+			}
+			const uint32_t before = s->s.avail_out;
+			const int r = inflate(&s->s, Z_NO_FLUSH);
+			if (r == Z_STREAM_END)
+				s->end = 1;
+			else if (r != Z_OK && !(r == Z_BUF_ERROR && before != s->s.avail_out))
+				return -1;
+			if (before == s->s.avail_out && !s->s.avail_in && !s->left_in)
+				break;
+		}
+		got = len - s->s.avail_out;
+	}
+	s->crc = (uint32_t)crc32(s->crc, dst, got);
+	s->total += got;
+	return (int)got;
+}
+
+uint32_t rbx_zip_stream_crc(const rbx_zip_stream *s) { return s ? s->crc : 0; }
+
+void rbx_zip_stream_close(rbx_zip_stream *s)
+{
+	if (!s)
+		return;
+	if (s->e->method == 8)
+		inflateEnd(&s->s);
+	free(s);
+}

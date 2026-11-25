@@ -24,6 +24,13 @@ int rbx_zip_find(const rbx_zip *z, const char *name, uint32_t crc, uint32_t size
 int rbx_zip_read(rbx_zip *z, int i, uint8_t *out);
 // read an entry in pieces through cb (non-zero from cb stops it). 0 = ok, the whole entry passed
 int rbx_zip_read_cb(rbx_zip *z, int i, int (*cb)(void *user, const uint8_t *data, uint32_t len), void *user);
+// read an entry in order by the caller's pieces (several streams of one zip may be read in turn): NULL = not readable.
+// read: the bytes given (len, fewer only at the end), -1 on an error; crc: of the bytes read so far
+typedef struct rbx_zip_stream rbx_zip_stream;
+rbx_zip_stream *rbx_zip_stream_open(rbx_zip *z, int i);
+int rbx_zip_stream_read(rbx_zip_stream *s, uint8_t *dst, uint32_t len);
+uint32_t rbx_zip_stream_crc(const rbx_zip_stream *s);
+void rbx_zip_stream_close(rbx_zip_stream *s);
 // helpers for the frontends (update packages)
 static inline const char *rbx_zip_entry_path(const rbx_zip *z, int i) { const rbx_zip_entry *e = rbx_zip_get(z, i); return e ? e->name : ""; }
 static inline uint32_t rbx_zip_entry_size(const rbx_zip *z, int i) { const rbx_zip_entry *e = rbx_zip_get(z, i); return e ? e->size : 0; }

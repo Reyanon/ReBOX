@@ -87,6 +87,63 @@ static int s_kctrl_restarted;   // started again by rbx_kctrl_init (the first st
 // the threads' stacks (render thread creation 0x80024302), so 152 MB
 unsigned int _newlib_heap_size_user = 152 * 1024 * 1024;
 
+// memory beyond the heap for the core's block regions (ADR-222: kof98umh's sprite chunks): memory blocks, the main
+// memory's first, then the physically contiguous one; NULL = none left (the core takes the heap). CDRAM is left to the
+// GPU (and the CPU reads it slower)
+#define BIG_MAX 512
+static struct { void *p; SceUID uid; } s_big[BIG_MAX];
+static int s_big_cdram;   // (MB of them in CDRAM)
+#define BIG_RESERVE (16u << 20)
+static void *big_alloc(size_t size, int last)
+{
+	static const SceKernelMemBlockType types[] = { SCE_KERNEL_MEMBLOCK_TYPE_USER_RW,
+	                                               SCE_KERNEL_MEMBLOCK_TYPE_USER_MAIN_PHYCONT_RW };
+	static const SceKernelMemBlockType cdram[] = { SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW };
+	int slot = -1;
+	for (int i = 0; i < BIG_MAX && slot < 0; i++)
+		if (!s_big[i].p)
+			slot = i;
+	if (slot < 0)
+		return NULL;
+	size = (size + 0xfffff) & ~(size_t)0xfffff;   // (1 MB: the physically contiguous memory's unit)
+	const SceKernelMemBlockType *ty = last ? cdram : types;
+	const unsigned nt = last ? 1 : 2;
+	// (a reserve of each kind left free: thread stacks, the video decoder and the system's own allocations take it)
+	SceKernelFreeMemorySizeInfo fm;
+	fm.size = sizeof(fm);
+	if (sceKernelGetFreeMemorySize(&fm) < 0)
+		return NULL;
+	for (unsigned t = 0; t < nt; t++) {
+		const unsigned freeb = last ? fm.size_cdram : t ? fm.size_phycont : fm.size_user;
+		if (freeb < size + BIG_RESERVE)
+			continue;
+		const SceUID uid = sceKernelAllocMemBlock("rbx_big", ty[t], size, NULL);
+		void *p = NULL;
+		if (uid >= 0 && sceKernelGetMemBlockBase(uid, &p) >= 0 && p) {
+			s_big[slot].p = p;
+			s_big[slot].uid = uid;
+			s_big_cdram += last;
+			return p;
+		}
+		if (uid >= 0)
+			sceKernelFreeMemBlock(uid);
+	}
+	return NULL;
+}
+static void big_free(void *p)
+{
+	for (int i = 0; i < BIG_MAX; i++)
+		if (s_big[i].p == p) {
+			SceKernelMemBlockInfo mi;
+			mi.size = sizeof(mi);
+			if (sceKernelGetMemBlockInfoByAddr(p, &mi) >= 0 && mi.type == SCE_KERNEL_MEMBLOCK_TYPE_USER_CDRAM_RW)
+				s_big_cdram--;
+			sceKernelFreeMemBlock(s_big[i].uid);
+			s_big[i].p = NULL;
+			return;
+		}
+}
+
 // time the threads spend waiting for each other in the core (perf log: emu and render are busy time, sound = the
 // emulation thread's wait): [0] the emulation (main) thread, [1] the render thread, [2] others
 SceUID g_render_tid = -1;
@@ -473,6 +530,8 @@ static int run_game(const rbx_game_found *game)
 			.jit_write_begin = jit_write_begin,
 			.jit_write_end = jit_write_end,
 			.neogeo_bios = g_settings.bios_neogeo,   // (Settings > BIOS > Neo Geo)
+			.big_alloc = big_alloc,
+			.big_free = big_free,
 		},
 		.render_threaded = 1, // drawing on CPU2 (video.c render thread)
 	};
@@ -484,10 +543,27 @@ static int run_game(const rbx_game_found *game)
 		return GAME_LIST;
 	}
 	RBX_LOG("core: %s, init %u ms", rbx_core_game_name(), (unsigned)((rbx_time_us() - t_load) / 1000));
+#ifdef RBX_ENABLE_LOG
+	{
+		SceKernelFreeMemorySizeInfo fm;
+		fm.size = sizeof(fm);
+		struct mallinfo mi = mallinfo();
+		if (sceKernelGetFreeMemorySize(&fm) < 0)
+			fm.size_user = fm.size_cdram = fm.size_phycont = 0;
+		int nbig = 0;
+		for (int i = 0; i < BIG_MAX; i++)
+			nbig += s_big[i].p != NULL;
+		RBX_LOG("game start: free user %u KB cdram %u KB phycont %u KB, heap in use %u KB, %d MB in memory blocks (%d in CDRAM)",
+			fm.size_user >> 10, fm.size_cdram >> 10, fm.size_phycont >> 10, (unsigned)mi.uordblks >> 10, nbig, s_big_cdram);
+	}
+#endif
 	(void)t_load;
 	rbx_loading_set(950);
 	rbx_settings_save(); // remember last game (even without opening the menu)
-	RBX_LOG("core: cheats %d (" RBX_DATA_DIR "cheats/)", rbx_core_cheats_load(RBX_DATA_DIR "cheats/"));
+	// (the call outside RBX_LOG: release builds drop the macro and its arguments, and no cheats were read)
+	const int ncheats = rbx_core_cheats_load(RBX_DATA_DIR "cheats/");
+	RBX_LOG("core: cheats %d (" RBX_DATA_DIR "cheats/)", ncheats);
+	(void)ncheats;
 	if (g_settings.dip_count > 0)
 		rbx_core_dip_set_raw(g_settings.dip, g_settings.dip_count);
 	rbx_core_set_start_stage(g_settings.start_stage);
@@ -865,6 +941,15 @@ int main(int argc, char *argv[])
 	(void)rbx_text_pad[0];
 #endif
 	rbx_log_init();
+#ifdef RBX_ENABLE_LOG
+	{
+		SceKernelFreeMemorySizeInfo fm;
+		fm.size = sizeof(fm);
+		if (sceKernelGetFreeMemorySize(&fm) >= 0)
+			RBX_LOG("start: free user %u KB cdram %u KB phycont %u KB (heap %u KB)", fm.size_user >> 10,
+				fm.size_cdram >> 10, fm.size_phycont >> 10, _newlib_heap_size_user >> 10);
+	}
+#endif
 	rbx_testfiles_start();   // (log builds: the test files looked for off the frame loop, ADR-161)
 	rbx_threads_pin_main();
 	s_main_tid = sceKernelGetThreadId();

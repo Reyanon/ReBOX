@@ -99,6 +99,10 @@ typedef struct {
 	// the Vita) before the regions and the loader's buffers do; returns their count. The driver takes them in init with
 	// rbx_early; the core frees them after the driver's exit (and when the load fails)
 	int (*early)(const rbx_game *g, size_t *sizes);
+	// optional (ADR-222): regions kept as blocks (NULL-terminated), read with rbx_region_blocks instead of rbx_region:
+	// regions made only of word-interleaved pairs (ROM_LOAD32_WORD: group 2, skip 2), kept as 8 KB chunks each stored
+	// once (chunks with the same bytes shared), so a sprite ROM full of blank or repeated pages takes its distinct ones
+	const char *const *block_regions;
 } rbx_driver;
 #define RBX_EARLY_MAX 4
 void *rbx_early(int i, size_t *size);   // block i of rbx_driver.early (NULL: none)
@@ -110,6 +114,10 @@ uint64_t rbx_clock_us(void);   // the frontend's clock (0 without one): profilin
 // (only appended to, never rewritten): NULL = none (the driver interprets); the emulation thread
 void *rbx_jit_alloc(unsigned size);
 void rbx_jit_write_begin(void);
+// a large optional buffer outside the heap (rbx_config.big_alloc: memory blocks, then CDRAM; malloc without one);
+// *big says how it was taken, for rbx_big_free. NULL: none (the driver does without)
+void *rbx_big_alloc(size_t size, int *big);
+void rbx_big_free(void *p, int big);
 void rbx_jit_write_end(void *code, unsigned size);
 void rbx_fail(const char *fmt, ...);      // set the error text returned by rbx_error()
 
@@ -127,12 +135,24 @@ int rbx_region_read(const char *name, uint32_t offset, void *dst, uint32_t len);
 // 1: the file region was loaded with ROM_LOAD16_WORD_SWAP, and rbx_region_read gives the file's bytes (the driver
 // swaps each pair: byte offset ^ 1 in the region = the file's byte)
 int rbx_region_file_swap16(const char *name);
+// a region of rbx_driver.block_regions (ADR-222): its 8 KB chunks, byte a of the region = chunk[a >> 13][a & 0x1fff]
+// (chunks with the same bytes are one, the region's fill included). NULL = missing (reported as rbx_region does)
+#define RBX_BLK_SHIFT 13
+#define RBX_BLK_MASK 0x1fffu
+uint8_t **rbx_region_blocks(const char *name, uint32_t *size);
+// each distinct chunk of the region once (to decode it in place: a decoding that depends on the place in the chunk only)
+void rbx_region_blocks_each(const char *name, void (*fn)(uint8_t *chunk, void *user), void *user);
 // reads of a file region ahead, on the frontend's io worker thread (ADR-160): rbx_io_submit queues one (its id, or -1:
 // no worker, or no room: the driver reads it itself when needed). rbx_io_finish = the bytes in place (0) or not readable
 // (-1): taken back and read here when the worker has not started it, waited for when it has; the id is free after.
 // rbx_io_ready: done by the worker (finish will not wait); rbx_io_queued: not started; rbx_io_drop: no longer needed.
 // The emulation thread only; every id submitted is finished or dropped before the driver's exit returns
 int rbx_io_on(void);
+// a file written whole (an NVRAM, a memory card) off the emulation thread when the io worker runs (ADR-224: an SD card
+// write stops a frame for 100+ ms), else here; the bytes are copied. The writes of one path land in the order given.
+// rbx_file_put_now: here, after the queued ones (the game's exit). 0 = queued or written
+int rbx_file_put(const char *path, const void *data, uint32_t len);
+int rbx_file_put_now(const char *path, const void *data, uint32_t len);
 int rbx_io_submit(const char *name, uint32_t offset, void *dst, uint32_t len);
 int rbx_io_ready(int id);
 int rbx_io_queued(int id);
@@ -295,6 +315,17 @@ static inline uint32_t rbx_div64_small(uint64_t num, uint64_t den)
 
 // (a * b) / c with a 32-bit division when the product fits (exactly (uint64_t)a * b / c)
 // v % n (0 when n is 0) with the division only past the end: a tile code against a decoded set's count
+// the set bits of v (__builtin_popcount is a libgcc call on ARMv7 without a count instruction)
+static inline uint32_t rbx_popcount(uint32_t v)
+{
+#if defined(__arm__)
+	v = v - ((v >> 1) & 0x55555555u);
+	v = (v & 0x33333333u) + ((v >> 2) & 0x33333333u);
+	return (((v + (v >> 4)) & 0x0f0f0f0fu) * 0x01010101u) >> 24;
+#else
+	return (uint32_t)__builtin_popcount(v);
+#endif
+}
 static inline uint32_t rbx_wrap(uint32_t v, uint32_t n) { return v < n ? v : n ? v % n : 0; }
 static inline uint32_t rbx_muldiv(uint32_t a, uint32_t b, uint32_t c)
 {

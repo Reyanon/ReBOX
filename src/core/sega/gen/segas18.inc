@@ -2847,10 +2847,10 @@ static const rbx_ipt_field segas18_ipf_wwally[] = {
 	{ 0x2, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 40, 2, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin Chute", 42, 2, 255, 0, 0x0, 0x0 },
 	{ 0x60, 0x60, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 44, 4, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas18_ipp_wwally[] = {
 	{ "P1", 0, 2 },
@@ -2942,12 +2942,12 @@ static const rbx_ipt_field segas18_ipf_wwally3p[] = {
 	{ 0x2, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 40, 2, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin Chute", 42, 2, 255, 0, 0x0, 0x0 },
 	{ 0x60, 0x60, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 44, 4, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas18_ipp_wwally3p[] = {
 	{ "P1", 0, 3 },

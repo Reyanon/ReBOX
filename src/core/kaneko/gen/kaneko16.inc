@@ -1748,7 +1748,7 @@ static const rbx_ipt_field kaneko16_ipf_gtmr[] = {
 	{ 0xc000, 0xc000, RBX_IPT_DIPSWITCH, 1, 0, 0, "National Anthem & Flag", 14, 4, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 18, 0, 4, 1, 0x1800, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 18, 0, 4, 2, 0x1800, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 18, 0, 4, 1, 0x1800, 0x1000 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 18, 0, 4, 1, 0x1800, 0x1000 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 18, 0, 4, 2, 0x1800, 0x1000 },
 };
 static const rbx_ipt_port kaneko16_ipp_gtmr[] = {
@@ -1819,7 +1819,7 @@ static const rbx_ipt_field kaneko16_ipf_gtmr2[] = {
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 1, "Service Mode", 13, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 15, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 15, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 15, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 15, 0, 255, 0, 0x0, 0x0 },
 	{ 0x100, 0x100, RBX_IPT_BUTTON5, 1, 0, 0, "", 15, 0, 255, 0, 0x0, 0x0 },
 	{ 0x200, 0x200, RBX_IPT_UNKNOWN, 1, 0, 0, "", 15, 0, 255, 0, 0x0, 0x0 },
 	{ 0x400, 0x400, RBX_IPT_UNKNOWN, 1, 0, 0, "", 15, 0, 255, 0, 0x0, 0x0 },

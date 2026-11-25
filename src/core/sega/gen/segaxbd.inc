@@ -2160,7 +2160,7 @@ static const rbx_ipt_field segaxbd_ipf_abcop[] = {
 	{ 0x30, 0x30, RBX_IPT_DIPSWITCH, 1, 0, 0, "Time", 40, 4, 255, 0, 0x0, 0x0 },
 	{ 0xc0, 0xc0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 44, 4, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segaxbd_ipp_abcop[] = {
 	{ "mainpcb:IO0PORTA", 0, 3 },
@@ -2879,8 +2879,8 @@ static const rbx_ipt_field segaxbd_ipf_rachero[] = {
 	{ 0x30, 0x30, RBX_IPT_DIPSWITCH, 1, 0, 0, "Time", 40, 4, 255, 0, 0x0, 0x0 },
 	{ 0xc0, 0xc0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 44, 4, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL2, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL2, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segaxbd_ipp_rachero[] = {
 	{ "mainpcb:IO0PORTA", 0, 3 },

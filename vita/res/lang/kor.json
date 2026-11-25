@@ -395,6 +395,13 @@
   "CONTROLS": "조작",
   "DISPLAY": "화면",
   "OPTIONS": "옵션",
-  "SETTINGS": "설정"
+  "SETTINGS": "설정",
+  "2nd stick Up": "두 번째 스틱 위",
+  "2nd stick Down": "두 번째 스틱 아래",
+  "2nd stick Left": "두 번째 스틱 왼쪽",
+  "2nd stick Right": "두 번째 스틱 오른쪽",
+  "Pedal": "페달",
+  "Pedal 2": "페달 2",
+  "Pedal 3": "페달 3"
  }
 }

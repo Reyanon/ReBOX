@@ -1525,8 +1525,8 @@ static const rbx_ipt_field konamigx_ipf_ggreats2[] = {
 	{ 0x2000000, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4000000, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 	{ 0x1000000, 0x1000000, RBX_IPT_CUSTOM, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 2, 0, 0, "", 32, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port konamigx_ipp_ggreats2[] = {
 	{ "SERVICE", 0, 8 },

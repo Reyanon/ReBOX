@@ -604,8 +604,8 @@ static const rbx_ipt_field arkanoid_ipf_ark1ball[] = {
 	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_ark1ball[] = {
 	{ "SYSTEM", 0, 7 },
@@ -660,8 +660,8 @@ static const rbx_ipt_field arkanoid_ipf_arkangc[] = {
 	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Ball Speed", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_arkangc[] = {
 	{ "SYSTEM", 0, 8 },
@@ -716,8 +716,8 @@ static const rbx_ipt_field arkanoid_ipf_arkangc2[] = {
 	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Ball Speed", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_arkangc2[] = {
 	{ "SYSTEM", 0, 8 },
@@ -770,8 +770,8 @@ static const rbx_ipt_field arkanoid_ipf_arkanoid[] = {
 	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 10, 2, 255, 0, 0x0, 0x0 },
 	{ 0xc0, 0xc0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 12, 4, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_arkanoid[] = {
 	{ "SYSTEM", 0, 7 },
@@ -825,8 +825,8 @@ static const rbx_ipt_field arkanoid_ipf_arkanoidj[] = {
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_arkanoidj[] = {
 	{ "SYSTEM", 0, 7 },
@@ -881,8 +881,8 @@ static const rbx_ipt_field arkanoid_ipf_arkatayt[] = {
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_arkatayt[] = {
 	{ "SYSTEM", 0, 8 },
@@ -937,8 +937,8 @@ static const rbx_ipt_field arkanoid_ipf_arkgcbl[] = {
 	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_arkgcbl[] = {
 	{ "SYSTEM", 0, 8 },
@@ -993,8 +993,8 @@ static const rbx_ipt_field arkanoid_ipf_arktayt2[] = {
 	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_arktayt2[] = {
 	{ "SYSTEM", 0, 8 },
@@ -1049,8 +1049,8 @@ static const rbx_ipt_field arkanoid_ipf_block2[] = {
 	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_block2[] = {
 	{ "SYSTEM", 0, 8 },
@@ -1140,8 +1140,8 @@ static const rbx_ipt_field arkanoid_ipf_cruisin5[] = {
 	{ 0x40, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Sound Hardware", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_cruisin5[] = {
 	{ "SYSTEM", 0, 8 },
@@ -1236,8 +1236,8 @@ static const rbx_ipt_field arkanoid_ipf_paddle2[] = {
 	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 12, 2, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port arkanoid_ipp_paddle2[] = {
 	{ "SYSTEM", 0, 8 },

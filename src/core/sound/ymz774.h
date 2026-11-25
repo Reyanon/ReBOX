@@ -99,10 +99,13 @@ typedef struct ymz77x_s {
 	int (*fetch)(void *user, uint32_t offset, void *dst, uint32_t len);
 	void *fetch_user;
 	int fetch_swap16;           // (the fetched bytes are the file's of a ROM_LOAD16_WORD_SWAP region: pairs swapped here)
-	uint8_t *pages;             // [YMZ_PAGES][YMZ_PAGE], heap
-	uint32_t page_tag[64];
+	uint8_t *pages;             // [YMZ_PAGES][YMZ_PAGE] then the pages' tags [YMZ_PAGES] (page + 1, 0 = empty), heap
 	uint8_t *window;            // [YMZ_WINDOW], heap
 	uint32_t page_misses;
+	uint32_t fetch_us, fetch_max_us;   // (the misses' reads: time, the longest; for the driver's log)
+	struct ymz_pf *pf;          // reads ahead on the io worker (ymz77x_prefetch_init), heap; NULL = none
+	const char *pf_region;      // (ymz77x_prefetch_init; the setup at the first ymz77x_prefetch with the io worker on)
+	int pf_tried;
 } ymz77x_t;
 
 typedef struct ymz77x_s ymz774_t;
@@ -116,6 +119,13 @@ int ymz77x_init(ymz77x_t *c, int type, uint32_t clock, const uint8_t *rom, uint3
 int ymz77x_init_fetch(ymz77x_t *c, int type, uint32_t clock, uint32_t rom_size,
                       int (*fetch)(void *user, uint32_t offset, void *dst, uint32_t len), void *user, int swap16);
 void ymz77x_exit(ymz77x_t *c);
+// ReBOX (a ROM read through fetch, ADR-227): the pages it will want read ahead on the frontend's io worker (rbx_io_*) from
+// the file region `region`: the next pages of each playing channel, and (YMZ774) the first two pages of every phrase,
+// kept in a buffer outside the heap (rbx_big_alloc) as they come in. ymz77x_prefetch: from the emulation thread
+// while nothing else runs the chip (the driver's worker synced); it puts the finished reads in place and asks for
+// more. A page not there yet is read when needed as before: the bytes are the file's either way
+void ymz77x_prefetch_init(ymz77x_t *c, const char *region);
+void ymz77x_prefetch(ymz77x_t *c);
 void ymz77x_reset(ymz77x_t *c);
 // offset & 1: 0 = register select, 1 = data (YMZ774 registers when type is YMZ_TYPE_774). Render the chip up to
 // the current time first (MAME m_stream->update()).

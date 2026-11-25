@@ -34,8 +34,8 @@ static const rbx_ipt_setting sspeedr_ips_sspeedr[] = {
 	{ 0, NULL }
 };
 static const rbx_ipt_field sspeedr_ipf_sspeedr[] = {
-	{ 0x3f, 0x3f, RBX_IPT_POSITIONAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0x1f, 0x1f, RBX_IPT_POSITIONAL_V, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3f, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1f, 0x0, RBX_IPT_POSITIONAL_V, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 0, 4, 255, 0, 0x0, 0x0 },
 	{ 0xc, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Play Time", 4, 4, 255, 0, 0x0, 0x0 },
 	{ 0x10, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Extended Play", 8, 2, 255, 0, 0x0, 0x0 },

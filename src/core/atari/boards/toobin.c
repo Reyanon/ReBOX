@@ -7,6 +7,7 @@
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "../../rbx.h"
+#include "../../rbx_core.h"
 #include "../../cpu/m68k_bus.h"
 #include "../../cpu/m68k/m68k.h"
 #include "../../video/gfxlayout.h"
@@ -279,6 +280,25 @@ static void main_irq2(int state)
 	set_ipl();
 }
 
+
+// ReBOX: the four paddle buttons also from the joystick (the cabinet has none; user report 11-24: two paddles on four
+// buttons are hard to play on a pad): up = both forward, down = both back, left = right forward + left back (a turn to
+// the left), right = left forward + right back. The bits pressed (active low: cleared by the caller)
+static uint16_t paddles_by_stick(void)
+{
+	uint16_t m = 0;
+	for (int p = 0; p < 2; p++) {
+		const uint32_t in = rbx_input_bits(p + 1);
+		const int sh = p ? 0 : 4;   // (P1 bits 4-7, P2 bits 0-3: R forward, L forward, L back, R back)
+		uint16_t b = 0;
+		if (in & RBX_IN_UP) b |= 0x1 | 0x2;
+		if (in & RBX_IN_DOWN) b |= 0x4 | 0x8;
+		if (in & RBX_IN_LEFT) b |= 0x1 | 0x4;
+		if (in & RBX_IN_RIGHT) b |= 0x2 | 0x8;
+		m |= (uint16_t)(b << sh);
+	}
+	return m;
+}
 static uint16_t io_read(uint32_t r)   // 0x82xxxx (mirror 0x450000)
 {
 	if (r >= 0xc000)
@@ -295,7 +315,7 @@ static uint16_t io_read(uint32_t r)   // 0x82xxxx (mirror 0x450000)
 		return v;
 	}
 	if (r >= 0x8800)
-		return (uint16_t)rbx_port_read(s_port[0]);
+		return (uint16_t)(rbx_port_read(s_port[0]) & ~paddles_by_stick());
 	if ((r & 0xffc0) == 0x8380)
 		return s_slip;
 	return 0;

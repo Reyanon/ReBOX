@@ -25,6 +25,8 @@ int rbx_game_flags(int i);            // RBX_GF_* (rbx.h)
 int rbx_game_find(const char *set);   // index or -1
 int rbx_game_players(int i);          // players with controls
 int rbx_game_buttons(int i);          // buttons of player 1
+int rbx_game_twin_stick(int i);       // the game has a second joystick (MAME JOYSTICKRIGHT_*: RBX_IN_RUP ..)
+const char *rbx_game_button_label(int i, int b);   // what button b (0..) works besides a button ("Pedal"), or NULL
 
 // ---- core modules (rbx_module.h: a maker's boards, src/core/<id>/) ----
 int rbx_module_count(void);
@@ -71,6 +73,11 @@ typedef struct {
 	// the Neo Geo BIOS by MAME's name (rbx_bios_set), NULL / "" = the default. Given here: the core's static data is
 	// the first game's again at each rbx_init, a choice made with rbx_bios_set between games would be lost
 	const char *neogeo_bios;
+	// optional (ADR-222): memory beyond the C heap for the block regions' slabs (1 MB each, the Vita's memory blocks):
+	// NULL = none (malloc only); big_free gets the pointer big_alloc gave. last: the heap is full too (slower memory
+	// may be given: the Vita's CDRAM)
+	void *(*big_alloc)(size_t size, int last);
+	void (*big_free)(void *p);
 } rbx_config;
 
 int rbx_init(const rbx_config *cfg);   // 0 = ok, else see rbx_error(). Every call after the first starts from the
@@ -105,6 +112,10 @@ double rbx_fps(void);
 #define RBX_IN_START  0x0400
 #define RBX_IN_COIN   0x0800
 #define RBX_IN_SERVICE 0x1000   // per player service coin (SERVICE1..)
+#define RBX_IN_RUP    0x2000    // the second joystick of a twin-stick game (MAME JOYSTICKRIGHT_*: Smash TV's fire)
+#define RBX_IN_RDOWN  0x4000
+#define RBX_IN_RLEFT  0x8000
+#define RBX_IN_RRIGHT 0x10000
 void rbx_set_input(int player, uint32_t bits);  // player 0..3
 #define RBX_SYS_TEST    1       // test / service mode switch (IPT_SERVICE)
 #define RBX_SYS_TILT    2

@@ -273,6 +273,35 @@ static void game_controls(const rbx_game *g, int *players, int *buttons)
 }
 int rbx_game_players(int i) { int p = 0, b = 0; const rbx_game *g = game_at(i, NULL); if (g) game_controls(g, &p, &b); return p; }
 int rbx_game_buttons(int i) { int p = 0, b = 0; const rbx_game *g = game_at(i, NULL); if (g) game_controls(g, &p, &b); return b; }
+int rbx_game_twin_stick(int i)
+{
+	const rbx_game *g = game_at(i, NULL);
+	if (g)
+		for (const rbx_ipt_port *p = g->ports; p->tag; p++)
+			for (int f = p->first; f < p->first + p->count; f++)
+				if (g->fields[f].type >= RBX_IPT_JOYSTICKRIGHT_UP && g->fields[f].type <= RBX_IPT_JOYSTICKRIGHT_RIGHT)
+					return 1;
+	return 0;
+}
+// what a game button does when it is not a button of the game's own (b = 0..): button 1, 2, 3 work its pedal,
+// pedal 2, pedal 3 when it has no such button (field_pressed and the drivers: no analog pedal, button N = pressed)
+const char *rbx_game_button_label(int i, int b)
+{
+	static const char *const ped[3] = { "Pedal", "Pedal 2", "Pedal 3" };
+	const rbx_game *g = game_at(i, NULL);
+	if (!g || b < 0 || b > 2)
+		return NULL;
+	int button = 0, pedal = 0;
+	for (const rbx_ipt_port *p = g->ports; p->tag; p++)
+		for (int f = p->first; f < p->first + p->count; f++) {
+			const rbx_ipt_field *fd = &g->fields[f];
+			if (fd->player != 1)
+				continue;
+			button |= fd->type == RBX_IPT_BUTTON1 + b;
+			pedal |= fd->type == RBX_IPT_PEDAL + b;
+		}
+	return pedal && !button ? ped[b] : NULL;
+}
 
 // ---- logging / errors ----
 static rbx_config s_cfg;
@@ -296,6 +325,25 @@ void *rbx_jit_alloc(unsigned size)
 		return NULL;
 	used += size;
 	return base + used - size;
+}
+void *rbx_big_alloc(size_t size, int *big)
+{
+	*big = 1;
+	if (s_cfg.big_alloc) {   // (beyond the heap: memory blocks, then the slower CDRAM; never the heap)
+		void *p = s_cfg.big_alloc(size, 0);
+		return p ? p : s_cfg.big_alloc(size, 1);
+	}
+	*big = 0;
+	return malloc(size);
+}
+void rbx_big_free(void *p, int big)
+{
+	if (!p)
+		return;
+	if (big && s_cfg.big_free)
+		s_cfg.big_free(p);
+	else if (!big)
+		free(p);
 }
 void rbx_jit_write_begin(void) { if (s_cfg.jit_write_begin) s_cfg.jit_write_begin(); }
 void rbx_jit_write_end(void *code, unsigned size) { if (s_cfg.jit_write_end) s_cfg.jit_write_end(code, size); }
@@ -421,6 +469,293 @@ static void io_slow(uint32_t len)
 		const uint64_t t0 = rbx_clock_us();
 		while (rbx_clock_us() - t0 < us)
 			;
+	}
+}
+
+// zips of the set and its parents, in lookup order
+#define MAX_ZIPS 4
+static rbx_zip *s_zips[MAX_ZIPS];
+static int s_nzips;
+
+// ---- block regions (ADR-222, rbx_driver.block_regions) ----
+// A region of word-interleaved pairs (ROM_LOAD32_WORD) kept as its 8 KB chunks, each distinct chunk stored once (slabs
+// of BLK_SLAB chunks), found again by a hash table while the region loads (freed after). A pair's two files are read
+// side by side, so no chunk is ever held twice
+#define BLK_SIZE 8192
+#define BLK_SLAB 128
+typedef struct { uint32_t h; uint8_t *p; } blk_slot;
+typedef struct {
+	uint8_t **chunk;
+	uint32_t nchunk;
+	uint8_t **slab;
+	uint8_t *slab_big;   // 1: the slab from rbx_config.big_alloc (else malloc)
+	int nslab, slab_cap;
+	uint32_t slab_used;   // chunks taken in the last slab
+	blk_slot *hash;
+	uint32_t hmask, nblk;
+	uint8_t fill;
+} blk_region;
+static blk_region *s_reg_blk[MAX_REGIONS];
+
+static uint32_t blk_hash(const uint8_t *d)
+{
+	const uint32_t *w = (const uint32_t *)d;
+	uint32_t h = 0x811c9dc5u;
+	for (int i = 0; i < BLK_SIZE / 4; i++)
+		h = (h ^ w[i]) * 0x01000193u;
+	return h ? h : 1;
+}
+
+// the region's chunk with these bytes (stored if new): NULL = no memory
+static uint8_t *blk_store(blk_region *b, const uint8_t *d)
+{
+	const uint32_t h = blk_hash(d);
+	uint32_t i = h & b->hmask;
+	for (; b->hash[i].h; i = (i + 1) & b->hmask)
+		if (b->hash[i].h == h && !memcmp(b->hash[i].p, d, BLK_SIZE))
+			return b->hash[i].p;
+	if (!b->nslab || b->slab_used == BLK_SLAB) {
+		if (b->nslab == b->slab_cap) {
+			const int cap = b->slab_cap ? b->slab_cap * 2 : 64;
+			uint8_t **s = (uint8_t **)realloc(b->slab, (size_t)cap * sizeof(*s));
+			uint8_t *f = s ? (uint8_t *)realloc(b->slab_big, (size_t)cap) : NULL;
+			if (s)
+				b->slab = s;
+			if (!f)
+				return NULL;
+			b->slab_big = f;
+			b->slab_cap = cap;
+		}
+		// (memory beyond the heap first: the heap is left to the driver's and the frontend's buffers)
+		uint8_t *s = s_cfg.big_alloc ? (uint8_t *)s_cfg.big_alloc((size_t)BLK_SLAB * BLK_SIZE, 0) : NULL;
+		b->slab_big[b->nslab] = s != NULL;
+		if (!s && !(s = (uint8_t *)malloc((size_t)BLK_SLAB * BLK_SIZE))) {
+			if (!s_cfg.big_alloc || !(s = (uint8_t *)s_cfg.big_alloc((size_t)BLK_SLAB * BLK_SIZE, 1)))
+				return NULL;
+			b->slab_big[b->nslab] = 1;
+		}
+		b->slab[b->nslab++] = s;
+		b->slab_used = 0;
+	}
+	uint8_t *p = b->slab[b->nslab - 1] + (size_t)b->slab_used++ * BLK_SIZE;
+	memcpy(p, d, BLK_SIZE);
+	b->hash[i].h = h;
+	b->hash[i].p = p;
+	b->nblk++;
+	return p;
+}
+
+static void blk_free(blk_region *b)
+{
+	if (!b)
+		return;
+	for (int k = 0; k < b->nslab; k++)
+		if (b->slab_big[k] && s_cfg.big_free)
+			s_cfg.big_free(b->slab[k]);
+		else
+			free(b->slab[k]);
+	free(b->slab);
+	free(b->slab_big);
+	free(b->hash);
+	free(b->chunk);
+	free(b);
+}
+
+// a region whose loads all fit the block layout (ROM_LOAD32_WORD files on 8 KB chunks)
+static int blk_layout_ok(const rbx_game *g, int reg, uint32_t size)
+{
+	if (!size || (size & (BLK_SIZE - 1)))
+		return 0;
+	int n = 0;
+	for (const rbx_rom_load *l = g->loads; l->op != RBX_ROM_END; l++)
+		if (l->region == reg) {
+			if (l->op != RBX_ROM_LOAD || l->group != 2 || l->skip != 2 || l->reverse || (l->offset & 1) ||
+			    ((l->offset & ~3u) & (BLK_SIZE - 1)) || (l->length & 1) ||
+			    (uint64_t)(l->offset & ~3u) + 2ull * l->length > size)
+				return 0;
+			n++;
+		}
+	(void)n;
+	return 1;   // (no file at all: every chunk the fill, one chunk)
+}
+
+static blk_region *blk_new(uint32_t size, uint8_t fill)
+{
+	blk_region *b = (blk_region *)calloc(1, sizeof(blk_region));
+	if (!b)
+		return NULL;
+	b->nchunk = size / BLK_SIZE;
+	b->fill = fill;
+	uint32_t hs = 1024;
+	while (hs < 2 * b->nchunk + 2)
+		hs <<= 1;
+	b->hmask = hs - 1;
+	b->chunk = (uint8_t **)calloc(b->nchunk, sizeof(uint8_t *));
+	b->hash = (blk_slot *)calloc(hs, sizeof(blk_slot));
+	if (!b->chunk || !b->hash) {
+		blk_free(b);
+		return NULL;
+	}
+	return b;
+}
+
+// a ROM file in zip k: by CRC, then name (rbx_zip_find). A default EEPROM / NVRAM (".nv") none of the zips has under its
+// name stands in by another ".nv" of its size: the same chip's defaults of another region, as older sets name them
+// (MAME 0.260 sailormn.zip: sailormn_europe.nv, 0.289 sailormn: sailormn_japan.nv; blank, the game came up flipped,
+// issue #7)
+static int rom_find(int k, const rbx_rom_load *l)
+{
+	const int zi = rbx_zip_find(s_zips[k], l->file, l->crc, l->length);
+	const size_t n = strlen(l->file);
+	if (zi >= 0 || n < 3 || strcmp(l->file + n - 3, ".nv"))
+		return zi;
+	for (int j = 0; j < s_nzips; j++)
+		if (rbx_zip_find(s_zips[j], l->file, l->crc, l->length) >= 0)
+			return -1;   // (in another zip: that one)
+	for (int i = 0; i < rbx_zip_count(s_zips[k]); i++) {
+		const rbx_zip_entry *e = rbx_zip_get(s_zips[k], i);
+		const size_t m = strlen(e->name);
+		if (e->size == l->length && m >= 3 && !strcmp(e->name + m - 3, ".nv")) {
+			rbx_log("%s: %s for %s (not in the set)", s_game ? s_game->set : "", e->name, l->file);
+			return i;
+		}
+	}
+	return -1;
+}
+
+static rbx_zip_stream *blk_stream(const rbx_rom_load *l, uint32_t *crc)
+{
+	for (int k = 0; l && k < s_nzips; k++) {
+		const int zi = rom_find(k, l);
+		if (zi >= 0) {
+			*crc = rbx_zip_get(s_zips[k], zi)->crc;
+			return rbx_zip_stream_open(s_zips[k], zi);
+		}
+	}
+	return NULL;
+}
+
+// a pair of files (lane 0 at a chunk, lane 1 two bytes on; either may be NULL: that lane keeps the fill) into the
+// block region, chunk by chunk: 0 = ok, -1 = a file missing or bad (in s_reg_missing), -2 = no memory
+static int blk_pair_load(int reg, const rbx_rom_load *l0, const rbx_rom_load *l1, int done, int total)
+{
+	blk_region *b = s_reg_blk[reg];
+	const rbx_rom_load *ls[2] = { l0, l1 };
+	rbx_zip_stream *st[2] = { NULL, NULL };
+	uint32_t crc[2] = { 0, 0 }, len = 0, base = 0;
+	int rc = 0;
+	for (int k = 0; k < 2; k++)
+		if (ls[k]) {
+			base = ls[k]->offset & ~3u;
+			if (ls[k]->length > len)
+				len = ls[k]->length;
+			if (!(st[k] = blk_stream(ls[k], &crc[k]))) {
+				rbx_log("%s: missing %s (crc %08x)", s_game->set, ls[k]->file, (unsigned)ls[k]->crc);
+				if (!s_reg_missing[reg])
+					s_reg_missing[reg] = ls[k];
+				rc = -1;
+			}
+		}
+	uint8_t *in = (uint8_t *)malloc(BLK_SIZE), *out = (uint8_t *)malloc(BLK_SIZE);
+	if (!in || !out) {
+		rc = -2;
+		goto done;
+	}
+	for (uint32_t pos = 0, c = base / BLK_SIZE; !rc && pos < len && c < b->nchunk; pos += BLK_SIZE / 2, c++) {
+		uint8_t *d = b->chunk[c];   // (an earlier load's chunk under this one: its bytes kept where this has none)
+		if (d)
+			memcpy(out, d, BLK_SIZE);
+		else
+			memset(out, b->fill, BLK_SIZE);
+		for (int k = 0; k < 2; k++) {
+			if (!st[k] || pos >= ls[k]->length)
+				continue;
+			const uint32_t want = ls[k]->length - pos < BLK_SIZE / 2 ? ls[k]->length - pos : BLK_SIZE / 2;
+			const int got = rbx_zip_stream_read(st[k], in, want);
+			if (got != (int)want) {
+				rc = -1;
+				break;
+			}
+			for (uint32_t j = 0; j < want; j += 2) {   // (the file's word j / 2: the chunk's word j + k)
+				out[j * 2 + k * 2] = in[j];
+				out[j * 2 + k * 2 + 1] = in[j + 1];
+			}
+		}
+		if (!rc && !(b->chunk[c] = blk_store(b, out)))
+			rc = -2;
+		if (s_cfg.progress && total && len)
+			s_cfg.progress((int)(((uint64_t)done * len + pos) * 900 / ((uint64_t)total * len)), s_cfg.progress_user);
+	}
+	for (int k = 0; !rc && k < 2; k++)
+		if (st[k] && rbx_zip_stream_crc(st[k]) != crc[k])
+			rc = -1;
+	if (rc == -1)
+		for (int k = 0; k < 2; k++)
+			if (ls[k] && !s_reg_missing[reg])
+				s_reg_missing[reg] = ls[k];
+	if (rc == -2)
+		rbx_fail("out of memory (%s blocks)", s_game->regions[reg].name);
+done:
+	free(in);
+	free(out);
+	for (int k = 0; k < 2; k++)
+		rbx_zip_stream_close(st[k]);
+	return rc;
+}
+
+// the region's loads done: chunks no file filled get the fill chunk, the hash table goes
+static int blk_region_finish(int reg)
+{
+	blk_region *b = s_reg_blk[reg];
+	if (!b)
+		return 0;
+	uint8_t *fill = (uint8_t *)malloc(BLK_SIZE);
+	if (!fill)
+		return -1;
+	memset(fill, b->fill, BLK_SIZE);
+	int rc = 0;
+	for (uint32_t c = 0; c < b->nchunk && !rc; c++)
+		if (!b->chunk[c] && !(b->chunk[c] = blk_store(b, fill)))
+			rc = -1;
+	free(fill);
+	free(b->hash);
+	b->hash = NULL;
+	if (rc) {
+		rbx_fail("out of memory (%s blocks)", s_game->regions[reg].name);
+		return -1;
+	}
+	rbx_log("%s: %s %u MB as %u chunks (%u MB)", s_game->set, s_game->regions[reg].name, (unsigned)(s_reg_size[reg] >> 20),
+	        (unsigned)b->nblk, (unsigned)(((uint64_t)b->nblk * BLK_SIZE) >> 20));
+	return 0;
+}
+
+uint8_t **rbx_region_blocks(const char *name, uint32_t *size)
+{
+	const int i = region_index(name);
+	if (size)
+		*size = 0;
+	if (i < 0 || !s_reg_blk[i])
+		return NULL;
+	if (s_reg_missing[i]) {
+		rbx_fail("%s: missing %s (crc %08x)", s_game->set, s_reg_missing[i]->file, (unsigned)s_reg_missing[i]->crc);
+		s_fail_sticky = 1;
+		return NULL;
+	}
+	if (size)
+		*size = s_reg_size[i];
+	return s_reg_blk[i]->chunk;
+}
+
+void rbx_region_blocks_each(const char *name, void (*fn)(uint8_t *chunk, void *user), void *user)
+{
+	const int i = region_index(name);
+	if (i < 0 || !s_reg_blk[i])
+		return;
+	blk_region *b = s_reg_blk[i];
+	for (int k = 0; k < b->nslab; k++) {
+		const uint32_t n = k == b->nslab - 1 ? b->slab_used : BLK_SLAB;
+		for (uint32_t j = 0; j < n; j++)
+			fn(b->slab[k] + (size_t)j * BLK_SIZE, user);
 	}
 }
 
@@ -574,6 +909,81 @@ static uint32_t s_io_merge = 64 * 1024;
 static int s_io_merge_set;
 
 // the worker: the queued requests read in order; the number read (0: none queued, the thread may sleep)
+// ---- files written by the io worker (ADR-224) ----
+#define WQ_N 16
+enum { WQ_FREE, WQ_QUEUED, WQ_WRITING };
+static struct { volatile int state; char path[272]; uint8_t *data; uint32_t len; } s_wq[WQ_N];
+static int s_wq_ring[WQ_N];
+static volatile unsigned s_wq_head, s_wq_tail;   // pushed by the emulation thread / popped by the worker or a flush
+
+static int file_write(const char *path, const void *data, uint32_t len)
+{
+	FILE *f = fopen(path, "wb");
+	if (!f)
+		return -1;
+	const int ok = fwrite(data, 1, len, f) == len;
+	return fclose(f) || !ok ? -1 : 0;
+}
+
+// the oldest queued write done (by the caller); 0 = none left
+static int wq_one(void)
+{
+	const unsigned tail = __atomic_load_n(&s_wq_tail, __ATOMIC_ACQUIRE);
+	if (tail == __atomic_load_n(&s_wq_head, __ATOMIC_ACQUIRE))
+		return 0;
+	const int id = s_wq_ring[tail % WQ_N];
+	if (!__atomic_compare_exchange_n(&s_wq_tail, &(unsigned){ tail }, tail + 1, 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE))
+		return 1;   // (the other thread took it: look again)
+	__atomic_store_n(&s_wq[id].state, WQ_WRITING, __ATOMIC_RELEASE);
+	if (file_write(s_wq[id].path, s_wq[id].data, s_wq[id].len))
+		rbx_log("io: %s not written", s_wq[id].path);
+	free(s_wq[id].data);
+	s_wq[id].data = NULL;
+	__atomic_store_n(&s_wq[id].state, WQ_FREE, __ATOMIC_RELEASE);
+	return 1;
+}
+
+// every queued write done (here, or waited for on the worker)
+static void wq_flush(void)
+{
+	while (wq_one())
+		;
+	for (int i = 0; i < WQ_N; i++)
+		while (__atomic_load_n(&s_wq[i].state, __ATOMIC_ACQUIRE) == WQ_WRITING)
+			wait_some();
+}
+
+int rbx_file_put_now(const char *path, const void *data, uint32_t len)
+{
+	wq_flush();
+	return file_write(path, data, len);
+}
+
+int rbx_file_put(const char *path, const void *data, uint32_t len)
+{
+	if (!rbx_io_on() || strlen(path) >= sizeof(s_wq[0].path))
+		return rbx_file_put_now(path, data, len);
+	const unsigned head = s_wq_head;
+	int id = -1;
+	for (int k = 0; k < WQ_N && id < 0; k++)
+		if (__atomic_load_n(&s_wq[k].state, __ATOMIC_ACQUIRE) == WQ_FREE)
+			id = k;
+	uint8_t *copy = id >= 0 && head - __atomic_load_n(&s_wq_tail, __ATOMIC_ACQUIRE) < WQ_N ? (uint8_t *)malloc(len ? len : 1) : NULL;
+	if (!copy)
+		return rbx_file_put_now(path, data, len);
+	memcpy(copy, data, len);
+	strcpy(s_wq[id].path, path);
+	s_wq[id].data = copy;
+	s_wq[id].len = len;
+	__atomic_store_n(&s_wq[id].state, WQ_QUEUED, __ATOMIC_RELEASE);
+	s_wq_ring[head % WQ_N] = id;
+	__atomic_store_n(&s_wq_head, head + 1, __ATOMIC_RELEASE);
+	void (*wake)(void) = s_io_wake;
+	if (wake)
+		wake();
+	return 0;
+}
+
 int rbx_io_run(void)
 {
 	static FILE *fp;
@@ -586,6 +996,8 @@ int rbx_io_run(void)
 			s_io_merge = (uint32_t)atoi(e) < IO_MERGE_MAX ? (uint32_t)atoi(e) : IO_MERGE_MAX;
 		s_io_merge_set = 1;
 	}
+	if (wq_one())   // (a file to write: one at a time, the reads waiting for it are taken back by the emulation thread)
+		return 1;
 	if (fp && __atomic_load_n(&s_io_close, __ATOMIC_ACQUIRE)) {   // (the last game's file: closed before this one's reads)
 		fclose(fp);
 		fp = NULL;
@@ -685,9 +1097,12 @@ uint8_t *rbx_region(const char *name, uint32_t *size)
 
 static void free_regions(void)
 {
+	wq_flush();   // (the files still queued for the io worker: written before the game's memory goes)
 	for (int i = 0; i < s_nreg; i++) {
 		free(s_reg_data[i]);
 		s_reg_data[i] = NULL;
+		blk_free(s_reg_blk[i]);
+		s_reg_blk[i] = NULL;
 		if (s_reg_fp[i])
 			fclose(s_reg_fp[i]);
 		s_reg_fp[i] = NULL;
@@ -699,11 +1114,6 @@ static void free_regions(void)
 	s_nreg = 0;
 	memset(&s_io_st, 0, sizeof(s_io_st));
 }
-
-// zips of the set and its parents, in lookup order
-#define MAX_ZIPS 4
-static rbx_zip *s_zips[MAX_ZIPS];
-static int s_nzips;
 
 static rbx_zip *open_set_zip(const char *set)
 {
@@ -726,7 +1136,7 @@ static const rbx_game *find_game(const char *set)
 static uint8_t *read_rom_file(const rbx_rom_load *l, uint32_t *size)
 {
 	for (int z = 0; z < s_nzips; z++) {
-		int i = rbx_zip_find(s_zips[z], l->file, l->crc, l->length);
+		int i = rom_find(z, l);
 		if (i < 0)
 			continue;
 		const rbx_zip_entry *e = rbx_zip_get(s_zips[z], i);
@@ -772,18 +1182,41 @@ static void region_post(const rbx_game *g, int reg)
 		d[i] = (uint8_t)~d[i];
 }
 
-static int file_region_load(int reg, const rbx_rom_load *l, int done, int total)
+// The region's files (ADR-222: one or more, end to end) in one cache file; its key is the file's CRC (one file: the
+// caches made before stay good) or the CRC of their CRCs. l: the region's first load (the others are read with it).
+// 0 = ok, -1 = a file missing or bad (s_reg_missing set), -2 = no memory
+#define FR_MAX 8
+static int file_region_load(int reg, const rbx_rom_load *loads, const rbx_rom_load *l, int done, int total)
 {
-	rbx_zip *z = NULL;
-	int zi = -1;
-	for (int k = 0; k < s_nzips && zi < 0; k++)
-		if ((zi = rbx_zip_find(s_zips[k], l->file, l->crc, l->length)) >= 0)
-			z = s_zips[k];
-	if (zi < 0)
-		return -1;
-	const rbx_zip_entry *e = rbx_zip_get(z, zi);
-	if (e->size != s_reg_size[reg])
-		return -1;
+	rbx_zip *zs[FR_MAX];
+	int zis[FR_MAX], nf = 0;
+	uint32_t key = 0;
+	uint8_t crcs[FR_MAX * 4];
+	for (const rbx_rom_load *o = l; o->op != RBX_ROM_END; o++) {
+		if (o->region != reg)
+			continue;
+		int zi = -1;
+		rbx_zip *z = NULL;
+		for (int k = 0; k < s_nzips && zi < 0; k++)
+			if ((zi = rom_find(k, o)) >= 0)
+				z = s_zips[k];
+		if (zi < 0 || nf == FR_MAX || rbx_zip_get(z, zi)->size != o->length) {
+			rbx_log("%s: missing %s (crc %08x)", s_game->set, o->file, (unsigned)o->crc);
+			if (!s_reg_missing[reg])
+				s_reg_missing[reg] = o;
+			return -1;
+		}
+		const uint32_t c = rbx_zip_get(z, zi)->crc;
+		crcs[nf * 4] = (uint8_t)c;
+		crcs[nf * 4 + 1] = (uint8_t)(c >> 8);
+		crcs[nf * 4 + 2] = (uint8_t)(c >> 16);
+		crcs[nf * 4 + 3] = (uint8_t)(c >> 24);
+		zs[nf] = z;
+		zis[nf++] = zi;
+	}
+	(void)loads;
+	const uint32_t size = s_reg_size[reg];
+	key = nf == 1 ? rbx_zip_get(zs[0], zis[0])->crc : (uint32_t)crc32(0, crcs, (uInt)nf * 4);
 	if (s_cfg.cache_dir) {
 		char nm[64], path[512], tmp[540];
 		int n = 0;
@@ -794,8 +1227,8 @@ static int file_region_load(int reg, const rbx_rom_load *l, int done, int total)
 		FILE *f = fopen(path, "rb");
 		region_unbuffered(f);
 		uint8_t h[16];
-		if (f && fread(h, 1, 16, f) == 16 && !memcmp(h, "RBXC", 4) && rd_le32(h + 4) == e->crc && rd_le32(h + 8) == e->size &&
-		    !fseek(f, 0, SEEK_END) && ftell(f) == 16 + (long)e->size) {
+		if (f && fread(h, 1, 16, f) == 16 && !memcmp(h, "RBXC", 4) && rd_le32(h + 4) == key && rd_le32(h + 8) == size &&
+		    !fseek(f, 0, SEEK_END) && ftell(f) == 16 + (long)size) {
 			s_reg_fp[reg] = f;
 			s_reg_path[reg] = path_dup(path);
 			rbx_log("%s: %s from %s", s_game->set, s_game->regions[reg].name, path);
@@ -807,16 +1240,21 @@ static int file_region_load(int reg, const rbx_rom_load *l, int done, int total)
 		int stack_mark;
 		snprintf(tmp, sizeof(tmp), "%s.%08x.tmp", path,
 		         (unsigned)((uintptr_t)&stack_mark ^ (uintptr_t)time(NULL) ^ (uintptr_t)clock()));
-		extract_ctx x = { fopen(tmp, "wb"), NULL, 0, e->size, 0, done, total };
+		FILE *fp = fopen(tmp, "wb");
 		static const uint8_t blank[16] = { 0 };
-		int ok = x.fp && fwrite(blank, 1, 16, x.fp) == 16 && !rbx_zip_read_cb(z, zi, extract_cb, &x) && x.crc == e->crc;
-		if (ok) {
-			const uint8_t hd[16] = { 'R', 'B', 'X', 'C', (uint8_t)e->crc, (uint8_t)(e->crc >> 8), (uint8_t)(e->crc >> 16),
-			                         (uint8_t)(e->crc >> 24), (uint8_t)e->size, (uint8_t)(e->size >> 8), (uint8_t)(e->size >> 16),
-			                         (uint8_t)(e->size >> 24), 0, 0, 0, 0 };
-			ok = !fseek(x.fp, 0, SEEK_SET) && fwrite(hd, 1, 16, x.fp) == 16;
+		int ok = fp && fwrite(blank, 1, 16, fp) == 16;
+		for (int k = 0; ok && k < nf; k++) {
+			const rbx_zip_entry *e = rbx_zip_get(zs[k], zis[k]);
+			extract_ctx x = { fp, NULL, 0, e->size, 0, done, total };
+			ok = !rbx_zip_read_cb(zs[k], zis[k], extract_cb, &x) && x.crc == e->crc;
 		}
-		if (x.fp && fclose(x.fp))
+		if (ok) {
+			const uint8_t hd[16] = { 'R', 'B', 'X', 'C', (uint8_t)key, (uint8_t)(key >> 8), (uint8_t)(key >> 16),
+			                         (uint8_t)(key >> 24), (uint8_t)size, (uint8_t)(size >> 8), (uint8_t)(size >> 16),
+			                         (uint8_t)(size >> 24), 0, 0, 0, 0 };
+			ok = !fseek(fp, 0, SEEK_SET) && fwrite(hd, 1, 16, fp) == 16;
+		}
+		if (fp && fclose(fp))
 			ok = 0;
 		if (ok) {
 			remove(path);
@@ -833,12 +1271,22 @@ static int file_region_load(int reg, const rbx_rom_load *l, int done, int total)
 		remove(tmp);
 		rbx_log("%s: %s could not be written to %s, kept in memory", s_game->set, s_game->regions[reg].name, path);
 	}
-	if (!(s_reg_data[reg] = (uint8_t *)malloc(s_reg_size[reg]))) {
-		rbx_fail("out of memory (%s, %u bytes)", s_game->regions[reg].name, (unsigned)s_reg_size[reg]);
+	if (!(s_reg_data[reg] = (uint8_t *)malloc(size))) {
+		rbx_fail("out of memory (%s, %u bytes)", s_game->regions[reg].name, (unsigned)size);
 		return -2;
 	}
-	extract_ctx x = { NULL, s_reg_data[reg], 0, e->size, 0, done, total };
-	return rbx_zip_read_cb(z, zi, extract_cb, &x) || x.crc != e->crc ? -1 : 0;
+	uint32_t at = 0;
+	for (int k = 0; k < nf; k++) {
+		const rbx_zip_entry *e = rbx_zip_get(zs[k], zis[k]);
+		extract_ctx x = { NULL, s_reg_data[reg] + at, 0, e->size, 0, done, total };
+		if (rbx_zip_read_cb(zs[k], zis[k], extract_cb, &x) || x.crc != e->crc) {
+			if (!s_reg_missing[reg])
+				s_reg_missing[reg] = l;
+			return -1;
+		}
+		at += e->size;
+	}
+	return 0;
 }
 
 // copy file bytes [*pos, *pos+length) into a region following the ROMX_LOAD layout
@@ -915,7 +1363,7 @@ static int stream_cb(void *user, const uint8_t *data, uint32_t len)
 static int stream_rom_file(const rbx_rom_load *l, uint8_t *reg, uint32_t rsize)
 {
 	for (int z = 0; z < s_nzips; z++) {
-		const int i = rbx_zip_find(s_zips[z], l->file, l->crc, l->length);
+		const int i = rom_find(z, l);
 		if (i < 0)
 			continue;
 		stream_place p;
@@ -1039,21 +1487,40 @@ static int load_roms(const rbx_game *g, const rbx_driver *drv)
 	s_fail_sticky = 0;
 	memset(s_reg_missing, 0, sizeof(s_reg_missing));
 	for (const rbx_rom_region *r = g->regions; r->name && s_nreg < MAX_REGIONS; r++) {
-		// a file region: one whole ROM file, nothing else loaded into it
+		// a file region: whole ROM files end to end from its start (ADR-222: one or more), nothing else loaded into it
 		int isfile = 0, loads = 0;
+		uint32_t next = 0;
 		s_reg_swap16[s_nreg] = 0;
 		for (const char *const *f = drv ? drv->file_regions : NULL; f && *f && !isfile; f++)
 			isfile = !strcmp(*f, r->name);
 		for (const rbx_rom_load *l = g->loads; isfile && l->op != RBX_ROM_END; l++)
-			if (l->region == s_nreg && (++loads > 1 || l->op != RBX_ROM_LOAD || l->offset || l->length != r->size ||
-			                            l->skip || ((l->group > 1 || l->reverse) && !(l->group == 2 && l->reverse == 1))))
+			if (l->region == s_nreg && (l->op != RBX_ROM_LOAD || l->offset != next || l->skip ||
+			                            ((l->group > 1 || l->reverse) && !(l->group == 2 && l->reverse == 1)) ||
+			                            (loads && s_reg_swap16[s_nreg] != (l->group == 2))))
 				isfile = 0;
-			else if (l->region == s_nreg)
+			else if (l->region == s_nreg) {
 				s_reg_swap16[s_nreg] = l->group == 2;   // (ROM_LOAD16_WORD_SWAP: the file's bytes, the driver swaps)
-		if (!isfile)
+				next += l->length;
+				loads++;
+			}
+		if (!isfile || next != r->size)
 			s_reg_swap16[s_nreg] = 0;
-		s_reg_isfile[s_nreg] = (uint8_t)(isfile && loads == 1 && !(r->flags & RBX_REGION_INVERT));
+		s_reg_isfile[s_nreg] = (uint8_t)(isfile && loads >= 1 && next == r->size && !(r->flags & RBX_REGION_INVERT));
 		s_reg_fp[s_nreg] = NULL;
+		s_reg_blk[s_nreg] = NULL;
+		int isblk = 0;
+		for (const char *const *f = drv ? drv->block_regions : NULL; f && *f && !isblk; f++)
+			isblk = !strcmp(*f, r->name);
+		if (isblk && !s_reg_isfile[s_nreg] && !(r->flags & RBX_REGION_INVERT) && blk_layout_ok(g, s_nreg, r->size)) {
+			if (!(s_reg_blk[s_nreg] = blk_new(r->size, r->fill))) {
+				rbx_fail("out of memory (%s blocks)", r->name);
+				return -1;
+			}
+			s_reg_data[s_nreg] = NULL;
+			s_reg_size[s_nreg] = r->size;
+			s_nreg++;
+			continue;
+		}
 		if (s_reg_isfile[s_nreg]) {
 			s_reg_data[s_nreg] = NULL;
 			s_reg_size[s_nreg] = r->size;
@@ -1086,16 +1553,30 @@ static int load_roms(const rbx_game *g, const rbx_driver *drv)
 			region_post(g, fin);
 		uint8_t *reg = s_reg_data[l->region];
 		uint32_t rsize = s_reg_size[l->region];
-		if (s_reg_isfile[l->region]) {   // (its one RBX_ROM_LOAD)
-			const int fr = file_region_load(l->region, l, done, total);
-			if (fr == -2) {
+		if (s_reg_blk[l->region]) {   // (RBX_ROM_LOADs only: blk_layout_ok) a pair's two files read together
+			const rbx_rom_load *pair = NULL;
+			for (const rbx_rom_load *o = loads; o->op != RBX_ROM_END && !pair; o++)
+				if (o != l && o->region == l->region && (o->offset & ~3u) == (l->offset & ~3u) && o->offset != l->offset)
+					pair = o;
+			if (pair && pair < l) {   // (read with its pair)
+				last = NULL;
+				continue;
+			}
+			const int lane = (int)((l->offset >> 1) & 1);
+			if (blk_pair_load(l->region, lane ? pair : l, lane ? l : pair, done, total) == -2) {
 				rc = -1;
 				goto out;
 			}
-			if (fr) {
-				rbx_log("%s: missing %s (crc %08x)", g->set, l->file, (unsigned)l->crc);
-				if (!s_reg_missing[l->region])
-					s_reg_missing[l->region] = l;
+			last = NULL;
+			continue;
+		}
+		if (s_reg_isfile[l->region]) {   // (RBX_ROM_LOADs only, all read with the region's first)
+			int first = 1;
+			for (const rbx_rom_load *o = loads; o < l && first; o++)
+				first = o->region != l->region;
+			if (first && file_region_load(l->region, loads, l, done, total) == -2) {
+				rc = -1;
+				goto out;
 			}
 			last = NULL;
 			continue;
@@ -1158,6 +1639,11 @@ static int load_roms(const rbx_game *g, const rbx_driver *drv)
 	}
 	for (; fin < s_nreg; fin++)
 		region_post(g, fin);
+	for (int r = 0; r < s_nreg; r++)
+		if (blk_region_finish(r)) {
+			rc = -1;
+			goto out;
+		}
 out:
 	free(file);
 	for (int z = 0; z < s_nzips; z++)
@@ -1249,6 +1735,11 @@ static int field_pressed(const rbx_ipt_field *f)
 	case RBX_IPT_JOYSTICK_DOWN: return !!(in & RBX_IN_DOWN);
 	case RBX_IPT_JOYSTICK_LEFT: return !!(in & RBX_IN_LEFT);
 	case RBX_IPT_JOYSTICK_RIGHT: return !!(in & RBX_IN_RIGHT);
+	// twin sticks: the left one is the joystick (tools/gen_games.py), the right one its own bits
+	case RBX_IPT_JOYSTICKRIGHT_UP: return !!(in & RBX_IN_RUP);
+	case RBX_IPT_JOYSTICKRIGHT_DOWN: return !!(in & RBX_IN_RDOWN);
+	case RBX_IPT_JOYSTICKRIGHT_LEFT: return !!(in & RBX_IN_RLEFT);
+	case RBX_IPT_JOYSTICKRIGHT_RIGHT: return !!(in & RBX_IN_RRIGHT);
 	case RBX_IPT_BUTTON1: case RBX_IPT_BUTTON2: case RBX_IPT_BUTTON3:
 	case RBX_IPT_BUTTON4: case RBX_IPT_BUTTON5: case RBX_IPT_BUTTON6:
 		return !!(in & (RBX_IN_B1 << (f->type - RBX_IPT_BUTTON1)));

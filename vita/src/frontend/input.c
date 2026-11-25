@@ -20,8 +20,10 @@ void rbx_input_init(void)
 
 // game inputs of each player, in RBX_ACT_* order
 static const int s_act_input[2][RBX_ACT_COUNT] = {
-	{ RBX_IN_P1_B1, RBX_IN_P1_B2, RBX_IN_P1_COIN, RBX_IN_P1_START, RBX_IN_P1_B3, RBX_IN_P1_B4, RBX_IN_P1_B5, RBX_IN_P1_B6 },
-	{ RBX_IN_P2_B1, RBX_IN_P2_B2, RBX_IN_P2_COIN, RBX_IN_P2_START, RBX_IN_P2_B3, RBX_IN_P2_B4, RBX_IN_P2_B5, RBX_IN_P2_B6 },
+	{ RBX_IN_P1_B1, RBX_IN_P1_B2, RBX_IN_P1_COIN, RBX_IN_P1_START, RBX_IN_P1_B3, RBX_IN_P1_B4, RBX_IN_P1_B5, RBX_IN_P1_B6,
+	  RBX_IN_P1_RUP, RBX_IN_P1_RDOWN, RBX_IN_P1_RLEFT, RBX_IN_P1_RRIGHT },
+	{ RBX_IN_P2_B1, RBX_IN_P2_B2, RBX_IN_P2_COIN, RBX_IN_P2_START, RBX_IN_P2_B3, RBX_IN_P2_B4, RBX_IN_P2_B5, RBX_IN_P2_B6,
+	  RBX_IN_P2_RUP, RBX_IN_P2_RDOWN, RBX_IN_P2_RLEFT, RBX_IN_P2_RRIGHT },
 };
 static const int s_dir_input[2][4] = {
 	{ RBX_IN_P1_UP, RBX_IN_P1_DOWN, RBX_IN_P1_LEFT, RBX_IN_P1_RIGHT },
@@ -42,8 +44,10 @@ static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b)
 	// presses what the port says (a direction set as a key is that key, not what the stick page says)
 	static const int s_btn_act[RBX_TURBO_BUTTONS] = { RBX_ACT_ATTACK, RBX_ACT_JUMP, RBX_ACT_B3, RBX_ACT_B4, RBX_ACT_B5, RBX_ACT_B6 };
 	int stick_act[RBX_ACT_COUNT] = { 0 };
+	// a twin-stick game (Smash TV): its second joystick is four actions (the right stick at first, any keys)
+	const int nact = rbx_core_twin_stick() ? RBX_ACT_COUNT : RBX_ACT_R_UP;
 	uint32_t keyed = rbx_key_mask(pr->turbo_key);
-	for (int a = 0; a < RBX_ACT_COUNT; a++)
+	for (int a = 0; a < nact; a++)
 		keyed |= rbx_act_bits(pr, a);
 	for (int st = 0; st < 2; st++) {
 		const int x = st ? pad->rx : pad->lx, y = st ? pad->ry : pad->ly;
@@ -116,7 +120,8 @@ static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b)
 	const int turbo_act = rbx_turbo_act(pl);
 
 	const int medal = rbx_medal_game();
-	for (int a = 0; a < RBX_ACT_COUNT; a++) {
+	int on_act[RBX_ACT_COUNT] = { 0 };
+	for (int a = 0; a < nact; a++) {
 		// if the turbo key is also mapped as a normal key, turbo wins (its normal mapping is ignored)
 		int on = ((game & ~tm) & rbx_act_bits(pr, a)) != 0 || stick_act[a];
 		if (a == turbo_act)
@@ -126,8 +131,20 @@ static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b)
 			coin_t[pl] = on ? coin_t[pl] + 1 : 0;
 			on = on && coin_t[pl] <= 6;
 		}
-		rbx_core_set_input(s_act_input[pl][a], on);
+		on_act[a] = on;
 	}
+	if (rbx_input_rot && re_pad_port(pl) == 0 && !re_pad_is_tv()) {
+		// the second joystick turned like the first (Rotate Vertical L / R)
+		int *r = on_act + RBX_ACT_R_UP;
+		const int ru = r[0], rd = r[1], rl = r[2], rr = r[3];
+		if (rbx_input_rot == 90) {
+			r[0] = rr; r[1] = rl; r[2] = ru; r[3] = rd;
+		} else {
+			r[0] = rl; r[1] = rr; r[2] = rd; r[3] = ru;
+		}
+	}
+	for (int a = 0; a < RBX_ACT_COUNT; a++)
+		rbx_core_set_input(s_act_input[pl][a], on_act[a]);
 }
 
 uint32_t rbx_input_poll(void)

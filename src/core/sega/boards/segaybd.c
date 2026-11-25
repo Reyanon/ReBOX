@@ -10,6 +10,7 @@
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "../../rbx.h"
+#include "../../rbx_core.h"
 #include "../../cpu/m68k_bus.h"
 #include "../../cpu/m68k/m68k.h"
 #include "../../cpu/m68k_spin.h"
@@ -40,7 +41,7 @@
 static uint8_t *s_rom[NCPU], *s_bspr, *s_yspr, *s_zrom, *s_pcmrom;
 static uint32_t s_rom_size[NCPU], s_bspr_size, s_yspr_size, s_zrom_size, s_pcm_size;
 static int s_port_p1, s_port_general, s_port_limitsw, s_port_dsw, s_port_coinage, s_port_adc[8];
-static uint8_t s_adc_def[8], s_adc_type[8];   // (the analog fields' defaults and kinds: 0 none, 1 x, 2 y)
+static uint8_t s_adc_def[8], s_adc_type[8];   // (the analog fields' defaults and kinds: 0 none, 1 x, 2 y, 3 pedal, 4 pedal 2)
 
 // ---- the state (saved; on the heap while the game runs, ADR-040) ----
 static struct ybd_state {
@@ -1072,6 +1073,15 @@ static void analog_frame(void)
 		if (p < 0)
 			continue;
 		const int def = s_adc_def[i];
+		if (s_adc_type[i] >= 3) {   // pedals (MAME's keys for them: button 1 gas, 2 brake, KEYDELTA 20 / 40 a frame;
+			                        // the stick up presses the gas too), back to rest when let go
+			const int gas = s_adc_type[i] == 3, step = gas ? 20 : 40;
+			const int on = (rbx_input_bits(1) & (gas ? RBX_IN_B1 : RBX_IN_B2)) || (gas && rbx_analog(1, RBX_IPT_PEDAL) > 2);
+			int v = b.adc_val[i] + (on ? step : -step);
+			v = v < def ? def : v > 255 ? 255 : v;
+			b.adc_val[i] = (uint8_t)v;
+			continue;
+		}
 		const int type = s_adc_type[i] == 1 ? RBX_IPT_AD_STICK_X : s_adc_type[i] == 2 ? RBX_IPT_AD_STICK_Y : -1;
 		if (type < 0) {
 			b.adc_val[i] = (uint8_t)def;
@@ -1204,7 +1214,7 @@ static int ybd_init(const rbx_game *g)
 				const rbx_ipt_field *f = &g->fields[pt->first];
 				s_adc_def[i] = (uint8_t)f->def;
 				s_adc_type[i] = f->type == RBX_IPT_AD_STICK_X || f->type == RBX_IPT_PADDLE ? 1
-				              : f->type == RBX_IPT_AD_STICK_Y ? 2 : 0;
+				              : f->type == RBX_IPT_AD_STICK_Y ? 2 : f->type == RBX_IPT_PEDAL ? 3 : f->type == RBX_IPT_PEDAL2 ? 4 : 0;
 			}
 	}
 	// sound: YM2151 0.30 (L / R), the SegaPCM 0.70

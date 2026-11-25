@@ -4190,12 +4190,12 @@ static const rbx_ipt_field segas32_ipf_sonic[] = {
 	{ 0x20, 0x20, RBX_IPT_SERVICE4, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 3, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 3, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 3, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 3, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas32_ipp_sonic[] = {
 	{ "mainpcb:P1_A", 0, 4 },

@@ -641,15 +641,27 @@ static void act_remove(int a, int x) // (the ones after it move up)
 		prt()->keyx[a][x] = prt()->keyx[a][x + 1];
 	prt()->keyx[a][RBX_KEY_EXTRA - 1] = RBX_KEY_NONE;
 }
-static int act_of(int j) // the actions on the page: the game's buttons, coin, start
+// a twin-stick game's second joystick on the page (the running game's; not in list options)
+static int ctrl_twin(void) { return !s_list_mode && rbx_core_twin_stick(); }
+static int ctrl_acts(void) { return ctrl_buttons() + (ctrl_twin() ? 4 : 0) + 2; }
+// the actions on the page: the game's buttons, its second joystick (twin-stick games), coin, start
+static int act_of(int j)
 {
-	const int b = ctrl_buttons();
-	return j < b ? button_act(j) : j == b ? RBX_ACT_COIN : RBX_ACT_START;
+	const int b = ctrl_buttons(), r = ctrl_twin() ? 4 : 0;
+	return j < b ? button_act(j) : j < b + r ? RBX_ACT_R_UP + (j - b) : j == b + r ? RBX_ACT_COIN : RBX_ACT_START;
+}
+// an action the running game uses (its buttons, its second joystick, coin, start)
+static int act_used(int a)
+{
+	for (int j = 0; j < ctrl_acts(); j++)
+		if (act_of(j) == a)
+			return 1;
+	return 0;
 }
 static int act_rows(void)
 {
 	int n = 0;
-	for (int j = 0; j < ctrl_buttons() + 2; j++)
+	for (int j = 0; j < ctrl_acts(); j++)
 		n += 1 + act_extras(act_of(j));
 	return n;
 }
@@ -662,7 +674,7 @@ static int port_kind(int i, int *act)
 	if (i < PORT_HEAD)
 		return s_port_head[i];
 	i -= PORT_HEAD;
-	for (int j = 0; j < ctrl_buttons() + 2; j++) {
+	for (int j = 0; j < ctrl_acts(); j++) {
 		const int a = act_of(j), ne = act_extras(a);
 		if (i == 0) {
 			*act = a;
@@ -680,7 +692,7 @@ static int port_kind(int i, int *act)
 static int port_row_of_act(int act)
 {
 	int r = PORT_HEAD;
-	for (int j = 0; j < ctrl_buttons() + 2; j++) {
+	for (int j = 0; j < ctrl_acts(); j++) {
 		if (act_of(j) == act)
 			break;
 		r += 1 + act_extras(act_of(j));
@@ -732,7 +744,15 @@ static int row_kind(int i, int *act)
 static const char *act_name(int act)
 {
 	static const char *const n[RBX_ACT_COUNT] = { "Button 1", "Button 2", "Coin", "Start", "Button 3", "Button 4", "Button 5",
-		"Button 6" };
+		"Button 6", "2nd stick Up", "2nd stick Down", "2nd stick Left", "2nd stick Right" };
+	// a button that works the running game's pedal (Power Drift's accelerator): "Button 1 (Pedal)"
+	const int b = act == RBX_ACT_ATTACK ? 0 : act == RBX_ACT_JUMP ? 1 : act == RBX_ACT_B3 ? 2 : -1;
+	const char *what = b >= 0 && !s_list_mode ? rbx_core_button_label(b) : NULL;
+	if (what) {
+		static char nb[3][64];
+		snprintf(nb[b], sizeof(nb[b]), "%s (%s)", T(n[act]), T(what));
+		return nb[b];
+	}
 	return n[act];
 }
 
@@ -759,14 +779,6 @@ static int combo_index(int mask) // key mask -> choice index (0 if not a pair)
 	return 0;
 }
 
-// an action among the game's buttons on the page
-static int act_is_button(int a)
-{
-	for (int i = 0; i < ctrl_buttons(); i++)
-		if (button_act(i) == a)
-			return 1;
-	return 0;
-}
 
 // ---- duplicate keys: one Vita key that drives two different things in the running game (list options: the 6-button
 // layout). func = what the key presses
@@ -775,8 +787,8 @@ typedef struct { int key, func; const char *what; } KeyUse;
 static int key_uses(KeyUse *u)
 {
 	int n = 0;
-	for (int i = 0; i < ctrl_buttons(); i++) {
-		const int a = button_act(i);
+	for (int i = 0; i < ctrl_buttons() + (ctrl_twin() ? 4 : 0); i++) {
+		const int a = act_of(i);
 		if (prt()->keymap[a] < RBX_KEY_COUNT)
 			u[n++] = (KeyUse){ prt()->keymap[a], a, act_name(a) };
 	}
@@ -784,7 +796,7 @@ static int key_uses(KeyUse *u)
 	u[n++] = (KeyUse){ prt()->keymap[RBX_ACT_START], RBX_ACT_START, "Start" };
 	for (int a = 0; a < RBX_ACT_COUNT; a++)
 		for (int x = 0; x < RBX_KEY_EXTRA; x++)
-			if (prt()->keyx[a][x] < RBX_KEY_COUNT && (a == RBX_ACT_COIN || a == RBX_ACT_START || act_is_button(a)))
+			if (prt()->keyx[a][x] < RBX_KEY_COUNT && act_used(a))
 				u[n++] = (KeyUse){ prt()->keyx[a][x], a, act_name(a) };
 	if (prt()->turbo_key < RBX_KEY_COUNT)
 		u[n++] = (KeyUse){ prt()->turbo_key, KF_TURBO, "Turbo key" };
@@ -3140,6 +3152,13 @@ static void content_get(int row)
 		snprintf(s_ct_msg, sizeof(s_ct_msg), T("Download failed: %s"), T(err));
 	else
 		snprintf(s_ct_msg, sizeof(s_ct_msg), T("%s downloaded: %s"), T(k_ct[row].name), k_ct[row].dest);
+	// cheats are read when a game starts: downloaded from a game's menu, the running game's are read now (only when it
+	// had none, so cheats already switched on stay on)
+	if (!err && !strcmp(k_ct[row].dest, CHEAT_ZIP) && rbx_core_cheat_count() == 0) {
+		const int n = rbx_core_cheats_load(RBX_DATA_DIR "cheats/");   // (not inside RBX_LOG: release drops it)
+		RBX_LOG("core: cheats %d after download", n);
+		(void)n;
+	}
 	s_drawn_h = 0;
 	s_dirty = 1;
 }
@@ -3521,7 +3540,7 @@ static void menu_paint(UiCanvas *c, int overlay)
 				const int st = act / STICK_ROWS, d = act % STICK_ROWS - 1;
 				const char *v = stick_tgt[prt()->smap[st][d]];
 				for (int a = 0; a < RBX_ACT_COUNT; a++) // (set as a key on the player's page: that wins)
-					if (rbx_act_bits(prt(), a) & rbx_key_mask(RBX_KEY_LUP + st * RBX_SDIR_COUNT + d))
+					if (act_used(a) && rbx_act_bits(prt(), a) & rbx_key_mask(RBX_KEY_LUP + st * RBX_SDIR_COUNT + d))
 						v = act_name(a);
 				snprintf(sb, sizeof(sb), "    %s", stick_dir[d]);
 				item(c, px, ty, i, s_sel, sb, v);

@@ -637,7 +637,7 @@ static const rbx_ipt_field segas24_ipf_dcclub[] = {
 	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Initial Balls", 40, 2, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Balls Limit", 42, 2, 255, 0, 0x0, 0x0 },
 	{ 0xc0, 0xc0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 44, 4, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas24_ipp_dcclub[] = {
 	{ "P1", 0, 5 },
@@ -725,8 +725,8 @@ static const rbx_ipt_field segas24_ipf_dcclubj[] = {
 	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Initial Balls", 40, 2, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Balls Limit", 42, 2, 255, 0, 0x0, 0x0 },
 	{ 0xc0, 0xc0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 44, 4, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 	{ 0xfff, 0xfff, RBX_IPT_UNUSED, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas24_ipp_dcclubj[] = {
@@ -931,14 +931,14 @@ static const rbx_ipt_field segas24_ipf_hotrod[] = {
 	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Start Credit", 42, 2, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin Chute", 44, 2, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Flip Screen", 46, 2, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 4, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0x0, RBX_IPT_PEDAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0x0, RBX_IPT_PEDAL, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0x0, RBX_IPT_PEDAL, 4, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 4, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x1, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x1, RBX_IPT_PEDAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x1, RBX_IPT_PEDAL, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x1, RBX_IPT_PEDAL, 4, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas24_ipp_hotrod[] = {
 	{ "P1", 0, 8 },
@@ -1044,14 +1044,14 @@ static const rbx_ipt_field segas24_ipf_hotrodj[] = {
 	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Play Mode", 42, 2, 255, 0, 0x0, 0x0 },
 	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Game Style", 44, 2, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Language", 46, 2, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 4, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0x0, RBX_IPT_PEDAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0x0, RBX_IPT_PEDAL, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0x0, RBX_IPT_PEDAL, 4, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 4, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x1, RBX_IPT_PEDAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x1, RBX_IPT_PEDAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x1, RBX_IPT_PEDAL, 3, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x1, RBX_IPT_PEDAL, 4, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas24_ipp_hotrodj[] = {
 	{ "P1", 0, 8 },
@@ -1667,8 +1667,8 @@ static const rbx_ipt_field segas24_ipf_roughrac[] = {
 	{ 0x30, 0x30, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 40, 4, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Start Money", 44, 2, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Start Intro", 46, 2, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas24_ipp_roughrac[] = {
 	{ "P1", 0, 8 },
@@ -1758,7 +1758,7 @@ static const rbx_ipt_field segas24_ipf_sgmast[] = {
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Flip Screen", 38, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Gameplay", 40, 2, 255, 0, 0x0, 0x0 },
 	{ 0xe0, 0xe0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 42, 8, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas24_ipp_sgmast[] = {
 	{ "P1", 0, 5 },
@@ -1847,8 +1847,8 @@ static const rbx_ipt_field segas24_ipf_sgmastj[] = {
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Flip Screen", 38, 2, 255, 0, 0x0, 0x0 },
 	{ 0xe0, 0xe0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 40, 8, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 48, 2, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
 	{ 0xfff, 0xfff, RBX_IPT_UNUSED, 1, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port segas24_ipp_sgmastj[] = {

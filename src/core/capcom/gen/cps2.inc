@@ -12340,8 +12340,8 @@ static const rbx_ipt_field cps2_ipf_ecofghtr[] = {
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "3-7", 48, 2, 5, 1, 0x1, 0x1 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "3-8", 50, 2, 5, 1, 0x1, 0x1 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 52, 0, 5, 1, 0x1, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port cps2_ipp_ecofghtr[] = {
 	{ "IN0", 0, 16 },
@@ -12474,8 +12474,8 @@ static const rbx_ipt_field cps2_ipf_pzloop2[] = {
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "3-7", 46, 2, 5, 1, 0x1, 0x1 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "3-8", 48, 2, 5, 1, 0x1, 0x1 },
 	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 50, 0, 5, 1, 0x1, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 50, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port cps2_ipp_pzloop2[] = {
 	{ "IN0", 0, 16 },

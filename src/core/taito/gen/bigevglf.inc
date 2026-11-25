@@ -115,10 +115,10 @@ static const rbx_ipt_field bigevglf_ipf_bigevglf[] = {
 	{ 0xc, 0xc, RBX_IPT_DIPSWITCH, 1, 0, 0, "Holes", 16, 4, 255, 0, 0x0, 0x0 },
 	{ 0x10, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Language", 20, 2, 255, 0, 0x0, 0x0 },
 	{ 0xe0, 0xa0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Full game price (credits)", 22, 8, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port bigevglf_ipp_bigevglf[] = {
 	{ "PORT00", 0, 8 },
@@ -184,10 +184,10 @@ static const rbx_ipt_field bigevglf_ipf_bigevglfj[] = {
 	{ 0xc, 0xc, RBX_IPT_DIPSWITCH, 1, 0, 0, "Holes", 16, 4, 255, 0, 0x0, 0x0 },
 	{ 0xe0, 0xa0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Full game price (credits)", 20, 8, 255, 0, 0x0, 0x0 },
 	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Language", 28, 2, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 30, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port bigevglf_ipp_bigevglfj[] = {
 	{ "PORT00", 0, 8 },

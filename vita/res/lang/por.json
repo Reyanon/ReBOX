@@ -342,6 +342,13 @@
   "CONTROLS": "CONTROLOS",
   "DISPLAY": "ECRÃ",
   "OPTIONS": "OPÇÕES",
-  "SETTINGS": "DEFINIÇÕES"
+  "SETTINGS": "DEFINIÇÕES",
+  "2nd stick Up": "2.º analógico cima",
+  "2nd stick Down": "2.º analógico baixo",
+  "2nd stick Left": "2.º analógico esquerda",
+  "2nd stick Right": "2.º analógico direita",
+  "Pedal": "Pedal",
+  "Pedal 2": "Pedal 2",
+  "Pedal 3": "Pedal 3"
  }
 }

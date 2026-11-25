@@ -150,7 +150,7 @@ shows the other working MAME boards that are not ported yet, greyed out.
 |  | M92 | 40 | 95% |
 |  | Classic boards (7 drivers: m10, m14, olibochu, redalert, ...) | 38 | 97% |
 | **IGS** | PGM | 150 | 100% |
-|  | PGM2 | 22 | 77% |
+|  | PGM2 | 22 | 95% |
 | **Midway** | T-Unit | 29 | 100% |
 |  | Wolf Unit | 25 | 100% |
 |  | Y-Unit | 43 | 73% |

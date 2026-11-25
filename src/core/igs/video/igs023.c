@@ -3,6 +3,7 @@
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "igs023.h"
+#include "../../rbx.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -211,7 +212,7 @@ static void sprite_line(spr_ctx *c, int wide, uint16_t *dest, uint8_t *destpri, 
 	if (!draw) {   // (only the colour data's position moves: 5 bits a pixel the mask lets through)
 		int n = 0;
 		for (int xcnt = 0; xcnt < wide; xcnt++)
-			n += 16 - __builtin_popcount(B[boff++ & bmask]);
+			n += 16 - (int)rbx_popcount(B[boff++ & bmask]);
 		ab += 5 * n;
 		c->aoffset = ao + (uint32_t)(ab / 15);
 		c->abit = ab % 15;
@@ -258,7 +259,7 @@ static void sprite_line(spr_ctx *c, int wide, uint16_t *dest, uint8_t *destpri, 
 	c->abit = ab;
 }
 
-static inline int popcount16(uint32_t m) { return __builtin_popcount(m); }
+static inline int popcount16(uint32_t m) { return (int)rbx_popcount(m); }
 
 static void sprite_line_basic(spr_ctx *c, int wide, uint16_t *dest, uint8_t *destpri, int flip, int xpos, int pri,
                               int realxsize, int palt, int draw)
@@ -457,7 +458,7 @@ void igs023_prepass(const igs023_t *v, igs023_snap *s)
 				break;
 			uint32_t n = 0;
 			for (int k = 0; k < wide; k++)
-				n += 16 - (uint32_t)__builtin_popcount(B[boff++ & v->bmask]);
+				n += 16 - rbx_popcount(B[boff++ & v->bmask]);
 			ab += 5 * n;
 			ao += ab / 15;
 			ab %= 15;

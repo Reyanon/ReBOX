@@ -333,8 +333,8 @@ static const rbx_ipt_field jackal_ipf_jackalr[] = {
 	{ 0x20, 0x20, RBX_IPT_BUTTON2, 2, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 2, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_POSITIONAL, 1, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_POSITIONAL, 2, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_POSITIONAL, 2, 0, 0, "", 52, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port jackal_ipp_jackalr[] = {
 	{ "DSW1", 0, 2 },

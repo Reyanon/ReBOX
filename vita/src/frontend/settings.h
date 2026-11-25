@@ -62,6 +62,8 @@ enum {
 	RBX_ACT_COIN,
 	RBX_ACT_START,
 	RBX_ACT_B3, RBX_ACT_B4, RBX_ACT_B5, RBX_ACT_B6, // game buttons 3-6 (shown in the menu only if the game uses them, RBX_KEY_NONE allowed)
+	// a twin-stick game's second joystick (Smash TV's fire; shown in the menu only for such games, the right stick at first)
+	RBX_ACT_R_UP, RBX_ACT_R_DOWN, RBX_ACT_R_LEFT, RBX_ACT_R_RIGHT,
 	RBX_ACT_COUNT
 };
 

@@ -9056,8 +9056,8 @@ static const rbx_ipt_field cps1_ipf_forgottn[] = {
 	{ 0x38, 0x38, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 42, 8, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 50, 2, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Flip Screen", 52, 2, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 54, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 54, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 54, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 54, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port cps1_ipp_forgottn[] = {
 	{ "IN0", 0, 8 },
@@ -9168,8 +9168,8 @@ static const rbx_ipt_field cps1_ipf_forgottnj[] = {
 	{ 0x38, 0x38, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 42, 8, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Speed up", 50, 2, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Flip Screen", 52, 2, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 1, 0, 0, "", 54, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_DIAL, 2, 0, 0, "", 54, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 54, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 54, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port cps1_ipp_forgottnj[] = {
 	{ "IN0", 0, 8 },
@@ -10285,7 +10285,7 @@ static const rbx_ipt_field cps1_ipf_mpumpkin[] = {
 	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
 	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
-	{ 0x3, 0x3, RBX_IPT_POSITIONAL, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_POSITIONAL, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
 	{ 0x10, 0x10, RBX_IPT_BUTTON2, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },

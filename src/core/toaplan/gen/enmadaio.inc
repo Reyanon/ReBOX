@@ -217,7 +217,7 @@ static const rbx_ipt_field enmadaio_ipf_enmadaio[] = {
 	{ 0x2000, 0x2000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 102, 2, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x4000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 104, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 106, 2, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 108, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 108, 0, 255, 0, 0x0, 0x0 },
 	{ 0x100, 0x100, RBX_IPT_DIPSWITCH, 1, 0, 0, "Freeze", 108, 2, 255, 0, 0x0, 0x0 },
 	{ 0x200, 0x200, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 110, 2, 255, 0, 0x0, 0x0 },
 	{ 0x400, 0x400, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 112, 2, 255, 0, 0x0, 0x0 },

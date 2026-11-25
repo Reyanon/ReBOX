@@ -538,10 +538,10 @@ static const rbx_ipt_field cabal_ipf_cabalt[] = {
 	{ 0x2000, 0x2000, RBX_IPT_UNKNOWN, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x4000, RBX_IPT_START2, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_START1, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 48, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port cabal_ipp_cabalt[] = {
 	{ "DSW", 0, 12 },

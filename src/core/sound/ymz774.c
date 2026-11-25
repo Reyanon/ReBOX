@@ -13,27 +13,78 @@
 #include <string.h>
 
 #define YMZ_PAGE 4096u
-#define YMZ_PAGES 64u
+#define YMZ_PAGES 1024u   // (4 MB: 16 channels of compressed sound each reading its own stream; 64 pages thrashed)
+#define YMZ_AHEAD 4u      // (a missing page read with the pages after it, one read: the streams go forward)
 #define YMZ_WINDOW 4096u
+
+// ReBOX: the reads ahead (ymz77x_prefetch)
+#define YMZ_REQ 16          // reads in flight
+#define YMZ_REQ_PAGES 4u    // pages a read
+#define YMZ_LOOK 4u         // pages after a channel's position wanted there
+#define YMZ_HEAD_FLIGHT 4   // phrase-head reads in flight at once (the channels' first)
+struct ymz_pf {
+	const char *region;
+	uint32_t npages;
+	uint32_t *head;         // the phrases' first pages and the ones after, sorted, distinct [nhead]
+	uint8_t *head_data;     // [nhead][YMZ_PAGE] (rbx_big_alloc)
+	uint8_t *head_ok;       // [nhead]
+	int head_big;
+	uint32_t nhead, head_next, head_loaded;
+	int mode;               // (RBX_YMZ_PF: 0 off, 1 both, 2 no heads, 3 heads only; testing)
+	struct { int id; uint32_t page, n, hidx; int head; } req[YMZ_REQ];
+	uint8_t *bufs;          // [YMZ_REQ][YMZ_REQ_PAGES][YMZ_PAGE]
+};
+
+// the index of page in the heads, or -1
+static int head_find(const struct ymz_pf *f, uint32_t page)
+{
+	uint32_t lo = 0, hi = f->nhead;
+	while (lo < hi) {
+		const uint32_t m = (lo + hi) / 2;
+		if (f->head[m] < page)
+			lo = m + 1;
+		else
+			hi = m;
+	}
+	return lo < f->nhead && f->head[lo] == page ? (int)lo : -1;
+}
 
 // ReBOX: a page of the ROM read through fetch (rom NULL)
 static const uint8_t *rom_page(ymz77x_t *c, uint32_t page)
 {
-	uint8_t *p = c->pages + (page % YMZ_PAGES) * YMZ_PAGE;
-	if (c->page_tag[page % YMZ_PAGES] != page + 1) {
+	uint32_t *const tag = (uint32_t *)(c->pages + YMZ_PAGES * YMZ_PAGE);
+	const uint32_t slot = page % YMZ_PAGES;
+	uint8_t *p = c->pages + slot * YMZ_PAGE;
+	if (tag[slot] != page + 1 && c->pf && c->pf->head_loaded) {   // (a phrase head read ahead)
+		const int h = head_find(c->pf, page);
+		if (h >= 0 && c->pf->head_ok[h])
+			return c->pf->head_data + (size_t)h * YMZ_PAGE;
+	}
+	if (tag[slot] != page + 1) {
+		// (with the pages after it that are not there, up to YMZ_AHEAD, in the slots after it)
+		const uint32_t npages = (c->rom_size + YMZ_PAGE - 1) / YMZ_PAGE;
+		uint32_t n = 1;
+		while (n < YMZ_AHEAD && slot + n < YMZ_PAGES && page + n < npages && tag[slot + n] != page + n + 1)
+			n++;
 		const uint32_t off = page * YMZ_PAGE;
-		const uint32_t len = c->rom_size - off < YMZ_PAGE ? c->rom_size - off : YMZ_PAGE;
+		const uint32_t len = c->rom_size - off < n * YMZ_PAGE ? c->rom_size - off : n * YMZ_PAGE;
+		const uint64_t t0 = rbx_clock_us();
 		if (c->fetch(c->fetch_user, off, p, len))
 			memset(p, 0xff, len);
-		if (len < YMZ_PAGE)
-			memset(p + len, 0xff, YMZ_PAGE - len);
+		const uint32_t us = (uint32_t)(rbx_clock_us() - t0);
+		c->fetch_us += us;
+		if (us > c->fetch_max_us)
+			c->fetch_max_us = us;
+		if (len < n * YMZ_PAGE)
+			memset(p + len, 0xff, n * YMZ_PAGE - len);
 		if (c->fetch_swap16)
-			for (uint32_t i = 0; i < YMZ_PAGE; i += 2) {
+			for (uint32_t i = 0; i < n * YMZ_PAGE; i += 2) {
 				const uint8_t t = p[i];
 				p[i] = p[i + 1];
 				p[i + 1] = t;
 			}
-		c->page_tag[page % YMZ_PAGES] = page + 1;
+		for (uint32_t k = 0; k < n; k++)
+			tag[slot + k] = page + k + 1;
 		c->page_misses++;
 	}
 	return p;
@@ -82,7 +133,9 @@ int ymz77x_init_fetch(ymz77x_t *c, int type, uint32_t clock, uint32_t rom_size,
 	c->fetch = fetch;
 	c->fetch_user = user;
 	c->fetch_swap16 = swap16;
-	c->pages = (uint8_t *)malloc(YMZ_PAGES * YMZ_PAGE);
+	c->pages = (uint8_t *)malloc(YMZ_PAGES * YMZ_PAGE + YMZ_PAGES * sizeof(uint32_t));
+	if (c->pages)
+		memset(c->pages + YMZ_PAGES * YMZ_PAGE, 0, YMZ_PAGES * sizeof(uint32_t));
 	c->window = (uint8_t *)malloc(YMZ_WINDOW);
 	if (!c->pages || !c->window) {
 		free(c->pages);
@@ -142,8 +195,225 @@ int ymz77x_init(ymz77x_t *c, int type, uint32_t clock, const uint8_t *rom, uint3
 	return 0;
 }
 
+static void swap16(uint8_t *p, uint32_t len)
+{
+	for (uint32_t i = 0; i < len; i += 2) {
+		const uint8_t t = p[i];
+		p[i] = p[i + 1];
+		p[i + 1] = t;
+	}
+}
+
+static int cmp_u32(const void *a, const void *b)
+{
+	const uint32_t x = *(const uint32_t *)a, y = *(const uint32_t *)b;
+	return x < y ? -1 : x > y;
+}
+
+void ymz77x_prefetch_init(ymz77x_t *c, const char *region) { c->pf_region = region; }
+
+static void pf_setup(ymz77x_t *c)
+{
+	const char *region = c->pf_region;
+	c->pf_tried = 1;
+	const char *e = getenv("RBX_YMZ_PF");
+	const int mode = e ? atoi(e) : 1;
+	if (!mode)
+		return;
+	struct ymz_pf *f = (struct ymz_pf *)calloc(1, sizeof(*f));
+	if (!f)
+		return;
+	f->mode = mode;
+	f->bufs = (uint8_t *)malloc((size_t)YMZ_REQ * YMZ_REQ_PAGES * YMZ_PAGE);
+	if (!f->bufs) {
+		free(f);
+		return;
+	}
+	f->region = region;
+	f->npages = (c->rom_size + YMZ_PAGE - 1) / YMZ_PAGE;
+	for (int k = 0; k < YMZ_REQ; k++)
+		f->req[k].id = -1;
+	// (YMZ774) the phrase table's 2048 starts: their page and the next (a block's window from there spans both)
+	uint8_t *t = c->type == YMZ_TYPE_774 && c->rom_size >= 0x2000 ? (uint8_t *)malloc(0x2000) : NULL;
+	uint32_t *pg = t ? (uint32_t *)malloc(2 * 0x800 * sizeof(uint32_t)) : NULL;
+	if (t && pg && !c->fetch(c->fetch_user, 0, t, 0x2000)) {
+		if (c->fetch_swap16)
+			swap16(t, 0x2000);
+		uint32_t n = 0;
+		for (int ph = 0; ph < 0x800; ph++) {
+			const uint32_t o = ((uint32_t)(t[4 * ph] & 0x0f) << 24 | (uint32_t)t[4 * ph + 1] << 16 |
+			                    (uint32_t)t[4 * ph + 2] << 8 | t[4 * ph + 3]) * 2;
+			if (o >= c->rom_size)
+				continue;
+			pg[n++] = o / YMZ_PAGE;
+			if (o / YMZ_PAGE + 1 < f->npages)
+				pg[n++] = o / YMZ_PAGE + 1;
+		}
+		qsort(pg, n, sizeof(*pg), cmp_u32);
+		uint32_t m = 0;
+		for (uint32_t i = 0; i < n; i++)
+			if (!m || pg[m - 1] != pg[i])
+				pg[m++] = pg[i];
+		f->head_data = m ? (uint8_t *)rbx_big_alloc((size_t)m * YMZ_PAGE, &f->head_big) : NULL;
+		f->head_ok = f->head_data ? (uint8_t *)calloc(m, 1) : NULL;
+		if (f->head_ok) {
+			f->head = pg;
+			pg = NULL;
+			f->nhead = m;
+		} else {
+			rbx_big_free(f->head_data, f->head_big);
+			f->head_data = NULL;
+		}
+	}
+	free(t);
+	free(pg);
+	c->pf = f;
+	rbx_log("ymz774: reads ahead on, %u phrase head pages (%u KB)", (unsigned)f->nhead, (unsigned)(f->nhead * (YMZ_PAGE / 1024)));
+}
+
+static int pf_inflight(const struct ymz_pf *f, uint32_t page)
+{
+	for (int k = 0; k < YMZ_REQ; k++)
+		if (f->req[k].id >= 0 && !f->req[k].head && page >= f->req[k].page && page < f->req[k].page + f->req[k].n)
+			return 1;
+	return 0;
+}
+
+static int pf_free_req(const struct ymz_pf *f)
+{
+	for (int k = 0; k < YMZ_REQ; k++)
+		if (f->req[k].id < 0)
+			return k;
+	return -1;
+}
+
+void ymz77x_prefetch(ymz77x_t *c)
+{
+	if (!c->pf) {
+		if (c->rom || !c->pf_region || c->pf_tried || !rbx_io_on())
+			return;
+		pf_setup(c);
+	}
+	struct ymz_pf *f = c->pf;
+	if (!f)
+		return;
+	uint32_t *const tag = (uint32_t *)(c->pages + YMZ_PAGES * YMZ_PAGE);
+	// the reads done: into place
+	int heads_flying = 0;
+	for (int k = 0; k < YMZ_REQ; k++) {
+		if (f->req[k].id < 0)
+			continue;
+		if (!rbx_io_ready(f->req[k].id)) {
+			heads_flying += f->req[k].head;
+			continue;
+		}
+		const int ok = rbx_io_finish(f->req[k].id) == 0;
+		f->req[k].id = -1;
+		if (!ok)
+			continue;
+		const uint32_t n = f->req[k].n;
+		if (f->req[k].head) {
+			uint8_t *d = f->head_data + (size_t)f->req[k].hidx * YMZ_PAGE;
+			if (c->fetch_swap16)
+				swap16(d, n * YMZ_PAGE);
+			for (uint32_t j = 0; j < n; j++)
+				f->head_ok[f->req[k].hidx + j] = 1;
+			f->head_loaded += n;
+		} else {
+			uint8_t *b = f->bufs + (size_t)k * YMZ_REQ_PAGES * YMZ_PAGE;
+			if (c->fetch_swap16)
+				swap16(b, n * YMZ_PAGE);
+			for (uint32_t j = 0; j < n; j++) {
+				const uint32_t q = f->req[k].page + j, slot = q % YMZ_PAGES;
+				memcpy(c->pages + (size_t)slot * YMZ_PAGE, b + (size_t)j * YMZ_PAGE, YMZ_PAGE);
+				tag[slot] = q + 1;
+			}
+		}
+	}
+	const int pfm = f->mode;
+	// the playing channels' next pages
+	for (int i = 0; i < 16 && pfm != 3; i++) {
+		const ymz_channel_t *ch = &c->ch[i];
+		if (!ch->is_playing)
+			continue;
+		const uint32_t page = ((uint32_t)ch->pptr >> 3) / YMZ_PAGE;
+		for (uint32_t k = 1; k <= YMZ_LOOK; k++) {
+			const uint32_t q = page + k;
+			if (q >= f->npages)
+				break;
+			if (tag[q % YMZ_PAGES] == q + 1 || pf_inflight(f, q))
+				continue;
+			const int h = f->nhead ? head_find(f, q) : -1;
+			if (h >= 0 && f->head_ok[h])
+				continue;
+			const int r = pf_free_req(f);
+			if (r < 0)
+				return;
+			uint32_t n = 1;   // (the run of wanted pages from q)
+			while (n < YMZ_REQ_PAGES && q + n < f->npages && tag[(q + n) % YMZ_PAGES] != q + n + 1 &&
+			       (q + n) % YMZ_PAGES != 0)
+				n++;
+			const uint32_t off = q * YMZ_PAGE;
+			uint8_t *b = f->bufs + (size_t)r * YMZ_REQ_PAGES * YMZ_PAGE;
+			const uint32_t len = c->rom_size - off < n * YMZ_PAGE ? c->rom_size - off : n * YMZ_PAGE;
+			if (len < n * YMZ_PAGE)
+				memset(b + len, 0xff, n * YMZ_PAGE - len);
+			const int id = rbx_io_submit(f->region, off, b, len);
+			if (id < 0)
+				return;
+			f->req[r].id = id;
+			f->req[r].page = q;
+			f->req[r].n = n;
+			f->req[r].head = 0;
+			break;
+		}
+	}
+	// the phrase heads, a few at a time (runs of following pages in one read)
+	while (pfm != 2 && f->head_next < f->nhead && heads_flying < YMZ_HEAD_FLIGHT) {
+		const int r = pf_free_req(f);
+		if (r < 0)
+			return;
+		const uint32_t i0 = f->head_next, q = f->head[i0];
+		uint32_t n = 1;
+		while (n < YMZ_REQ_PAGES && i0 + n < f->nhead && f->head[i0 + n] == q + n)
+			n++;
+		const uint32_t off = q * YMZ_PAGE;
+		uint8_t *d = f->head_data + (size_t)i0 * YMZ_PAGE;
+		const uint32_t len = c->rom_size - off < n * YMZ_PAGE ? c->rom_size - off : n * YMZ_PAGE;
+		if (len < n * YMZ_PAGE)
+			memset(d + len, 0xff, n * YMZ_PAGE - len);
+		const int id = rbx_io_submit(f->region, off, d, len);
+		if (id < 0)
+			return;
+		f->req[r].id = id;
+		f->req[r].page = q;
+		f->req[r].n = n;
+		f->req[r].hidx = i0;
+		f->req[r].head = 1;
+		f->head_next += n;
+		heads_flying++;
+	}
+}
+
+static void prefetch_exit(ymz77x_t *c)
+{
+	struct ymz_pf *f = c->pf;
+	if (!f)
+		return;
+	for (int k = 0; k < YMZ_REQ; k++)   // (every id finished: the worker may be reading into the buffers)
+		if (f->req[k].id >= 0)
+			rbx_io_finish(f->req[k].id);
+	rbx_big_free(f->head_data, f->head_big);
+	free(f->head);
+	free(f->head_ok);
+	free(f->bufs);
+	free(f);
+	c->pf = NULL;
+}
+
 void ymz77x_exit(ymz77x_t *c)
 {
+	prefetch_exit(c);
 	free(c->output_data);
 	free(c->dec);
 	free(c->pages);

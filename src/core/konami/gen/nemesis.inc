@@ -806,7 +806,7 @@ static const rbx_ipt_field nemesis_ipf_citybomb[] = {
 	{ 0x18, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Qualify", 46, 4, 255, 0, 0x0, 0x0 },
 	{ 0x60, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 50, 4, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 54, 2, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 56, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 56, 0, 255, 0, 0x0, 0x0 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 56, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port nemesis_ipp_citybomb[] = {
@@ -1110,9 +1110,9 @@ static const rbx_ipt_field nemesis_ipf_hcrash[] = {
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 1, "Service Mode", 45, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Speed Unit", 47, 2, 255, 0, 0x0, 0x0 },
 	{ 0xf0, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 49, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_PEDAL, 1, 0, 0, "", 49, 0, 5, 1, 0x3, 0x2 },
+	{ 0xff, 0x0, RBX_IPT_PEDAL, 1, 0, 0, "", 49, 0, 5, 1, 0x3, 0x2 },
 	{ 0xff, 0x80, RBX_IPT_PADDLE, 1, 0, 0, "", 49, 0, 5, 1, 0x3, 0x2 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 49, 0, 5, 2, 0x3, 0x2 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 49, 0, 5, 2, 0x3, 0x2 },
 };
 static const rbx_ipt_port nemesis_ipp_hcrash[] = {
 	{ "IN0", 0, 8 },
@@ -1193,7 +1193,7 @@ static const rbx_ipt_field nemesis_ipf_konamigt[] = {
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Flip Screen", 38, 2, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 1, "Service Mode", 40, 2, 255, 0, 0x0, 0x0 },
 	{ 0xfa, 0xfa, RBX_IPT_UNUSED, 1, 0, 0, "", 42, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 42, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 42, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port nemesis_ipp_konamigt[] = {
 	{ "IN0", 0, 8 },
@@ -1669,7 +1669,7 @@ static const rbx_ipt_field nemesis_ipf_rf2[] = {
 	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Flip Screen", 38, 2, 255, 0, 0x0, 0x0 },
 	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 1, "Service Mode", 40, 2, 255, 0, 0x0, 0x0 },
 	{ 0xfa, 0xfa, RBX_IPT_UNUSED, 1, 0, 0, "", 42, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 42, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 42, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port nemesis_ipp_rf2[] = {
 	{ "IN0", 0, 8 },

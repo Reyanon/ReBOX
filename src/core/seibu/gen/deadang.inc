@@ -362,8 +362,8 @@ static const rbx_ipt_field deadang_ipf_ghunter[] = {
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "User Mode", 28, 2, 255, 0, 0x0, 0x0 },
 	{ 0x400, 0x400, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 30, 2, 255, 0, 0x0, 0x0 },
 	{ 0x800, 0x800, RBX_IPT_DIPSWITCH, 1, 0, 0, "Controller", 32, 2, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 34, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 34, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 34, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 34, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port deadang_ipp_ghunter[] = {
 	{ "COIN", 0, 8 },

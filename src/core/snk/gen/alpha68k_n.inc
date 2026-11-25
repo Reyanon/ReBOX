@@ -204,8 +204,8 @@ static const rbx_ipt_field alpha68k_n_ipf_jongbou[] = {
 	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Show Girls", 14, 2, 255, 0, 0x0, 0x0 },
 	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 	{ 0x2, 0x2, RBX_IPT_COIN2, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
-	{ 0xf, 0xf, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port alpha68k_n_ipp_jongbou[] = {
 	{ "IN0", 0, 5 },

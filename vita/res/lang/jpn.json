@@ -342,6 +342,13 @@
   "CONTROLS": "操作",
   "DISPLAY": "画面",
   "OPTIONS": "オプション",
-  "SETTINGS": "設定"
+  "SETTINGS": "設定",
+  "2nd stick Up": "第2スティック 上",
+  "2nd stick Down": "第2スティック 下",
+  "2nd stick Left": "第2スティック 左",
+  "2nd stick Right": "第2スティック 右",
+  "Pedal": "ペダル",
+  "Pedal 2": "ペダル 2",
+  "Pedal 3": "ペダル 3"
  }
 }

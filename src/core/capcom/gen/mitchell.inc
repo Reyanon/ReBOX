@@ -1019,8 +1019,8 @@ static const rbx_ipt_field mitchell_ipf_block[] = {
 	{ 0x8, 0x8, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 	{ 0x80, 0x80, RBX_IPT_BUTTON1, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
-	{ 0xff, 0xff, RBX_IPT_DIAL, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_DIAL, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port mitchell_ipp_block[] = {
 	{ "SYS0", 0, 6 },

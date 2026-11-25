@@ -3400,10 +3400,10 @@ static const rbx_ipt_field seta_ipf_krzybowl[] = {
 	{ 0x3800, 0x3800, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin B", 24, 8, 255, 0, 0x0, 0x0 },
 	{ 0x4000, 0x4000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Force Coinage", 32, 2, 255, 0, 0x0, 0x0 },
 	{ 0x8000, 0x8000, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown 2-8", 34, 2, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
-	{ 0xfff, 0xfff, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 1, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 1, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_X, 2, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfff, 0x0, RBX_IPT_TRACKBALL_Y, 2, 0, 0, "", 36, 0, 255, 0, 0x0, 0x0 },
 };
 static const rbx_ipt_port seta_ipp_krzybowl[] = {
 	{ "P1", 0, 8 },
