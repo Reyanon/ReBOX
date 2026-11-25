@@ -8,7 +8,7 @@ body:
       label: ROM set name
       description: The zip name without .zip (for example sailormn, 1942)
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: romset
     attributes:
@@ -18,7 +18,7 @@ body:
         - MAME 0.289 non-merged
         - Other / not sure
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: kind
     attributes:
@@ -31,7 +31,7 @@ body:
         - Controls
         - Other
     validations:
-      required: true
+      required: false
   - type: textarea
     id: what
     attributes:
@@ -45,7 +45,7 @@ body:
       label: ReBOX version
       description: Shown in Options > About (for example v0.15.38)
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: device
     attributes:
@@ -55,7 +55,7 @@ body:
         - PS Vita 2000 (Slim)
         - PS TV
     validations:
-      required: true
+      required: false
   - type: textarea
     id: shots
     attributes:
