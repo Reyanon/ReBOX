@@ -45,7 +45,7 @@ body:
       label: ReBOX version
       description: Shown in Options > About (for example v0.15.38)
     validations:
-      required: false
+      required: true
   - type: dropdown
     id: device
     attributes:
