@@ -21,7 +21,7 @@ body:
       label: ReBOX version
       description: Shown in Options > About (for example v0.15.38)
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: device
     attributes:
@@ -31,7 +31,7 @@ body:
         - PS Vita 2000 (Slim)
         - PS TV
     validations:
-      required: true
+      required: false
   - type: textarea
     id: shots
     attributes:
