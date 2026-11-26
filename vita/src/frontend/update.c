@@ -523,6 +523,12 @@ void rbx_update_check_start(void)
 	const int test = sceIoGetstat(DATA_DIR "/updtest", &st) >= 0;
 	if ((!test && sceIoGetstat(DATA_DIR "/rbx_game", &st) >= 0) || sceIoGetstat(DATA_DIR "/noupdate", &st) >= 0)
 		return; // (the dev loop's autostart, except a test; ux0:data/rebox/noupdate turns the check off)
+	// a build without a release version ("unknown": built where git could not be read, or "-dirty") is not compared
+	// with the releases: every release would look newer and the update window would come back each start (user 11-26)
+	if (!test && (RBX_VERSION[0] != 'v' || RBX_VERSION[1] < '0' || RBX_VERSION[1] > '9' || strstr(RBX_VERSION, "dirty"))) {
+		RBX_LOG("update: build version %s, no check", RBX_VERSION);
+		return;
+	}
 	snprintf(s_cur, sizeof(s_cur), "%s", RBX_VERSION);
 	FILE *tf = fopen(DATA_DIR "/updtest", "r"); // test: pretend to be this version
 	if (tf) {

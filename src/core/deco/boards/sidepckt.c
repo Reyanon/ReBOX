@@ -184,14 +184,22 @@ static void bg_draw(uint16_t *bm, int pitch, int layer0)
 	for (int y = 0; y < VIS_H; y++) {
 		uint16_t *d = bm + y * pitch;
 		const int py = (y + VIS_Y0 + s_snap->scroll_y) & 0xff;
+		int hi = 0;
+		uint32_t cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {
-			const int idx = (py >> 3) * 32 + (31 - (x >> 3)), attr = s_snap->cram[idx];
-			const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(s_snap->vram[idx] + ((attr & 7) << 8)), s_gfx8.count) : 0;
-			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(x & 7)];
-			const int in0 = (attr & 0x80) && p != 0;
+			if (!(x & 7)) {   // (a character looked up once for its 8 pixels)
+				const int idx = (py >> 3) * 32 + (31 - (x >> 3)), attr = s_snap->cram[idx];
+				const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(s_snap->vram[idx] + ((attr & 7) << 8)), s_gfx8.count) : 0;
+				trow = s_gfx8.pix + (code * 8 + (uint32_t)(py & 7)) * 8;
+				hi = (attr & 0x80) != 0;
+				cbase = 128 + (uint32_t)(((attr & 0x10) >> 3) | ((attr & 0x20) >> 5)) * 8;
+			}
+			const uint8_t p = trow[x & 7];
+			const int in0 = hi && p != 0;
 			if (in0 != layer0)
 				continue;
-			d[x] = (uint16_t)(128 + (((attr & 0x10) >> 3) | ((attr & 0x20) >> 5)) * 8 + p);
+			d[x] = (uint16_t)(cbase + p);
 		}
 	}
 }

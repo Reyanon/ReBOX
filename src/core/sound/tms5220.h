@@ -19,7 +19,8 @@
 
     Left out: the VSM (speech ROM) interface, M0/M1/ADD/ROMCLK: nothing is attached, so VSM bit reads
     return 1s (a stray Speak ends on a stop frame) as in MAME without a VSM; the combined_rsq_wsq_w hack
-    (TI 99/8 only); the 5200 / CD2501E / CD2501ECD variants (only their coefficient tables differ).
+    (TI 99/8 only); the CD2501ECD variant. The TMS5200 (CD2501E) is the 5220 with its own pitch and LPC tables
+    (tms5110r.hxx T0285_2501E_coeff).
 */
 #ifndef RBX_TMS5220_H
 #define RBX_TMS5220_H
@@ -32,6 +33,7 @@ extern "C" {
 
 // variants (MAME's TMS5220_IS_* values)
 #define TMS5220_VARIANT_5220C 7
+#define TMS5220_VARIANT_5200  8
 #define TMS5220_VARIANT_5220  9
 
 #define TMS5220_FIFO_SIZE 16
@@ -70,6 +72,8 @@ typedef struct {
 	void (*irq_cb)(void *ctx, int state);     // MAME irq_cb: called with !irq_pin (active low); may be NULL
 	void (*ready_cb)(void *ctx, int state);   // MAME ready_cb: called with !ready_pin (active low); may be NULL
 	void *cb_ctx;
+	const uint16_t *pitch_tab;      // the variant's tables (m_coeff)
+	const int16_t (*k_tab)[32];
 } tms5220_t;
 
 void tms5220_init(tms5220_t *t, int variant, uint32_t clock);   // device_start + device_reset

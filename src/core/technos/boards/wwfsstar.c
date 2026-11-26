@@ -234,13 +234,21 @@ static void draw_fg_line(const piece *pc, int y, uint16_t *dst)
 {
 	const int flip = pc->r.flip;
 	const int ty = (flip ? 255 - y : y) & 255;
+	int last = -1;
+	uint32_t cbase = 0;
+	const uint8_t *trow = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const int tx = (flip ? VIS_W - 1 - x : x) & 255;
-		const uint16_t *t = &pc->fgram[((ty >> 3) * 32 + (tx >> 3)) * 2];
-		const uint32_t code = rbx_wrap((uint32_t)((t[1] & 0x00ff) | (t[0] & 0x000f) << 8), s_gfxfg.count);
-		const uint8_t p = s_gfxfg.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
+		if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+			last = tx >> 3;
+			const uint16_t *t = &pc->fgram[((ty >> 3) * 32 + (tx >> 3)) * 2];
+			const uint32_t code = rbx_wrap((uint32_t)((t[1] & 0x00ff) | (t[0] & 0x000f) << 8), s_gfxfg.count);
+			trow = s_gfxfg.pix + code * 64 + (ty & 7) * 8;
+			cbase = (uint32_t)((t[0] & 0x00f0) >> 4) * 16;
+		}
+		const uint8_t p = trow[tx & 7];
 		if (p)
-			dst[x] = (uint16_t)(((t[0] & 0x00f0) >> 4) * 16 + p);
+			dst[x] = (uint16_t)(cbase + p);
 	}
 }
 

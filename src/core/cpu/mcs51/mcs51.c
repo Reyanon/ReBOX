@@ -10,7 +10,10 @@
 enum { PSW_CY = 7, PSW_AC = 6, PSW_OV = 2 };
 enum { IE_A = 7 };
 enum { TCON_TF1 = 7, TCON_TR1 = 6, TCON_TF0 = 5, TCON_TR0 = 4, TCON_IE1 = 3, TCON_IT1 = 2, TCON_IE0 = 1, TCON_IT0 = 0 };
-enum { SCON_TI = 1, SCON_RI = 0 };
+enum { SCON_SM0 = 7, SCON_SM1 = 6, SCON_SM2 = 5, SCON_REN = 4, SCON_TB8 = 3, SCON_RB8 = 2, SCON_TI = 1, SCON_RI = 0 };
+enum { PCON_SMOD = 7 };
+enum { SIO_IDLE, SIO_START_LE, SIO_START, SIO_DATA0, SIO_DATA1, SIO_DATA2, SIO_DATA3, SIO_DATA4, SIO_DATA5, SIO_DATA6,
+       SIO_DATA7, SIO_DATA8, SIO_STOP };
 enum { TMOD_GATE1 = 7, TMOD_CT1 = 6, TMOD_GATE0 = 3, TMOD_CT0 = 2 };
 enum { V_IE0 = 0x03, V_TF0 = 0x0b, V_IE1 = 0x13, V_TF1 = 0x1b, V_RITI = 0x23 };
 enum { T2CON_TF2 = 7, T2CON_EXF2 = 6, T2CON_RCLK = 5, T2CON_TCLK = 4, T2CON_EXEN2 = 3, T2CON_TR2 = 2, T2CON_CT2 = 1,
@@ -63,8 +66,8 @@ static inline void idata_w(mcs51_t *c, uint8_t a, uint8_t v)
 		c->st2.iram_hi[a - 0x80] = v;
 }
 
-static inline uint8_t port_rd(mcs51_t *c, int n) { return c->port_in ? c->port_in(c->user, n) : 0xff; }
-static inline void port_wr(mcs51_t *c, int n, uint8_t v) { if (c->port_out) c->port_out(c->user, n, v); }
+static inline uint8_t port_rd(mcs51_t *c, int n) { c->orb_dirty = 1; return c->port_in ? c->port_in(c->user, n) : 0xff; }
+static inline void port_wr(mcs51_t *c, int n, uint8_t v) { c->orb_dirty = 1; if (c->port_out) c->port_out(c->user, n, v); }
 
 static void acc_w(mcs51_t *c, uint8_t v)
 {
@@ -110,7 +113,26 @@ static int sfr52_w(mcs51_t *c, uint8_t a, uint8_t v)
 	return 0;
 }
 
-static uint8_t sfr_r(mcs51_t *c, uint8_t a)
+// the lazy timers (below): the SFRs whose reads see the timers (1) and whose writes change how they run (2)
+static void timers_sync(mcs51_t *c);
+static const uint8_t s_tsfr[128] = {
+	[0x07] = 2, [0x08] = 3, [0x09] = 2, [0x0a] = 3, [0x0b] = 3, [0x0c] = 3, [0x0d] = 3,   // PCON TCON TMOD TL0 TL1 TH0 TH1
+	[0x18] = 3, [0x19] = 2,                                                              // SCON SBUF
+	[0x48] = 3, [0x4a] = 2, [0x4b] = 2, [0x4c] = 3, [0x4d] = 3                           // T2CON RCAP2L/H TL2 TH2
+};
+
+static uint8_t sfr_r_now(mcs51_t *c, uint8_t a);
+static inline uint8_t sfr_r(mcs51_t *c, uint8_t a)
+{
+	if (s_tsfr[a & 0x7f] & 1) {
+		timers_sync(c);
+		if ((a >= 0x8a && a <= 0x8d) || a == 0xcc || a == 0xcd)
+			c->orb_dirty = 1;   // (a timer count read: the program sees time go by)
+	}
+	return sfr_r_now(c, a);
+}
+
+static uint8_t sfr_r_now(mcs51_t *c, uint8_t a)
 {
 	mcs51_state *s = &c->st;
 	if (c->is_8052) {
@@ -148,7 +170,19 @@ static uint8_t sfr_r(mcs51_t *c, uint8_t a)
 	return 0;
 }
 
+static void sfr_w_now(mcs51_t *c, uint8_t a, uint8_t v);
+static int32_t timers_quiet(mcs51_t *c);
 static void sfr_w(mcs51_t *c, uint8_t a, uint8_t v)
+{
+	if (s_tsfr[a & 0x7f] & 2) {
+		timers_sync(c);
+		sfr_w_now(c, a, v);
+		c->t_quiet = timers_quiet(c);
+	} else
+		sfr_w_now(c, a, v);
+}
+
+static void sfr_w_now(mcs51_t *c, uint8_t a, uint8_t v)
 {
 	mcs51_state *s = &c->st;
 	if (c->is_8052 && sfr52_w(c, a, v))
@@ -167,7 +201,14 @@ static void sfr_w(mcs51_t *c, uint8_t a, uint8_t v)
 	case 0x8d: s->th1 = v; break;
 	case 0x90: s->p1 = v; port_wr(c, 1, v); break;
 	case 0x98: s->scon = v; break;
-	case 0x99: s->sbuf = v; break;   // (serial transmission not emulated)
+	case 0x99:
+		c->orb_dirty = 1;
+		s->sbuf = v;
+		if (c->uart_tx) {   // (i8051.cpp sbuf_w)
+			c->uart.data_out = v;
+			c->uart.txbit = SIO_START;
+		}
+		break;
 	case 0xa0: s->p2 = v; port_wr(c, 2, v); break;
 	case 0xa8: s->ie = v; break;
 	case 0xb0: s->p3 = v; port_wr(c, 3, v); break;   // (TxD stays high: no serial)
@@ -536,11 +577,13 @@ static void execute_op(mcs51_t *c, uint8_t op)
 		const int st = op >= 0xf0;
 		switch (lo) {
 		case 0x0:   // MOVX A,@DPTR / MOVX @DPTR,A
+			c->orb_dirty = 1;
 			if (st) { if (c->xdata_w) c->xdata_w(c->user, s->dptr, s->acc); }
 			else acc_w(c, c->xdata_r ? c->xdata_r(c->user, s->dptr) : 0);
 			return;
 		case 0x2:
 		case 0x3: {   // MOVX @Ri (P2 gives the high address byte, MAME external_ram_iaddr)
+			c->orb_dirty = 1;
 			uint16_t a = (uint16_t)(r_reg(c, ri) | s->p2 << 8);
 			if (st) { if (c->xdata_w) c->xdata_w(c->user, a, s->acc); }
 			else acc_w(c, c->xdata_r ? c->xdata_r(c->user, a) : 0);
@@ -567,6 +610,100 @@ static void execute_op(mcs51_t *c, uint8_t op)
 		(void)is_r;
 		return;
 	}
+	}
+}
+
+// ---- the serial port's transmitter (i8051.cpp transmit_receive / handle_8bit_uart_clock, i8052.cpp's) ----
+static void transmit_receive(mcs51_t *c, int source)
+{
+	mcs51_state *s = &c->st;
+	mcs51_uart *u = &c->uart;
+	const int mode = BIT(s->scon, SCON_SM0) << 1 | BIT(s->scon, SCON_SM1);
+	if (source == 1)   // timer1
+		u->smod_div = (uint8_t)((u->smod_div + 1) & !BIT(s->pcon, PCON_SMOD));
+	switch (mode) {
+	case 0:   // 8 bit shifter - rate set by clock freq / 12 (the byte handed over after its 8 bits)
+		if (source == 0) {
+			switch (u->txbit) {
+			case SIO_IDLE:
+				break;
+			case SIO_START:
+				u->txbit = SIO_DATA0;
+				break;
+			case SIO_STOP:
+				u->txbit = SIO_IDLE;
+				break;
+			default:
+				if (u->txbit == SIO_DATA7) {
+					s->scon |= 1 << SCON_TI;
+					u->txbit = SIO_STOP;
+					c->uart_tx(c->user, u->data_out);
+				} else {
+					u->txbit++;
+				}
+				break;
+			}
+		}
+		return;
+	case 1:
+	case 3:   // 8 bit uart (+ start, stop bit) - baud set by timer1 or timer2
+		if (c->is_8052) {
+			if (source == 1)
+				u->tx_clk = (uint8_t)(u->tx_clk + (BIT(c->st2.t2con, T2CON_TCLK) ? 0 : !u->smod_div));
+			if (source == 2)
+				u->tx_clk = (uint8_t)(u->tx_clk + (BIT(c->st2.t2con, T2CON_TCLK) ? 1 : 0));
+		} else if (source == 1) {
+			u->tx_clk = (uint8_t)(u->tx_clk + !u->smod_div);
+		}
+		break;
+	case 2:   // 9 bit uart
+		u->tx_clk = (uint8_t)(u->tx_clk + ((source == 0) ? (BIT(s->pcon, PCON_SMOD) ? 6 : 3) : 0));
+		break;
+	}
+	if (u->tx_clk >= 16) {
+		u->tx_clk &= 0x0f;
+		switch (u->txbit) {
+		case SIO_IDLE:
+			break;
+		case SIO_START:
+			u->txbit = SIO_DATA0;
+			break;
+		case SIO_DATA8:
+			u->txbit = SIO_STOP;
+			break;
+		case SIO_STOP:
+			s->scon |= 1 << SCON_TI;
+			u->txbit = SIO_IDLE;
+			c->uart_tx(c->user, u->data_out | (BIT(s->scon, SCON_TB8) << 8));
+			break;
+		default:   // data bits (mode 1 has no data8 / parity bit)
+			if (mode == 1 && u->txbit == SIO_DATA7)
+				u->txbit = SIO_STOP;
+			else
+				u->txbit++;
+			break;
+		}
+	}
+}
+
+void mcs51_uart_rx(mcs51_t *c, int data)
+{
+	c->orb_dirty = 1;
+	mcs51_state *s = &c->st;
+	const int mode = BIT(s->scon, SCON_SM0) << 1 | BIT(s->scon, SCON_SM1);
+	if (!BIT(s->scon, SCON_REN) || mode == 0 || BIT(s->scon, SCON_RI))
+		return;
+	s->sbuf = (uint8_t)data;
+	if (mode == 1) {
+		// RB8 contains the stop bit (always valid here)
+		if (!BIT(s->scon, SCON_SM2))
+			s->scon |= 1 << SCON_RB8;
+		s->scon |= 1 << SCON_RI;
+	} else {
+		s->scon = (uint8_t)((s->scon & ~(1 << SCON_RB8)) | ((data >> 8) & 1) << SCON_RB8);
+		// no RI if SM2 && !RB8
+		if (!BIT(s->scon, SCON_SM2) || BIT(s->scon, SCON_RB8))
+			s->scon |= 1 << SCON_RI;
 	}
 }
 
@@ -654,7 +791,9 @@ static void update_timer_t1(mcs51_t *c, int cycles)
 		break;
 	}
 	if (overflow && mode_0 != 3)
-		s->tcon |= 1 << TCON_TF1;   // (the serial port clock is not emulated)
+		s->tcon |= 1 << TCON_TF1;
+	if (overflow && c->uart_tx)
+		transmit_receive(c, 1);
 }
 
 // i8052_device::update_timer_t2 (no T2 / T2EX pins: their counts stay 0)
@@ -677,12 +816,250 @@ static void update_timer_t2(mcs51_t *c, int cycles)
 		if (count & 0xffff0000u)
 			s->t2con |= 1 << T2CON_TF2;
 		break;
-	default:  // baud rate (the serial port clock is not emulated)
-		if (count & 0xffff0000u)
+	default:  // baud rate
+		if (count & 0xffff0000u) {
 			count += s->rcap2;
+			if (c->uart_tx)
+				transmit_receive(c, 2);
+		}
 		break;
 	}
 	s->t2 = count & 0xffff;   // (u16 m_t2)
+}
+
+// ---- the lazy timers ----
+// MAME advances the timers one machine cycle at a time. Here the cycles are kept pending (t_pend) and applied in bulk:
+// exactly, as long as every overflow in between is "silent" (its flag already set or none, the transmitter idle: only
+// counts and the baud clock dividers move). t_quiet is how many cycles that holds from the last sync; the cycle of
+// any other event (or a state the bulk step does not cover) runs through the per-cycle functions above.
+#define T_FOREVER 0x3fffffff
+
+// one machine cycle (MAME burn_cycles' loop body)
+static void timers_tick(mcs51_t *c)
+{
+	update_timer_t0(c, 1);
+	update_timer_t1(c, 1);
+	if (c->is_8052)
+		update_timer_t2(c, 1);
+	if (c->uart_tx && !BIT(c->st.scon, SCON_SM1))   // (modes 0 and 2 count machine cycles)
+		transmit_receive(c, 0);
+}
+
+static inline int32_t min32(int32_t a, int32_t b) { return a < b ? a : b; }
+
+// the overflows of timer `source` (1 / 2) until the one whose baud clock moves the transmitter on (tx_clk reaching
+// 16: modes 1 / 3, a byte being sent); 0: none of them does (they only count the clock dividers)
+static uint32_t uart_ovf_to_step(const mcs51_t *c, int source)
+{
+	const mcs51_state *s = &c->st;
+	if (!c->uart_tx || c->uart.txbit == SIO_IDLE || !BIT(s->scon, SCON_SM1))
+		return 0;   // (idle; modes 0 / 2 clock every cycle: timers_quiet 0)
+	const uint32_t need = 16u - c->uart.tx_clk;
+	if (c->is_8052 && BIT(c->st2.t2con, T2CON_TCLK))
+		return source == 2 ? need : 0;
+	if (source != 1)
+		return 0;
+	return BIT(s->pcon, PCON_SMOD) ? need : 2 * need - c->uart.smod_div;   // (every other overflow counts)
+}
+
+static int32_t timers_quiet(mcs51_t *c)
+{
+	const mcs51_state *s = &c->st;
+	const int m0 = s->tmod & 3, m1 = (s->tmod >> 4) & 3;
+	int32_t q = T_FOREVER;
+	if (c->uart_tx && !BIT(s->scon, SCON_SM1) && (BIT(s->scon, SCON_SM0) || c->uart.txbit != SIO_IDLE))
+		return 0;   // (the serial port's modes 0 / 2 clock every cycle)
+	if (BIT(s->tcon, TCON_TR0)) {
+		if (s->t0_cnt || (m0 == 0 && (s->tl0 & 0xe0)))
+			return 0;   // (a counted input or TL0's unused bits: the next cycle normalizes them)
+		if (!BIT(s->tmod, TMOD_CT0) && !(BIT(s->tmod, TMOD_GATE0) && !BIT(s->tcon, TCON_IE0)) && !BIT(s->tcon, TCON_TF0)) {
+			const uint32_t v = m0 == 0 ? (uint32_t)s->th0 << 5 | s->tl0 : m0 == 1 ? (uint32_t)s->th0 << 8 | s->tl0 : s->tl0;
+			const uint32_t lim = m0 == 0 ? 0x2000 : m0 == 1 ? 0x10000 : 0x100;
+			q = min32(q, (int32_t)(lim - v) - 1);
+		}
+	}
+	if (BIT(s->tcon, TCON_TR1) && m0 == 3 && !BIT(s->tcon, TCON_TF1))   // (TH0 as an 8-bit timer)
+		q = min32(q, 0x100 - s->th0 - 1);
+	if (m0 == 3 || BIT(s->tcon, TCON_TR1)) {
+		if (s->t1_cnt || (m1 == 0 && (s->tl1 & 0xe0)))
+			return 0;
+		const int counting = m1 != 3 && (m0 == 3 || (!BIT(s->tmod, TMOD_CT1) && !(BIT(s->tmod, TMOD_GATE1) && !BIT(s->tcon, TCON_IE1))));
+		if (counting) {
+			const uint32_t v = m1 == 0 ? (uint32_t)s->th1 << 5 | s->tl1 : m1 == 1 ? (uint32_t)s->th1 << 8 | s->tl1 : s->tl1;
+			const uint32_t lim = m1 == 0 ? 0x2000 : m1 == 1 ? 0x10000 : 0x100;
+			if (!(m0 == 3 || BIT(s->tcon, TCON_TF1)))
+				q = min32(q, (int32_t)(lim - v) - 1);   // (the overflow sets TF1)
+			else {
+				const uint32_t j = uart_ovf_to_step(c, 1);
+				if (j)   // (the j-th overflow moves the transmitter; a period of lim - reload between them)
+					q = min32(q, (int32_t)((lim - v) + (j - 1) * (lim - (m1 == 2 ? s->th1 : 0))) - 1);
+			}
+		}
+	}
+	if (c->is_8052 && BIT(c->st2.t2con, T2CON_TR2) && !BIT(c->st2.t2con, T2CON_CT2)) {
+		const mcs51_state52 *s2 = &c->st2;
+		if (BIT(s2->t2con, T2CON_TCLK) | BIT(s2->t2con, T2CON_RCLK)) {   // baud rate: 6 counts a cycle
+			if (s2->rcap2 > 0x10000 - 6)
+				return 0;   // (a period under 6 counts: not the bulk step's arithmetic)
+			const uint32_t j = uart_ovf_to_step(c, 2);
+			if (j)
+				q = min32(q, (int32_t)(((0x10000 - s2->t2) + (j - 1) * (0x10000 - s2->rcap2) + 5) / 6) - 1);
+		} else if (!BIT(s2->t2con, T2CON_TF2))
+			q = min32(q, (int32_t)(0x10000 - s2->t2) - 1);
+	}
+	return q;
+}
+
+// a counter at *v counting d a cycle for k cycles, overflowing at lim and reloading rel (the period lim - rel at least
+// d): its value after them, and the number of overflows
+static uint32_t count_run(uint32_t *v, uint32_t k, uint32_t d, uint32_t lim, uint32_t rel)
+{
+	const uint32_t total = *v + k * d;
+	if (total < lim) {
+		*v = total;
+		return 0;
+	}
+	const uint32_t x = total - lim, p = lim - rel;   // (counts past the first overflow; the value then rel + x mod p)
+	if (x < p) {
+		*v = rel + x;
+		return 1;
+	}
+	*v = rel + x % p;
+	return 1 + x / p;
+}
+
+// transmit_receive called m times by `source` (1 / 2) with the transmitter idle: only the baud clock dividers move
+static void uart_idle_clocks(mcs51_t *c, int source, uint32_t m)
+{
+	const mcs51_state *s = &c->st;
+	mcs51_uart *u = &c->uart;
+	const int mode = BIT(s->scon, SCON_SM0) << 1 | BIT(s->scon, SCON_SM1);
+	uint32_t inc = m;
+	if (source == 1) {
+		if (BIT(s->pcon, PCON_SMOD))
+			u->smod_div = 0;
+		else {
+			inc = (m + u->smod_div) >> 1;   // (the calls that bring smod_div back to 0)
+			u->smod_div = (uint8_t)((u->smod_div + m) & 1);
+		}
+	}
+	if (mode != 1 && mode != 3)
+		return;   // (mode 0 returns early, mode 2 counts machine cycles only)
+	if (c->is_8052)
+		inc = BIT(c->st2.t2con, T2CON_TCLK) ? (source == 2 ? m : 0) : (source == 1 ? inc : 0);
+	else if (source != 1)
+		inc = 0;
+	u->tx_clk = (uint8_t)((u->tx_clk + inc) & 0x0f);
+}
+
+// k cycles at once (k <= timers_quiet: every overflow on the way silent)
+static void timers_bulk(mcs51_t *c, uint32_t k)
+{
+	mcs51_state *s = &c->st;
+	const int m0 = s->tmod & 3, m1 = (s->tmod >> 4) & 3;
+	uint32_t v, o;
+	if (BIT(s->tcon, TCON_TR0) && !BIT(s->tmod, TMOD_CT0) && !(BIT(s->tmod, TMOD_GATE0) && !BIT(s->tcon, TCON_IE0))) {
+		switch (m0) {
+		case 0:
+			v = (uint32_t)s->th0 << 5 | s->tl0;
+			o = count_run(&v, k, 1, 0x2000, 0);
+			s->th0 = (uint8_t)(v >> 5);
+			s->tl0 = v & 0x1f;
+			break;
+		case 1:
+			v = (uint32_t)s->th0 << 8 | s->tl0;
+			o = count_run(&v, k, 1, 0x10000, 0);
+			s->th0 = (uint8_t)(v >> 8);
+			s->tl0 = (uint8_t)v;
+			break;
+		case 2:
+			v = s->tl0;
+			o = count_run(&v, k, 1, 0x100, s->th0);
+			s->tl0 = (uint8_t)v;
+			break;
+		default:
+			v = s->tl0;
+			o = count_run(&v, k, 1, 0x100, 0);
+			s->tl0 = (uint8_t)v;
+			break;
+		}
+		if (o)
+			s->tcon |= 1 << TCON_TF0;
+	}
+	if (BIT(s->tcon, TCON_TR1) && m0 == 3) {
+		v = s->th0;
+		if (count_run(&v, k, 1, 0x100, 0))
+			s->tcon |= 1 << TCON_TF1;
+		s->th0 = (uint8_t)v;
+	}
+	if ((m0 == 3 || BIT(s->tcon, TCON_TR1)) && m1 != 3 &&
+	    (m0 == 3 || (!BIT(s->tmod, TMOD_CT1) && !(BIT(s->tmod, TMOD_GATE1) && !BIT(s->tcon, TCON_IE1))))) {
+		switch (m1) {
+		case 0:
+			v = (uint32_t)s->th1 << 5 | s->tl1;
+			o = count_run(&v, k, 1, 0x2000, 0);
+			s->th1 = (uint8_t)(v >> 5);
+			s->tl1 = v & 0x1f;
+			break;
+		case 1:
+			v = (uint32_t)s->th1 << 8 | s->tl1;
+			o = count_run(&v, k, 1, 0x10000, 0);
+			s->th1 = (uint8_t)(v >> 8);
+			s->tl1 = (uint8_t)v;
+			break;
+		default:
+			v = s->tl1;
+			o = count_run(&v, k, 1, 0x100, s->th1);
+			s->tl1 = (uint8_t)v;
+			break;
+		}
+		if (o) {
+			if (m0 != 3)
+				s->tcon |= 1 << TCON_TF1;
+			if (c->uart_tx)
+				uart_idle_clocks(c, 1, o);
+		}
+	}
+	if (c->is_8052 && BIT(c->st2.t2con, T2CON_TR2) && !BIT(c->st2.t2con, T2CON_CT2)) {
+		mcs51_state52 *s2 = &c->st2;
+		v = s2->t2;
+		if (BIT(s2->t2con, T2CON_TCLK) | BIT(s2->t2con, T2CON_RCLK)) {
+			o = count_run(&v, k, 6, 0x10000, s2->rcap2);
+			if (o && c->uart_tx)
+				uart_idle_clocks(c, 2, o);
+		} else if (count_run(&v, k, 1, 0x10000, BIT(s2->t2con, T2CON_CP) ? 0 : s2->rcap2))
+			s2->t2con |= 1 << T2CON_TF2;
+		s2->t2 = v;
+	}
+}
+
+static void timers_run(mcs51_t *c, int32_t n)
+{
+	while (n > 0) {
+		const int32_t q = timers_quiet(c);
+		if (q >= n) {
+			timers_bulk(c, (uint32_t)n);
+			return;
+		}
+		if (q > 0) {
+			timers_bulk(c, (uint32_t)q);
+			n -= q;
+		}
+		timers_tick(c);
+		c->orb_dirty = 1;
+		n--;
+	}
+}
+
+// the pending cycles applied (before anything sees or changes the timers), t_quiet from now
+static void timers_sync(mcs51_t *c)
+{
+	if (c->t_pend) {
+		const int32_t n = c->t_pend;
+		c->t_pend = 0;
+		timers_run(c, n);
+		c->t_quiet = timers_quiet(c);
+	}
 }
 
 static void check_irqs(mcs51_t *c)
@@ -715,12 +1092,15 @@ static void check_irqs(mcs51_t *c)
 	s->inst_cycles += 2;
 	s->cur_irq_prio = (int8_t)prio;
 	s->irq_active |= (uint8_t)(1 << prio);
+	timers_sync(c);   // (a flag or IE0 cleared: the timers' events from here on change)
+	c->orb_dirty = 1;
 	switch (vec) {
 	case V_IE0: if (BIT(s->tcon, TCON_IT0)) s->tcon &= (uint8_t)~(1 << TCON_IE0); break;
 	case V_TF0: s->tcon &= (uint8_t)~(1 << TCON_TF0); break;
 	case V_IE1: if (BIT(s->tcon, TCON_IT1)) s->tcon &= (uint8_t)~(1 << TCON_IE1); break;
 	case V_TF1: s->tcon &= (uint8_t)~(1 << TCON_TF1); break;
 	}
+	c->t_quiet = timers_quiet(c);
 }
 
 void mcs51_set_input(mcs51_t *c, int line, int state)
@@ -728,6 +1108,8 @@ void mcs51_set_input(mcs51_t *c, int line, int state)
 	mcs51_state *s = &c->st;
 	uint32_t ns = (s->last_line_state & ~(1u << line)) | ((uint32_t)(state != 0) << line);
 	uint32_t tr = ~s->last_line_state & ns;
+	timers_sync(c);   // (IE0 / IE1 gate the timers, the counted inputs)
+	c->orb_dirty = 1;
 	switch (line) {
 	case MCS51_INT0_LINE:
 		if (state) {
@@ -753,29 +1135,139 @@ void mcs51_set_input(mcs51_t *c, int line, int state)
 		break;
 	}
 	s->last_line_state = ns;
+	c->t_quiet = timers_quiet(c);
 }
+
+// A wait loop at pc that keeps waiting: SJMP $, JB / JNB bit,$ or JB / JNB bit,+2 + SJMP back, on a bit that only
+// the program, an interrupt or a timer / serial event changes (internal RAM, TCON, SCON, T2CON). Its machine cycles a
+// round, 0 if it is not one or it is about to leave.
+static int wait_loop(mcs51_t *c)
+{
+	const uint16_t pc = c->st.pc;
+	const uint8_t op = prog_r(c, pc);
+	if (op == 0x80)
+		return prog_r(c, (uint16_t)(pc + 1)) == 0xfe ? 2 : 0;
+	if (op != 0x20 && op != 0x30)
+		return 0;
+	const uint8_t bit = prog_r(c, (uint16_t)(pc + 1)), rel = prog_r(c, (uint16_t)(pc + 2));
+	int n;
+	if (rel == 0xfd)
+		n = 2;
+	else if (rel == 0x02 && prog_r(c, (uint16_t)(pc + 3)) == 0x80 && prog_r(c, (uint16_t)(pc + 4)) == 0xfb)
+		n = 4;
+	else
+		return 0;
+	if (bit >= 0x80 && (bit & 0xf8) != 0x88 && (bit & 0xf8) != 0x98 && (bit & 0xf8) != 0xc8)
+		return 0;
+	// (the jump taken: loops in the first form, leaves in the second)
+	const int taken = (int)bit_r(c, bit) == (op == 0x20);
+	return taken == (n == 2) ? n : 0;
+}
+
+#define UNLIKELY_51(x) __builtin_expect(!!(x), 0)
+
+// ---- idle orbits ----
+// A main loop that waits by going round (the Eolith sound CPU polls its queue: calls, compares, an SJMP back) is
+// seen at an unconditional jump back: the state at its target (all but the timer counts) the same as a round
+// before, nothing from outside in between (no callback, input, interrupt or timer event: orb_dirty), the same period
+// twice. Each round then leaves the state as it found it, so the rounds that end before the slice does and before
+// the next timer event are taken at once (their cycles; the timers lazily).
+static void orb_take(const mcs51_t *c, mcs51_state *s, mcs51_state52 *s2, mcs51_uart *u)
+{
+	memcpy(s, &c->st, sizeof(*s));
+	memcpy(s2, &c->st2, sizeof(*s2));
+	memcpy(u, &c->uart, sizeof(*u));
+	s->tl0 = s->tl1 = s->th0 = s->th1 = 0;
+	s->icount = s->inst_cycles = 0;
+	s2->t2 = 0;
+	u->smod_div = u->tx_clk = 0;
+}
+
+static void orbit_check(mcs51_t *c)
+{
+	mcs51_state s;
+	mcs51_state52 s2;
+	mcs51_uart u;
+	if (c->orb_wait) {   // (after misses: fewer tries, the snapshot is the cost)
+		c->orb_wait--;
+		return;
+	}
+	orb_take(c, &s, &s2, &u);
+	if (c->orb_armed && c->orb_pc == c->st.pc && !c->orb_dirty && !memcmp(&s, &c->orb_st, sizeof(s)) &&
+	    !memcmp(&s2, &c->orb_st2, sizeof(s2)) && !memcmp(&u, &c->orb_uart, sizeof(u))) {
+		const uint32_t len = c->ccount - c->orb_at;
+		if (len && len == c->orb_len) {
+			int32_t room = c->st.icount - 1;   // (the slice goes on after them)
+			if (c->t_quiet - c->t_pend < room)
+				room = c->t_quiet - c->t_pend;
+			if (room >= (int32_t)len) {
+				const int32_t t = room / (int32_t)len * (int32_t)len;
+				c->st.icount -= t;
+				c->t_pend += t;
+				c->ccount += (uint32_t)t;
+			}
+		}
+		c->orb_len = len;
+		c->orb_at = c->ccount;
+		c->orb_back = 0;
+		return;
+	}
+	if (c->orb_armed) {   // (a miss)
+		c->orb_back = (uint8_t)(c->orb_back < 32 ? c->orb_back * 2 + 1 : 63);
+		c->orb_wait = c->orb_back;
+		c->orb_armed = 0;
+		return;
+	}
+	memcpy(&c->orb_st, &s, sizeof(s));
+	memcpy(&c->orb_st2, &s2, sizeof(s2));
+	memcpy(&c->orb_uart, &u, sizeof(u));
+	c->orb_pc = c->st.pc;
+	c->orb_at = c->ccount;
+	c->orb_len = 0;
+	c->orb_dirty = 0;
+	c->orb_armed = 1;
+}
+
 
 int mcs51_execute(mcs51_t *c, int cycles)
 {
 	mcs51_state *s = &c->st;
 	int start = s->icount + cycles;
 	s->icount = start;
+	c->t_pend = 0;
+	c->t_quiet = timers_quiet(c);   // (the driver may have changed the state between slices)
 	while (s->icount > 0) {
 		check_irqs(c);
+		if (!s->inst_cycles) {   // (no interrupt taken)
+			const int n = wait_loop(c);
+			if (n) {
+				// the rounds that end before the slice does and before the next timer event, at once: nothing else
+				// changes in them (the last round or two run as usual)
+				int32_t k = (s->icount - 1) < (c->t_quiet - c->t_pend) ? s->icount - 1 : c->t_quiet - c->t_pend;
+				k = n == 2 ? k >> 1 : k >> 2;
+				if (k > 0) {
+					s->icount -= k * n;
+					c->t_pend += k * n;
+					c->ccount += (uint32_t)(k * n);
+				}
+			}
+		}
 		s->ppc = s->pc;
 		uint8_t op = fetch(c);
 		s->inst_cycles += s_cycles[op];
 		execute_op(c, op);
-		// MAME burn_cycles: the timers advance one machine cycle at a time
-		for (int n = s->inst_cycles; n > 0; n--) {
-			s->icount--;
-			update_timer_t0(c, 1);
-			update_timer_t1(c, 1);
-			if (c->is_8052)
-				update_timer_t2(c, 1);
-		}
+		// MAME burn_cycles (the timers a machine cycle at a time: here lazily, timers_sync)
+		const int n = s->inst_cycles;
 		s->inst_cycles = 0;
+		s->icount -= n;
+		c->t_pend += n;
+		c->ccount += (uint32_t)n;
+		if (c->t_pend > c->t_quiet)
+			timers_sync(c);
+		if (UNLIKELY_51((op == 0x80 || op == 0x02 || (op & 0x1f) == 0x01) && s->pc < s->ppc))
+			orbit_check(c);   // (an unconditional jump back)
 	}
+	timers_sync(c);
 	return start - s->icount;
 }
 
@@ -790,6 +1282,8 @@ void mcs51_reset(mcs51_t *c)
 {
 	mcs51_state *s = &c->st;
 	uint8_t iram[128];
+	c->t_pend = 0;
+	c->orb_armed = 0;
 	memcpy(iram, s->iram, sizeof(iram));   // (RAM keeps its contents over a reset)
 	memset(s, 0, sizeof(*s));
 	memcpy(s->iram, iram, sizeof(iram));
@@ -797,6 +1291,7 @@ void mcs51_reset(mcs51_t *c)
 	c->st2.rcap2 = c->st2.t2 = 0;
 	c->st2.saddr = c->st2.saden = 0;
 	c->st2.iph = 0;
+	memset(&c->uart, 0, sizeof(c->uart));   // (SIO_IDLE)
 	s->cur_irq_prio = -1;
 	s->sp = 7;
 	sfr_w(c, 0xb0, 0xff);

@@ -397,27 +397,46 @@ static void db_layer_band(int band)   // (the layers' lines apart; the sprites a
 		uint8_t *pr = s_dbpri + y * VIS_W;
 		const uint32_t vb = (uint32_t)(by + s_snap->sy[2]) & 511, vf = (uint32_t)(by + s_snap->sy[1]) & 511;
 		const uint32_t vt = (uint32_t)by & 255;
+		uint32_t last = 0xffffffffu, cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {   // BG (opaque, priority 1), set_scrolldx(-248)
-			const uint32_t u = (uint32_t)(x + s_snap->sx[2] + 248) & 1023, i = (vb >> 4) * 64 + (u >> 4);
-			const uint32_t code = rbx_wrap((s_snap->bg[0x800 + i] & 0x0fffu), s_gfxbg.count);
-			d[x] = (uint16_t)(0x300 + ((s_snap->bg[i] & 0xf0u) >> 4) * 16 + s_gfxbg.pix[code * 256 + (vb & 15) * 16 + (u & 15)]);
+			const uint32_t u = (uint32_t)(x + s_snap->sx[2] + 248) & 1023;
+			if ((u >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = u >> 4;
+				const uint32_t i = (vb >> 4) * 64 + (u >> 4);
+				const uint32_t code = rbx_wrap((s_snap->bg[0x800 + i] & 0x0fffu), s_gfxbg.count);
+				trow = s_gfxbg.pix + code * 256 + (vb & 15) * 16;
+				cbase = 0x300 + ((s_snap->bg[i] & 0xf0u) >> 4) * 16;
+			}
+			d[x] = (uint16_t)(cbase + trow[u & 15]);
 			pr[x] = 1;
 		}
+		last = 0xffffffffu;
 		for (int x = 0; x < VIS_W; x++) {   // FG (pen 15 transparent, priority 2), set_scrolldx(-252)
-			const uint32_t u = (uint32_t)(x + s_snap->sx[1] + 252) & 1023, i = (vf >> 4) * 64 + (u >> 4);
-			const uint32_t code = rbx_wrap((s_snap->fg[0x800 + i] & 0x0fffu), s_gfxfg.count);
-			const uint8_t p = s_gfxfg.pix[code * 256 + (vf & 15) * 16 + (u & 15)];
+			const uint32_t u = (uint32_t)(x + s_snap->sx[1] + 252) & 1023;
+			if ((u >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = u >> 4;
+				const uint32_t i = (vf >> 4) * 64 + (u >> 4);
+				const uint32_t code = rbx_wrap((s_snap->fg[0x800 + i] & 0x0fffu), s_gfxfg.count);
+				trow = s_gfxfg.pix + code * 256 + (vf & 15) * 16;
+				cbase = 0x200 + ((s_snap->fg[i] & 0xf0u) >> 4) * 16;
+			}
+			const uint8_t p = trow[u & 15];
 			if (p != 15) {
-				d[x] = (uint16_t)(0x200 + ((s_snap->fg[i] & 0xf0u) >> 4) * 16 + p);
+				d[x] = (uint16_t)(cbase + p);
 				pr[x] |= 2;
 			}
 		}
 		for (int x = 0; x < VIS_W; x++) {   // text (pen 15 transparent, priority 4)
-			const uint32_t i = (vt >> 3) * 32 + ((uint32_t)x >> 3);
-			const uint32_t code = rbx_wrap((s_snap->tx[0x400 + i] & 0x07ffu), s_gfxtx.count);
-			const uint8_t p = s_gfxtx.pix[code * 64 + (vt & 7) * 8 + (x & 7)];
+			if (!(x & 7)) {   // (a character looked up once for its 8 pixels)
+				const uint32_t i = (vt >> 3) * 32 + ((uint32_t)x >> 3);
+				const uint32_t code = rbx_wrap((s_snap->tx[0x400 + i] & 0x07ffu), s_gfxtx.count);
+				trow = s_gfxtx.pix + code * 64 + (vt & 7) * 8;
+				cbase = ((s_snap->tx[i] & 0xf0u) >> 4) * 16;
+			}
+			const uint8_t p = trow[x & 7];
 			if (p != 15) {
-				d[x] = (uint16_t)(((s_snap->tx[i] & 0xf0u) >> 4) * 16 + p);
+				d[x] = (uint16_t)(cbase + p);
 				pr[x] |= 4;
 			}
 		}

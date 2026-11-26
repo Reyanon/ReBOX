@@ -85,7 +85,7 @@ static void v60_log(const char *fmt, ...) { (void)fmt; }
 // ---- the bus (MAME memory_access<24, 1, 0, ENDIANNESS_LITTLE>: native 16-bit accesses) ----
 static inline uint16_t r16n(uint32_t a, uint16_t mask)
 {
-	a &= 0xfffffe;
+	a &= v60_bus.amask & ~1u;
 	const uint8_t *p = v60_bus.rd[a >> V60_PAGE_SHIFT];
 	if (p) {
 		uint16_t v;
@@ -98,7 +98,7 @@ static inline uint16_t r16n(uint32_t a, uint16_t mask)
 static inline void w16n(uint32_t a, uint16_t d, uint16_t mask)
 {
 	s_touch++;
-	a &= 0xfffffe;
+	a &= v60_bus.amask & ~1u;
 	uint8_t *p = v60_bus.wr[a >> V60_PAGE_SHIFT];
 	if (p) {
 		p += a & 0xfff;
@@ -115,7 +115,7 @@ static inline void w16n(uint32_t a, uint16_t d, uint16_t mask)
 
 static inline uint8_t V60_RB(uint32_t a)
 {
-	a &= 0xffffff;
+	a &= v60_bus.amask;
 	const uint8_t *p = v60_bus.rd[a >> V60_PAGE_SHIFT];
 	if (p)
 		return p[a & 0xfff];
@@ -124,7 +124,7 @@ static inline uint8_t V60_RB(uint32_t a)
 }
 static inline uint16_t V60_RW(uint32_t a)
 {
-	a &= 0xffffff;
+	a &= v60_bus.amask;
 	if (!(a & 1))
 		return r16n(a, 0xffff);
 	const uint8_t *p = v60_bus.rd[a >> V60_PAGE_SHIFT];
@@ -134,7 +134,7 @@ static inline uint16_t V60_RW(uint32_t a)
 }
 static inline uint32_t V60_RD(uint32_t a)
 {
-	a &= 0xffffff;
+	a &= v60_bus.amask;
 	const uint8_t *p = v60_bus.rd[a >> V60_PAGE_SHIFT];
 	if (p && (a & 0xfff) <= 0xffc) {
 		uint32_t v;
@@ -150,7 +150,7 @@ static inline uint64_t V60_RQ(uint32_t a) { return V60_RD(a) | ((uint64_t)V60_RD
 static inline void V60_WB(uint32_t a, uint8_t d)
 {
 	s_touch++;
-	a &= 0xffffff;
+	a &= v60_bus.amask;
 	uint8_t *p = v60_bus.wr[a >> V60_PAGE_SHIFT];
 	if (p) {
 		p[a & 0xfff] = d;
@@ -163,7 +163,7 @@ static inline void V60_WB(uint32_t a, uint8_t d)
 }
 static inline void V60_WW(uint32_t a, uint16_t d)
 {
-	a &= 0xffffff;
+	a &= v60_bus.amask;
 	if (!(a & 1)) {
 		w16n(a, d, 0xffff);
 		return;
@@ -174,7 +174,7 @@ static inline void V60_WW(uint32_t a, uint16_t d)
 static inline void V60_WD(uint32_t a, uint32_t d)
 {
 	s_touch++;
-	a &= 0xffffff;
+	a &= v60_bus.amask;
 	uint8_t *p = v60_bus.wr[a >> V60_PAGE_SHIFT];
 	if (p && (a & 0xfff) <= 0xffc) {
 		memcpy(p + (a & 0xfff), &d, 4);
@@ -208,13 +208,20 @@ void v60_bus_clear(void)
 {
 	memset(v60_bus.rd, 0, sizeof(v60_bus.rd));
 	memset(v60_bus.wr, 0, sizeof(v60_bus.wr));
+	v60_bus.amask = 0xffffff;
+	s_maps_changed = 1;
+}
+
+void v60_bus_set_bits(int bits)
+{
+	v60_bus.amask = bits >= 26 ? 0x3ffffffu : (1u << bits) - 1;
 	s_maps_changed = 1;
 }
 
 void v60_bus_map(uint32_t start, uint32_t end, void *mem, uint32_t size, int readable, int writable)
 {
 	s_maps_changed = 1;
-	for (uint32_t a = start; a <= end && a < 0x1000000; a += 1u << V60_PAGE_SHIFT) {
+	for (uint32_t a = start; a <= end && a <= v60_bus.amask; a += 1u << V60_PAGE_SHIFT) {
 		uint8_t *p = (uint8_t *)mem + ((a - start) & (size - 1));
 		v60_bus.rd[a >> V60_PAGE_SHIFT] = readable ? p : NULL;
 		v60_bus.wr[a >> V60_PAGE_SHIFT] = writable ? p : NULL;

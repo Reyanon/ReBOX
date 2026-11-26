@@ -134,14 +134,21 @@ static void bl_render(void)
 	for (int y = 0; y < VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + y * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y + s_snap->scrolly : y + s_snap->scrolly) & 511;
+		uint32_t last = 0xffffffffu, cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = VIS_X0; x < VIS_X0 + VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + s_snap->scrollx : x + s_snap->scrollx) & 511;
-			const uint32_t col = tx >> 4, row = ty >> 4;
-			const uint32_t idx = (row & 0xf) * 16 + (col & 0xf) + (row & 0x10) * 32 + (col & 0x10) * 16;
-			const uint8_t attr = s_snap->tile[idx + 0x400];
-			const rbx_gfx *g = &s_gtile[attr & 1];
-			const uint32_t code = rbx_wrap(s_snap->tile[idx], g->count);
-			d[x - VIS_X0] = (uint16_t)(32 + ((attr >> 1) & 3) * 8 + g->pix[code * 256 + (ty & 15) * 16 + (tx & 15)]);
+			if ((tx >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = tx >> 4;
+				const uint32_t col = tx >> 4, row = ty >> 4;
+				const uint32_t idx = (row & 0xf) * 16 + (col & 0xf) + (row & 0x10) * 32 + (col & 0x10) * 16;
+				const uint8_t attr = s_snap->tile[idx + 0x400];
+				const rbx_gfx *g = &s_gtile[attr & 1];
+				const uint32_t code = rbx_wrap(s_snap->tile[idx], g->count);
+				trow = g->pix + code * 256 + (ty & 15) * 16;
+				cbase = 32 + (uint32_t)((attr >> 1) & 3) * 8;
+			}
+			d[x - VIS_X0] = (uint16_t)(cbase + trow[tx & 15]);
 		}
 	}
 	for (int o = 0; o < 0x100; o += 4) {

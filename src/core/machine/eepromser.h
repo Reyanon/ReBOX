@@ -22,9 +22,10 @@ typedef struct {
 	int64_t op_time[4];   // write, write all, erase, erase all (ticks)
 	int dirty;            // (written since loaded or saved)
 	char nv_path[256];    // (eepser_nv_load's file: the set's .nv in the NVRAM folder)
+	uint16_t data_hi[256];   // cells 256-511 (a 93C66 in 8-bit mode; saved as a block of their own)
 } eepser_t;
 
-// cells: 64 / 128 ..., data_bits: 8 or 16
+// cells: 64 / 128 ... 512, data_bits: 8 or 16
 void eepser_init(eepser_t *e, int type, int cells, int data_bits, int64_t ticks_per_sec);
 void eepser_cs_write(eepser_t *e, int state, int64_t now);
 void eepser_clk_write(eepser_t *e, int state, int64_t now);

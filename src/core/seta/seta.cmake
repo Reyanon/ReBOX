@@ -7,6 +7,7 @@ list(APPEND RBX_CORE_SOURCES
   ${RBX_SETA_DIR}/boards/seta_sp.c
   ${RBX_SETA_DIR}/boards/seta_tm.c
   ${RBX_SETA_DIR}/boards/seta2.c
+  ${RBX_SETA_DIR}/boards/ssv.c
   ${RBX_SETA_DIR}/video/x1_012.c
 )
 list(APPEND RBX_CORE_MODULE_DEFS RBX_MOD_SETA)

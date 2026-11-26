@@ -13,6 +13,9 @@ enum { CMD_INVALID, CMD_READ, CMD_WRITE, CMD_ERASE, CMD_LOCK, CMD_UNLOCK, CMD_WR
 enum { EV_CS_RISING, EV_CS_FALLING, EV_CLK_RISING, EV_CLK_FALLING };
 enum { T_WRITE, T_WRITE_ALL, T_ERASE, T_ERASE_ALL };
 
+// cell a (0..511: the 512 cells of a 93C66 in 8-bit mode go on in data_hi)
+#define CELL(e, a) (*((a) < 256 ? &(e)->data[(a)] : &(e)->data_hi[((a) - 256) & 0xff]))
+
 void eepser_init(eepser_t *e, int type, int cells, int data_bits, int64_t ticks_per_sec)
 {
 	memset(e, 0, sizeof(*e));
@@ -30,8 +33,8 @@ void eepser_init(eepser_t *e, int type, int cells, int data_bits, int64_t ticks_
 	e->op_time[T_WRITE_ALL] = ticks_per_sec * 8000 / 1000000;
 	e->op_time[T_ERASE] = ticks_per_sec * 1000 / 1000000;
 	e->op_time[T_ERASE_ALL] = ticks_per_sec * 8000 / 1000000;
-	for (int i = 0; i < 256; i++)
-		e->data[i] = (uint16_t)((1u << data_bits) - 1);
+	for (int i = 0; i < 512; i++)
+		CELL(e, i) = (uint16_t)((1u << data_bits) - 1);
 	e->state = ST_IN_RESET;
 	e->completion_time = 0;
 	e->last_cs_rising = -1;
@@ -40,11 +43,11 @@ void eepser_init(eepser_t *e, int type, int cells, int data_bits, int64_t ticks_
 void eepser_default(eepser_t *e, const uint8_t *data, uint32_t size)
 {
 	const int cells = 1 << e->address_bits;
-	for (int i = 0; i < cells && i < 256; i++) {
+	for (int i = 0; i < cells && i < 512; i++) {
 		if (e->data_bits == 16)
-			e->data[i] = 2u * (uint32_t)i + 1 < size ? (uint16_t)(data[2 * i] << 8 | data[2 * i + 1]) : 0xffff;
+			CELL(e, i) = 2u * (uint32_t)i + 1 < size ? (uint16_t)(data[2 * i] << 8 | data[2 * i + 1]) : 0xffff;
 		else
-			e->data[i] = (uint32_t)i < size ? data[i] : 0xff;
+			CELL(e, i) = (uint32_t)i < size ? data[i] : 0xff;
 	}
 }
 
@@ -52,7 +55,7 @@ static inline int ready(const eepser_t *e, int64_t now) { return now >= e->compl
 static inline uint32_t mask_data(const eepser_t *e) { return (1u << e->data_bits) - 1; }
 static void ewrite(eepser_t *e, int a, uint32_t v, int64_t now)
 {
-	e->data[a & ((1 << e->address_bits) - 1)] = (uint16_t)(v & mask_data(e));
+	CELL(e, a & ((1 << e->address_bits) - 1)) = (uint16_t)(v & mask_data(e));
 	e->dirty = 1;
 	e->completion_time = now + e->op_time[T_WRITE];
 }
@@ -95,7 +98,7 @@ static void execute_command(eepser_t *e, int64_t now)
 			e->state = ST_IN_RESET;
 			break;
 		}
-		e->data[e->address & ((1 << e->address_bits) - 1)] = (uint16_t)mask_data(e);
+		CELL(e, e->address & ((1 << e->address_bits) - 1)) = (uint16_t)mask_data(e);
 		e->dirty = 1;
 		e->completion_time = now + e->op_time[T_ERASE];
 		e->state = ST_WAIT_FOR_COMPLETION;
@@ -108,7 +111,7 @@ static void execute_command(eepser_t *e, int64_t now)
 			break;
 		}
 		for (int a = 0; a < (1 << e->address_bits); a++)
-			e->data[a] = (uint16_t)mask_data(e);
+			CELL(e, a) = (uint16_t)mask_data(e);
 		e->dirty = 1;
 		e->completion_time = now + e->op_time[T_ERASE_ALL];
 		e->state = ST_WAIT_FOR_COMPLETION;
@@ -129,7 +132,7 @@ static void execute_write_command(eepser_t *e, int64_t now)
 		ewrite(e, e->address, e->shift, now);
 	else {   // (WRITEALL: ANDed with the data after an ERASEALL)
 		for (int a = 0; a < (1 << e->address_bits); a++)
-			e->data[a] = (uint16_t)(e->data[a] & e->shift & mask_data(e));
+			CELL(e, a) = (uint16_t)(CELL(e, a) & e->shift & mask_data(e));
 		e->dirty = 1;
 		e->completion_time = now + e->op_time[T_WRITE_ALL];
 	}
@@ -163,7 +166,7 @@ static void handle_event(eepser_t *e, int ev, int64_t now)
 		if (ev == EV_CLK_RISING) {   // (output on the rising clock)
 			const int bit_index = e->bits_accum++;
 			if (bit_index % e->data_bits == 0 && (bit_index == 0 || e->streaming))
-				e->shift = (uint32_t)e->data[(e->address + e->bits_accum / e->data_bits) & ((1 << e->address_bits) - 1)]
+				e->shift = (uint32_t)CELL(e, (e->address + e->bits_accum / e->data_bits) & ((1 << e->address_bits) - 1))
 				           << (32 - e->data_bits);
 			else
 				e->shift = (e->shift << 1) | 1;
@@ -226,6 +229,12 @@ int eepser_state(eepser_t *e, void *ctx, int load, const char *tag)
 {
 	(void)load;
 	const uint32_t n = (uint32_t)((const uint8_t *)&e->type - (const uint8_t *)e);
+	if (e->address_bits > 8) {   // (the cells past 256: a block of their own, the others' states unchanged)
+		char t2[64];
+		snprintf(t2, sizeof(t2), "%s+", tag);
+		if (rbx_state_io(ctx, t2, e->data_hi, sizeof(e->data_hi)))
+			return -1;
+	}
 	return rbx_state_io(ctx, tag, e, n);
 }
 
@@ -256,10 +265,10 @@ void eepser_nv_save(eepser_t *e)
 	const int cells = 1 << e->address_bits;
 	uint8_t b[512];
 	uint32_t n = 0;
-	for (int i = 0; i < cells && i < 256; i++) {
+	for (int i = 0; i < cells && i < 512; i++) {
 		if (e->data_bits > 8)
-			b[n++] = (uint8_t)(e->data[i] >> 8);
-		b[n++] = (uint8_t)e->data[i];
+			b[n++] = (uint8_t)(CELL(e, i) >> 8);
+		b[n++] = (uint8_t)CELL(e, i);
 	}
 	FILE *f = fopen(e->nv_path, "wb");
 	if (!f)

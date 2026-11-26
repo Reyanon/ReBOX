@@ -38,6 +38,7 @@ extern void (*rbx_m68k_int_hook)(int level); /* ReBOX: called with the level tak
 extern void (*rbx_m68k_cmpild_hook)(int reg, unsigned int imm); /* ReBOX: CMPI.L #imm,Dn executed (MAME cmpild_callback, the FD1094) */
 extern void (*rbx_m68k_rte_hook)(void);
 extern void (*rbx_m68k_irqack_hook)(int level); /* ReBOX: an interrupt taken (besides rbx_m68k_int_hook) */ /* ReBOX: RTE executed (MAME rte_callback) */
+extern int (*rbx_m68k_vector_hook)(int level); /* ReBOX: the vector of a vectored interrupt (MAME AS_CPU_SPACE), < 0 or NULL = autovector */
 #include <limits.h>
 
 /* ReBOX: reads of directly mapped memory (ROM, RAM pages of m68k_bus) inline, the call only for handlers and
@@ -2055,6 +2056,12 @@ INLINE void m68ki_exception_interrupt(uint int_level)
 
 	/* Acknowledge the interrupt */
 	vector = m68ki_int_ack(int_level);
+	if (rbx_m68k_vector_hook)   /* ReBOX: a board's vectored interrupts */
+	{
+		int v = rbx_m68k_vector_hook((int)int_level);
+		if (v >= 0)
+			vector = (uint)v;
+	}
 
 	/* Get the interrupt vector */
 	if(vector == M68K_INT_ACK_AUTOVECTOR)

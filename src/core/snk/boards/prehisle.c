@@ -185,34 +185,53 @@ static void layers_line(int y)
 	uint8_t *pr = s_pri[y];
 	const int by = y + VIS_Y0, flip = s_snap->flip;
 	const uint32_t bty = tcoord(by, s_snap->bg_sy, flip, 511), fty = tcoord(by, s_snap->fg_sy, flip, 511);
+	uint32_t last = 0xffffffffu, cbase = 0, hflip = 0;
+	const uint8_t *trow = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const uint32_t tx = tcoord(x, s_snap->bg_sx, flip, 16383);
-		const uint32_t i = (tx >> 4) * 32 + (bty >> 4);
-		const uint32_t attr = (uint32_t)s_bgmap[rbx_wrap((2 * i + 1), s_bgmap_size)] + ((uint32_t)s_bgmap[rbx_wrap((2 * i), s_bgmap_size)] << 8);
-		const uint32_t code = rbx_wrap((attr & 0x7ff), s_gfxbg.count);
-		const uint32_t px = (attr & 0x800) ? 15 - (tx & 15) : (tx & 15);
-		d[x] = (uint16_t)(768 + (attr >> 12) * 16 + s_gfxbg.pix[code * 256 + (bty & 15) * 16 + px]);
+		if ((tx >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+			last = tx >> 4;
+			const uint32_t i = (tx >> 4) * 32 + (bty >> 4);
+			const uint32_t attr = (uint32_t)s_bgmap[rbx_wrap((2 * i + 1), s_bgmap_size)] + ((uint32_t)s_bgmap[rbx_wrap((2 * i), s_bgmap_size)] << 8);
+			const uint32_t code = rbx_wrap((attr & 0x7ff), s_gfxbg.count);
+			trow = s_gfxbg.pix + code * 256 + (bty & 15) * 16;
+			hflip = attr & 0x800;
+			cbase = 768 + (attr >> 12) * 16;
+		}
+		d[x] = (uint16_t)(cbase + trow[hflip ? 15 - (tx & 15) : (tx & 15)]);
 		pr[x] = 1;
 	}
+	last = 0xffffffffu;
 	for (int x = 0; x < VIS_W; x++) {
 		const uint32_t tx = tcoord(x, s_snap->fg_sx, flip, 4095);
-		const uint16_t attr = s_snap->fg[(tx >> 4) * 32 + (fty >> 4)];
-		const uint32_t code = rbx_wrap((attr & 0x7ffu), s_gfxfg.count);
-		const uint32_t py = (attr & 0x800) ? 15 - (fty & 15) : (fty & 15);
-		const uint8_t p = s_gfxfg.pix[code * 256 + py * 16 + (tx & 15)];
+		if ((tx >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+			last = tx >> 4;
+			const uint16_t attr = s_snap->fg[(tx >> 4) * 32 + (fty >> 4)];
+			const uint32_t code = rbx_wrap((attr & 0x7ffu), s_gfxfg.count);
+			const uint32_t py = (attr & 0x800) ? 15 - (fty & 15) : (fty & 15);
+			trow = s_gfxfg.pix + code * 256 + py * 16;
+			cbase = 512 + (uint32_t)(attr >> 12) * 16;
+		}
+		const uint8_t p = trow[tx & 15];
 		if (p != 15) {
-			d[x] = (uint16_t)(512 + (attr >> 12) * 16 + p);
+			d[x] = (uint16_t)(cbase + p);
 			pr[x] |= 2;
 		}
 	}
 	const uint32_t tty = (uint32_t)(flip ? 255 - by : by) & 255;
+	last = 0xffffffffu;
 	for (int x = 0; x < VIS_W; x++) {   // the text: 32x32 of 8x8, pen 15 transparent, priority 4
 		const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
-		const uint16_t attr = s_snap->tx[(tty >> 3) * 32 + (tx >> 3)];
-		const uint32_t code = rbx_wrap((attr & 0xfffu), s_gfxtx.count);
-		const uint8_t p = s_gfxtx.pix[code * 64 + (tty & 7) * 8 + (tx & 7)];
+		if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+			last = tx >> 3;
+			const uint16_t attr = s_snap->tx[(tty >> 3) * 32 + (tx >> 3)];
+			const uint32_t code = rbx_wrap((attr & 0xfffu), s_gfxtx.count);
+			trow = s_gfxtx.pix + code * 64 + (tty & 7) * 8;
+			cbase = (uint32_t)(attr >> 12) * 16;
+		}
+		const uint8_t p = trow[tx & 7];
 		if (p != 15) {
-			d[x] = (uint16_t)((attr >> 12) * 16 + p);
+			d[x] = (uint16_t)(cbase + p);
 			pr[x] |= 4;
 		}
 	}

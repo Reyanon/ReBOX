@@ -186,11 +186,17 @@ static void mm_render(void)
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const int ty = y + s_snap->scroll;   // (copyscrollbitmap, -scroll; at most 502)
 		const int row = ty >> 4;
+		uint32_t cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {
-			const int offs = (15 - (x >> 4)) * 32 + row;
-			const uint32_t code = rbx_wrap((uint32_t)(vr[offs] + (s_maniach ? (cr[offs] & 3) << 8 : (cr[offs] & 8) << 5)), s_gtile.count);
-			const int py = row >= 16 ? 15 - (ty & 15) : ty & 15;
-			d[x] = (uint16_t)(32 + ((cr[offs] & 0x30) >> 4) * 8 + s_gtile.pix[code * 256 + py * 16 + (x & 15)]);
+			if (!(x & 15)) {   // (a tile looked up once for its 16 pixels)
+				const int offs = (15 - (x >> 4)) * 32 + row;
+				const uint32_t code = rbx_wrap((uint32_t)(vr[offs] + (s_maniach ? (cr[offs] & 3) << 8 : (cr[offs] & 8) << 5)), s_gtile.count);
+				const int py = row >= 16 ? 15 - (ty & 15) : ty & 15;
+				trow = s_gtile.pix + code * 256 + py * 16;
+				cbase = 32 + (uint32_t)((cr[offs] & 0x30) >> 4) * 8;
+			}
+			d[x] = (uint16_t)(cbase + trow[x & 15]);
 		}
 	}
 	for (int o = 0x780; o < 0x7e0; o += 4) {
@@ -202,13 +208,19 @@ static void mm_render(void)
 	}
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
+		uint32_t cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {
-			const int offs = (31 - (x >> 3)) * 32 + (y >> 3);
-			const uint8_t c = s_snap->vram1[0x400 + offs];
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram1[offs] + 256 * (c & 7)), s_gchar.count);
-			const uint8_t p = s_gchar.pix[code * 64 + (y & 7) * 8 + (x & 7)];
+			if (!(x & 7)) {   // (a character looked up once for its 8 pixels)
+				const int offs = (31 - (x >> 3)) * 32 + (y >> 3);
+				const uint8_t c = s_snap->vram1[0x400 + offs];
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram1[offs] + 256 * (c & 7)), s_gchar.count);
+				trow = s_gchar.pix + code * 64 + (y & 7) * 8;
+				cbase = (uint32_t)((c & 0x30) >> 4) * 8;
+			}
+			const uint8_t p = trow[x & 7];
 			if (p)
-				d[x] = (uint16_t)(((c & 0x30) >> 4) * 8 + p);
+				d[x] = (uint16_t)(cbase + p);
 		}
 	}
 }

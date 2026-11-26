@@ -17,7 +17,8 @@ extern "C" {
 #endif
 
 #define V60_PAGE_SHIFT 12
-#define V60_PAGES (1u << (24 - V60_PAGE_SHIFT))
+// (the page tables cover 26 address bits: the V70 boards' 64 MB mirror, v60_bus_set_bits; the V60 boards use 24)
+#define V60_PAGES (1u << (26 - V60_PAGE_SHIFT))
 
 typedef struct {
 	uint8_t *rd[V60_PAGES];   // host memory of the page (little-endian bytes), NULL = the handlers
@@ -27,11 +28,15 @@ typedef struct {
 	void (*write16)(uint32_t a, uint16_t data, uint16_t mask);
 	// MAME irq_cycle_callback: the vector of the interrupt being taken (0x40 is added)
 	uint8_t (*irq_cycle)(void);
+	uint32_t amask;   // the address bits decoded (v60_bus_clear: 24, the V60; v60_bus_set_bits)
 } v60_bus_t;
 
 extern v60_bus_t v60_bus;
 
-void v60_bus_clear(void);   // all pages to the handlers
+void v60_bus_clear(void);   // all pages to the handlers, 24 address bits
+// after v60_bus_clear: the address bits decoded (24 or 26: the V70 boards' 64 MB mirrored image of the 32-bit space,
+// Jaleco Mega System 32); the maps and the handlers see the addresses masked to them
+void v60_bus_set_bits(int bits);
 // map [start, end] (page aligned, inclusive) to mem, repeating every size bytes (a power of two, >= 4 KB)
 void v60_bus_map(uint32_t start, uint32_t end, void *mem, uint32_t size, int readable, int writable);
 

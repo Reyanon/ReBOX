@@ -1,5 +1,5 @@
 /*  NEC uPD7810 / 78C10 / 78C11 CPU, ported from MAME src/devices/cpu/upd7810 (BSD-3-Clause,
-    copyright-holders: Juergen Buchmueller). One instance (the C-Chip MCU of the Taito boards).
+    copyright-holders: Juergen Buchmueller). One instance (the C-Chip MCU of the Taito boards, the Metro sound CPU).
     Cycle counts are machine states (MAME: one state = 3 input clocks).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
@@ -32,6 +32,7 @@ typedef struct {
 	void (*port_out)(int port, uint8_t v);
 	uint8_t (*an_in)(int n);          // A/D inputs AN0..AN7
 	void (*line_out)(int line, int state);
+	int (*rxd)(void);                 // serial input line RXD (MAME rxd_func), NULL = 1
 } upd7810_config;
 
 void upd7810_init(const upd7810_config *cfg);   // also selects the uPD7810 / 78C1x opcode tables

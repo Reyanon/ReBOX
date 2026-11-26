@@ -260,7 +260,7 @@ static void e_read(int dim)
 		e_bsr(0xe, SR_RD8 + dim, 1);
 		return;
 	}
-	E(0xe3c004ffu);   // bic r0, r0, #0xff000000
+	E(v60_bus.amask == 0xffffff ? 0xe3c004ffu : 0xe3c004fcu);   // bic r0, r0, #0xff000000 / #0xfc000000 (26 bits)
 	E(0xe1a0c620u);   // lsr r12, r0, #12
 	E(0xe796c10cu);   // ldr r12, [r6, r12, lsl #2]
 	E(0xe35c0000u);   // cmp r12, #0
@@ -283,7 +283,7 @@ static void e_write(int dim)
 		e_bsr(0xe, SR_WR8 + dim, 1);
 		return;
 	}
-	E(0xe3c004ffu);   // bic r0, r0, #0xff000000
+	E(v60_bus.amask == 0xffffff ? 0xe3c004ffu : 0xe3c004fcu);   // bic r0, r0, #0xff000000 / #0xfc000000 (26 bits)
 	E(0xe1a0c620u);   // lsr r12, r0, #12
 	E(0xe797c10cu);   // ldr r12, [r7, r12, lsl #2]
 	E(0xe35c0000u);   // cmp r12, #0
@@ -711,7 +711,7 @@ static void vj_insert(uint32_t pc, uint32_t *body)
 static int vj_rom(uint32_t pc)
 {
 	for (uint32_t a = pc & ~0xfffu; a < pc + 24; a += 0x1000) {
-		const uint32_t p = (a & 0xffffff) >> V60_PAGE_SHIFT;
+		const uint32_t p = (a & v60_bus.amask) >> V60_PAGE_SHIFT;
 		if (!v60_bus.rd[p] || v60_bus.wr[p])
 			return 0;
 	}

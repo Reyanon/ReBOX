@@ -221,13 +221,20 @@ static void draw_piece(const vseg *sg, int y0, int y1)
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const line_regs *l = &L[y];
 		const uint32_t ty = (uint32_t)(l->flip ? 255 - y + l->sy : y + l->sy) & 511;
+		uint32_t last = 0xffffffffu, cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(l->flip ? 255 - x + l->sx : x + l->sx) & 511;
-			const uint32_t col = tx >> 3, row = ty >> 3;
-			const uint32_t idx = (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
-			const uint8_t attr = sg->attr[idx];
-			const uint32_t code = rbx_wrap((uint32_t)(sg->vram[idx] + ((attr & 0x1f) << 8) + (l->gfxset << 8)), s_gchar.count);
-			d[x] = (uint16_t)(((attr >> 5) & 7) * 16 + s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)]);
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint32_t col = tx >> 3, row = ty >> 3;
+				const uint32_t idx = (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
+				const uint8_t attr = sg->attr[idx];
+				const uint32_t code = rbx_wrap((uint32_t)(sg->vram[idx] + ((attr & 0x1f) << 8) + (l->gfxset << 8)), s_gchar.count);
+				trow = s_gchar.pix + code * 64 + (ty & 7) * 8;
+				cbase = (uint32_t)((attr >> 5) & 7) * 16;
+			}
+			d[x] = (uint16_t)(cbase + trow[tx & 7]);
 		}
 	}
 	s_clip0 = y0;

@@ -1840,7 +1840,7 @@ static void upd7810_sio_input(void)
 	/* sample next bit? */
 	if (m_rxcnt > 0)
 	{
-		RXD = 1;
+		RXD = s_cfg.rxd ? s_cfg.rxd() : 1;
 		m_rxs = (m_rxs >> 1) | ((uint16_t)RXD << 15);
 		m_rxcnt--;
 		if (0 == m_rxcnt)
@@ -1979,7 +1979,7 @@ static void upd7810_sio_input(void)
 		if (SML & 0x03)     /* asynchronous mode ? */
 		{
 			// start bit check
-			RXD = 1;
+			RXD = s_cfg.rxd ? s_cfg.rxd() : 1;
 			m_rxs = (m_rxs >> 1) | ((uint16_t)RXD << 15);
 			if ((m_rxs & 0xc000) != 0x4000)
 				return;

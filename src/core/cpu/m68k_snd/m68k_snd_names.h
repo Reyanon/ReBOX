@@ -2031,6 +2031,7 @@
 #define rbx_m68k_cmpild_hook snd_rbx_m68k_cmpild_hook
 #define rbx_m68k_rte_hook snd_rbx_m68k_rte_hook
 #define rbx_m68k_irqack_hook snd_rbx_m68k_irqack_hook
+#define rbx_m68k_vector_hook snd_rbx_m68k_vector_hook
 #define rbx_m68k_next_base snd_rbx_m68k_next_base
 #define m68ki_cycles_base snd_m68ki_cycles_base
 #define m68k_set_mame_timing snd_m68k_set_mame_timing

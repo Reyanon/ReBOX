@@ -43,14 +43,15 @@ and no errors that affect play. Every frame is emulated and drawn.
 
 **Core**
 - Board drivers ported from MAME 0.289, from 8-bit classics up to CPS3, Sega System 32 and Y-Board, Cave CV1000, PGM, PGM2,
-  Seibu SPI and the Midway T / Wolf / Y units (see [Supported Boards](#3-supported-boards)).
+  Seibu SPI, the Williams 6809 boards, Bally Midway MCR / MCR-3 / MCR-68k and the Midway T / Wolf / Y units (see
+  [Supported Boards](#3-supported-boards)).
 - CPUs:
   - Musashi (68000, 68EC020) and superzazu/z80.
   - Ports of MAME's cores: SH-2 and SH-3 (with a dynamic recompiler to ARM), V60 / V70, TMS34010, i386, ARM7,
     NEC V20-V35, HuC6280, HD6309, 6502, 6800, 6805, 6809, Konami, 8080, MCS-48 / 51, M37710, TLCS-90, ADSP-2100,
-    TMS320C1x, TMS57002, PIC16C5x and uPD7810.
+    TMS320C1x, TMS57002, PIC16C5x, uPD7810 and Hyperstone E1.
 - Sound: ymfm for the Yamaha FM chips and ports of MAME's PCM and PSG chips (QSound, YMZ770, YMF271, ICS2115, C140,
-  C352, MultiPCM, K054539, ES5505, OKI MSM6295, AY-3-8910, ...).
+  C352, MultiPCM, K054539, ES5505, QS1000, OKI MSM6295, AY-3-8910, ...).
 - Game lists, ROM layouts and input ports (with DIP switches) are generated from the MAME sources.
 - Drawing and the heavier sound chips run on other CPU cores, so emulation, drawing and sound of a frame overlap.
 
@@ -155,7 +156,11 @@ shows the other working MAME boards that are not ported yet, greyed out.
 |  | Classic boards (7 drivers: m10, m14, olibochu, redalert, ...) | 38 | 97% |
 | **IGS** | PGM | 150 | 100% |
 |  | PGM2 | 22 | 95% |
-| **Midway** | T-Unit | 29 | 100% |
+| **Midway** | MCR | 33 | 100% |
+|  | MCR-3 | 11 | 100% |
+|  | MCR-68k | 12 | 92% |
+|  | T-Unit | 29 | 100% |
+|  | Williams 6809 | 60 | 100% |
 |  | Wolf Unit | 25 | 100% |
 |  | Y-Unit | 43 | 73% |
 | **Atari** | Gauntlet | 28 | 100% |
@@ -170,9 +175,12 @@ shows the other working MAME boards that are not ported yet, greyed out.
 | **Toaplan** | GP9001 | 57 | 81% |
 |  | Toaplan 1 | 13 | 57% |
 |  | Twin Cobra | 20 | 100% |
+|  | Snow Bros (Pandora, SemiCom, Barko) | 37 | 95% |
 | **Seta** | Seta Hardware | 67 | 100% |
 |  | Seta 2 | 28 | 100% |
+|  | SSV | 32 | 97% |
 | **Jaleco** | Mega System 1 | 54 | 98% |
+|  | Mega System 32 | 18 | 86% |
 | **Psikyo** | 68EC020 | 17 | 89% |
 |  | PS3/PS5 | 14 | 88% |
 |  | PS4 | 8 | 100% |
@@ -182,6 +190,9 @@ shows the other working MAME boards that are not ported yet, greyed out.
 | **Tecmo** | Ninja Gaiden | 14 | 93% |
 |  | Tecmo 16 | 7 | 100% |
 |  | Single-game boards (1 drivers: spbactn) | 2 | 67% |
+| **Metro** | Metro (Imagetek I4100 / I4220 / I4300) | 48 | 100% |
+| **Eolith** | Gradation 2D | 21 | 100% |
+|  | 16-bit | 1 | 100% |
 
 **Speed.** The heaviest game of each board was measured on a PS Vita at 444 MHz in play (coin, start, buttons
 pressed):

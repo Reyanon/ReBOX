@@ -258,14 +258,22 @@ static void tx_line(int by, uint16_t *d)   // 64x32 of 8x8, 2 bits, pen 3 transp
 {
 	const int flip = (s_snap->active & 0x04) != 0;
 	const uint32_t ty = (uint32_t)(flip ? 255 - by : by) & 255;
+	uint32_t last = 0xffffffffu, cbase = 0, hflip = 0;
+	const uint8_t *row = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const uint32_t tx = (uint32_t)(flip ? 511 - (x + VIS_X0) : x + VIS_X0) & 511;
-		const uint16_t t = s_snap->vram[(ty >> 3) * 64 + (tx >> 3)];
-		const uint32_t code = rbx_wrap((t & 0x3ffu), s_gfxtx.count);
-		const uint32_t px = (t & 0x400) ? 7 - (tx & 7) : (tx & 7), py = (t & 0x800) ? 7 - (ty & 7) : (ty & 7);
-		const uint8_t p = s_gfxtx.pix[code * 64 + py * 8 + px];
+		if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+			last = tx >> 3;
+			const uint16_t t = s_snap->vram[(ty >> 3) * 64 + (tx >> 3)];
+			const uint32_t code = rbx_wrap((t & 0x3ffu), s_gfxtx.count);
+			const uint32_t py = (t & 0x800) ? 7 - (ty & 7) : (ty & 7);
+			row = s_gfxtx.pix + code * 64 + py * 8;
+			hflip = t & 0x400;
+			cbase = 768 + (uint32_t)(t >> 12) * 4;
+		}
+		const uint8_t p = row[hflip ? 7 - (tx & 7) : (tx & 7)];
 		if (p != 3)
-			d[x] = (uint16_t)(768 + (t >> 12) * 4 + p);
+			d[x] = (uint16_t)(cbase + p);
 	}
 }
 

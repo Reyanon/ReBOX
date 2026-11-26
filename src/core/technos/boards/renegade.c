@@ -237,13 +237,20 @@ static void rg_render(void)
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 265 - y : y - 10) & 255;
+		uint32_t last = 0xffffffffu, cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {   // bg: scrolldx(256, 0), scrolldy(10, 10)
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + scroll : x - 256 + scroll) & 1023;
-			const uint32_t idx = (ty >> 4) * 64 + (tx >> 4);
-			const uint8_t attr = s_snap->bgram[idx + 0x400];
-			const rbx_gfx *g = &s_tiles[attr & 7];
-			const uint32_t code = rbx_wrap(s_snap->bgram[idx], g->count);
-			d[x] = (uint16_t)(192 + (attr >> 5) * 8 + g->pix[code * 256 + (ty & 15) * 16 + (tx & 15)]);
+			if ((tx >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = tx >> 4;
+				const uint32_t idx = (ty >> 4) * 64 + (tx >> 4);
+				const uint8_t attr = s_snap->bgram[idx + 0x400];
+				const rbx_gfx *g = &s_tiles[attr & 7];
+				const uint32_t code = rbx_wrap(s_snap->bgram[idx], g->count);
+				trow = g->pix + code * 256 + (ty & 15) * 16;
+				cbase = 192 + (uint32_t)(attr >> 5) * 8;
+			}
+			d[x] = (uint16_t)(cbase + trow[tx & 15]);
 		}
 	}
 	for (int o = 0; o < 0x200; o += 4) {
@@ -270,14 +277,21 @@ static void rg_render(void)
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 265 - y : y - 10) & 255;
+		uint32_t last = 0xffffffffu, cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
-			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
-			const uint8_t attr = s_snap->fgram[idx + 0x400];
-			const uint32_t code = rbx_wrap(((attr & 3u) << 8 | s_snap->fgram[idx]), s_chars.count);
-			const uint8_t p = s_chars.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
+				const uint8_t attr = s_snap->fgram[idx + 0x400];
+				const uint32_t code = rbx_wrap(((attr & 3u) << 8 | s_snap->fgram[idx]), s_chars.count);
+				trow = s_chars.pix + code * 64 + (ty & 7) * 8;
+				cbase = (uint32_t)(attr >> 6) * 8;
+			}
+			const uint8_t p = trow[tx & 7];
 			if (p)
-				d[x] = (uint16_t)((attr >> 6) * 8 + p);
+				d[x] = (uint16_t)(cbase + p);
 		}
 	}
 }

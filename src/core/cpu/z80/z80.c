@@ -1597,7 +1597,12 @@ void exec_opcode_ed(z80* const z, uint8_t opcode) {
     z->iff1 = z->iff2;
     ret(z);
     break; // retn
-  case 0x4D: z->iff1 = z->iff2; ret(z); break; // reti (copies IFF2 to IFF1 like retn, as MAME z80)
+  case 0x4D: // reti (copies IFF2 to IFF1 like retn, as MAME z80)
+    z->iff1 = z->iff2;
+    ret(z);
+    if (z80_reti_hook)   // ReBOX: the daisy chain's RETI (MAME daisy_call_reti_device)
+      z80_reti_hook(z);
+    break;
 
   case 0xA0: ldi(z); break; // ldi
   case 0xB0: {
@@ -1832,6 +1837,10 @@ int z80_halt_skip(z80* const z, unsigned long end, int int_line) {
 // ReBOX: set (by a memory handler) to end z80_run after the instruction that set it: the board lets another CPU catch
 // up to this one's time there (not saved: only within a run)
 int z80_break;
+
+// ReBOX: called after a RETI (ED 4D) by any Z80 (NULL: none). A board with a Z80 daisy chain (CTC / PIO interrupts)
+// sets it at init and clears it at exit (not saved)
+void (*z80_reti_hook)(z80* z);
 
 void z80_run(z80* const z, unsigned long end, int* const line, int hold) {
   while ((long)(z->cyc - end) < 0) {

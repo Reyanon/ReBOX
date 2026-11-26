@@ -117,20 +117,32 @@ static void sz_render(void)
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y + s_snap->scroll : y + s_snap->scroll) & 511;
+		uint32_t last = 0xffffffffu, cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {   // bg: TILEMAP_SCAN_COLS_FLIP_X, 16 x 32 of 16x16, the lower half flipped
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
-			const uint32_t row = ty >> 4, idx = (15 - (tx >> 4)) * 32 + row;
-			const uint8_t c = s_snap->bg[0x200 + idx];
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg[idx] + ((c & 8) << 5)), s_gtile.count);
-			const uint32_t py = row >= 16 ? 15 - (ty & 15) : ty & 15;
-			d[x] = (uint16_t)(32 + ((c & 0x30) >> 4) * 8 + s_gtile.pix[code * 256 + py * 16 + (tx & 15)]);
+			if ((tx >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = tx >> 4;
+				const uint32_t row = ty >> 4, idx = (15 - (tx >> 4)) * 32 + row;
+				const uint8_t c = s_snap->bg[0x200 + idx];
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg[idx] + ((c & 8) << 5)), s_gtile.count);
+				const uint32_t py = row >= 16 ? 15 - (ty & 15) : ty & 15;
+				trow = s_gtile.pix + code * 256 + py * 16;
+				cbase = 32 + (uint32_t)((c & 0x30) >> 4) * 8;
+			}
+			d[x] = (uint16_t)(cbase + trow[tx & 15]);
 		}
 		const uint32_t fy = (uint32_t)(flip ? 255 - y : y) & 255;
+		last = 0xffffffffu;
 		for (int x = 0; x < VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
-			const uint32_t idx = (31 - (tx >> 3)) * 32 + (fy >> 3);
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->fg[idx] + 256 * (s_snap->fg[0x400 + idx] & 7)), s_gchar.count);
-			const uint8_t p = s_gchar.pix[code * 64 + (fy & 7) * 8 + (tx & 7)];
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint32_t idx = (31 - (tx >> 3)) * 32 + (fy >> 3);
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->fg[idx] + 256 * (s_snap->fg[0x400 + idx] & 7)), s_gchar.count);
+				trow = s_gchar.pix + code * 64 + (fy & 7) * 8;
+			}
+			const uint8_t p = trow[tx & 7];
 			if (p)
 				d[x] = (uint16_t)(s_snap->color_bank * 8 + p);
 		}

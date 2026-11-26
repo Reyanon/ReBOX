@@ -44,6 +44,7 @@ void z80_step(z80* const z);
 void z80_run(z80* const z, unsigned long end, int* const line, int hold);
 int z80_halt_skip(z80* const z, unsigned long end, int int_line);
 extern int z80_break;   // ReBOX: z80_run ends after the instruction that sets it
+extern void (*z80_reti_hook)(z80* z);   // ReBOX: after a RETI (the daisy chain), NULL = none
 void z80_debug_output(z80* const z);
 void z80_gen_nmi(z80* const z);
 void z80_gen_int(z80* const z, uint8_t data);

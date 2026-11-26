@@ -6,6 +6,7 @@ list(APPEND RBX_CORE_SOURCES
   ${RBX_TOAPLAN_DIR}/boards/toaplan2.c
   ${RBX_TOAPLAN_DIR}/boards/toaplan1.c
   ${RBX_TOAPLAN_DIR}/boards/twincobr.c
+  ${RBX_TOAPLAN_DIR}/boards/snowbros.c
   ${RBX_TOAPLAN_DIR}/video/gp9001.c
   ${RBX_TOAPLAN_DIR}/video/txtilemap.c
 )

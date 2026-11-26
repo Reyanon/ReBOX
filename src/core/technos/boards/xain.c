@@ -210,36 +210,50 @@ static void draw_bg(const vseg *sg, int n, const line_regs *r, int y, int opaque
 	const uint16_t base = n ? 256 : 384;
 	const uint32_t ty = (uint32_t)(r->flip ? 255 - y + r->sy[n] : y + r->sy[n]) & 511;
 	const uint32_t row = ty >> 4, fy = ty & 15;
+	uint32_t last = 0xffffffffu, hflip = 0, pbase = 0;
+	const uint8_t *trow = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const uint32_t tx = (uint32_t)(r->flip ? 255 - x + r->sx[n] : x + r->sx[n]) & 511;
 		const uint32_t col = tx >> 4;
-		const uint32_t idx = (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
-		const uint8_t attr = vram[idx | 0x400];
-		const uint32_t code = rbx_wrap((uint32_t)(vram[idx] | (attr & 7) << 8), g->count);
-		const uint32_t px = attr & 0x80 ? 15 - (tx & 15) : tx & 15;
-		const uint8_t p = g->pix[code * 256 + fy * 16 + px];
+		if (col != last) {   // (a tile looked up once for its 16 pixels)
+			last = col;
+			const uint32_t idx = (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
+			const uint8_t attr = vram[idx | 0x400];
+			const uint32_t code = rbx_wrap((uint32_t)(vram[idx] | (attr & 7) << 8), g->count);
+			trow = g->pix + code * 256 + fy * 16;
+			hflip = attr & 0x80;
+			pbase = base + ((attr & 0x70) >> 4) * 16;
+		}
+		const uint8_t p = trow[hflip ? 15 - (tx & 15) : tx & 15];
 		if (p || opaque)
-			d[x] = (uint16_t)(base + ((attr & 0x70) >> 4) * 16 + p);
+			d[x] = (uint16_t)(pbase + p);
 	}
 }
 
 static void draw_char(const vseg *sg, const line_regs *r, int y, int opaque, uint16_t *d)
 {
 	const uint32_t ty = (uint32_t)(r->flip ? 255 - y : y) & 255;
+	uint32_t last = 0xffffffffu, pbase = 0;
+	const uint8_t *trow = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const uint32_t tx = (uint32_t)(r->flip ? 255 - x : x) & 255;
-		const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
-		const uint8_t attr = sg->chr[idx | 0x400];
-		const uint32_t code = rbx_wrap((uint32_t)(sg->chr[idx] | (attr & 3) << 8), s_gchar.count);
-		const uint8_t p = s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
+		if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+			last = tx >> 3;
+			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
+			const uint8_t attr = sg->chr[idx | 0x400];
+			const uint32_t code = rbx_wrap((uint32_t)(sg->chr[idx] | (attr & 3) << 8), s_gchar.count);
+			trow = s_gchar.pix + code * 64 + (ty & 7) * 8;
+			pbase = ((attr & 0xe0) >> 5) * 16;
+		}
+		const uint8_t p = trow[tx & 7];
 		if (p || opaque)
-			d[x] = (uint16_t)(((attr & 0xe0) >> 5) * 16 + p);
+			d[x] = (uint16_t)(pbase + p);
 	}
 }
 
 static void draw_spr16(uint32_t code, int color, int fx, int fy, int sx, int sy)
 {
-	code %= s_gspr.count;
+	code = rbx_wrap(code, s_gspr.count);
 	if (!s_gspr.used[code] || sy >= s_clip1 || sy + 16 <= s_clip0)
 		return;
 	const uint8_t *src = s_gspr.pix + code * 256;

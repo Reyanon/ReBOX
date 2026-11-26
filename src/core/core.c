@@ -102,6 +102,12 @@ extern const rbx_module rbx_mod_tecmo;
 #ifdef RBX_MOD_MIDWAY
 extern const rbx_module rbx_mod_midway;
 #endif
+#ifdef RBX_MOD_METRO
+extern const rbx_module rbx_mod_metro;
+#endif
+#ifdef RBX_MOD_EOLITH
+extern const rbx_module rbx_mod_eolith;
+#endif
 static const rbx_module *const s_modules[] = {
 #ifdef RBX_MOD_TAITO
 	&rbx_mod_taito,
@@ -168,6 +174,12 @@ static const rbx_module *const s_modules[] = {
 #endif
 #ifdef RBX_MOD_MIDWAY
 	&rbx_mod_midway,
+#endif
+#ifdef RBX_MOD_METRO
+	&rbx_mod_metro,
+#endif
+#ifdef RBX_MOD_EOLITH
+	&rbx_mod_eolith,
 #endif
 };
 #define NMODULES ((int)(sizeof(s_modules) / sizeof(s_modules[0])))

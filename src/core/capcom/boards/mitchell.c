@@ -200,14 +200,21 @@ static void mt_render(void)
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y : y) & 255;
+		uint32_t last = 0xffffffffu, cbase = 0, hflip = 0;
+		const uint8_t *row = NULL;
 		for (int x = VIS_X0; x < VIS_X0 + VIS_W; x++) {   // (bitmap.fill(0), then the tilemap with pen 15 clear)
 			const uint32_t tx = (uint32_t)(flip ? 511 - x : x) & 511;
-			const uint32_t idx = (ty >> 3) * 64 + (tx >> 3);
-			const uint8_t attr = s_snap->color[idx];
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[2 * idx] | s_snap->vram[2 * idx + 1] << 8), s_gchar.count);
-			const uint32_t px = (attr & 0x80) ? 7 - (tx & 7) : tx & 7;
-			const uint8_t p = s_gchar.pix[code * 64 + (ty & 7) * 8 + px];
-			d[x - VIS_X0] = p == 15 ? 0 : (uint16_t)((attr & 0x7f) * 16 + p);
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint32_t idx = (ty >> 3) * 64 + (tx >> 3);
+				const uint8_t attr = s_snap->color[idx];
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[2 * idx] | s_snap->vram[2 * idx + 1] << 8), s_gchar.count);
+				row = s_gchar.pix + code * 64 + (ty & 7) * 8;
+				hflip = attr & 0x80;
+				cbase = (uint32_t)(attr & 0x7f) * 16;
+			}
+			const uint8_t p = row[hflip ? 7 - (tx & 7) : tx & 7];
+			d[x - VIS_X0] = p == 15 ? 0 : (uint16_t)(cbase + p);
 		}
 	}
 	for (int o = 0x1000 - 0x40; o >= 0; o -= 0x20) {

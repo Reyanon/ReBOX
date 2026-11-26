@@ -360,13 +360,21 @@ static void draw_text(int y0, int y1, int flip)   // WrestleFest's 8x8 text laye
 	for (int y = y0; y < y1; y++) {
 		uint16_t *dst = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const int ty = (flip ? 255 - y : y) & 255;
+		int last = -1;
+		uint32_t cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {
 			const int tx = (flip ? VIS_W - 1 - x : x) & 511;
-			const uint16_t *t = &s_snap->fg0ram[((ty >> 3) * 64 + (tx >> 3)) * 2];
-			const uint32_t code = rbx_wrap((uint32_t)((t[0] & 0x00ff) | (t[1] & 0x000f) << 8), s_gfxtext.count);
-			const uint8_t p = s_gfxtext.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint16_t *t = &s_snap->fg0ram[((ty >> 3) * 64 + (tx >> 3)) * 2];
+				const uint32_t code = rbx_wrap((uint32_t)((t[0] & 0x00ff) | (t[1] & 0x000f) << 8), s_gfxtext.count);
+				trow = s_gfxtext.pix + code * 64 + (ty & 7) * 8;
+				cbase = (uint32_t)((t[1] & 0x00f0) >> 4) * 16;
+			}
+			const uint8_t p = trow[tx & 7];
 			if (p)
-				dst[x] = (uint16_t)(((t[1] & 0x00f0) >> 4) * 16 + p);
+				dst[x] = (uint16_t)(cbase + p);
 		}
 	}
 }

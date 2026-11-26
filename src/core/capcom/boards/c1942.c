@@ -162,24 +162,38 @@ static void c42_render(void)
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y : y) & 255;
+		uint32_t last = 0xffffffffu, cbase = 0, hflip = 0;
+		const uint8_t *row = NULL;
 		for (int x = 0; x < VIS_W; x++) {   // bg: TILEMAP_SCAN_COLS 32 x 16 of 16x16
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + scroll : x + scroll) & 511;
-			const uint32_t ti0 = (tx >> 4) * 16 + (ty >> 4);
-			const uint32_t ti = (ti0 & 0x0f) | ((ti0 & 0x1f0) << 1);
-			const uint8_t c = s_snap->bg[ti + 0x10];
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg[ti] + ((c & 0x80) << 1)), s_gtile.count);
-			const uint32_t px = (c & 0x20) ? 15 - (tx & 15) : tx & 15, py = (c & 0x40) ? 15 - (ty & 15) : ty & 15;
-			d[x] = (uint16_t)(64 * 4 + ((c & 0x1f) + 0x20 * s_snap->palbank) * 8 + s_gtile.pix[code * 256 + py * 16 + px]);
+			if ((tx >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = tx >> 4;
+				const uint32_t ti0 = (tx >> 4) * 16 + (ty >> 4);
+				const uint32_t ti = (ti0 & 0x0f) | ((ti0 & 0x1f0) << 1);
+				const uint8_t c = s_snap->bg[ti + 0x10];
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg[ti] + ((c & 0x80) << 1)), s_gtile.count);
+				const uint32_t py = (c & 0x40) ? 15 - (ty & 15) : ty & 15;
+				row = s_gtile.pix + code * 256 + py * 16;
+				hflip = c & 0x20;
+				cbase = (uint32_t)(64 * 4 + ((c & 0x1f) + 0x20 * s_snap->palbank) * 8);
+			}
+			d[x] = (uint16_t)(cbase + row[hflip ? 15 - (tx & 15) : tx & 15]);
 		}
 		draw_sprite_line(y);
+		last = 0xffffffffu;
 		for (int x = 0; x < VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
-			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
-			const uint8_t c = s_snap->fg[idx + 0x400];
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->fg[idx] + ((c & 0x80) << 1)), s_gchar.count);
-			const uint8_t p = s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
+				const uint8_t c = s_snap->fg[idx + 0x400];
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->fg[idx] + ((c & 0x80) << 1)), s_gchar.count);
+				row = s_gchar.pix + code * 64 + (ty & 7) * 8;
+				cbase = (uint32_t)(c & 0x3f) * 4;
+			}
+			const uint8_t p = row[tx & 7];
 			if (p)
-				d[x] = (uint16_t)((c & 0x3f) * 4 + p);
+				d[x] = (uint16_t)(cbase + p);
 		}
 	}
 }

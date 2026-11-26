@@ -102,12 +102,19 @@ static void ss_render(void)
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y : y) & 255;
 		const uint32_t sx = (ty >> 3) >= 5 ? s_snap->scrollx : 0;   // (scroll rows 5-31)
+		uint32_t last = 0xffffffffu, cbase = 0;
+		const uint8_t *row = NULL;
 		for (int x = VIS_X0; x < VIS_X0 + VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + (int)sx : x + (int)sx) & 255;
-			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
-			const uint8_t attr = s_snap->cram[idx];
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] + 256 * (attr & 3)), s_gchar.count);
-			d[x - VIS_X0] = (uint16_t)((attr >> 2) * 4 + s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)]);
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
+				const uint8_t attr = s_snap->cram[idx];
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] + 256 * (attr & 3)), s_gchar.count);
+				row = s_gchar.pix + code * 64 + (ty & 7) * 8;
+				cbase = (uint32_t)(attr >> 2) * 4;
+			}
+			d[x - VIS_X0] = (uint16_t)(cbase + row[tx & 7]);
 		}
 	}
 	for (int o = 0x60 - 4; o >= 0; o -= 4) {

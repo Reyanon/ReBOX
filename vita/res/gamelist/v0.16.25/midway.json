@@ -1,0 +1,150 @@
+{
+"name":"Midway",
+"order":21,
+"games":[
+{
+"rompath":"/roms/archrivla.zip",
+"title":"Arch Rivals (rev 2.0 5/03/89)",
+"board":"MCR",
+"publisher":"Bally Midway",
+"year":"1989",
+"genre":"Sports",
+"marquee":"/marquee/archrivla.png",
+"snap":"/snap/archrivla.png",
+"video":"/video/archrivla.mp4",
+"description":null
+},
+{
+"rompath":"/roms/archrivlb.zip",
+"title":"Arch Rivals (rev 2.0 5/03/89, 8-way joystick bootleg)",
+"board":"MCR",
+"publisher":"Bootleg",
+"year":"1989",
+"genre":"Sports",
+"marquee":"/marquee/archrivlb.png",
+"snap":"/snap/archrivlb.png",
+"video":"/video/archrivlb.mp4",
+"description":null
+},
+{
+"rompath":"/roms/archrivl.zip",
+"title":"Arch Rivals (rev 4.0 6/29/89)",
+"board":"MCR",
+"publisher":"Bally Midway",
+"year":"1989",
+"genre":"Sports",
+"marquee":"/marquee/archrivl.png",
+"snap":"/snap/archrivl.png",
+"video":"/video/archrivl.mp4",
+"description":null
+},
+{
+"rompath":"/roms/basketbal.zip",
+"title":"Basket Ball (8-way joystick bootleg of Arch Rivals)",
+"board":"MCR",
+"publisher":"Bootleg",
+"year":"1989",
+"genre":"Sports",
+"marquee":"/marquee/basketbal.png",
+"snap":"/snap/basketbal.png",
+"video":"/video/basketbal.mp4",
+"description":null
+},
+{
+"rompath":"/roms/blasted.zip",
+"title":"Blasted",
+"board":"MCR",
+"publisher":"Bally Midway",
+"year":"1988",
+"genre":"Shooter",
+"marquee":"/marquee/blasted.png",
+"snap":"/snap/blasted.png",
+"video":"/video/blasted.mp4",
+"description":null
+},
+{
+"rompath":"/roms/pigskinb.zip",
+"title":"Pigskin 621AD (rev 1.1 6/05/90)",
+"board":"MCR",
+"publisher":"Midway",
+"year":"1990",
+"genre":"Sports",
+"marquee":"/marquee/pigskinb.png",
+"snap":"/snap/pigskinb.png",
+"video":"/video/pigskinb.mp4",
+"description":null
+},
+{
+"rompath":"/roms/pigskin.zip",
+"title":"Pigskin 621AD (rev 1.1K 8/01/90)",
+"board":"MCR",
+"publisher":"Midway",
+"year":"1990",
+"genre":"Sports",
+"marquee":"/marquee/pigskin.png",
+"snap":"/snap/pigskin.png",
+"video":"/video/pigskin.mp4",
+"description":null
+},
+{
+"rompath":"/roms/pigskina.zip",
+"title":"Pigskin 621AD (rev 2.0 7/06/90)",
+"board":"MCR",
+"publisher":"Midway",
+"year":"1990",
+"genre":"Sports",
+"marquee":"/marquee/pigskina.png",
+"snap":"/snap/pigskina.png",
+"video":"/video/pigskina.mp4",
+"description":null
+},
+{
+"rompath":"/roms/spyhunt2a.zip",
+"title":"Spy Hunter II (rev 1)",
+"board":"MCR",
+"publisher":"Bally Midway",
+"year":"1987",
+"genre":"Shooter",
+"marquee":"/marquee/spyhunt2a.png",
+"snap":"/snap/spyhunt2a.png",
+"video":"/video/spyhunt2a.mp4",
+"description":null
+},
+{
+"rompath":"/roms/spyhunt2.zip",
+"title":"Spy Hunter II (rev 2)",
+"board":"MCR",
+"publisher":"Bally Midway",
+"year":"1987",
+"genre":"Shooter",
+"marquee":"/marquee/spyhunt2.png",
+"snap":"/snap/spyhunt2.png",
+"video":"/video/spyhunt2.mp4",
+"description":null
+},
+{
+"rompath":"/roms/trisport.zip",
+"title":"Tri-Sports",
+"board":"MCR",
+"publisher":"Bally Midway",
+"year":"1989",
+"genre":"MultiGame",
+"marquee":"/marquee/trisport.png",
+"snap":"/snap/trisport.png",
+"video":"/video/trisport.mp4",
+"description":null
+},
+{
+"rompath":"/roms/xenophob.zip",
+"title":"Xenophobe",
+"board":"MCR",
+"publisher":"Bally Midway",
+"year":"1987",
+"genre":"Platform",
+"marquee":"/marquee/xenophob.png",
+"snap":"/snap/xenophob.png",
+"video":"/video/xenophob.mp4",
+"description":null
+}
+]
+}

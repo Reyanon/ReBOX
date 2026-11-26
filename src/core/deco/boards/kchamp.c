@@ -238,11 +238,19 @@ static void kc_render(void)
 	for (int y = 0; y < VIS_H; y++) {   // the map (TILEMAP_SCAN_ROWS, opaque; flip: mirrored)
 		const int sy = y + VIS_Y0, ty = flip ? 255 - sy : sy;
 		uint16_t *d = bm + y * pitch;
+		int last = -1;
+		uint32_t cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < 256; x++) {
 			const int tx = flip ? 255 - x : x;
-			const int idx = (ty >> 3) * 32 + (tx >> 3);
-			const int code = s_snap->vram[idx] + ((s_snap->cram[idx] & 7) << 8), color = (s_snap->cram[idx] >> 3) & 0x1f;
-			d[x] = (uint16_t)(128 + color * 4 + s_gfxtile.pix[(size_t)rbx_wrap(code, s_gfxtile.count) * 64 + (ty & 7) * 8 + (tx & 7)]);
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const int idx = (ty >> 3) * 32 + (tx >> 3);
+				const int code = s_snap->vram[idx] + ((s_snap->cram[idx] & 7) << 8), color = (s_snap->cram[idx] >> 3) & 0x1f;
+				trow = s_gfxtile.pix + (size_t)rbx_wrap(code, s_gfxtile.count) * 64 + (ty & 7) * 8;
+				cbase = 128 + (uint32_t)color * 4;
+			}
+			d[x] = (uint16_t)(cbase + trow[tx & 7]);
 		}
 	}
 	const int dx = s_vs ? 0 : -8, dy = s_vs ? 0 : 7;

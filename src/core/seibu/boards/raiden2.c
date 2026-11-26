@@ -662,11 +662,17 @@ static void layer_pens(int layer, int y, uint16_t *out)
 	int sx, sy;
 	if (layer == 3) {
 		const int ty = y & 255;
+		uint32_t tbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {
-			const uint16_t data = s_snap.text[(ty >> 3) * 64 + (x >> 3)];
-			const uint32_t code = rbx_wrap((data & 0xfffu) | s_snap.tx_bank << 12, s_chars.count);
-			const uint8_t pen = s_chars.pix[(size_t)code * 64 + (size_t)(ty & 7) * 8 + (size_t)(x & 7)];
-			out[x] = pen == 15 ? 0xffff : (uint16_t)(0x700 + ((data >> 12) & 0xf) * 16 + pen);
+			if (!(x & 7)) {   // (a character looked up once for its 8 pixels)
+				const uint16_t data = s_snap.text[(ty >> 3) * 64 + (x >> 3)];
+				const uint32_t code = rbx_wrap((data & 0xfffu) | s_snap.tx_bank << 12, s_chars.count);
+				trow = s_chars.pix + (size_t)code * 64 + (size_t)(ty & 7) * 8;
+				tbase = 0x700 + (uint32_t)((data >> 12) & 0xf) * 16;
+			}
+			const uint8_t pen = trow[x & 7];
+			out[x] = pen == 15 ? 0xffff : (uint16_t)(tbase + pen);
 		}
 		return;
 	}
@@ -676,12 +682,20 @@ static void layer_pens(int layer, int y, uint16_t *out)
 	default: ram = s_snap.fore; bank = s_snap.fg_bank; cbase = 0x500; sx = s_snap.scroll[4]; sy = s_snap.scroll[5]; break;
 	}
 	const int ty = (y + sy) & 511;
+	int last = -1;
+	uint32_t tbase = 0;
+	const uint8_t *trow = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const int tx = (x + sx) & 511;
-		const uint16_t data = ram[(ty >> 4) * 32 + (tx >> 4)];
-		const uint32_t code = rbx_wrap((data & 0xfffu) | bank << 12, s_tiles.count);
-		const uint8_t pen = s_tiles.pix[(size_t)code * 256 + (size_t)(ty & 15) * 16 + (size_t)(tx & 15)];
-		out[x] = pen == 15 ? 0xffff : (uint16_t)(cbase + (data >> 12) * 16 + pen);
+		if ((tx >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+			last = tx >> 4;
+			const uint16_t data = ram[(ty >> 4) * 32 + (tx >> 4)];
+			const uint32_t code = rbx_wrap((data & 0xfffu) | bank << 12, s_tiles.count);
+			trow = s_tiles.pix + (size_t)code * 256 + (size_t)(ty & 15) * 16;
+			tbase = cbase + (uint32_t)(data >> 12) * 16;
+		}
+		const uint8_t pen = trow[tx & 15];
+		out[x] = pen == 15 ? 0xffff : (uint16_t)(tbase + pen);
 	}
 }
 

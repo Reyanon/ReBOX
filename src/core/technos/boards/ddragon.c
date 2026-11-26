@@ -713,14 +713,22 @@ static void draw_bg_line(const vseg *sg, int y, const line_regs *r, uint16_t *ds
 	const uint8_t *vram = sg->bgram;
 	const uint32_t ty = (uint32_t)(r->flip ? 247 - y + r->sy : y + 8 + r->sy) & 511;
 	const uint32_t row = ty >> 4, fy = ty & 15;
+	uint32_t last = 0xffffffffu, cbase = 0, hflip = 0;
+	const uint8_t *trow = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const uint32_t tx = (uint32_t)(r->flip ? 255 - x + r->sx : x + r->sx) & 511;
 		const uint32_t col = tx >> 4;
-		const uint32_t off = ((col & 0x0f) | ((row & 0x0f) << 4) | ((col & 0x10) << 4) | ((row & 0x10) << 5)) * 2;
-		const uint8_t attr = vram[off];
-		const uint32_t code = rbx_wrap((uint32_t)(vram[off | 1] | (attr & 7) << 8), s_gfxtile.count);
-		const uint32_t px = attr & 0x40 ? 15 - (tx & 15) : tx & 15, py = attr & 0x80 ? 15 - fy : fy;
-		dst[x] = (uint16_t)(256 + ((attr >> 3) & 7) * 16 + s_gfxtile.pix[code * 256 + py * 16 + px]);
+		if (col != last) {   // (a tile looked up once for its 16 pixels)
+			last = col;
+			const uint32_t off = ((col & 0x0f) | ((row & 0x0f) << 4) | ((col & 0x10) << 4) | ((row & 0x10) << 5)) * 2;
+			const uint8_t attr = vram[off];
+			const uint32_t code = rbx_wrap((uint32_t)(vram[off | 1] | (attr & 7) << 8), s_gfxtile.count);
+			const uint32_t py = attr & 0x80 ? 15 - fy : fy;
+			trow = s_gfxtile.pix + code * 256 + py * 16;
+			hflip = attr & 0x40;
+			cbase = 256 + (uint32_t)((attr >> 3) & 7) * 16;
+		}
+		dst[x] = (uint16_t)(cbase + trow[hflip ? 15 - (tx & 15) : tx & 15]);
 	}
 }
 
@@ -728,22 +736,29 @@ static void draw_fg_line(const vseg *sg, int y, const line_regs *r, uint16_t *ds
 {
 	const uint8_t *vram = sg->fgram;
 	const uint32_t ty = (uint32_t)(r->flip ? 247 - y : y + 8) & 255;
+	uint32_t last = 0xffffffffu, cbase = 0;
+	const uint8_t *trow = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const uint32_t tx = (uint32_t)(r->flip ? 255 - x : x) & 255;
-		const uint32_t off = ((ty >> 3) * 32 + (tx >> 3)) * 2;
-		const uint8_t attr = vram[off];
-		uint32_t code, color;
-		if (s_hw == 1) {   // get_fg_16color_tile_info
-			code = vram[off | 1] | (uint32_t)(attr & 0x0f) << 8;
-			color = attr >> 4;
-		} else {
-			code = vram[off | 1] | (uint32_t)(attr & 0x07) << 8;
-			color = attr >> 5;
+		if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+			last = tx >> 3;
+			const uint32_t off = ((ty >> 3) * 32 + (tx >> 3)) * 2;
+			const uint8_t attr = vram[off];
+			uint32_t code, color;
+			if (s_hw == 1) {   // get_fg_16color_tile_info
+				code = vram[off | 1] | (uint32_t)(attr & 0x0f) << 8;
+				color = attr >> 4;
+			} else {
+				code = vram[off | 1] | (uint32_t)(attr & 0x07) << 8;
+				color = attr >> 5;
+			}
+			code %= s_gfxchar.count;
+			trow = s_gfxchar.pix + code * 64 + (ty & 7) * 8;
+			cbase = color * 16;
 		}
-		code %= s_gfxchar.count;
-		const uint8_t p = s_gfxchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
+		const uint8_t p = trow[tx & 7];
 		if (p)
-			dst[x] = (uint16_t)(color * 16 + p);
+			dst[x] = (uint16_t)(cbase + p);
 	}
 }
 

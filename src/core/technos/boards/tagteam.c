@@ -119,11 +119,17 @@ static void tt_render(void)
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y : y) & 255;
+		uint32_t last = 0xffffffffu;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {   // TILEMAP_SCAN_ROWS_FLIP_X
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
-			const uint32_t idx = (ty >> 3) * 32 + (31 - (tx >> 3));
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] + 256 * s_snap->cram[idx]), s_gchar.count);
-			d[x] = (uint16_t)(cbase + s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)]);
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint32_t idx = (ty >> 3) * 32 + (31 - (tx >> 3));
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] + 256 * s_snap->cram[idx]), s_gchar.count);
+				trow = s_gchar.pix + code * 64 + (ty & 7) * 8;
+			}
+			d[x] = (uint16_t)(cbase + trow[tx & 7]);
 		}
 	}
 	for (int o = 0; o < 0x20; o += 4) {

@@ -239,18 +239,26 @@ static void bg_draw(int which, uint16_t *bm, int pitch, int opaque)
 	for (int y = 0; y < VIS_H; y++) {
 		uint16_t *d = bm + y * pitch;
 		const int py = flip ? 511 - ((y + VIS_Y0 - (272 - 512 + sy)) & 0x1ff) : (y + VIS_Y0 + sy) & 0x1ff;
+		int last = -1, hflip = 0;
+		uint32_t cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {
 			const int px = flip ? 511 - ((x - (384 - 512 + sx)) & 0x1ff) : (x + sx) & 0x1ff;
-			const int col = px >> 4, row = py >> 4;
-			const int idx = ((row & 0x0f) ^ 0x0f) | ((col & 0x0f) << 4) | ((row & 0x10) << 5) | ((col & 0x10) << 6);
-			const int attr = v[idx + 0x100];
-			int tx = px & 15, ty = py & 15;
-			if (attr & 4) tx = 15 - tx;
-			if (attr & 8) ty = 15 - ty;
-			const uint32_t code = rbx_wrap((uint32_t)(v[idx] + ((attr & 3) << 8)), g->count);
-			const uint8_t p = g->pix[(code * 16 + (uint32_t)ty) * 16 + (uint32_t)tx];
+			if ((px >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = px >> 4;
+				const int col = px >> 4, row = py >> 4;
+				const int idx = ((row & 0x0f) ^ 0x0f) | ((col & 0x0f) << 4) | ((row & 0x10) << 5) | ((col & 0x10) << 6);
+				const int attr = v[idx + 0x100];
+				int ty = py & 15;
+				if (attr & 8) ty = 15 - ty;
+				const uint32_t code = rbx_wrap((uint32_t)(v[idx] + ((attr & 3) << 8)), g->count);
+				trow = g->pix + (code * 16 + (uint32_t)ty) * 16;
+				hflip = attr & 4;
+				cbase = (uint32_t)((which ? 0xc0 : 0x80) + ((attr & 0x30) >> 4) * 16);
+			}
+			const uint8_t p = trow[hflip ? 15 - (px & 15) : px & 15];
 			if (opaque || p)
-				d[x] = (uint16_t)((which ? 0xc0 : 0x80) + ((attr & 0x30) >> 4) * 16 + p);
+				d[x] = (uint16_t)(cbase + p);
 		}
 	}
 }

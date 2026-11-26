@@ -173,18 +173,27 @@ static void draw_text(const snap_t *sn, int y, uint16_t *d, int cat, int skip)
 	const int flip = sn->flip;
 	const int ly = flip ? 223 - y : y;
 	const int row = ly >> 3;
+	const int py = flip ? 7 - (ly & 7) : ly & 7;
+	int last = -1, hide = 0;
+	uint32_t cbase = 0;
+	const uint8_t *trow = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const int lx = flip ? VIS_W - 1 - x : x;
-		const int r = row + 2, c = (lx >> 3) - 2;
-		const int idx = (c & 0x20) ? r + ((c & 0x1f) << 5) : c + (r << 5);
-		const uint8_t code = sn->text[idx];
-		if (cat >= 0 && ((code >> 4) == cat) == skip)
+		if ((lx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+			last = lx >> 3;
+			const int r = row + 2, c = (lx >> 3) - 2;
+			const int idx = (c & 0x20) ? r + ((c & 0x1f) << 5) : c + (r << 5);
+			const uint8_t code = sn->text[idx];
+			hide = cat >= 0 && ((code >> 4) == cat) == skip;
+			// (the second set holds the flipped characters: the tile itself is not flipped back)
+			trow = s_txpix + rbx_wrap(code | (flip ? 0x100u : 0u), s_tx_count) * 64 + (uint32_t)(py * 8);
+			cbase = (uint32_t)(sn->text[idx + 0x400] & 0x3f) * 4;
+		}
+		if (hide)
 			continue;
-		// (the second set holds the flipped characters: the tile itself is not flipped back)
-		const int px = flip ? 7 - (lx & 7) : lx & 7, py = flip ? 7 - (ly & 7) : ly & 7;
-		const uint8_t pen = s_txpix[rbx_wrap(code | (flip ? 0x100u : 0u), s_tx_count) * 64 + (uint32_t)(py * 8 + px)];
+		const uint8_t pen = trow[flip ? 7 - (lx & 7) : lx & 7];
 		if (pen)
-			d[x] = (uint16_t)((sn->text[idx + 0x400] & 0x3f) * 4 + pen);
+			d[x] = (uint16_t)(cbase + pen);
 	}
 }
 

@@ -469,6 +469,11 @@ static void map_common(void)
 		nec_map(&s_cpu, k->vram[1], k->vram[1] + 0x4000, (uint8_t *)t.vram[1], (uint8_t *)t.vram[1]);
 	if (k->kind == K_M72)
 		nec_map(&s_cpu, 0xe0000, 0xf0000, t.soundram, t.soundram);
+	// the MCU boards' shared RAM read straight (dpram_left_r has no side effect; writes still go to main_wm, which
+	// raises the MCU's INT0): at power on the V30 polls it for the MCU's answer, hundreds of thousands of reads a
+	// frame through main_r8 / main_r16 (11 fps for the first 50 s on the Vita)
+	if (k->mcu)
+		nec_map(&s_cpu, 0xb0000, 0xb1000, (const uint8_t *)t.dpram, NULL);
 	s_cpu.omap[0xff] = s_rom + 0xff000;
 }
 

@@ -349,8 +349,19 @@ static void draw_lines(int y0, int y1)   // screen_update on [y0, y1]
 			const uint16_t color = (uint16_t)(256 + (0x10 + s_pf_color_bank * 8 + ((data >> 12) & 7)) * 16);
 			const uint8_t *src = s_gfx_pf.pix + code * 64 + py * 8;
 			const int flip = data >> 15;
-			for (int px = tx & 7; px < 8 && x < VIS_W; px++, x++, tx++)
-				d[x] = (uint16_t)(color + src[flip ? 7 - px : px]);
+			if (!(tx & 7) && x + 8 <= VIS_W) {   // (a whole tile on the line: no per-pixel tests)
+				uint16_t *dd = d + x;
+				if (!flip)
+					for (int k = 0; k < 8; k++)
+						dd[k] = (uint16_t)(color + src[k]);
+				else
+					for (int k = 0; k < 8; k++)
+						dd[k] = (uint16_t)(color + src[7 - k]);
+				x += 8;
+				tx += 8;
+			} else
+				for (int px = tx & 7; px < 8 && x < VIS_W; px++, x++, tx++)
+					d[x] = (uint16_t)(color + src[flip ? 7 - px : px]);
 			tx &= 511;
 		}
 	}

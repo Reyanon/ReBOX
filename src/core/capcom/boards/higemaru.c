@@ -80,13 +80,21 @@ static void hg_render(void)
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y : y) & 255;
+		uint32_t last = 0xffffffffu, cbase = 0, hflip = 0;
+		const uint8_t *row = NULL;
 		for (int x = 0; x < VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
-			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
-			const uint8_t attr = s_snap->cram[idx];
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] | ((attr & 0x80) << 1)), s_gchar.count);
-			const uint32_t px = (attr & 0x20) ? 7 - (tx & 7) : tx & 7, py = (attr & 0x40) ? 7 - (ty & 7) : ty & 7;
-			d[x] = (uint16_t)((attr & 0x1f) * 4 + s_gchar.pix[code * 64 + py * 8 + px]);
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
+				const uint8_t attr = s_snap->cram[idx];
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] | ((attr & 0x80) << 1)), s_gchar.count);
+				const uint32_t py = (attr & 0x40) ? 7 - (ty & 7) : ty & 7;
+				row = s_gchar.pix + code * 64 + py * 8;
+				hflip = attr & 0x20;
+				cbase = (uint32_t)(attr & 0x1f) * 4;
+			}
+			d[x] = (uint16_t)(cbase + row[hflip ? 7 - (tx & 7) : tx & 7]);
 		}
 	}
 	for (int o = 0x180 - 16; o >= 0; o -= 16) {

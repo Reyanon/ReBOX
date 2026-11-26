@@ -343,11 +343,16 @@ static void draw_tilemap(const uint8_t *vram, int bank_add, int pal, int sx, int
 		uint16_t *d = bm + (y - VIS_Y0) * pitch;
 		uint8_t *pr = s_pri + (y - VIS_Y0) * SCREEN_W;
 		const uint8_t *row = vram + (ly >> 3) * 32;
+		int last = -1;
+		const uint8_t *trow = NULL;
 		for (int x = VIS_X0; x < 256; x++) {
 			int lx = (x - ex) & 0xff;
 			if (fx) lx = 255 - lx;
-			int code = row[lx >> 3] + bank_add;
-			uint8_t p = s_tiles[(code & 2047) * 64 + (ly & 7) * 8 + (lx & 7)];
+			if ((lx >> 3) != last) {   // (a tile looked up once for its 8 pixels)
+				last = lx >> 3;
+				trow = s_tiles + ((row[lx >> 3] + bank_add) & 2047) * 64 + (ly & 7) * 8;
+			}
+			const uint8_t p = trow[lx & 7];
 			if (p || opaque) {
 				d[x - VIS_X0] = (uint16_t)(pal + p);
 				pr[x - VIS_X0] |= (uint8_t)pcode;

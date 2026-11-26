@@ -77,6 +77,50 @@ static const int16_t ktable[NUM_K][32] = {
 	// K10
 	{ -205, -132,  -59,   14,   87,  160,  234,  307 },
 };
+// T0285_2501E_coeff (TMS5200 / CD2501E): TI_2501E_PITCH and TI_2801_2501E_LPC; energy, chirp, interpolation as above
+static const uint16_t pitchtable_5200[64] = {
+	0,  14,  15,  16,  17,  18,  19,  20,
+	21,  22,  23,  24,  25,  26,  27,  28,
+	29,  30,  31,  32,  34,  36,  38,  40,
+	41,  43,  45,  48,  49,  51,  54,  55,
+	57,  60,  62,  64,  68,  72,  74,  76,
+	81,  85,  87,  90,  96,  99, 103, 107,
+	112, 117, 122, 127, 133, 139, 145, 151,
+	157, 164, 171, 178, 186, 194, 202, 211
+};
+static const int16_t ktable_5200[NUM_K][32] = {
+	// K1
+	{ -501, -498, -495, -490, -485, -478, -469, -459,
+	  -446, -431, -412, -389, -362, -331, -295, -253,
+	  -207, -156, -102,  -45,   13,   70,  126,  179,
+	   228,  272,  311,  345,  374,  399,  420,  437 },
+	// K2
+	{ -376, -357, -335, -312, -286, -258, -227, -195,
+	  -161, -124,  -87,  -49,  -10,   29,   68,  106,
+	   143,  178,  212,  243,  272,  299,  324,  346,
+	   366,  384,  400,  414,  427,  438,  448,  506 },
+	// K3
+	{ -407, -381, -349, -311, -268, -218, -162, -102,
+	   -39,   25,   89,  149,  206,  257,  302,  341 },
+	// K4
+	{ -290, -252, -209, -163, -114,  -62,   -9,   44,
+	    97,  147,  194,  238,  278,  313,  344,  371 },
+	// K5
+	{ -318, -283, -245, -202, -156, -107,  -56,   -3,
+	    49,  101,  150,  196,  239,  278,  313,  344 },
+	// K6
+	{ -193, -152, -109,  -65,  -20,   26,   71,  115,
+	   158,  198,  235,  270,  301,  330,  355,  377 },
+	// K7
+	{ -254, -218, -180, -140,  -97,  -53,   -8,   36,
+	    81,  124,  165,  204,  240,  274,  304,  332 },
+	// K8
+	{ -205, -112,  -10,   92,  187,  269,  336,  387 },
+	// K9
+	{ -249, -183, -110,  -32,   48,  126,  198,  261 },
+	// K10
+	{ -190, -133,  -73,  -10,   53,  115,  173,  227 },
+};
 // TI_LATER_CHIRP
 static const int8_t chirptable[52] = {
 	0x00, 0x03, 0x0f, 0x28, 0x4c, 0x6c, 0x71, 0x50,
@@ -450,13 +494,13 @@ static int16_t gen_sample(tms5220_t *t)
 					break;
 				case 1:
 					t->current_pitch = (int16_t)((t->current_pitch +
-					    (((pitchtable[t->new_frame_pitch_idx] - t->current_pitch) * (1 - inhibit_state)) >> sh)) *
+					    (((t->pitch_tab[t->new_frame_pitch_idx] - t->current_pitch) * (1 - inhibit_state)) >> sh)) *
 					    (1 - t->zpar));
 					break;
 				case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: {
 					const int i = t->PC - 2;
 					t->current_k[i] = (int16_t)((t->current_k[i] +
-					    (((ktable[i][t->new_frame_k_idx[i]] - t->current_k[i]) * (1 - inhibit_state)) >> sh)) *
+					    (((t->k_tab[i][t->new_frame_k_idx[i]] - t->current_k[i]) * (1 - inhibit_state)) >> sh)) *
 					    (1 - (i < 4 ? t->zpar : t->uv_zpar)));
 					break;
 				}
@@ -661,6 +705,8 @@ void tms5220_init(tms5220_t *t, int variant, uint32_t clock)
 {
 	memset(t, 0, sizeof(*t));
 	t->variant = variant == TMS5220_VARIANT_5220C ? TMS5220_VARIANT_5220C : TMS5220_VARIANT_5220;
+	t->pitch_tab = variant == TMS5220_VARIANT_5200 ? pitchtable_5200 : pitchtable;   // (the 5200: a 5220 otherwise)
+	t->k_tab = variant == TMS5220_VARIANT_5200 ? ktable_5200 : ktable;
 	t->clock = clock;
 	// (device_start)
 	t->io_ready = 1;

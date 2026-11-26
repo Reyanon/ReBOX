@@ -14,6 +14,7 @@ void (*rbx_m68k_int_hook)(int level);
 void (*rbx_m68k_cmpild_hook)(int reg, unsigned int imm);
 void (*rbx_m68k_rte_hook)(void);
 void (*rbx_m68k_irqack_hook)(int level);
+int (*rbx_m68k_vector_hook)(int level);
 
 void m68k_bus_select(m68k_bus_t *b) { m68k_bus_cur = b ? b : &m68k_bus; }
 
@@ -30,6 +31,7 @@ void m68k_bus_reset_map(void)
 	rbx_m68k_cmpild_hook = NULL;   // (set again by the boards that use them)
 	rbx_m68k_rte_hook = NULL;
 	rbx_m68k_irqack_hook = NULL;
+	rbx_m68k_vector_hook = NULL;
 }
 
 void m68k_bus_map(uint32_t start, uint32_t end, void *mem, uint32_t size, int readable, int writable)

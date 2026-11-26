@@ -197,27 +197,34 @@ static void draw_bg1(int layer)   // layer: -1 whole (lwings), 1 back, 0 front (
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y + s_snap->sy : y + s_snap->sy) & 511;
+		uint32_t last = 0xffffffffu, cbase = 0, mask = 0;
+		int fx = 0;
+		const uint8_t *row = NULL;
 		for (int x = 0; x < VIS_W; x++) {   // TILEMAP_SCAN_COLS 32 x 32 of 16x16
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + s_snap->sx : x + s_snap->sx) & 511;
-			const uint32_t idx = (tx >> 4) * 32 + (ty >> 4);
-			const uint8_t c = s_snap->bg1[idx + 0x400];
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg1[idx] + ((c & 0xe0) << 3)), s_gbg1.count);
-			int fx, fy;
-			if (s_trojan) {
-				fx = (c & 0x10) != 0;
-				fy = 0;
-			} else {
-				fx = (c & 0x08) != 0;
-				fy = (c & 0x10) != 0;
+			if ((tx >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = tx >> 4;
+				const uint32_t idx = (tx >> 4) * 32 + (ty >> 4);
+				const uint8_t c = s_snap->bg1[idx + 0x400];
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg1[idx] + ((c & 0xe0) << 3)), s_gbg1.count);
+				int fy;
+				if (s_trojan) {
+					fx = (c & 0x10) != 0;
+					fy = 0;
+				} else {
+					fx = (c & 0x08) != 0;
+					fy = (c & 0x10) != 0;
+				}
+				const uint32_t py = fy ? 15 - (ty & 15) : ty & 15;
+				row = s_gbg1.pix + code * 256 + py * 16;
+				cbase = s_base_bg1 + (uint32_t)(c & 7) * 16;
+				// (set_transmask: group 0 0xffff / 0x0001, group 1 0xf07f / 0x0f81)
+				mask = layer < 0 ? 0 : (c & 8) ? (layer ? 0x0f81u : 0xf07fu) : (layer ? 0x0001u : 0xffffu);
 			}
-			const uint32_t px = fx ? 15 - (tx & 15) : tx & 15, py = fy ? 15 - (ty & 15) : ty & 15;
-			const uint8_t p = s_gbg1.pix[code * 256 + py * 16 + px];
-			if (layer >= 0) {   // (set_transmask: group 0 0xffff / 0x0001, group 1 0xf07f / 0x0f81)
-				const uint32_t mask = (c & 8) ? (layer ? 0x0f81u : 0xf07fu) : (layer ? 0x0001u : 0xffffu);
-				if ((mask >> p) & 1)
-					continue;
-			}
-			d[x] = (uint16_t)(s_base_bg1 + (c & 7) * 16 + p);
+			const uint8_t p = row[fx ? 15 - (tx & 15) : tx & 15];
+			if ((mask >> p) & 1)
+				continue;
+			d[x] = (uint16_t)(cbase + p);
 		}
 	}
 }
@@ -229,13 +236,21 @@ static void draw_bg2(void)   // trojan: 32 x 16 of 16x16 from ROM (get_bg2_memor
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y : y) & 255;
+		uint32_t last = 0xffffffffu, cbase = 0, hflip = 0;
+		const uint8_t *row = NULL;
 		for (int x = 0; x < VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + s_snap->bg2_sx : x + s_snap->bg2_sx) & 511;
-			const uint32_t ti = (((ty >> 4) * 0x800) | ((tx >> 4) * 2)) + (uint32_t)s_snap->bg2_image * 0x20;
-			const uint8_t c = s_bg2rom[(ti + 1) & mask];
-			const uint32_t code = rbx_wrap((uint32_t)(s_bg2rom[ti & mask] + ((c & 0x80) << 1)), s_gbg2.count);
-			const uint32_t px = (c & 0x10) ? 15 - (tx & 15) : tx & 15, py = (c & 0x20) ? 15 - (ty & 15) : ty & 15;
-			d[x] = (uint16_t)((c & 7) * 16 + s_gbg2.pix[code * 256 + py * 16 + px]);
+			if ((tx >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = tx >> 4;
+				const uint32_t ti = (((ty >> 4) * 0x800) | ((tx >> 4) * 2)) + (uint32_t)s_snap->bg2_image * 0x20;
+				const uint8_t c = s_bg2rom[(ti + 1) & mask];
+				const uint32_t code = rbx_wrap((uint32_t)(s_bg2rom[ti & mask] + ((c & 0x80) << 1)), s_gbg2.count);
+				const uint32_t py = (c & 0x20) ? 15 - (ty & 15) : ty & 15;
+				row = s_gbg2.pix + code * 256 + py * 16;
+				hflip = c & 0x10;
+				cbase = (uint32_t)(c & 7) * 16;
+			}
+			d[x] = (uint16_t)(cbase + row[hflip ? 15 - (tx & 15) : tx & 15]);
 		}
 	}
 }
@@ -296,15 +311,23 @@ static void lw_render(void)
 	for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 		uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 		const uint32_t ty = (uint32_t)(flip ? 255 - y : y) & 255;
+		uint32_t last = 0xffffffffu, cbase = 0, hflip = 0;
+		const uint8_t *row = NULL;
 		for (int x = 0; x < VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
-			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
-			const uint8_t c = s_snap->fg[idx + 0x400];
-			const uint32_t code = rbx_wrap((uint32_t)(s_snap->fg[idx] + ((c & 0xc0) << 2)), s_gchar.count);
-			const uint32_t px = (c & 0x10) ? 7 - (tx & 7) : tx & 7, py = (c & 0x20) ? 7 - (ty & 7) : ty & 7;
-			const uint8_t p = s_gchar.pix[code * 64 + py * 8 + px];
+			if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = tx >> 3;
+				const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
+				const uint8_t c = s_snap->fg[idx + 0x400];
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->fg[idx] + ((c & 0xc0) << 2)), s_gchar.count);
+				const uint32_t py = (c & 0x20) ? 7 - (ty & 7) : ty & 7;
+				row = s_gchar.pix + code * 64 + py * 8;
+				hflip = c & 0x10;
+				cbase = s_base_chr + (uint32_t)(c & 0x0f) * 4;
+			}
+			const uint8_t p = row[hflip ? 7 - (tx & 7) : tx & 7];
 			if (p != 3)
-				d[x] = (uint16_t)(s_base_chr + (c & 0x0f) * 4 + p);
+				d[x] = (uint16_t)(cbase + p);
 		}
 	}
 }

@@ -63,6 +63,8 @@ set(RBX_CORE_SOURCES
   ${RBX_CORE_DIR}/machine/tmp68301.c
   ${RBX_CORE_DIR}/machine/i8255.c
   ${RBX_CORE_DIR}/machine/z80pio.c
+  ${RBX_CORE_DIR}/machine/z80ctc.c
+  ${RBX_CORE_DIR}/machine/ptm6840.c
   ${RBX_CORE_DIR}/machine/segacrpt.c
   ${RBX_CORE_DIR}/machine/taito68705.c
   ${RBX_CORE_DIR}/video/x1_001.c
@@ -81,10 +83,14 @@ set(RBX_CORE_SOURCES
   ${RBX_CORE_DIR}/cpu/m68k_snd/snd_m68kopnz.c
   ${RBX_CORE_DIR}/cpu/m68k_snd/snd_m68k_bus.c
   ${RBX_CORE_DIR}/sound/es5505.c
+  ${RBX_CORE_DIR}/sound/es5506.c
+  ${RBX_CORE_DIR}/cpu/upd7725/upd7725.c
   ${RBX_CORE_DIR}/sound/es5510.c
   ${RBX_CORE_DIR}/video/zoomgfx.c
   ${RBX_CORE_DIR}/sound/msm5232.c
   ${RBX_CORE_DIR}/cpu/mcs51/mcs51.c
+  ${RBX_CORE_DIR}/cpu/e132xs/e132xs.c
+  ${RBX_CORE_DIR}/sound/qs1000.c
   ${RBX_CORE_DIR}/cpu/tlcs90/tlcs90.c
   ${RBX_CORE_DIR}/sound/sn76496.c
   ${RBX_CORE_DIR}/sound/ymz280b.c
@@ -125,6 +131,8 @@ include(${RBX_CORE_DIR}/technos/technos.cmake)
 include(${RBX_CORE_DIR}/atari/atari.cmake)
 include(${RBX_CORE_DIR}/tecmo/tecmo.cmake)
 include(${RBX_CORE_DIR}/midway/midway.cmake)
+include(${RBX_CORE_DIR}/metro/metro.cmake)
+include(${RBX_CORE_DIR}/eolith/eolith.cmake)
 
 add_library(rbx_core STATIC ${RBX_CORE_SOURCES})
 target_compile_definitions(rbx_core PRIVATE ${RBX_CORE_MODULE_DEFS})

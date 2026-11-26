@@ -19,11 +19,13 @@
 #include "gen/toaplan1.inc"
 #include "gen/twincobr.inc"
 #include "gen/wardner.inc"
+#include "gen/snowbros.inc"
 
 extern const rbx_driver rbx_drv_toaplan2;
 extern const rbx_driver rbx_drv_toaplan1;
 extern const rbx_driver rbx_drv_twincobr;
 extern const rbx_driver rbx_drv_wardner;
+extern const rbx_driver rbx_drv_snowbros;
 
 static const rbx_board_tab s_boards[] = {
 	{ truxton2_games, TRUXTON2_GAME_COUNT, &rbx_drv_toaplan2 },
@@ -39,9 +41,10 @@ static const rbx_board_tab s_boards[] = {
 	{ toaplan1_games, TOAPLAN1_GAME_COUNT, &rbx_drv_toaplan1 },
 	{ twincobr_games, TWINCOBR_GAME_COUNT, &rbx_drv_twincobr },
 	{ wardner_games, WARDNER_GAME_COUNT, &rbx_drv_wardner },
+	{ snowbros_games, SNOWBROS_GAME_COUNT, &rbx_drv_snowbros },
 };
 
-static const char *const s_groups[] = { "GP9001", "Toaplan 1", "Twin Cobra", "Wardner" };
+static const char *const s_groups[] = { "GP9001", "Toaplan 1", "Twin Cobra", "Wardner", "Snow Bros" };
 
 static int group(const rbx_game *g)
 {
@@ -49,6 +52,8 @@ static int group(const rbx_game *g)
 		return 2;
 	if (!strcmp(g->board, "Toaplan Wardner"))
 		return 3;
+	if (!strcmp(g->board, "Snow Bros"))
+		return 4;
 	return !strcmp(g->board, "Toaplan 1") ? 1 : 0;
 }
 

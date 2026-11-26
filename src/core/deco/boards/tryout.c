@@ -199,22 +199,35 @@ static void to_render(void)
 	for (int y = 0; y < VIS_H; y++) {
 		uint16_t *d = bm + y * pitch;
 		const int py = tm_pos(y + VIS_Y0, scrolly, 256, flip);
+		int last = -1;
+		uint32_t cbase = 0;
+		const uint8_t *trow = NULL;
 		for (int x = 0; x < VIS_W; x++) {   // the background: 64x16 of 16x16, opaque, colour 2
 			const int px = tm_pos(x, scrollx, 1024, flip);
-			const int col = px >> 4, row = py >> 4;
-			const int a = (7 - (row & 7)) + ((0x8 - (row & 0x8)) << 4) + ((col & 0xf) << 3) + ((col & 0x10) << 4) +
-			              ((col & 0x20) << 4);
-			const int t = s_snap->map[a & 0x3ff] & 0x7f;
-			d[x] = (uint16_t)(2 * 8 + s_bgpix[(t * 16 + (py & 15)) * 16 + (px & 15)]);
+			if ((px >> 4) != last) {   // (a tile looked up once for its 16 pixels)
+				last = px >> 4;
+				const int col = px >> 4, row = py >> 4;
+				const int a = (7 - (row & 7)) + ((0x8 - (row & 0x8)) << 4) + ((col & 0xf) << 3) + ((col & 0x10) << 4) +
+				              ((col & 0x20) << 4);
+				const int t = s_snap->map[a & 0x3ff] & 0x7f;
+				trow = s_bgpix + (t * 16 + (py & 15)) * 16;
+			}
+			d[x] = (uint16_t)(2 * 8 + trow[px & 15]);
 		}
 		const int qy = tm_pos(y + VIS_Y0, 0, 256, flip);
+		last = -1;
 		for (int x = 0; x < VIS_W; x++) {   // the text: 32x32 of 8x8 by columns (rows reversed), pen 0 clear
 			const int qx = tm_pos(x, flip ? -8 : 16, 256, flip);
-			const int off = ((qy >> 3) ^ 0x1f) + ((qx >> 3) << 5), attr = s_snap->videoram[off + 0x400];
-			const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(s_snap->videoram[off] | ((attr & 3) << 8)), s_gfx8.count) : 0;
-			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(qy & 7)) * 8 + (uint32_t)(qx & 7)];
+			if ((qx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+				last = qx >> 3;
+				const int off = ((qy >> 3) ^ 0x1f) + ((qx >> 3) << 5), attr = s_snap->videoram[off + 0x400];
+				const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(s_snap->videoram[off] | ((attr & 3) << 8)), s_gfx8.count) : 0;
+				trow = s_gfx8.pix + (code * 8 + (uint32_t)(qy & 7)) * 8;
+				cbase = (uint32_t)(((attr & 4) >> 2) + 6) * 4;
+			}
+			const uint8_t p = trow[qx & 7];
 			if (p)
-				d[x] = (uint16_t)((((attr & 4) >> 2) + 6) * 4 + p);
+				d[x] = (uint16_t)(cbase + p);
 		}
 	}
 	for (int offs = 0; offs < 0x7f; offs += 4) {   // draw_sprites (in the list's order)
