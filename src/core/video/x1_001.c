@@ -160,7 +160,9 @@ static void draw_background(x1_001_t *x, const target *t, int bank_size)
 				flipx = !flipx;
 				flipy = !flipy;
 			}
-			int c = (color >> (16 - 5)) % x->colors;
+			int c = color >> (16 - 5);
+			if (c >= x->colors)   // (wrap without a divide in the usual case)
+				c %= x->colors;
 			tile4(x, t, code & 0x3fff, c, flipx, flipy, sx & 0x1ff, sy & 0x0ff, transpen);
 		}
 	}
@@ -186,7 +188,7 @@ static void draw_foreground(x1_001_t *x, const target *t, int screen_h, int vis_
 		int sx = (xp[i] & 0x00ff) - (xp[i] & 0x0100);
 		int sy = x->ylow[i] & 0xff;
 		int flipx = chr[i] & 0x8000, flipy = chr[i] & 0x4000;
-		color = color % x->colors + x->colorbase;
+		color = (color < x->colors ? color : color % x->colors) + x->colorbase;
 		if (screenflip) {
 			sy = max_y - sy + (screen_h - (vis_max_y + 1));
 			flipx = !flipx;

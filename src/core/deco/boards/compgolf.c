@@ -117,13 +117,13 @@ static void cg_render(void)
 			const int col = px >> 4, row = py >> 4;
 			const int idx = (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 			const int attr = bg[idx * 2];
-			const uint32_t code = s_gfx16.count ? (uint32_t)(bg[idx * 2 + 1] + ((attr & 1) << 8)) % s_gfx16.count : 0;
+			const uint32_t code = s_gfx16.count ? rbx_wrap((uint32_t)(bg[idx * 2 + 1] + ((attr & 1) << 8)), s_gfx16.count) : 0;
 			const uint8_t p = s_gfx16.pix[(code * 16 + (uint32_t)(py & 15)) * 16 + (uint32_t)(px & 15)];
 			d[x] = (uint16_t)(((attr & 0x3e) >> 1) * 8 + p);
 			// the text (32x32 of 8x8, pen 0 clear; the colour modulo 16)
 			const int qx = x + VIS_X0, qy = y + VIS_Y0;
 			const int o = ((qy >> 3) * 32 + (qx >> 3)) * 2;
-			const uint32_t c8 = s_gfx8.count ? (uint32_t)(txt[o + 1] | (txt[o] << 8)) % s_gfx8.count : 0;
+			const uint32_t c8 = s_gfx8.count ? rbx_wrap((uint32_t)(txt[o + 1] | (txt[o] << 8)), s_gfx8.count) : 0;
 			const uint8_t q = s_gfx8.pix[(c8 * 8 + (uint32_t)(qy & 7)) * 8 + (uint32_t)(qx & 7)];
 			if (q)
 				d[x] = (uint16_t)(((txt[o] >> 2) & 15) * 8 + q);

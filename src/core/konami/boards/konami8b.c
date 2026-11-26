@@ -346,7 +346,7 @@ static uint8_t al_rd(void *ctx, uint16_t a)   // (aliens main_map)
 	if (a < 0x2000)
 		return (a < 0x400 && t.pal_view) ? t.pal8[a] : t.ram[a];
 	if (a < 0x4000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x2000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x2000)), s_rom_size)];
 	if (a < 0x8000) {
 		switch (a) {
 		case 0x5f80: return port(s_port_dsw[2]);
@@ -409,7 +409,7 @@ static uint8_t cf_rd(void *ctx, uint16_t a)   // (crimfght main_map)
 		return vid_r(a - 0x2000);
 	}
 	if (a < 0x8000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)), s_rom_size)];
 	return s_rom[0x18000 + (a - 0x8000)];
 }
 static void cf_wr(void *ctx, uint16_t a, uint8_t v)
@@ -450,7 +450,7 @@ static uint8_t bh_rd(void *ctx, uint16_t a)   // (blockhl main_map)
 	if (a < 0x6000)
 		return (a >= 0x5800 && t.pal_view) ? t.pal8[a - 0x5800] : t.ram[a - 0x4000];
 	if (a < 0x8000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)), s_rom_size)];
 	return s_rom[0x8000 + (a - 0x8000)];
 }
 static void bh_wr(void *ctx, uint16_t a, uint8_t v)
@@ -488,7 +488,7 @@ static uint8_t g88_rd(void *ctx, uint16_t a)
 	if (a < 0x2000) {   // (the banked ROM; 1000-1fff the palette with its view)
 		if (a >= 0x1000 && t.pal_view)
 			return t.pal8[a - 0x1000];
-		return s_rom[(0x10000u + (uint32_t)t.mainbank * 0x2000 + a) % s_rom_size];
+		return s_rom[rbx_wrap((0x10000u + (uint32_t)t.mainbank * 0x2000 + a), s_rom_size)];
 	}
 	if (a < 0x4000) {
 		if (a >= 0x3800 && !t.videobank)   // (the K051316's RAM, or its ROM through rom_r)
@@ -600,7 +600,7 @@ static uint8_t tx_rd(void *ctx, uint16_t a)
 	}
 	if (a < 0x8000) {   // (entries 0-7 the ROM's first 8 KB pages again and again, 8-15 its 10000-1ffff)
 		const uint32_t e = t.mainbank;
-		return s_rom[((e < 8 ? (e & 3) * 0x2000u : 0x10000u + (e - 8) * 0x2000u) + (a - 0x6000)) % s_rom_size];
+		return s_rom[rbx_wrap(((e < 8 ? (e & 3) * 0x2000u : 0x10000u + (e - 8) * 0x2000u) + (a - 0x6000)), s_rom_size)];
 	}
 	return s_rom[a];
 }
@@ -653,7 +653,7 @@ static void map_bank(void)   // (the banked ROM's direct pages)
 		return;
 	}
 	const uint16_t at = s_mach == M_ALIENS ? 0x2000 : 0x6000;
-	uint32_t base = ((uint32_t)t.mainbank * 0x2000) % s_rom_size;
+	uint32_t base = rbx_wrap(((uint32_t)t.mainbank * 0x2000), s_rom_size);
 	if (TX)
 		base = t.mainbank < 8 ? (t.mainbank & 3u) * 0x2000u : 0x10000u + (t.mainbank - 8u) * 0x2000u;
 	for (uint32_t p = 0; p < 0x20; p++)

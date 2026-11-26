@@ -196,7 +196,7 @@ static void draw_bg(int front, int y0, int y1)
 				const uint32_t ti = l8x4 ? (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x70) << 4) + ((row & 0x30) << 7)
 				                         : (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x30) << 4) + ((row & 0x70) << 6);
 				const uint8_t attr = s_snap->scroll[(2 * ti + 1) & 0x3fff];
-				const uint32_t code = (uint32_t)(s_snap->scroll[(2 * ti) & 0x3fff] + ((attr & 7) << 8)) % s_gtile.count;
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->scroll[(2 * ti) & 0x3fff] + ((attr & 7) << 8)), s_gtile.count);
 				const int color = (attr & 0x78) >> 3;
 				src = s_gtile.pix + code * 256 + (ty & 15) * 16;
 				fx = (attr & 0x80) ? 15 : 0;
@@ -225,7 +225,7 @@ static void draw_tx(int y0, int y1)
 				last = tx >> 3;
 				const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
 				const uint8_t attr = s_snap->tx[idx + 0x400];
-				const uint32_t code = (uint32_t)(s_snap->tx[idx] + ((attr & 0xe0) << 3)) % s_gchar.count;
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->tx[idx] + ((attr & 0xe0) << 3)), s_gchar.count);
 				src = s_gchar.pix + code * 64 + (ty & 7) * 8;
 				base = (uint16_t)(0x300 + (attr & 0x1f) * 4);
 			}

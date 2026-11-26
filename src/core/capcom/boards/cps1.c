@@ -17,6 +17,7 @@
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "../../rbx.h"
+#include "../../rbx_core.h"
 #include "../../cpu/m68k_bus.h"
 #include "../../cpu/m68k/m68k.h"
 #include "../../cpu/z80/z80.h"
@@ -84,6 +85,13 @@ static int s_mix_n, s_mix_cap;
 #define QS_CLOCK 60000000        // (one sample per 2 x 1248 clocks)
 static int s_qs;
 static int s_pang3;              // (pang3: the EEPROM at 0x80017a, init_pang3b / init_pang3)
+// Forgotten Worlds: the B-board's NEC uPD4701A counts the two dials (MAME devices/machine/upd4701.cpp, the parts the
+// board uses: X = DIAL0 for player 1, Y = DIAL1, reset by 0x800041 / 0x800049, read at 0x800052-55 / 0x80005a-5d;
+// no switches wired). The dial turns with the right stick's left / right (MAME's key delta 20 a frame)
+static int s_upd;
+static struct { uint16_t cnt[2], start[2]; } s_ud;
+#define UPD_MASK 0xfff
+#define UPD_STEP 20
 static struct {
 	uint8_t shared[2][0x1000];   // the Z80's c000 / f000, the 68000's f18000 / f1e000 (low bytes)
 	int32_t zirq_left, zline;
@@ -301,6 +309,11 @@ static uint16_t main_r16(uint32_t a)
 		const int in = p >= 0 ? (int)(rbx_port_read(p) & 0xff) : 0xff;
 		return (uint16_t)(in << 8 | 0xff);
 	}
+	if (s_upd && ((a >= 0x800052 && a <= 0x800055) || (a >= 0x80005a && a <= 0x80005d))) {   // read_x / read_y
+		const int axis = a >= 0x80005a, hi = ((a - (axis ? 0x80005a : 0x800052)) >> 1) & 1;
+		const uint16_t latch = (uint16_t)((s_ud.cnt[axis] - s_ud.start[axis]) & UPD_MASK);
+		return (uint16_t)(0xff00 | (hi ? latch >> 8 : latch & 0xff));
+	}
 	if (s_pang3 && a == 0x80017a)   // EEPROMIN
 		return (uint16_t)(eepser_do_read_93cxx(&s_eeprom, q.mcyc + m68k_cycles_run()) & 1);
 	if (a >= s_cpsb_base && a < s_cpsb_base + 0x40)
@@ -359,6 +372,9 @@ static void main_w16m(uint32_t a, uint16_t v, uint16_t mask)
 			eepser_clk_write(&s_eeprom, (v >> 6) & 1, t);
 			eepser_cs_write(&s_eeprom, (v >> 7) & 1, t);
 		}
+	} else if (s_upd && (a == 0x800040 || a == 0x800048) && (mask & 0xff)) {   // reset_x_w / reset_y_w (a pulse)
+		const int axis = a == 0x800048;
+		s_ud.start[axis] = s_ud.cnt[axis];
 	} else if (a >= 0x800180 && a <= 0x800187)   // the sound command (either byte)
 		b.latch[0] = (mask & 0xff) ? (uint8_t)v : (uint8_t)(v >> 8);
 	else if (a >= 0x800188 && a <= 0x80018f) {   // the sound timer fade
@@ -686,7 +702,7 @@ static void draw_one(uint32_t code, int col, int flipx, int flipy, int sx, int s
 {
 	if (code == (uint32_t)-1 || !s_n16)
 		return;
-	const uint32_t base = (code % s_n16) * 128;
+	const uint32_t base = (rbx_wrap(code, s_n16)) * 128;
 	for (int yy = 0; yy < 16; yy++) {
 		const int dy = sy + yy - VIS_Y0;
 		if (dy < y0 || dy >= y1)
@@ -749,7 +765,7 @@ static void draw_one2(uint32_t code, int col, int flipx, int flipy, int sx, int 
 {
 	if (!s_n16)
 		return;
-	const uint32_t base = (code % s_n16) * 128;
+	const uint32_t base = (rbx_wrap(code, s_n16)) * 128;
 	for (int yy = 0; yy < 16; yy++) {
 		const int dy = sy + yy - VIS_Y0;
 		if (dy < y0 || dy >= y1)
@@ -1058,8 +1074,19 @@ static void sound_line(void)
 
 static void qsound_frame(void);
 static void cps2_frame(void);
+static void upd_frame(void)   // (upd4701_device::update: the dials' movement this frame counted)
+{
+	for (int p = 0; p < 2; p++) {
+		const uint32_t in = rbx_input(p + 1);
+		const int d = ((in & RBX_IN_RRIGHT) ? UPD_STEP : 0) - ((in & RBX_IN_RLEFT) ? UPD_STEP : 0);
+		s_ud.cnt[p] = (uint16_t)(s_ud.cnt[p] + d);
+	}
+}
+
 static void cps1_frame(void)
 {
+	if (s_upd)
+		upd_frame();
 	if (s_cps2) {
 		cps2_frame();
 		return;
@@ -1308,6 +1335,9 @@ static int cps1_init(const rbx_game *g)
 	}
 	s_qs = !strcmp(g->machine, "qsound") || s_cps2;
 	s_pang3 = !strcmp(g->machine, "pang3");
+	s_upd = !strcmp(g->machine, "forgottn");
+	memset(&s_ud, 0, sizeof(s_ud));
+	rbx_set_rstick_dial(s_upd);
 	s_rom = rbx_region("maincpu", &s_rom_size);
 	s_zrom = rbx_region("audiocpu", &s_zrom_size);
 	s_gfx = rbx_region("gfx", &s_gfx_size);
@@ -1475,6 +1505,8 @@ static int cps1_state(void *ctx, int load)
 		rc |= rbx_state_io(ctx, "cps2", &c2, (uint32_t)offsetof(__typeof__(c2), state_end));
 		rc |= rbx_state_io(ctx, "cps2obj", s_c2obj, sizeof(s_c2obj));
 	}
+	if (s_upd)
+		rc |= rbx_state_io(ctx, "upd4701", &s_ud, sizeof(s_ud));
 	if (s_pang3) {
 		rc |= rbx_state_io(ctx, "mcyc", &q.mcyc, sizeof(q.mcyc));
 		rc |= eepser_state(&s_eeprom, ctx, load, "eeprom");

@@ -43,6 +43,8 @@ rbx_settings g_settings = {
 	.touch_keys = 1,
 	.touch_show = 1,
 	.theme = RBX_THEME_GRAPHITE,   // (the owner's choice, 2026-11-23)
+	.snd_normalize = 0,   // (user 11-26: off by default)
+	.snd_volume = 100,
 	.neon = { 10, 2, -10, 10, 5, 60, 200 },   // (fixed: the owner's choice, 2026-11-07; not in the settings file nor the menu)
 	// (the game list's corridor: the owner's values, 2026-11-23; fixed: its rows and settings-file keys only in builds
 	// with the logger)
@@ -509,6 +511,9 @@ void rbx_settings_load(void)
 		else if (!strcmp(key, "list_group")) g_settings.list_group = clampi(val, 0, RBX_GROUP_COUNT - 1);
 		else if (!strcmp(key, "list_all")) g_settings.list_filter = val ? RBX_LIST_ALL : RBX_LIST_PLAYABLE; // (old two-state filter)
 		else if (!strcmp(key, "theme")) g_settings.theme = clampi(val, 0, RBX_THEME_COUNT - 1);
+		else if (!strcmp(key, "snd_normalize")) g_settings.snd_normalize = val != 0;
+		else if (!strcmp(key, "snd_volume"))
+			g_settings.snd_volume = clampi(val, 0, RBX_VOLUME_MAX) / RBX_VOLUME_STEP * RBX_VOLUME_STEP;
 		else if (!strcmp(key, "pad_p1")) g_settings.pad_src[0] = clampi(val, 0, RE_PAD_SRC_COUNT - 1);
 		else if (!strcmp(key, "pad_p2")) g_settings.pad_src[1] = clampi(val, 0, RE_PAD_SRC_COUNT - 1);
 		else if (!strcmp(key, "pad_p2_added")) g_settings.p2_added = val != 0;
@@ -594,6 +599,7 @@ void rbx_settings_save(void)
 	if (g_settings.show_list)
 		fprintf(f, "show_list=1\n");
 	fprintf(f, "list_filter=%d\nlist_group=%d\ntheme=%d\n", g_settings.list_filter, g_settings.list_group, g_settings.theme);
+	fprintf(f, "snd_normalize=%d\nsnd_volume=%d\n", g_settings.snd_normalize, g_settings.snd_volume);
 #ifdef RBX_ENABLE_LOG
 	for (int k = 0; k < 7; k++)
 		fprintf(f, "neon_list%d=%d\n", k, g_settings.neon_list[k]);

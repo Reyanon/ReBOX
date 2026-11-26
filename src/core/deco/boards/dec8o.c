@@ -288,7 +288,7 @@ static void d8o_render(void)
 			}
 			const int o = ((py >> 3) * 32 + (px >> 3)) * 2;
 			const int tile = txt[o + 1] | (txt[o] << 8);
-			const uint32_t code = s_gfx8.count ? (uint32_t)(tile & 0xfff) % s_gfx8.count : 0;
+			const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(tile & 0xfff), s_gfx8.count) : 0;
 			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(px & 7)];
 			if (p)
 				d[x] = (uint16_t)(oscar ? 256 + ((tile & 0xf000) >> 14) * 8 + p : ((tile & 0xe000) >> 13) * 4 + p);

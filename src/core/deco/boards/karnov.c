@@ -215,7 +215,7 @@ static void kn_render(void)
 				py = (511 - ((y + VIS_Y0 + sy0) & 0x1ff));
 			}
 			const uint16_t t = s_snap->bg[(py >> 4) * 32 + (px >> 4)];
-			const uint32_t code = s_gfx16.count ? (t & 0x7ffu) % s_gfx16.count : 0;
+			const uint32_t code = s_gfx16.count ? rbx_wrap((t & 0x7ffu), s_gfx16.count) : 0;
 			const uint8_t p = s_gfx16.pix[(code * 16 + (uint32_t)(py & 15)) * 16 + (uint32_t)(px & 15)];
 			d[x] = (uint16_t)(512 + (t >> 12) * 16 + p);
 		}
@@ -232,7 +232,7 @@ static void kn_render(void)
 			}
 			const int col = px >> 3, row = py >> 3;
 			const uint16_t t = s_snap->tx[s_wndrplnt ? col * 32 + row : row * 32 + col];
-			const uint32_t code = s_gfx8.count ? (t & 0xfffu) % s_gfx8.count : 0;
+			const uint32_t code = s_gfx8.count ? rbx_wrap((t & 0xfffu), s_gfx8.count) : 0;
 			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(px & 7)];
 			if (p)
 				d[x] = (uint16_t)((t >> 14) * 8 + p);

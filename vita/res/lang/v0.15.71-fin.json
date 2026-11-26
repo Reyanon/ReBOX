@@ -1,0 +1,25 @@
+{
+ "code": "fin",
+ "name": "Suomi",
+ "english": "Finnish",
+ "strings": {
+  "A cheat of cheats/<set>.xml: off, or one of its values": "Huijaus tiedostosta cheats/<set>.xml: pois tai jokin sen arvoista",
+  "Left/Right: change   Cheat files: cheats/<set>.xml": "Vasen/Oikea: vaihda   Huijaustiedostot: cheats/<set>.xml",
+  "No cheats: put %s.xml in cheats/": "Ei huijauksia: lisää %s.xml kansioon cheats/",
+  "Start stage, infinite health and the cheats of cheats/<set>.xml": "Aloitustaso, loputon terveys ja tiedoston cheats/<set>.xml huijaukset",
+  "2nd stick Up": "2. sauva ylös",
+  "2nd stick Down": "2. sauva alas",
+  "2nd stick Left": "2. sauva vasemmalle",
+  "2nd stick Right": "2. sauva oikealle",
+  "Pedal": "Poljin",
+  "Pedal 2": "Poljin 2",
+  "Pedal 3": "Poljin 3",
+  "Sound  >": "Ääni  >",
+  "SOUND": "ÄÄNI",
+  "Normalize": "Normalisointi",
+  "Volume": "Äänenvoimakkuus",
+  "Volume and the automatic level of the sound": "Äänenvoimakkuus ja automaattinen äänitaso",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Päällä: hiljaiset ja kovat pelit samalle tasolle (seuraa pelin tasoa). Pois: pelin oma taso",
+  "The volume of the games' sound": "Pelien äänen voimakkuus"
+ }
+}

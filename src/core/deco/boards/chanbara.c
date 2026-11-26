@@ -135,7 +135,7 @@ static void cb_render(void)
 			const int ty = py & 15;
 			if (attr & 1)   // (TILE_FLIPXY(1): the x flip)
 				tx = 15 - tx;
-			const uint32_t code = s_gfx16.count ? (uint32_t)ram[BG + idx] % s_gfx16.count : 0;
+			const uint32_t code = s_gfx16.count ? rbx_wrap((uint32_t)ram[BG + idx], s_gfx16.count) : 0;
 			uint8_t p = s_gfx16.pix[(code * 16 + (uint32_t)ty) * 16 + (uint32_t)tx];
 			d[x] = (uint16_t)(((attr >> 1) & 0x1f) * 8 + p);
 			pr[x] = p ? 1 : 0;
@@ -147,7 +147,7 @@ static void cb_render(void)
 			}
 			idx = (qy >> 3) * 32 + (qx >> 3);
 			attr = ram[TXT_COL + idx];
-			const uint32_t c8 = s_gfx8.count ? (uint32_t)(ram[TXT + idx] + ((attr & 1) << 8)) % s_gfx8.count : 0;
+			const uint32_t c8 = s_gfx8.count ? rbx_wrap((uint32_t)(ram[TXT + idx] + ((attr & 1) << 8)), s_gfx8.count) : 0;
 			p = s_gfx8.pix[(c8 * 8 + (uint32_t)(qy & 7)) * 8 + (uint32_t)(qx & 7)];
 			if (p) {
 				d[x] = (uint16_t)(0x40 + ((attr >> 1) & 0x1f) * 4 + p);

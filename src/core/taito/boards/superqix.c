@@ -113,7 +113,7 @@ static void snd_run_to(uint32_t pos)
 	if (s_smp_len) {
 		for (int i = 0; i < n && s_smp_len; i++) {
 			uint32_t ip = s_smp_pos >> 16, fr = s_smp_pos & 0xffff;
-			int32_t a = s_smp_buf[s_smp_start + ip], b = s_smp_buf[s_smp_start + (ip + 1) % s_smp_len];
+			int32_t a = s_smp_buf[s_smp_start + ip], b = s_smp_buf[s_smp_start + rbx_wrap((ip + 1), s_smp_len)];
 			int32_t v = (int32_t)((a * (int32_t)(0x10000 - fr) + b * (int32_t)fr) >> 16);
 			s_mix[s_mix_n + i] += v / 2;   // MAME route 0.50
 			s_smp_pos += s_smp_step;
@@ -524,12 +524,12 @@ static void sq_render(void)
 		for (int row = 2; row < 30; row++)
 			for (int col = 0; col < 32; col++) {
 				int i = row * 32 + col, attr = vram[i + 0x400];
-				int code = (vram[i] + 256 * (attr & 7)) % s_nchars;
+				int code = rbx_wrap((vram[i] + 256 * (attr & 7)), s_nchars);
 				draw_tile8(s_chars + code * 64, col, row, (uint16_t)(256 + ((attr & 0xf0) >> 4) * 16), flip, 0);
 			}
 		for (int offs = 0; offs < 0x100; offs += 4) {
 			int attr = spr[offs + 3];
-			int code = (((spr[offs] & 0xfc) >> 2) + 64 * (attr & 0x0f)) % s_nspr;
+			int code = rbx_wrap((((spr[offs] & 0xfc) >> 2) + 64 * (attr & 0x0f)), s_nspr);
 			int sx = spr[offs + 1] + 256 * (spr[offs] & 1), sy = spr[offs + 2];
 			if (flip) {
 				sx = 240 - sx;
@@ -553,7 +553,7 @@ static void sq_render(void)
 					src = s_chars + code * 64;
 					used = s_char_used + code;
 				} else {
-					code = (code + 1024 * s_snap_gfxbank) % s_nbg;
+					code = rbx_wrap((code + 1024 * s_snap_gfxbank), s_nbg);
 					src = s_bgtiles + code * 64;
 					used = s_bg_used + code;
 				}
@@ -583,7 +583,7 @@ static void sq_render(void)
 		}
 		for (int offs = 0; offs < 0x100; offs += 4) {
 			int attr = spr[offs + 3];
-			int code = (spr[offs] + 256 * (attr & 1)) % s_nspr;
+			int code = rbx_wrap((spr[offs] + 256 * (attr & 1)), s_nspr);
 			int fx = attr & 4, fy = attr & 8;
 			int sx = spr[offs + 1], sy = spr[offs + 2];
 			if (flip) {

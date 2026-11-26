@@ -360,7 +360,7 @@ static void go_render(void)
 				const int colour = tile >> 12;
 				if (pass == 1 && !(colour & 8))
 					continue;
-				const uint32_t code = s_gfx16.count ? (uint32_t)(tile & 0xfff) % s_gfx16.count : 0;
+				const uint32_t code = s_gfx16.count ? rbx_wrap((uint32_t)(tile & 0xfff), s_gfx16.count) : 0;
 				const uint8_t p = s_gfx16.pix[(code * 16 + (uint32_t)(py & 15)) * 16 + (uint32_t)(px & 15)];
 				d[x] = (uint16_t)(768 + colour * 16 + p);
 				pr[x] = (uint8_t)(p >= 8 ? 2 : 1);
@@ -381,7 +381,7 @@ static void go_render(void)
 			}
 			const int o = ((py >> 3) * 32 + (px >> 3)) * 2;
 			const int tile = txt[o + 1] | (txt[o] << 8);
-			const uint32_t code = s_gfx8.count ? (uint32_t)(tile & 0xfff) % s_gfx8.count : 0;
+			const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(tile & 0xfff), s_gfx8.count) : 0;
 			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(px & 7)];
 			if (p)
 				d[x] = (uint16_t)(((tile & 0x7000) >> 12) * 8 + p);
@@ -412,7 +412,7 @@ static void gb_render(void)
 			}
 			const int o = ((py >> 3) * 32 + (px >> 3)) * 2;
 			const int tile = txt[o + 1] | (txt[o] << 8);
-			const uint32_t code = s_gfx8.count ? (uint32_t)(tile & 0x3ff) % s_gfx8.count : 0;
+			const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(tile & 0x3ff), s_gfx8.count) : 0;
 			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(px & 7)];
 			if (p)
 				d[x] = (uint16_t)(((tile & 0xc00) >> 10) * 8 + p);

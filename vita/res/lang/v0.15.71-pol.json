@@ -1,0 +1,25 @@
+{
+ "code": "pol",
+ "name": "Polski",
+ "english": "Polish",
+ "strings": {
+  "A cheat of cheats/<set>.xml: off, or one of its values": "Kod z cheats/<set>.xml: wyłączony lub jedna z jego wartości",
+  "Left/Right: change   Cheat files: cheats/<set>.xml": "Lewo/Prawo: zmień   Pliki kodów: cheats/<set>.xml",
+  "No cheats: put %s.xml in cheats/": "Brak kodów: umieść %s.xml w cheats/",
+  "Start stage, infinite health and the cheats of cheats/<set>.xml": "Etap startowy, nieskończone zdrowie i kody z cheats/<set>.xml",
+  "2nd stick Up": "2. drążek góra",
+  "2nd stick Down": "2. drążek dół",
+  "2nd stick Left": "2. drążek lewo",
+  "2nd stick Right": "2. drążek prawo",
+  "Pedal": "Pedał",
+  "Pedal 2": "Pedał 2",
+  "Pedal 3": "Pedał 3",
+  "Sound  >": "Dźwięk  >",
+  "SOUND": "DŹWIĘK",
+  "Normalize": "Normalizacja",
+  "Volume": "Głośność",
+  "Volume and the automatic level of the sound": "Głośność i automatyczny poziom dźwięku",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Wł.: ciche i głośne gry na podobnym poziomie (podąża za poziomem gry). Wył.: własny poziom gry",
+  "The volume of the games' sound": "Głośność dźwięku gier"
+ }
+}

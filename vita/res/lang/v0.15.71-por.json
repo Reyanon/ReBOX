@@ -1,0 +1,25 @@
+{
+ "code": "por",
+ "name": "Português",
+ "english": "Portuguese",
+ "strings": {
+  "A cheat of cheats/<set>.xml: off, or one of its values": "Uma batota de cheats/<set>.xml: desligada ou um dos seus valores",
+  "Left/Right: change   Cheat files: cheats/<set>.xml": "Esquerda/Direita: mudar   Ficheiros de batotas: cheats/<set>.xml",
+  "No cheats: put %s.xml in cheats/": "Sem batotas: coloque %s.xml em cheats/",
+  "Start stage, infinite health and the cheats of cheats/<set>.xml": "Nível inicial, energia infinita e as batotas de cheats/<set>.xml",
+  "2nd stick Up": "2.º analógico cima",
+  "2nd stick Down": "2.º analógico baixo",
+  "2nd stick Left": "2.º analógico esquerda",
+  "2nd stick Right": "2.º analógico direita",
+  "Pedal": "Pedal",
+  "Pedal 2": "Pedal 2",
+  "Pedal 3": "Pedal 3",
+  "Sound  >": "Som  >",
+  "SOUND": "SOM",
+  "Normalize": "Normalizar",
+  "Volume": "Volume",
+  "Volume and the automatic level of the sound": "Volume e nível de som automático",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Ligado: jogos baixos e altos num nível parecido (segue o nível do jogo). Desligado: o nível próprio do jogo",
+  "The volume of the games' sound": "O volume do som dos jogos"
+ }
+}

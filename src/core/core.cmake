@@ -60,7 +60,10 @@ set(RBX_CORE_SOURCES
   ${RBX_CORE_DIR}/sound/ymfm/ymfm_pcm.cpp
   ${RBX_CORE_DIR}/machine/eeprom93c46.c
   ${RBX_CORE_DIR}/machine/eepromser.c
+  ${RBX_CORE_DIR}/machine/tmp68301.c
   ${RBX_CORE_DIR}/machine/i8255.c
+  ${RBX_CORE_DIR}/machine/z80pio.c
+  ${RBX_CORE_DIR}/machine/segacrpt.c
   ${RBX_CORE_DIR}/machine/taito68705.c
   ${RBX_CORE_DIR}/video/x1_001.c
   ${RBX_CORE_DIR}/sound/ay8910.c

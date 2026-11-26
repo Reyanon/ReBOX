@@ -189,7 +189,7 @@ static void sh_render(void)
 				py = 255 - py;
 			}
 			const uint16_t tw = s_snap->pf1[(py >> 3) * 32 + (px >> 3)];
-			const uint32_t code = s_gfx8.count ? (tw & 0xfffu) % s_gfx8.count : 0;
+			const uint32_t code = s_gfx8.count ? rbx_wrap((tw & 0xfffu), s_gfx8.count) : 0;
 			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(px & 7)];
 			if (p)
 				d[x] = (uint16_t)((tw >> 12) * 8 + p);

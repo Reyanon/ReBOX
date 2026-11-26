@@ -414,7 +414,7 @@ static void draw_sprites(int y0, int y1)
 				const int sx = sx_base + dim_x;
 				if (sy + 8 <= y0 || sy >= y1 || sx + 8 <= 0 || sx >= VIS_W || !s_nsprites)
 					continue;
-				const uint32_t code = sprite % s_nsprites;
+				const uint32_t code = rbx_wrap(sprite, s_nsprites);
 				for (int yy = 0; yy < 8; yy++) {
 					const int dy = sy + yy;
 					if (dy < y0 || dy >= y1)

@@ -491,7 +491,7 @@ static void draw_layer(uint16_t *bm, int pitch, const snap_t *s, int layer, int 
 			uint32_t code;
 			int base;
 			tile_info(s, layer, idx, &code, &base);
-			const uint8_t *src = g->pix + (size_t)(code % g->count) * (size_t)(ts * ts) + py * ts;
+			const uint8_t *src = g->pix + (size_t)(rbx_wrap(code, g->count)) * (size_t)(ts * ts) + py * ts;
 			int n = flip ? px + 1 : ts - px;
 			if (n > VIS_W - x)
 				n = VIS_W - x;

@@ -84,7 +84,7 @@ static void ym_irq(int state) { t.ym_irq = state; }
 static uint8_t z_read(void *u, uint16_t a)
 {
 	(void)u;
-	if (a < 0x8000) return s_zrom[a % s_zrom_size];
+	if (a < 0x8000) return s_zrom[rbx_wrap(a, s_zrom_size)];
 	if (a < 0x8800) return t.zram[a - 0x8000];
 	if (a == 0x8800 || a == 0x8801) return rbx_ym_read(0, a & 1);
 	if (a >= 0x9800 && a < 0x9804) return oki_read(&s_oki);
@@ -226,7 +226,7 @@ static void draw_piece(const vseg *sg, int y0, int y1)
 			const uint32_t col = tx >> 3, row = ty >> 3;
 			const uint32_t idx = (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 			const uint8_t attr = sg->attr[idx];
-			const uint32_t code = (uint32_t)(sg->vram[idx] + ((attr & 0x1f) << 8) + (l->gfxset << 8)) % s_gchar.count;
+			const uint32_t code = rbx_wrap((uint32_t)(sg->vram[idx] + ((attr & 0x1f) << 8) + (l->gfxset << 8)), s_gchar.count);
 			d[x] = (uint16_t)(((attr >> 5) & 7) * 16 + s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)]);
 		}
 	}

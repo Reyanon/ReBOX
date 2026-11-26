@@ -118,7 +118,7 @@ static void snd_start(void)
 static void map_bank(void)
 {
 	for (int p = 0; p < 0x40; p++)
-		s_mmap[0x80 + p] = s_rom + (0x8000 + (uint32_t)t->bank * 0x4000 + p * 256) % s_rom_size;
+		s_mmap[0x80 + p] = s_rom + rbx_wrap((0x8000 + (uint32_t)t->bank * 0x4000 + p * 256), s_rom_size);
 }
 
 static void control_w(uint8_t v)
@@ -177,7 +177,7 @@ static uint8_t main_read(void *u, uint16_t a)
 {
 	(void)u;
 	if (a < 0x8000) return s_rom[a];
-	if (a < 0xc000) return s_rom[(0x8000 + (uint32_t)t->bank * 0x4000 + (a - 0x8000)) % s_rom_size];
+	if (a < 0xc000) return s_rom[rbx_wrap((0x8000 + (uint32_t)t->bank * 0x4000 + (a - 0x8000)), s_rom_size)];
 	if (a >= s_a_io && a < s_a_io + 0x800) return io_read(a - s_a_io);
 	if (a >= s_a_vram && a < s_a_vram + 0x800) return t->vram[a - s_a_vram];
 	if (a >= s_a_vram + 0x800 && a < s_a_vram + 0x1000) return t->cram[a - s_a_vram - 0x800];
@@ -278,8 +278,8 @@ static void draw_bg(int y0, int y1)
 				const uint32_t col = tx >> 5, row = ty >> 5;
 				uint32_t off = ((row << 7) + col) << 1;   // (tilemap_scan)
 				off = ((off & 0xf801) | ((off & 0x0700) >> 7) | ((off & 0x00fe) << 3)) & 0x7fff;
-				const uint8_t attr = s_tilerom[(off + 1) % s_tilerom_size];
-				uint32_t code = s_tilerom[off % s_tilerom_size];
+				const uint8_t attr = s_tilerom[rbx_wrap((off + 1), s_tilerom_size)];
+				uint32_t code = s_tilerom[rbx_wrap(off, s_tilerom_size)];
 				int color;
 				if (philko) {
 					code |= (uint32_t)(((attr >> 6) & 2) | (attr & 1)) * 0x100;
@@ -317,7 +317,7 @@ static void draw_chars(int y0, int y1)
 				last = tx >> 3;
 				const uint32_t ti = ((ty >> 3) * 64 + (tx >> 3)) & 0x7ff;
 				const uint8_t attr = s_snap->cram[ti];
-				const uint32_t code = (uint32_t)(s_snap->vram[ti] + ((attr << 2) & 0x300)) % s_gchar.count;
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[ti] + ((attr << 2) & 0x300)), s_gchar.count);
 				src = s_gchar.pix + code * 64 + (ty & 7) * 8;
 				base = (uint16_t)(768 + (attr & 0x3f) * 4);
 			}

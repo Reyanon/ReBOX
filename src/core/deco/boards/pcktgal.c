@@ -164,7 +164,7 @@ static void pg_render(void)
 		}
 		if (!s_gfxspr.count)
 			continue;
-		const uint32_t code = (uint32_t)(sr[offs + 3] + ((sr[offs + 1] & 1) << 8)) % s_gfxspr.count;
+		const uint32_t code = rbx_wrap((uint32_t)(sr[offs + 3] + ((sr[offs + 1] & 1) << 8)), s_gfxspr.count);
 		const int colour = (sr[offs + 1] & 0x70) >> 4;
 		const uint8_t *src = s_gfxspr.pix + code * 256;
 		for (int y = 0; y < 16; y++) {

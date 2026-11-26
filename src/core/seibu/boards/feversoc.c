@@ -192,7 +192,7 @@ static void fs_render(void)
 	const uint16_t *spr = s_snap.spr;
 	for (int i = 0x1000 - 4; i != -4; i -= 4) {   // sei25x_rise1x_device::draw
 		uint32_t code = spr[i + 1];
-		if (!s_gspr.count || code % s_gspr.count == 0)
+		if (!s_gspr.count || rbx_wrap(code, s_gspr.count) == 0)
 			continue;
 		const int flipy = (spr[i] >> 15) & 1, sizey = ((spr[i] >> 12) & 7) + 1;
 		const int flipx = (spr[i] >> 11) & 1, sizex = ((spr[i] >> 8) & 7) + 1;

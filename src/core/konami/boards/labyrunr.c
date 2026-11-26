@@ -91,7 +91,7 @@ static void draw_layer(int which, int scrollx, int scrolly, int cols, int cat, i
 				int bank = ((attr >> (bit0 + 3)) & 1) | ((attr >> (bit1 + 2)) & 2) | ((attr >> (bit2 + 1)) & 4) | ((attr >> bit3) & 8);
 				bank = (bank & ~mask) | (k[4] & mask);
 				bank = ((attr & 0x80) >> 7) | (bank << 1) | ((k[3] & 1) << 5);
-				const uint32_t code = (uint32_t)(v[idx + 0x400] + bank * 256) % s_gfx_count;
+				const uint32_t code = rbx_wrap((uint32_t)(v[idx + 0x400] + bank * 256), s_gfx_count);
 				const uint8_t *src = s_gfx + code * 64 + (ty & 7) * 8 + (tx & 7);
 				const int pb = (colbase + (attr & 7)) * 16;
 				for (int i = 0; i < n; i++) {
@@ -184,7 +184,7 @@ static void lr_render(void)   // (screen_update)
 static void map_bank(void)
 {
 	for (int p = 0; p < 0x40; p++)
-		s_cpu.rpage[0x40 + p] = s_rom + ((uint32_t)t.mainbank * 0x4000 + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x40 + p] = s_rom + rbx_wrap(((uint32_t)t.mainbank * 0x4000 + (uint32_t)p * 256), s_rom_size);
 }
 
 static uint8_t main_rd(void *ctx, uint16_t a)
@@ -217,7 +217,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a < 0x4000)
 		return t.vram[(a >> 11) & 1][a & 0x7ff];
 	if (a < 0x8000)
-		return s_rom[((uint32_t)t.mainbank * 0x4000 + (a - 0x4000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x4000 + (a - 0x4000)), s_rom_size)];
 	return s_rom[0x18000 + (a - 0x8000)];
 }
 

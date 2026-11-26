@@ -371,7 +371,7 @@ static void draw_sprite_list(const uint8_t *spr, int len)
 			s_rng = s_rng * 1103515245u + 12345u;
 			color = (int)(s_rng >> 16) & 0xf;
 		}
-		const uint8_t *g = s_sprites + (code % s_nsprites) * 256;
+		const uint8_t *g = s_sprites + (rbx_wrap(code, s_nsprites)) * 256;
 		const int base = color * 16;
 		// drawn at sx + m_xoffset (128) on the 512-wide screen, visible area starts at 128
 		for (int ty = 0; ty < 16; ty++) {
@@ -443,7 +443,7 @@ static void ft_render(void)
 			if ((attrib & 0x20) && code >= 0xc0)
 				code = (code & 0x3f) | lb | 0x100;
 			code |= hb;
-			uint8_t p = s_tiles[((uint32_t)code % s_ntiles) * 64 + (ly & 7) * 8 + (lx & 7)];
+			uint8_t p = s_tiles[(rbx_wrap((uint32_t)code, s_ntiles)) * 64 + (ly & 7) * 8 + (lx & 7)];
 			if (p)
 				d[ox] = (uint16_t)(base + p);
 		}

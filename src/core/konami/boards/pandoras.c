@@ -77,7 +77,7 @@ static void draw_tiles(int category, uint16_t *bm, int pitch)
 			const int code = s_vs.vram[idx] + ((attr & 0x10) << 4);
 			const int pen = 0x100 + (attr & 0x0f) * 16;
 			const int fx = ((attr & 0x40) != 0) ^ flip, fy = (attr & 0x80) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
 			for (int i = 0; i < 8; i++)
 				d[col * 8 + i] = (uint16_t)(pen + src[fx ? 7 - i : i]);
 		}
@@ -98,7 +98,7 @@ static void pd_render(void)   // (screen_update)
 		const int sx = sr[offs + 1], sy = 240 - sr[offs];
 		const int color = sr[offs + 3] & 0x0f;
 		const int flipx = !(sr[offs + 3] & 0x40), flipy = !(sr[offs + 3] & 0x80);
-		const uint8_t *src = s_spr + ((uint32_t)sr[offs + 2] % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)sr[offs + 2], s_nspr)) * 256;
 		const uint8_t *lut = s_prom + 0x20 + color * 16;
 		for (int j = 0; j < 16; j++) {
 			const int yy = sy + j;
@@ -163,7 +163,7 @@ static uint8_t a_rd(void *ctx, uint16_t a)
 	if (a >= 0x6000 && a < 0x6800)
 		return t.shared[a - 0x6000];
 	if (a >= 0x4000 && (a < 0x6000 || a >= 0x8000))
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 static void a_wr(void *ctx, uint16_t a, uint8_t v)
@@ -203,7 +203,7 @@ static uint8_t b_rd(void *ctx, uint16_t a)
 	if (a >= 0xc000 && a < 0xc800)
 		return t.shared[a - 0xc000];
 	if (a >= 0xe000)
-		return s_srom[a % s_srom_size];
+		return s_srom[rbx_wrap(a, s_srom_size)];
 	return 0;
 }
 static void b_wr(void *ctx, uint16_t a, uint8_t v)

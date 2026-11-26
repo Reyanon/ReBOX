@@ -1,0 +1,25 @@
+{
+ "code": "nor",
+ "name": "Norsk",
+ "english": "Norwegian",
+ "strings": {
+  "A cheat of cheats/<set>.xml: off, or one of its values": "En juksekode fra cheats/<set>.xml: av, eller en av verdiene",
+  "Left/Right: change   Cheat files: cheats/<set>.xml": "Venstre/Høyre: endre   Juksefiler: cheats/<set>.xml",
+  "No cheats: put %s.xml in cheats/": "Ingen juksekoder: legg %s.xml i cheats/",
+  "Start stage, infinite health and the cheats of cheats/<set>.xml": "Startbrett, uendelig helse og juksekodene i cheats/<set>.xml",
+  "2nd stick Up": "Spak 2 opp",
+  "2nd stick Down": "Spak 2 ned",
+  "2nd stick Left": "Spak 2 venstre",
+  "2nd stick Right": "Spak 2 høyre",
+  "Pedal": "Pedal",
+  "Pedal 2": "Pedal 2",
+  "Pedal 3": "Pedal 3",
+  "Sound  >": "Lyd  >",
+  "SOUND": "LYD",
+  "Normalize": "Normaliser",
+  "Volume": "Volum",
+  "Volume and the automatic level of the sound": "Volum og automatisk lydnivå",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "På: stille og høye spill på et likt nivå (følger spillets nivå). Av: spillets eget nivå",
+  "The volume of the games' sound": "Volumet på spillenes lyd"
+ }
+}

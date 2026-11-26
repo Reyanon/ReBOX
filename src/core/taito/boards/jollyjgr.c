@@ -117,7 +117,7 @@ static void draw_tilemap(const snap_t *s, uint16_t *bm, int pitch, int fx, int f
 			int nx = fx ? 255 - sx : sx;
 			int col = nx >> 3;
 			int ty = (ny + s->ram98[col << 1]) & 255;
-			int code = s->videoram[(ty >> 3) * 32 + col] % nchars;
+			int code = rbx_wrap(s->videoram[(ty >> 3) * 32 + col], nchars);
 			uint8_t p = chars[code * 64 + (ty & 7) * 8 + (nx & 7)];
 			if (p)
 				d[sx] = (uint16_t)((s->ram98[(col << 1) | 1] & 7) * 4 + p);

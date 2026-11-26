@@ -188,7 +188,7 @@ static void mm_render(void)
 		const int row = ty >> 4;
 		for (int x = 0; x < VIS_W; x++) {
 			const int offs = (15 - (x >> 4)) * 32 + row;
-			const uint32_t code = (uint32_t)(vr[offs] + (s_maniach ? (cr[offs] & 3) << 8 : (cr[offs] & 8) << 5)) % s_gtile.count;
+			const uint32_t code = rbx_wrap((uint32_t)(vr[offs] + (s_maniach ? (cr[offs] & 3) << 8 : (cr[offs] & 8) << 5)), s_gtile.count);
 			const int py = row >= 16 ? 15 - (ty & 15) : ty & 15;
 			d[x] = (uint16_t)(32 + ((cr[offs] & 0x30) >> 4) * 8 + s_gtile.pix[code * 256 + py * 16 + (x & 15)]);
 		}
@@ -205,7 +205,7 @@ static void mm_render(void)
 		for (int x = 0; x < VIS_W; x++) {
 			const int offs = (31 - (x >> 3)) * 32 + (y >> 3);
 			const uint8_t c = s_snap->vram1[0x400 + offs];
-			const uint32_t code = (uint32_t)(s_snap->vram1[offs] + 256 * (c & 7)) % s_gchar.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram1[offs] + 256 * (c & 7)), s_gchar.count);
 			const uint8_t p = s_gchar.pix[code * 64 + (y & 7) * 8 + (x & 7)];
 			if (p)
 				d[x] = (uint16_t)(((c & 0x30) >> 4) * 8 + p);

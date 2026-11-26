@@ -172,7 +172,7 @@ static void set_bank(void)
 {
 	const uint32_t base = 0x10000 + (uint32_t)t.bank * 0x1000;
 	for (int p = 0; p < 16; p++)
-		s_cpu.rpage[0x90 + p] = s_rom + (base + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x90 + p] = s_rom + rbx_wrap((base + (uint32_t)p * 256), s_rom_size);
 }
 
 static uint8_t main_rd(void *ctx, uint16_t a)
@@ -196,9 +196,9 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a >= 0x8800 && a < 0x9000)
 		return t.ram[a - 0x8800];
 	if (a >= 0x9000 && a < 0xa000)
-		return s_rom[(0x10000 + (uint32_t)t.bank * 0x1000 + (a & 0xfff)) % s_rom_size];
+		return s_rom[rbx_wrap((0x10000 + (uint32_t)t.bank * 0x1000 + (a & 0xfff)), s_rom_size)];
 	if (a >= 0xa000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 

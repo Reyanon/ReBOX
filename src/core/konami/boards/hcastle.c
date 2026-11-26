@@ -98,7 +98,7 @@ static void draw_layer(int which, int opaque)
 			const int attr = pf[idx];
 			int bank = ((attr >> (bit0 + 3)) & 1) | ((attr >> (bit1 + 2)) & 2) | ((attr >> (bit2 + 1)) & 4) | ((attr >> bit3) & 8);
 			bank = ((attr & 0x80) >> 7) | (bank << 1);
-			const uint32_t code = (uint32_t)(pf[idx + 0x400] + bank * 0x100 + bankbase) % count;
+			const uint32_t code = rbx_wrap((uint32_t)(pf[idx + 0x400] + bank * 0x100 + bankbase), count);
 			const uint8_t *src = gfx + code * 64 + (ty & 7) * 8 + (tx & 7);
 			const int pb = base + (colbase + (attr & 7)) * 16;
 			for (int i = 0; i < n; i++) {
@@ -178,7 +178,7 @@ static void irq_lines(int set, int cleared)   // (the K007121 #0's IRQ)
 static void map_banks(void)
 {
 	for (int p = 0; p < 0x20; p++)
-		s_cpu.rpage[0x60 + p] = s_rom + (0x10000u + (uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x60 + p] = s_rom + rbx_wrap((0x10000u + (uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256), s_rom_size);
 	for (int p = 0; p < 8; p++)
 		s_cpu.rpage[0x08 + p] = s_cpu.wpage[0x08 + p] = t.bankedram + t.rambank * 0x800 + p * 256;
 }
@@ -210,7 +210,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a < 0x6000)
 		return t.ram[a];
 	if (a < 0x8000)
-		return s_rom[(0x10000u + (uint32_t)t.mainbank * 0x2000 + (a - 0x6000)) % s_rom_size];
+		return s_rom[rbx_wrap((0x10000u + (uint32_t)t.mainbank * 0x2000 + (a - 0x6000)), s_rom_size)];
 	return s_rom[a];
 }
 

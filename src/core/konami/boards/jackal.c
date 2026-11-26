@@ -81,7 +81,7 @@ static void draw_background(uint16_t *bm, int pitch)
 			const int attr = s_vs.vram[idx];
 			const int code = s_vs.vram[0x400 + idx] + ((attr & 0xc0) << 2) + ((attr & 0x30) << 6);
 			const int fx = (attr & 0x10) != 0, fy = (attr & 0x20) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
 			for (int i = 0; i < n; i++) {
 				const int px = (tx + i) & 7;
 				d[x + i] = src[fx ? 7 - px : px];   // (colours 256-511 without the lookup: pens 0-255)
@@ -94,7 +94,7 @@ static void draw_background(uint16_t *bm, int pitch)
 static void draw_tile(int set, int big, int code, int color, int flipx, int flipy, int sx, int sy, uint16_t *bm, int pitch)
 {
 	const int sz = big ? 16 : 8;
-	const uint8_t *src = big ? s_spr16[set] + ((uint32_t)code % s_nspr16) * 256 : s_spr8[set] + ((uint32_t)code % s_nspr8) * 64;
+	const uint8_t *src = big ? s_spr16[set] + (rbx_wrap((uint32_t)code, s_nspr16)) * 256 : s_spr8[set] + (rbx_wrap((uint32_t)code, s_nspr8)) * 64;
 	const int pb = (set ? 0x200 : 0x100) + 16 * color;
 	for (int j = 0; j < sz; j++) {
 		const int yy = sy + j;
@@ -198,7 +198,7 @@ static uint8_t port(int p) { return (uint8_t)rbx_port_read(p); }
 static void map_banks(void)
 {
 	for (int p = 0; p < 0x80; p++)   // (4000-bfff: the ROM's 0x4000 + 0x8000 x bank)
-		s_cpu.rpage[0x40 + p] = s_rom + (0x4000u + (uint32_t)t.mainbank * 0x8000u + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x40 + p] = s_rom + rbx_wrap((0x4000u + (uint32_t)t.mainbank * 0x8000u + (uint32_t)p * 256), s_rom_size);
 	for (int p = 0; p < 0x10; p++) {
 		s_cpu.rpage[0x20 + p] = s_cpu.wpage[0x20 + p] = NULL;   // (2000-2fff: the video RAM's view, its writes as is)
 		s_cpu.rpage[0x30 + p] = s_cpu.wpage[0x30 + p] = t.spriteram[t.spritebank] + p * 256;
@@ -232,8 +232,8 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a < 0x4000)
 		return t.spriteram[t.spritebank][a - 0x3000];
 	if (a < 0xc000)
-		return s_rom[(0x4000u + (uint32_t)t.mainbank * 0x8000u + (a - 0x4000)) % s_rom_size];
-	return s_rom[(a - 0xc000) % s_rom_size];
+		return s_rom[rbx_wrap((0x4000u + (uint32_t)t.mainbank * 0x8000u + (a - 0x4000)), s_rom_size)];
+	return s_rom[rbx_wrap((a - 0xc000), s_rom_size)];
 }
 
 static void main_wr(void *ctx, uint16_t a, uint8_t v)
@@ -271,7 +271,7 @@ static uint8_t slave_rd(void *ctx, uint16_t a)
 	if (a >= 0x6060 && a < 0x8000)
 		return t.mainsub[a - 0x6060];
 	if (a >= 0x8000)
-		return s_srom[(a - 0x8000) % s_srom_size];
+		return s_srom[rbx_wrap((a - 0x8000), s_srom_size)];
 	return 0;
 }
 static void slave_wr(void *ctx, uint16_t a, uint8_t v)

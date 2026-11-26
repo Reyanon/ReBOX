@@ -201,7 +201,7 @@ static void draw_bg1(int layer)   // layer: -1 whole (lwings), 1 back, 0 front (
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + s_snap->sx : x + s_snap->sx) & 511;
 			const uint32_t idx = (tx >> 4) * 32 + (ty >> 4);
 			const uint8_t c = s_snap->bg1[idx + 0x400];
-			const uint32_t code = (uint32_t)(s_snap->bg1[idx] + ((c & 0xe0) << 3)) % s_gbg1.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg1[idx] + ((c & 0xe0) << 3)), s_gbg1.count);
 			int fx, fy;
 			if (s_trojan) {
 				fx = (c & 0x10) != 0;
@@ -233,7 +233,7 @@ static void draw_bg2(void)   // trojan: 32 x 16 of 16x16 from ROM (get_bg2_memor
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + s_snap->bg2_sx : x + s_snap->bg2_sx) & 511;
 			const uint32_t ti = (((ty >> 4) * 0x800) | ((tx >> 4) * 2)) + (uint32_t)s_snap->bg2_image * 0x20;
 			const uint8_t c = s_bg2rom[(ti + 1) & mask];
-			const uint32_t code = (uint32_t)(s_bg2rom[ti & mask] + ((c & 0x80) << 1)) % s_gbg2.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_bg2rom[ti & mask] + ((c & 0x80) << 1)), s_gbg2.count);
 			const uint32_t px = (c & 0x10) ? 15 - (tx & 15) : tx & 15, py = (c & 0x20) ? 15 - (ty & 15) : ty & 15;
 			d[x] = (uint16_t)((c & 7) * 16 + s_gbg2.pix[code * 256 + py * 16 + px]);
 		}
@@ -300,7 +300,7 @@ static void lw_render(void)
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
 			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
 			const uint8_t c = s_snap->fg[idx + 0x400];
-			const uint32_t code = (uint32_t)(s_snap->fg[idx] + ((c & 0xc0) << 2)) % s_gchar.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_snap->fg[idx] + ((c & 0xc0) << 2)), s_gchar.count);
 			const uint32_t px = (c & 0x10) ? 7 - (tx & 7) : tx & 7, py = (c & 0x20) ? 7 - (ty & 7) : ty & 7;
 			const uint8_t p = s_gchar.pix[code * 64 + py * 8 + px];
 			if (p != 3)

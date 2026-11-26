@@ -117,7 +117,7 @@ static void q_put(int kind, uint32_t v)
 static void map_bank(void)
 {
 	for (int p = 0; p < 0x40; p++)
-		s_cpu.rpage[0x40 + p] = s_rom + (0x10000u + (uint32_t)t.mainbank * 0x4000 + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x40 + p] = s_rom + rbx_wrap((0x10000u + (uint32_t)t.mainbank * 0x4000 + (uint32_t)p * 256), s_rom_size);
 }
 
 static uint8_t main_rd(void *ctx, uint16_t a)
@@ -141,7 +141,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a < 0x4000)
 		return 0;
 	if (a < 0x8000)
-		return s_rom[(0x10000u + (uint32_t)t.mainbank * 0x4000 + (a - 0x4000)) % s_rom_size];
+		return s_rom[rbx_wrap((0x10000u + (uint32_t)t.mainbank * 0x4000 + (a - 0x4000)), s_rom_size)];
 	return s_rom[a];
 }
 

@@ -120,7 +120,7 @@ static void draw_bg(int which, int cat, int opaque, uint8_t priority)
 			int color, tc;
 			tile_info(which, (ty >> 3) * 32 + (tx >> 3), &code, &color, &tc);
 			if (tc == cat) {
-				const uint8_t *src = gfx + (code % count) * 64 + (ty & 7) * 8 + (tx & 7);
+				const uint8_t *src = gfx + (rbx_wrap(code, count)) * 64 + (ty & 7) * 8 + (tx & 7);
 				for (int i = 0; i < n; i++) {
 					const int p = src[i];
 					if (p || opaque) {
@@ -151,7 +151,7 @@ static void draw_text(void)
 			uint16_t *d = bm + (y - VIS_Y0) * rbx_video.pitch;
 			for (int x = 0; x < VIS_W; x++) {
 				const int idx = (y >> 3) * 32 + (x >> 3);
-				const int p = s_gfx[0][(uint32_t)(v[0xc00 + idx] % s_gfx_count[0]) * 64 + (y & 7) * 8 + (x & 7)];
+				const int p = s_gfx[0][(uint32_t)(rbx_wrap(v[0xc00 + idx], s_gfx_count[0])) * 64 + (y & 7) * 8 + (x & 7)];
 				if (p || opaque)
 					d[x] = (uint16_t)((16 + (v[0x800 + idx] & 0x0f)) * 16 + p);
 			}
@@ -261,7 +261,7 @@ static void map_view(void)   // (the RAM views: 2000-3fff the chip's video RAM; 
 	for (int p = 0; p < 0x20; p++)
 		s_cpu.rpage[0x20 + p] = s_cpu.wpage[0x20 + p] = t.video[t.view] + p * 256;
 	for (int p = 0; p < 0x40; p++)
-		s_cpu.rpage[0x40 + p] = s_rom + ((uint32_t)t.mainbank * 0x4000 + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x40 + p] = s_rom + rbx_wrap(((uint32_t)t.mainbank * 0x4000 + (uint32_t)p * 256), s_rom_size);
 }
 
 static void bankselect_w(uint8_t v)
@@ -312,7 +312,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a < 0x4000)
 		return t.video[t.view][a - 0x2000];
 	if (a < 0x8000)
-		return s_rom[((uint32_t)t.mainbank * 0x4000 + (a - 0x4000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x4000 + (a - 0x4000)), s_rom_size)];
 	return s_rom[0x28000 + (a - 0x8000)];
 }
 

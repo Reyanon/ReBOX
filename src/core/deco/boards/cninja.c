@@ -340,7 +340,7 @@ static void cninjabl_draw_sprites(const uint16_t *spr, uint16_t *bm, uint8_t *pb
 		} else
 			mult = -16;
 		for (; multi >= 0; multi--)
-			rbx_gfx_prio_transpen(&s_gfxspr, (uint32_t)(sprite - multi * inc) % s_gfxspr.count,
+			rbx_gfx_prio_transpen(&s_gfxspr, rbx_wrap((uint32_t)(sprite - multi * inc), s_gfxspr.count),
 			                      (uint16_t)(768 + colour * 16), fx, fy, x, y + mult * multi - VIS_Y0, bm, pb, pitch, w,
 			                      VIS_H, pri);
 	}

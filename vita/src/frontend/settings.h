@@ -52,6 +52,9 @@ enum { RBX_BCOL_NAVY, RBX_BCOL_GRAY, RBX_BCOL_MAROON, RBX_BCOL_GREEN, RBX_BCOL_P
        RBX_BCOL_OLIVE, RBX_BCOL_FOREST, RBX_BCOL_BROWN, RBX_BCOL_ORANGE, RBX_BCOL_GOLD, RBX_BCOL_RED, RBX_BCOL_WINE,
        RBX_BCOL_PINK, RBX_BCOL_INDIGO, RBX_BCOL_COUNT };   // (new ones at the end: the saved numbers stay)
 
+#define RBX_VOLUME_MAX 200
+#define RBX_VOLUME_STEP 10
+
 // Options screen confirm button (the other one is back)
 enum { RBX_CONFIRM_CROSS, RBX_CONFIRM_CIRCLE, RBX_CONFIRM_COUNT };
 
@@ -146,6 +149,8 @@ typedef struct {
 	int neon_list[7];                   // the game list's corridor (user 11-22: set apart from the games' one)
 	int neon_list_gap;                  // its walls' distance (px, the middle of the screen between them)
 	int frame_buffer;                   // RBX_FRAMEBUF_* (per game or global)
+	int snd_normalize;                  // Sound > Normalize: the output follows the game's level (global only)
+	int snd_volume;                     // Sound > Volume, percent: 0..RBX_VOLUME_MAX step RBX_VOLUME_STEP (global only)
 } rbx_settings;
 
 extern rbx_settings g_settings;

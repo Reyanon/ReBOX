@@ -80,7 +80,7 @@ static void draw_row(int category, int y, uint16_t *d)
 		const int code = s_vs.vram[0x400 + idx] + 8 * (attr & 0x20);
 		const int pen = (attr & 0x1f) * 4;
 		const int fx = (attr & 0x40) != 0, fy = (attr & 0x80) != 0;
-		const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
+		const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
 		for (int i = 0; i < 8; i++)
 			d[col * 8 + i] = (uint16_t)(pen + src[fx ? 7 - i : i]);
 	}
@@ -111,7 +111,7 @@ static void tp_render(void)   // (screen_update, a line at a time)
 			const int sx = sl->s0[o], code = sl->s0[o + 1];
 			const int color = sl->s1[o] & 0x3f;
 			const int flipx = !(sl->s1[o] & 0x40), flipy = (sl->s1[o] & 0x80) != 0;
-			const uint8_t *s = s_spr + ((uint32_t)code % s_nspr) * 256 + (flipy ? 15 - j : j) * 16;
+			const uint8_t *s = s_spr + (rbx_wrap((uint32_t)code, s_nspr)) * 256 + (flipy ? 15 - j : j) * 16;
 			const int pen = 32 * 4 + color * 4;
 			for (int k = 0; k < 16; k++) {
 				const int xx = sx + k;

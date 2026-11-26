@@ -1017,7 +1017,7 @@ static void bg_line(const pgm2_snap *v, int y, uint16_t *out)
 			x += n;
 			continue;
 		}
-		const uint32_t code = (t & 0x3ffff) % ntiles;
+		const uint32_t code = rbx_wrap((t & 0x3ffff), ntiles);
 		const uint16_t base = (uint16_t)(PAL_BG + ((t >> 18) & 0xf) * 0x80);
 		// (MAME TILE_FLIPXY: bit 24 = flip x, bit 23 = flip y)
 		const uint32_t flip = ((t >> 24) & 1) | ((t >> 22) & 2);   // (bit 0 x, bit 1 y)
@@ -1055,7 +1055,7 @@ static void fg_line(const pgm2_snap *v, int y, uint16_t *out)
 			x += n;
 			continue;
 		}
-		const uint32_t code = (t & 0x3ffff) % ntiles;
+		const uint32_t code = rbx_wrap((t & 0x3ffff), ntiles);
 		const uint16_t base = (uint16_t)(PAL_TX + ((t >> 18) & 0x1f) * 16);
 		const uint32_t flip = ((t >> 24) & 1) | ((t >> 22) & 2);   // (MAME TILE_FLIPXY: bit 24 x, bit 23 y)
 		const uint8_t *src = s_tiles + code * 32 + ((flip & 2) ? (sy & 7) ^ 7 : (sy & 7)) * 4;

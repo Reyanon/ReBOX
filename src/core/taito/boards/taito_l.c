@@ -161,7 +161,7 @@ static void msm_vck(void)
 		msm5205_data_w(&s_msm, (uint8_t)(s_adpcm_data & 0x0f));
 		s_adpcm_data = -1;
 	} else {
-		s_adpcm_data = s_adpcm[s_adpcm_pos % s_adpcm_size];
+		s_adpcm_data = s_adpcm[rbx_wrap(s_adpcm_pos, s_adpcm_size)];
 		s_adpcm_pos = (s_adpcm_pos + 1) & 0x1ffff;
 		msm5205_data_w(&s_msm, (uint8_t)(s_adpcm_data >> 4));
 	}
@@ -345,10 +345,10 @@ static uint8_t slave_read(void *u, uint16_t a)
 		if (a < 0xe800) return dpram_left_r(a);
 		return 0;
 	}
-	if (a < 0x8000) return s_slave_rom[a % s_slave_size];
+	if (a < 0x8000) return s_slave_rom[rbx_wrap(a, s_slave_size)];
 	if (a < 0xc000) {
 		uint32_t banks = s_slave_size / 0x4000;
-		return s_slave_rom[((uint32_t)s_slave_bank % banks) * 0x4000 + (a & 0x3fff)];
+		return s_slave_rom[(rbx_wrap((uint32_t)s_slave_bank, banks)) * 0x4000 + (a & 0x3fff)];
 	}
 	if (s_m->kind == M_FHAWK) {
 		if (a == 0xc801) return tc0140syt_master_comm_r(&s_syt);
@@ -406,7 +406,7 @@ static uint8_t audio_read(void *u, uint16_t a)
 	if (a < 0x4000) return s_audio_rom[a];
 	if (a < 0x8000) {
 		uint32_t banks = s_audio_size / 0x4000;
-		return s_audio_rom[((uint32_t)s_audio_bank % banks) * 0x4000 + (a & 0x3fff)];
+		return s_audio_rom[(rbx_wrap((uint32_t)s_audio_bank, banks)) * 0x4000 + (a & 0x3fff)];
 	}
 	switch (s_m->kind) {
 	case M_FHAWK:

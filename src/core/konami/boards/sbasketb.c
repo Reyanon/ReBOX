@@ -85,7 +85,7 @@ static void sb_render(void)   // (screen_update)
 			const int code = s_vs.vram[idx] + ((attr & 0x20) << 3);
 			const int pen = (attr & 0x0f) * 16;
 			const int fx = ((attr & 0x40) != 0) ^ flip, fy = (attr & 0x80) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
 			for (int i = 0; i < 8; i++)
 				d[sc * 8 + i] = (uint16_t)(pen + src[fx ? 7 - i : i]);
 		}
@@ -104,7 +104,7 @@ static void sb_render(void)   // (screen_update)
 			flipx = !flipx;
 			flipy = !flipy;
 		}
-		const uint8_t *src = s_spr + ((uint32_t)code % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)code, s_nspr)) * 256;
 		for (int j = 0; j < 16; j++) {
 			const int yy = sy + j;
 			if (yy < VIS_Y0 || yy >= VIS_Y0 + VIS_H)
@@ -160,7 +160,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	case 0x3f00: return port(s_port_dsw[0]);
 	}
 	if (a >= 0x6000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 

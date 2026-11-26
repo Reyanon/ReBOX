@@ -122,7 +122,7 @@ static void tt_render(void)
 		for (int x = 0; x < VIS_W; x++) {   // TILEMAP_SCAN_ROWS_FLIP_X
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
 			const uint32_t idx = (ty >> 3) * 32 + (31 - (tx >> 3));
-			const uint32_t code = (uint32_t)(s_snap->vram[idx] + 256 * s_snap->cram[idx]) % s_gchar.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] + 256 * s_snap->cram[idx]), s_gchar.count);
 			d[x] = (uint16_t)(cbase + s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)]);
 		}
 	}

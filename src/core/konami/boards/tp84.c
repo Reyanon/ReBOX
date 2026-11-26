@@ -99,7 +99,7 @@ static void draw_layer(int fg, int x0, int x1, uint16_t *bm, int pitch)
 			const int code = ((c & 0x30) << 4) | vram[idx];
 			const int pen = (cbase | (c & 0x0f)) * 4;
 			const int fx = (c >> 6) & 1, fy = (c >> 7) & 1;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
 			for (int i = 0; i < n; i++) {
 				const int px = (tx + i) & 7;
 				d[x + i] = (uint16_t)(pen + src[fx ? 7 - px : px]);
@@ -128,7 +128,7 @@ static void tp_render(void)   // (screen_update, band by band for the sprites)
 			uint8_t trans[16];
 			for (int p = 0; p < 16; p++)
 				trans[p] = ctab(pen + p) == pbase;
-			const uint8_t *src = s_spr + ((uint32_t)sr[offs + 1] % s_nspr) * 256;
+			const uint8_t *src = s_spr + (rbx_wrap((uint32_t)sr[offs + 1], s_nspr)) * 256;
 			for (int j = 0; j < 16; j++) {
 				const int yy = y + j;
 				if (yy < y0 || yy > y1 || yy < VIS_Y0 || yy >= VIS_Y0 + VIS_H)
@@ -193,7 +193,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a == (s_b ? 0x1c00 : 0x3000))
 		return port(s_port_dsw[1]);
 	if (a >= 0x8000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 
@@ -244,7 +244,7 @@ static uint8_t sub_rd(void *ctx, uint16_t a)
 	if (a >= 0x8000 && a < 0x8800)
 		return t.shared[a - 0x8000];
 	if (a >= 0xe000)
-		return s_srom[a % s_srom_size];
+		return s_srom[rbx_wrap(a, s_srom_size)];
 	return 0;
 }
 static void sub_wr(void *ctx, uint16_t a, uint8_t v)

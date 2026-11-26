@@ -582,7 +582,7 @@ static void draw_sprites(uint16_t *bm, int pitch, const snap_t *s)
 		for (int y = 0; y <= size; y++)
 			for (int x = 0; x <= size; x++) {
 				int ex = xflip ? size - x : x, ey = yflip ? size - y : y;
-				uint32_t t = (uint32_t)(tile_offset[ey][ex] + tile_number) % s_spr_n;
+				uint32_t t = rbx_wrap((uint32_t)(tile_offset[ey][ex] + tile_number), s_spr_n);
 				if (!s_spr_opaque[t])
 					continue;
 				const uint8_t *g = s_spr + t * 256;
@@ -626,7 +626,7 @@ static void gl_render(void)
 				int ty = map_y(sy, st->ppk_scrolly[tx >> 4], 512, st->flip);
 				int idx = (ty >> 3) * 32 + (tx >> 3);
 				int attr = s->colorram[idx];
-				uint32_t code = (uint32_t)(s->videoram[idx] + ((attr & 7) << 8)) % s_bg_n;
+				uint32_t code = rbx_wrap((uint32_t)(s->videoram[idx] + ((attr & 7) << 8)), s_bg_n);
 				d[x] = (uint16_t)(((attr >> 3) ^ 0x1f) * 8 + s_bg[code * 64 + (ty & 7) * 8 + (tx & 7)]);
 			}
 		}
@@ -637,7 +637,7 @@ static void gl_render(void)
 			int ty = (y + VIS_Y0 + st->fg_scrolly) & 0x1ff;
 			for (int x = 0; x < SCREEN_W; x++) {
 				int idx = (ty >> 3) * 32 + (x >> 3);
-				uint32_t code = (uint32_t)(s->textram[idx] + (st->fg_tile_bank << 8)) % s_tx_n;
+				uint32_t code = rbx_wrap((uint32_t)(s->textram[idx] + (st->fg_tile_bank << 8)), s_tx_n);
 				if (s_tx[code * 64 + (ty & 7) * 8 + (x & 7)])
 					d[x] += 512;
 			}
@@ -660,7 +660,7 @@ static void gl_render(void)
 			int tx = map_x(x, bgsx, -0x30, 0x12f, 512, st->flip);
 			int idx = (ty >> 3) * 64 + (tx >> 3);
 			int attr = s->colorram[idx];
-			uint32_t code = (uint32_t)(s->videoram[idx] + ((attr & 7) << 8) + bgbank) % s_bg_n;
+			uint32_t code = rbx_wrap((uint32_t)(s->videoram[idx] + ((attr & 7) << 8) + bgbank), s_bg_n);
 			d[x] = (uint16_t)(((attr >> 3) ^ 0x1f) * 8 + s_bg[code * 64 + (ty & 7) * 8 + (tx & 7)]);
 		}
 	}
@@ -671,7 +671,7 @@ static void gl_render(void)
 		for (int x = 0; x < SCREEN_W; x++) {
 			int tx = map_x(x, fgsx, -0x30, 0x12f, 512, st->flip);
 			int idx = (ty >> 3) * 64 + (tx >> 3);
-			uint32_t code = (uint32_t)(s->textram[idx] + fgbank) % s_tx_n;
+			uint32_t code = rbx_wrap((uint32_t)(s->textram[idx] + fgbank), s_tx_n);
 			int c = s_tx[code * 64 + (ty & 7) * 8 + (tx & 7)];
 			if (c)
 				d[x] = (uint16_t)(0x200 + c);

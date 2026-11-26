@@ -109,7 +109,7 @@ static void ms_render(void)
 		for (int x = 0; x < VIS_W; x++) {   // bg: TILEMAP_SCAN_COLS_FLIP_X, 16 x 32 of 16x16
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
 			const uint32_t idx = (15 - (tx >> 4)) * 32 + (ty >> 4);
-			const uint32_t code = (uint32_t)(((s_snap->bgram[page | 0x200 | idx] & 1) << 8) | s_snap->bgram[page | idx]) % s_gbg.count;
+			const uint32_t code = rbx_wrap((uint32_t)(((s_snap->bgram[page | 0x200 | idx] & 1) << 8) | s_snap->bgram[page | idx]), s_gbg.count);
 			const uint32_t py = (idx & 0x10) ? 15 - (ty & 15) : ty & 15;
 			d[x] = (uint16_t)(16 + s_gbg.pix[code * 256 + py * 16 + (tx & 15)]);
 		}
@@ -137,7 +137,7 @@ static void ms_render(void)
 		for (int x = 0; x < VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
 			const uint32_t idx = (31 - (tx >> 3)) * 32 + (ty >> 3);
-			const uint32_t code = (uint32_t)(((s_snap->fgram[0x400 | idx] & 7) << 8) | s_snap->fgram[idx]) % s_gchar.count;
+			const uint32_t code = rbx_wrap((uint32_t)(((s_snap->fgram[0x400 | idx] & 7) << 8) | s_snap->fgram[idx]), s_gchar.count);
 			const uint8_t p = s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
 			if (p)
 				d[x] = (uint16_t)(32 + fgcol * 8 + p);

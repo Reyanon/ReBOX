@@ -110,7 +110,7 @@ static void bm_render(void)
 			const int attr = s_snap->bg[0x100 + idx];
 			const int bank = ((((attr & 1) << 8) + s_snap->bg[idx]) / 0x80);
 			const rbx_gfx *g = &s_gtile[bank & 3];
-			const uint32_t code = (uint32_t)(s_snap->bg[idx] & 0x7f) % g->count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg[idx] & 0x7f), g->count);
 			d[x] = (uint16_t)(16 + 128 + ((attr >> 1) & 7) * 8 + g->pix[code * 256 + (ty & 15) * 16 + (tx & 15)]);
 		}
 	}
@@ -144,7 +144,7 @@ static void bm_render(void)
 			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
 			const uint32_t tile = s_snap->fg[idx] | (uint32_t)(s_snap->fg[0x400 + idx] & 3) << 8;
 			const rbx_gfx *g = &s_gchar[(tile >> 9) & 1];
-			const uint8_t p = g->pix[((tile & 0x1ff) % g->count) * 64 + (ty & 7) * 8 + (tx & 7)];
+			const uint8_t p = g->pix[(rbx_wrap((tile & 0x1ff), g->count)) * 64 + (ty & 7) * 8 + (tx & 7)];
 			if (p)
 				d[x] = (uint16_t)(16 + s_snap->colbank * 8 + p);
 		}

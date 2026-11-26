@@ -306,7 +306,7 @@ static void m_w8(uint32_t a, uint8_t v) { tc_write16(a, (a & 1) ? v : (uint16_t)
 static void w_map(void)
 {
 	for (int p = 0x80; p < 0x100; p++)
-		s_wmap[p] = t->wbank ? s_rom + (((uint32_t)(t->wbank & 7) * 0x8000 + (uint32_t)(p - 0x80) * 256) % s_rom_size) : NULL;
+		s_wmap[p] = t->wbank ? s_rom + (rbx_wrap(((uint32_t)(t->wbank & 7) * 0x8000 + (uint32_t)(p - 0x80) * 256), s_rom_size)) : NULL;
 }
 
 static uint8_t w_read(uint16_t a)
@@ -314,7 +314,7 @@ static uint8_t w_read(uint16_t a)
 	if (a < 0x7000) return s_rom[a];
 	if (a < 0x8000) return ((uint8_t *)t->ram)[a - 0x7000];
 	if (t->wbank)
-		return s_rom[((uint32_t)(t->wbank & 7) * 0x8000 + (a - 0x8000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)(t->wbank & 7) * 0x8000 + (a - 0x8000)), s_rom_size)];
 	if (a < 0x9000) return ((uint8_t *)t->spr)[a - 0x8000];   // (view 0)
 	if (a >= 0xa000 && a < 0xb000) return ((uint8_t *)t->pal)[a - 0xa000];
 	if (a >= 0xc000 && a < 0xc800) return t->shram[a - 0xc000];
@@ -371,7 +371,7 @@ static void ym_irq(int state) { t->ym_irq = state; }
 static uint8_t snd_read(void *u, uint16_t a)
 {
 	(void)u;
-	if (a < 0x8000) return s_zrom[a % s_zrom_size];
+	if (a < 0x8000) return s_zrom[rbx_wrap(a, s_zrom_size)];
 	if (s_wardner) {
 		if (a < 0x8080) return t->zram[a - 0x8000];
 		if (a >= 0xc000 && a < 0xc800) return t->shram[a - 0xc000];
@@ -434,7 +434,7 @@ static void draw_layer(const uint16_t *vram, uint32_t rows_mask, const rbx_gfx *
 			if ((tx >> 3) != last) {
 				last = tx >> 3;
 				const uint16_t c = row[tx >> 3];
-				const uint32_t code = (((uint32_t)c & (uint32_t)tbits & codemask) | codeor) % g->count;
+				const uint32_t code = rbx_wrap((((uint32_t)c & (uint32_t)tbits & codemask) | codeor), g->count);
 				src = g->pix + code * 64 + (ty & 7) * 8;
 				cbase = (uint16_t)(base + (c >> colshift) * cmul);
 			}

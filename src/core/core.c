@@ -273,8 +273,12 @@ static void game_controls(const rbx_game *g, int *players, int *buttons)
 }
 int rbx_game_players(int i) { int p = 0, b = 0; const rbx_game *g = game_at(i, NULL); if (g) game_controls(g, &p, &b); return p; }
 int rbx_game_buttons(int i) { int p = 0, b = 0; const rbx_game *g = game_at(i, NULL); if (g) game_controls(g, &p, &b); return b; }
+static int s_rstick_dial;   // (the running game's driver: its dial on the right stick, rbx_set_rstick_dial)
+void rbx_set_rstick_dial(int on) { s_rstick_dial = on; }
 int rbx_game_twin_stick(int i)
 {
+	if (i >= 0 && i == rbx_running_game() && s_rstick_dial)
+		return 1;
 	const rbx_game *g = game_at(i, NULL);
 	if (g)
 		for (const rbx_ipt_port *p = g->ports; p->tag; p++)
@@ -2530,6 +2534,7 @@ size_t rbx_fresh_range(void)
 
 int rbx_init(const rbx_config *cfg)
 {
+	s_rstick_dial = 0;
 	fresh_core();
 	rbx_bios_set(cfg->neogeo_bios);   // (after fresh_core: the choice is the frontend's, not the first game's)
 	rbx_cheat_cpu_reset();   // (the CPUs the driver sets up offer their spaces again: the first is the main one)

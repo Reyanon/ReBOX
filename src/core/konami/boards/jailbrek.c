@@ -79,7 +79,7 @@ static void jb_render(void)   // (screen_update)
 			const int attr = s_vs.ram[idx];
 			const int code = s_vs.ram[0x800 + idx] + ((attr & 0xc0) << 2);
 			const int pen = (attr & 0x0f) * 16;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (ty & 7) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (ty & 7) * 8;
 			for (int i = 0; i < n; i++)
 				d[x + i] = (uint16_t)(pen + src[(tx + i) & 7]);
 			x += n;
@@ -92,7 +92,7 @@ static void jb_render(void)   // (screen_update)
 		const int color = attr & 0x0f;
 		const int flipx = (attr & 0x10) != 0, flipy = (attr & 0x20) != 0;
 		const int sx = sr[i + 2] - ((attr & 0x80) << 1), sy = sr[i + 3];
-		const uint8_t *src = s_spr + ((uint32_t)code % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)code, s_nspr)) * 256;
 		const uint8_t *lut = s_prom + 0x140 + color * 16;
 		for (int j = 0; j < 16; j++) {
 			const int yy = sy + j;
@@ -132,7 +132,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	case 0x6000: return (uint8_t)vlm5030_bsy(&s_vlm);
 	}
 	if (a >= 0x8000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 

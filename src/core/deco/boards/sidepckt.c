@@ -186,7 +186,7 @@ static void bg_draw(uint16_t *bm, int pitch, int layer0)
 		const int py = (y + VIS_Y0 + s_snap->scroll_y) & 0xff;
 		for (int x = 0; x < VIS_W; x++) {
 			const int idx = (py >> 3) * 32 + (31 - (x >> 3)), attr = s_snap->cram[idx];
-			const uint32_t code = s_gfx8.count ? (uint32_t)(s_snap->vram[idx] + ((attr & 7) << 8)) % s_gfx8.count : 0;
+			const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(s_snap->vram[idx] + ((attr & 7) << 8)), s_gfx8.count) : 0;
 			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(x & 7)];
 			const int in0 = (attr & 0x80) && p != 0;
 			if (in0 != layer0)

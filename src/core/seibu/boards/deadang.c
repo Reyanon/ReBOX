@@ -153,7 +153,7 @@ static void pf_rom_line(const uint8_t *map, const rbx_gfx *g, uint16_t cbase, in
 		const int col = tx >> 4, row = ty >> 4;
 		const uint32_t idx = (uint32_t)((col & 0xf) | ((row & 0xf) << 4) | ((col & 0x70) << 4) | ((row & 0xf0) << 7));
 		const uint16_t code = (uint16_t)(map[idx * 2] << 8 | map[idx * 2 + 1]);   // (ROM_REGION16_BE)
-		const uint8_t *rowp = g->pix + (size_t)((code & 0x7ff) % g->count) * 256 + (size_t)(ty & 15) * 16;
+		const uint8_t *rowp = g->pix + (size_t)(rbx_wrap((code & 0x7ff), g->count)) * 256 + (size_t)(ty & 15) * 16;
 		const uint16_t base = (uint16_t)(cbase + (code >> 12) * 16);
 		for (int fx = tx & 15; fx < 16 && x < VIS_W; fx++, x++) {
 			const uint8_t c = rowp[fx];
@@ -185,7 +185,7 @@ static void draw_band(int band)
 				const int tx = (x + s_snap.s1x) & 511;
 				const uint16_t data = rd16(s_snap.video_data, (uint32_t)(((tx >> 4) * 32 + (ty >> 4)) * 2));
 				const uint32_t code = (data & 0xfff) + s_snap.tilebank * 0x1000u;
-				const uint8_t *row = s_t1.pix + (size_t)(code % s_t1.count) * 256 + (size_t)(ty & 15) * 16;
+				const uint8_t *row = s_t1.pix + (size_t)(rbx_wrap(code, s_t1.count)) * 256 + (size_t)(ty & 15) * 16;
 				const uint16_t base = (uint16_t)(1024 + (data >> 12) * 16);
 				for (int fx = tx & 15; fx < 16 && x < VIS_W; fx++, x++)
 					if (row[fx] != 15) {
@@ -210,7 +210,7 @@ static void draw_band(int band)
 			if (w2 & 0x100)
 				x = 0 - (0xff - x);
 			const uint16_t base = (uint16_t)(768 + ((w1 >> 12) & 0xf) * 16);
-			const uint8_t *src = s_spr.pix + (size_t)((w1 & 0xfff) % s_spr.count) * 256;
+			const uint8_t *src = s_spr.pix + (size_t)(rbx_wrap((w1 & 0xfff), s_spr.count)) * 256;
 			for (int j = 0; j < 16; j++) {
 				const int r = y + j - VIS_Y0;
 				if (r < r0 || r >= r1)
@@ -238,7 +238,7 @@ static void draw_band(int band)
 			for (int x = 0; x < VIS_W; x++) {
 				const uint16_t data = rd16(s_snap.textram, (uint32_t)(((y >> 3) * 32 + (x >> 3)) * 2));
 				const uint32_t tile = (data & 0xff) | ((data >> 6) & 0x300);
-				const uint8_t c = s_tx.pix[(size_t)(tile % s_tx.count) * 64 + (size_t)(y & 7) * 8 + (x & 7)];
+				const uint8_t c = s_tx.pix[(size_t)(rbx_wrap(tile, s_tx.count)) * 64 + (size_t)(y & 7) * 8 + (x & 7)];
 				if (c != 15)
 					d[x] = (uint16_t)(512 + ((data >> 8) & 0xf) * 16 + c);
 			}

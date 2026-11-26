@@ -154,7 +154,7 @@ static void dg_render(void)
 		for (int x = 0; x < VIS_W; x++) {
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + s_snap->sx : x + s_snap->sx) & 511;
 			const uint32_t idx = (ty >> 4) * 32 + (tx >> 4);
-			const uint32_t code = s_snap->bg[idx] % s_gtile.count;
+			const uint32_t code = rbx_wrap(s_snap->bg[idx], s_gtile.count);
 			d[x] = (uint16_t)(16 + (s_snap->bg[idx + 0x400] & 3) * 8 + s_gtile.pix[code * 256 + (ty & 15) * 16 + (tx & 15)]);
 		}
 	}

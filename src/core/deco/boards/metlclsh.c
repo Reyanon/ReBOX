@@ -159,7 +159,7 @@ static void fg_draw(uint16_t *bm, int pitch, int cat)
 			const int idx = (py >> 3) * 32 + (px >> 3), attr = fg[0x400 + idx];
 			if (((attr & 0x80) ? 1 : 2) != cat)
 				continue;
-			const uint32_t code = s_gfx8.count ? (uint32_t)(fg[idx] + ((attr & 3) << 8)) % s_gfx8.count : 0;
+			const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(fg[idx] + ((attr & 3) << 8)), s_gfx8.count) : 0;
 			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(px & 7)];
 			if (p)
 				d[x] = (uint16_t)(0x20 + ((attr >> 5) & 3) * 4 + p);
@@ -192,7 +192,7 @@ static void mc_render(void)
 				}
 				const int col = px >> 4, row = py >> 4;
 				const int idx = (row & 7) + ((row & ~7) << 4) + ((col & 0xf) << 3) + ((col & ~0xf) << 4);
-				const uint32_t code = s_gfx16.count ? (uint32_t)(s_snap->bgram[idx & 0x1ff] + (s_snap->gfxbank << 7)) % s_gfx16.count : 0;
+				const uint32_t code = s_gfx16.count ? rbx_wrap((uint32_t)(s_snap->bgram[idx & 0x1ff] + (s_snap->gfxbank << 7)), s_gfx16.count) : 0;
 				const uint8_t p = s_gfx16.pix[(code * 16 + (uint32_t)(py & 15)) * 16 + (uint32_t)(px & 15)];
 				if (p)
 					d[x] = (uint16_t)(0x10 + p);

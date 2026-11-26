@@ -119,9 +119,9 @@ static void ex_render(void)
 				const uint32_t tx = ((uint32_t)x + s_snap->bgx) & 2047;
 				const uint32_t col = tx >> 5, row = ty >> 5;
 				const uint32_t idx = ((col * 32 & 0xe0) >> 5) + ((row * 32 & 0xe0) >> 2) + ((col * 32 & 0x3f00) >> 1) + 0x4000;
-				const uint8_t attr = s_tilerom[idx % s_tilerom_size];
-				const uint8_t color = s_tilerom[(idx + 64) % s_tilerom_size];
-				const uint32_t code = (uint32_t)(attr & 0x3f) % s_gbg.count;
+				const uint8_t attr = s_tilerom[rbx_wrap(idx, s_tilerom_size)];
+				const uint8_t color = s_tilerom[rbx_wrap((idx + 64), s_tilerom_size)];
+				const uint32_t code = rbx_wrap((uint32_t)(attr & 0x3f), s_gbg.count);
 				const uint32_t px = (attr & 0x40) ? 31 - (tx & 31) : tx & 31, py = (attr & 0x80) ? 31 - (ty & 31) : ty & 31;
 				d[x] = (uint16_t)(64 * 4 + color * 4 + s_gbg.pix[code * 1024 + py * 32 + px]);
 				pri[x] = 1;
@@ -134,7 +134,7 @@ static void ex_render(void)
 				const uint32_t tx = ((uint32_t)x + s_snap->fgx) & 2047;
 				const uint32_t col = tx >> 4, row = ty >> 4;
 				const uint32_t idx = ((col * 16 & 0xf0) >> 4) + (row * 16 & 0xf0) + (col * 16 & 0x700) + ((row * 16 & 0x700) << 3);
-				const uint32_t code = s_tilerom[idx % s_tilerom_size] % s_gfg.count;
+				const uint32_t code = rbx_wrap(s_tilerom[rbx_wrap(idx, s_tilerom_size)], s_gfg.count);
 				const uint8_t p = s_gfg.pix[code * 256 + (ty & 15) * 16 + (tx & 15)];
 				if (p) {
 					d[x] = (uint16_t)(2 * 64 * 4 + p);
@@ -157,7 +157,7 @@ static void ex_render(void)
 			for (int x = 0; x < VIS_W; x++) {
 				const uint32_t idx = ((uint32_t)y >> 3) * 32 + ((uint32_t)x >> 3);
 				const uint8_t c = s_snap->cram[idx];
-				const uint32_t code = (uint32_t)(s_snap->vram[idx] + 2 * (c & 0x80)) % s_gchar.count;
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] + 2 * (c & 0x80)), s_gchar.count);
 				const uint32_t pen = (c & 0x3f) * 4 + s_gchar.pix[code * 64 + (y & 7) * 8 + (x & 7)];
 				if (s_ctab[pen] != 0xcf)   // (configure_groups(gfx, 0xcf))
 					d[x] = (uint16_t)pen;

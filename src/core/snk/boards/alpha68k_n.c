@@ -504,7 +504,7 @@ static void draw_tile(int bank, uint32_t code, int color, int fx, int fy, int sx
 		return;
 	const uint8_t *g = s_gfx_pix + idx * 64;
 	const int depth = s_board_n ? 8 : 16;
-	const uint16_t c0 = (uint16_t)((color % s_ncolors) * depth);
+	const uint16_t c0 = (uint16_t)((rbx_wrap(color, s_ncolors)) * depth);
 	sy -= VIS_Y0;
 	for (int j = 0; j < 8; j++) {
 		const int yy = sy + j;
@@ -533,7 +533,7 @@ static void draw_sprites_i(int c, int d)
 		for (int i = 0; i < 0x20; i++) {
 			const uint16_t data = sp[offs + d + i];
 			const uint32_t tile = data & 0x3fff;
-			const uint32_t ci = (tile << 1 | data >> 15) % s_cprom_size;
+			const uint32_t ci = rbx_wrap((tile << 1 | data >> 15), s_cprom_size);
 			draw_tile(0, tile, s_cprom[ci], 0, (data & 0x4000) != 0, mx, my);
 			my = (my + 8) & 0xff;
 		}

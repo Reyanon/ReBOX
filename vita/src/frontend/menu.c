@@ -29,6 +29,7 @@
 #include <strings.h>
 
 #include "common/re_pad.h"
+#include "frontend/audio.h"
 #include "frontend/avsnap.h"
 #include "frontend/present.h"
 #include "frontend/settings.h"
@@ -488,7 +489,9 @@ static char s_set[32], s_title[96];
 static UiCanvas *s_cv, *s_osd_cv, *s_fps_cv;
 static int s_changed; // settings changed since the menu opened (saved on close only then)
 enum { PAGE_MAIN, PAGE_STATES, PAGE_DISPLAY, PAGE_CONTROLS, PAGE_DIPS, PAGE_CHEATS, PAGE_ABOUT, PAGE_COMBO, PAGE_TURBO,
-	PAGE_TOUCH, PAGE_TEDIT, PAGE_PORT, PAGE_STICK, PAGE_SETTINGS, PAGE_FOLDERS, PAGE_BIOS, PAGE_CONTENT };
+	PAGE_TOUCH, PAGE_TEDIT, PAGE_PORT, PAGE_STICK, PAGE_SETTINGS, PAGE_FOLDERS, PAGE_BIOS, PAGE_CONTENT, PAGE_SOUND };
+// Sound (user 11-26, issue #3): the level-following gain on or off, the volume
+enum { SO_NORM, SO_VOL, SO_BACK, SO_COUNT };
 // the Settings page (user 11-22) and its sub-pages (user 11-25): Folders (ROM, snap, marquee: 11-24), BIOS (Neo Geo: its
 // list of BIOSes)
 enum { SET_LANG, SET_FOLDERS, SET_BIOS, SET_BACK, SET_COUNT };
@@ -506,7 +509,7 @@ static int s_mt_wait_up; // the finger that left the touch layout editor: not a 
 // rows in groups (a gap before M_STATES, M_DISPLAY and M_ABOUT): game, states, settings, about / leave.
 // M_REFRESH (read the ROM folders again) only in the game list options
 enum { M_RESUME, M_RESET, M_STATES, M_DISPLAY, M_CONTROLS, M_DIPS, M_CHEATS, M_GAME_SAVE, M_GAME_DEL, M_ABOUT, M_SELECT_GAME,
-	M_EXIT, M_BACK, M_REFRESH, M_GROUP, M_SETTINGS, M_CONTENT, M_COUNT };
+	M_EXIT, M_BACK, M_REFRESH, M_GROUP, M_SETTINGS, M_CONTENT, M_SOUND, M_COUNT };
 #define GROUP_GAP 10
 // game list options (START in the list): no game. Only Display / Controls / Refresh / Back, global settings only
 static int s_list_mode;
@@ -516,6 +519,7 @@ static int main_list(int *k)
 	int n = 0;
 	if (s_list_mode) {
 		k[n++] = M_DISPLAY;
+		k[n++] = M_SOUND;
 		k[n++] = M_CONTROLS;
 		k[n++] = M_SETTINGS;
 		k[n++] = M_CONTENT;   // (Content Download: the list's options only, user 11-25)
@@ -530,6 +534,8 @@ static int main_list(int *k)
 		if (m == (rbx_settings_has_game() ? M_GAME_SAVE : M_GAME_DEL))
 			continue;
 		k[n++] = m;
+		if (m == M_DISPLAY)
+			k[n++] = M_SOUND;
 		if (m == M_CONTROLS)
 			k[n++] = M_SETTINGS;
 	}
@@ -915,6 +921,7 @@ static const char *page_row_help(void)
 		case M_DISPLAY: return "Screen size, rotation, filter, scanlines, border, FPS and menu colors";
 		case M_SETTINGS: return "The app's language and its other settings";
 		case M_CONTENT: return "Download extra files from ReBOX's GitHub (cheats ...)";
+		case M_SOUND: return "Volume and the automatic level of the sound";
 		case M_CONTROLS: return "Controllers, input engine, buttons, analog stick, turbo, combo keys and touch buttons";
 		case M_DIPS: return "The board's DIP switches: difficulty, lives, coins and the game's other settings";
 		case M_CHEATS: return "Start stage, infinite health and the cheats of cheats/<set>.xml";
@@ -962,6 +969,10 @@ static const char *page_row_help(void)
 		return NULL;
 	case PAGE_BIOS:
 		return s_sel == BI_NEOGEO ? "The Neo Geo BIOS (its file in the game's zip or neogeo.zip). From the next game start" : NULL;
+	case PAGE_SOUND:
+		if (s_sel == SO_NORM)
+			return "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level";
+		return s_sel == SO_VOL ? "The volume of the games' sound" : NULL;
 	case PAGE_CONTENT:
 		if (s_sel == CT_CHEAT && s_ct_msg[0])
 			return s_ct_msg;
@@ -1313,6 +1324,7 @@ static int page_items(void)
 	case PAGE_FOLDERS: return FD_COUNT;
 	case PAGE_BIOS: return BI_COUNT;
 	case PAGE_CONTENT: return CT_COUNT;
+	case PAGE_SOUND: return SO_COUNT;
 	case PAGE_ABOUT: return ABOUT_LINES;   // (all its lines: the page scrolls as the others, user 11-25)
 	default: return main_rows();
 	}
@@ -1550,6 +1562,14 @@ static int item_choices(const char **out, int *cur, const char **title)
 		}
 		*cur = s_state_slot;
 		*title = "Save slot";
+	} else if (s_page == PAGE_SOUND && s_sel == SO_VOL) {
+		n = RBX_VOLUME_MAX / RBX_VOLUME_STEP + 1;
+		for (int i = 0; i < n; i++) {
+			snprintf(num[i], sizeof(num[i]), "%d%%", i * RBX_VOLUME_STEP);
+			out[i] = num[i];
+		}
+		*cur = g_settings.snd_volume / RBX_VOLUME_STEP;
+		*title = "Volume";
 	} else if (s_page == PAGE_BIOS && s_sel == BI_NEOGEO) {   // (the Neo Geo BIOS: a dropdown, user 11-25)
 		n = rbx_bios_count() < MAX_CHOICES ? rbx_bios_count() : MAX_CHOICES;
 		for (int i = 0; i < n; i++)
@@ -1642,6 +1662,14 @@ static void set_choice(int idx)
 			snprintf(g_settings.bios_neogeo, sizeof(g_settings.bios_neogeo), "%s", rbx_bios_name(idx));
 			if (!s_list_mode)
 				rbx_osd_show("%s", T("The BIOS is used from the next game start"));
+		}
+		return;
+	}
+	if (s_page == PAGE_SOUND && s_sel == SO_VOL) {   // (directly: the steps stop at the ends)
+		if (idx >= 0 && idx < n && idx != cur) {
+			g_settings.snd_volume = idx * RBX_VOLUME_STEP;
+			rbx_audio_set_level(g_settings.snd_normalize, g_settings.snd_volume);
+			s_changed = 1;
 		}
 		return;
 	}
@@ -1788,6 +1816,17 @@ static void change(int dir)
 	case PAGE_STATES:
 		if (s_sel == S_SLOT)
 			s_state_slot = wrap(s_state_slot + dir, RBX_STATE_SLOTS);
+		break;
+	case PAGE_SOUND:
+		if (s_sel == SO_NORM)
+			g_settings.snd_normalize = !g_settings.snd_normalize;
+		else if (s_sel == SO_VOL) {   // (stops at the ends: no wrap from silent to loudest)
+			const int v = g_settings.snd_volume + dir * RBX_VOLUME_STEP;
+			g_settings.snd_volume = v < 0 ? 0 : v > RBX_VOLUME_MAX ? RBX_VOLUME_MAX : v;
+		} else
+			break;
+		rbx_audio_set_level(g_settings.snd_normalize, g_settings.snd_volume);
+		s_changed = 1;
 		break;
 	case PAGE_BIOS:
 		if (s_sel == BI_NEOGEO) {   // (the next / previous BIOS)
@@ -2153,6 +2192,7 @@ static rbx_menu_result confirm(void)
 		case M_DISPLAY: go_page(PAGE_DISPLAY); break;
 		case M_SETTINGS: go_page(PAGE_SETTINGS); break;
 		case M_CONTENT: go_page(PAGE_CONTENT); break;
+		case M_SOUND: go_page(PAGE_SOUND); break;
 		case M_CONTROLS: go_page(PAGE_CONTROLS); break;
 		case M_DIPS:
 			if (rbx_core_dip_count() > 0)
@@ -2281,6 +2321,10 @@ static rbx_menu_result confirm(void)
 		break;
 	case PAGE_BIOS:   // (the Neo Geo row: its dropdown, item_choices)
 		if (s_sel == BI_BACK) page_back();
+		break;
+	case PAGE_SOUND:
+		if (s_sel == SO_BACK) page_back();
+		else if (s_sel == SO_NORM) change(+1);
 		break;
 	case PAGE_CONTENT:
 		if (s_sel == CT_BACK) page_back();
@@ -3354,6 +3398,9 @@ static void menu_paint(UiCanvas *c, int overlay)
 	case PAGE_CONTENT:
 		title = "CONTENT DOWNLOAD";
 		break;
+	case PAGE_SOUND:
+		title = "SOUND";
+		break;
 	case PAGE_STATES:
 		title = "SAVE / LOAD STATE";
 		foot = "Quick save: SELECT+L   Quick load: SELECT+R";
@@ -3427,7 +3474,7 @@ static void menu_paint(UiCanvas *c, int overlay)
 		case PAGE_MAIN: {
 			static const char *const names[M_COUNT] = { "Resume game", "Reset game", "Save / Load state  >", "Display  >",
 				"Controls  >", "DIP switches  >", "Cheats  >", "Save game settings", "Delete game settings", "About  >",
-				"Select game", "Exit", "Back", "Refresh ROM list", "Group games by", "Settings  >", "Content Download  >" };
+				"Select game", "Exit", "Back", "Refresh ROM list", "Group games by", "Settings  >", "Content Download  >", "Sound  >" };
 			const int k = main_kind(i);
 			const char *name = names[k];
 			char rbuf[64];
@@ -3639,6 +3686,16 @@ static void menu_paint(UiCanvas *c, int overlay)
 			if (i == BI_NEOGEO)   // (a value row as the others: its dropdown on the button)
 				item(c, px, ty, i, s_sel, "Neo Geo", rbx_bios_desc(rbx_bios_get()));
 			else
+				item(c, px, ty, i, s_sel, "Back", NULL);
+			break;
+		case PAGE_SOUND:
+			if (i == SO_NORM)
+				item(c, px, ty, i, s_sel, "Normalize", g_settings.snd_normalize ? VAL_ON : VAL_OFF);
+			else if (i == SO_VOL) {
+				char v[16];
+				snprintf(v, sizeof(v), "%d%%", g_settings.snd_volume);
+				item(c, px, ty, i, s_sel, "Volume", v);
+			} else
 				item(c, px, ty, i, s_sel, "Back", NULL);
 			break;
 		case PAGE_CONTENT:

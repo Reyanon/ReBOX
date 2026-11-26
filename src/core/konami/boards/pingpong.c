@@ -67,7 +67,7 @@ static void pp_render(void)   // (screen_update)
 			const int code = s_vs.vram[0x400 + idx] + ((attr & 0x20) << 3);
 			const int pen = (attr & 0x1f) * 4;
 			const int fx = (attr & 0x40) != 0, fy = (attr & 0x80) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
 			for (int i = 0; i < 8; i++)
 				d[col * 8 + i] = (uint16_t)(pen + src[fx ? 7 - i : i]);
 		}
@@ -76,7 +76,7 @@ static void pp_render(void)   // (screen_update)
 		const int sx = s_vs.spr[offs + 3], sy = 241 - s_vs.spr[offs + 1];
 		const int flipx = (s_vs.spr[offs] & 0x40) != 0, flipy = (s_vs.spr[offs] & 0x80) != 0;
 		const int color = s_vs.spr[offs] & 0x1f;
-		const uint8_t *src = s_spr + ((uint32_t)(s_vs.spr[offs + 2] & 0x7f) % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)(s_vs.spr[offs + 2] & 0x7f), s_nspr)) * 256;
 		for (int j = 0; j < 16; j++) {
 			const int yy = sy + j;
 			if (yy < 4 * 8 || yy > 29 * 8 - 1)
@@ -103,7 +103,7 @@ static uint8_t z_rd(void *u, uint16_t a)
 {
 	(void)u;
 	if (a < 0x8000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	if (a < 0x8800)
 		return t.vram[a - 0x8000];
 	if (a >= 0x9000 && a < 0x9800)

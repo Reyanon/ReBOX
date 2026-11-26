@@ -224,7 +224,7 @@ static uint8_t sub_rd(void *ctx, uint16_t a)
 	if (a >= 0x6000 && a < 0x6800)
 		return t.shared[a - 0x6000];
 	if (a >= 0xe000)
-		return s_srom[a % s_srom_size];
+		return s_srom[rbx_wrap(a, s_srom_size)];
 	return 0;
 }
 static void sub_wr(void *ctx, uint16_t a, uint8_t v)

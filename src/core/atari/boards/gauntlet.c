@@ -17,6 +17,7 @@
 #include "../../video/gfxlayout.h"
 #include "../video/atarimo.h"
 #include "../machine/slapstic.h"
+#include "../../rbx_prof.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,6 +94,48 @@ static struct { uint16_t frame[VIS_W * VIS_H]; uint32_t pal[0x400]; } *s_snap;
 
 static void tms_sync(void);
 static void pokey_sync(void);
+// the sampled profile's marks (ADR-155)
+enum { GT_PA_68K = RBX_PA_DRV, GT_PA_6502, GT_PA_DRAW, GT_PA_YM, GT_PA_TMS, GT_PA_WAITPK, GT_PA_END };
+static const char *const s_gt_pa_names[] = { "68010", "6502", "draw", "ym2151", "tms5220", "pokey wait" };
+
+// the POKEY on the second worker (its clock-exact model is the frame's largest cost): the 6502's writes and the samples
+// to make are queued in order and done there (the same calls in the same order: the same samples). A read, the mix
+// and a reset or state wait for it first
+enum { PK_RENDER = 0x01000000u, PK_WRITE = 0x02000000u, PK_KIND = 0xff000000u };
+#define PKQ 4096
+static uint32_t s_pkq[PKQ][2];
+static volatile uint32_t s_pkq_h, s_pkq_t;
+static void pk_job(void)
+{
+	for (;;) {
+		const uint32_t t = s_pkq_t, h = __atomic_load_n(&s_pkq_h, __ATOMIC_ACQUIRE);
+		if (t == h)
+			return;
+		for (uint32_t i = t; i != h; i++) {
+			const uint32_t a = s_pkq[i % PKQ][0], b = s_pkq[i % PKQ][1];
+			if ((a & PK_KIND) == PK_WRITE)
+				pokey_write(&s_pokey, (uint8_t)(a & 0x0f), (uint8_t)b);
+			else {
+				const int n = (int)(a & 0xffff), off = (int)(b & 0xffff), g = (int)(b >> 16);
+				int16_t *o = s_pk_buf + off;
+				pokey_render(&s_pokey, o, n);
+				for (int k = 0; k < n; k++)   // (0.32 x g / 3)
+					o[k] = (int16_t)(o[k] * g * 32 / 300);
+			}
+		}
+		__atomic_store_n(&s_pkq_t, h, __ATOMIC_RELEASE);
+	}
+}
+static void pk_push(uint32_t a, uint32_t b)
+{
+	const uint32_t h = s_pkq_h;
+	if (h - __atomic_load_n(&s_pkq_t, __ATOMIC_ACQUIRE) >= PKQ)
+		rbx_aux2_sync();
+	s_pkq[h % PKQ][0] = a;
+	s_pkq[h % PKQ][1] = b;
+	__atomic_store_n(&s_pkq_h, h + 1, __ATOMIC_RELEASE);
+	rbx_aux2_kick();
+}
 
 // ---- the latches and the sound CPU's lines ----
 static void main_irq6(void) { m68k_bus_set_line(6, s_main_pending); }
@@ -200,7 +243,7 @@ static uint8_t snd_r(void *ctx, uint16_t a)
 		return s_soundlatch;
 	case 0x0020: return (uint8_t)rbx_port_read(s_port[5]);
 	case 0x0030: return switch_6502_r();
-	case 0x0800: pokey_sync(); return pokey_read(&s_pokey, a & 0x0f);
+	case 0x0800: pokey_sync(); rbx_aux2_sync(); return pokey_read(&s_pokey, a & 0x0f);
 	case 0x0810: return s_soundctl & 1 ? rbx_ym_read(0, a & 1) : 0;
 	case 0x0830: m6502_set_irq(&s_snd, 0); return 0xff;
 	default: return 0xff;
@@ -224,7 +267,7 @@ static void snd_w(void *ctx, uint16_t a, uint8_t v)
 		break;
 	case 0x0020: mixer_w(v); break;
 	case 0x0030: soundctl_w(a & 7, v >> 7); break;
-	case 0x0800: pokey_sync(); pokey_write(&s_pokey, a & 0x0f, v); break;
+	case 0x0800: pokey_sync(); pk_push(PK_WRITE | (a & 0x0f), v); break;
 	case 0x0810:
 		if (s_soundctl & 1)
 			rbx_ym_write(0, a & 1, v);
@@ -250,10 +293,7 @@ static void pokey_sync(void)
 		n = s_pk_cap - s_pk_n;
 	if (n <= 0)
 		return;
-	pokey_render(&s_pokey, s_pk_buf + s_pk_n, n);
-	const int g = (s_mixer >> 3) & 3;   // 0.32 x g / 3
-	for (int i = 0; i < n; i++)
-		s_pk_buf[s_pk_n + i] = (int16_t)(s_pk_buf[s_pk_n + i] * g * 32 / 300);
+	pk_push(PK_RENDER | (uint32_t)n, (uint32_t)s_pk_n | (uint32_t)((s_mixer >> 3) & 3) << 16);   // (pk_job)
 	s_pk_n += n;
 }
 
@@ -356,7 +396,9 @@ static void update_partial(int vpos)   // screen().update_partial(vpos)
 		vpos = VIS_H - 1;
 	if (vpos <= s_last_drawn)
 		return;
+	const unsigned pa = rbx_prof_enter(GT_PA_DRAW);
 	draw_lines(s_last_drawn + 1, vpos);
+	rbx_prof_leave(pa);
 	s_last_drawn = vpos;
 }
 
@@ -610,6 +652,7 @@ static void gt_frame(void)
 			s_mdebt += step;
 			if (s_mdebt > 0) {
 				s_slices++;
+				rbx_prof_set(GT_PA_68K);
 				s_mdebt -= m68k_execute((int)s_mdebt);
 			}
 			if (s_pq > 0)
@@ -619,21 +662,37 @@ static void gt_frame(void)
 			s_sndacc &= 3;
 			if (s_snd_reset)
 				s_snd.cycles += sc;
-			else
+			else {
+				rbx_prof_set(GT_PA_6502);
 				m6502_run_until(&s_snd, s_snd.cycles + sc);
+			}
 		}
+		// (the POKEY's samples queued every line: the worker keeps up, and a read waits only for the last bit)
+		if ((line & 7) == 7 && !s_snd_reset)
+			pokey_sync();
+		rbx_prof_set(GT_PA_YM);
 		s_ym_n += rbx_ym_advance_lr(0, YM_LINE_CLK, s_ym_l + s_ym_n, s_ym_r + s_ym_n, s_ym_cap - s_ym_n);
 	}
 	pokey_sync();
+	rbx_prof_set(GT_PA_TMS);
 	tms_sync();
+	rbx_prof_set(GT_PA_WAITPK);
+	rbx_aux2_sync();   // (the POKEY's samples done)
+	rbx_prof_set(RBX_PA_DRIVER);
 	rbx_ym_async_take_lr(0, s_ym_l, s_ym_r, s_ym_n);
+	// (sample i of the others: i * n / s_ym_n, stepped without a divide)
+	int pi = 0, pr = 0, ti = 0, tr = 0;
 	for (int i = 0; i < s_ym_n; i++) {
 		int32_t o = 0;
 		if (s_pk_n)
-			o += s_pk_buf[(int)((int64_t)i * s_pk_n / s_ym_n)];
+			o += s_pk_buf[pi];
 		if (s_tms_n)
-			o += s_tms_buf[(int)((int64_t)i * s_tms_n / s_ym_n)];
+			o += s_tms_buf[ti];
 		rbx_audio_put_stereo(s_ym_r[i] + o, s_ym_l[i] + o);   // (YM output 1 to the left)
+		for (pr += s_pk_n; pr >= s_ym_n; pr -= s_ym_n)
+			pi++;
+		for (tr += s_tms_n; tr >= s_ym_n; tr -= s_ym_n)
+			ti++;
 	}
 	memset(s_ym_l, 0, sizeof(int32_t) * (size_t)s_ym_n);
 	memset(s_ym_r, 0, sizeof(int32_t) * (size_t)s_ym_n);
@@ -674,6 +733,8 @@ static void gt_reset(void)
 	s_snd.write = snd_w;
 	s_snd_cyc0 = s_snd.cycles = 0;
 	rbx_ym_reset(0);
+	rbx_aux2_sync();
+	s_pkq_h = s_pkq_t = 0;
 	pokey_reset(&s_pokey);
 	s_tms_clock = 14318181u / 2 / 11;
 	tms5220_set_clock(&s_tms, s_tms_clock);
@@ -775,6 +836,11 @@ static int gt_init(const rbx_game *g)
 		s_pk_cap = (int)(pokey_rate(&s_pokey) / 50) + 64;
 		s_tms_cap = 20000 / 50 + 64;
 		s_pk_buf = (int16_t *)calloc((size_t)s_pk_cap, sizeof(int16_t));
+		s_pkq_h = s_pkq_t = 0;
+		rbx_aux2_set_alone(1);   // (CPU3 on the Vita: the YM is on the first worker, the render thread on CPU2)
+		rbx_aux2_set_job(pk_job);
+		rbx_aux2_set_spin(300);   // (samples queued every 8 lines: it waits for the next by spinning, not asleep)
+		rbx_prof_name(RBX_PA_DRV, s_gt_pa_names, GT_PA_END - RBX_PA_DRV);
 		s_tms_buf = (int16_t *)calloc((size_t)s_tms_cap, sizeof(int16_t));
 		rc = !s_ym_l || !s_ym_r || !s_pk_buf || !s_tms_buf || rbx_audio_setup_stereo(rbx_ym_rate(0)) ||
 		     rbx_video_setup(VIS_W, VIS_H, 0x400);
@@ -813,6 +879,7 @@ static int gt_init(const rbx_game *g)
 
 static void gt_exit(void)
 {
+	rbx_aux2_set_job(NULL);   // (syncs first)
 	if (s_nv_path[0]) {
 		FILE *f = fopen(s_nv_path, "wb");
 		if (f) {
@@ -871,6 +938,7 @@ static int gt_state(void *ctx, int load)
 	rc |= rbx_state_io(ctx, "sram", s_sram, sizeof(s_sram));
 	rc |= rbx_state_io(ctx, "tmsacc", &acc, sizeof(acc));
 	rc |= rbx_ym_state(0, ctx, load);
+	rbx_aux2_sync();
 	rc |= pokey_state(&s_pokey, ctx, load, "pokey");
 	rc |= tms5220_state(&s_tms, ctx, load, "tms");
 	if (!rc && load) {

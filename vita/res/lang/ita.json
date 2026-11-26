@@ -349,6 +349,13 @@
   "2nd stick Right": "2° stick destra",
   "Pedal": "Pedale",
   "Pedal 2": "Pedale 2",
-  "Pedal 3": "Pedale 3"
+  "Pedal 3": "Pedale 3",
+  "Sound  >": "Audio  >",
+  "SOUND": "AUDIO",
+  "Normalize": "Normalizza",
+  "Volume": "Volume",
+  "Volume and the automatic level of the sound": "Volume e livello audio automatico",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Attivo: giochi silenziosi e rumorosi a un livello simile (segue il livello del gioco). Disattivo: il livello proprio del gioco",
+  "The volume of the games' sound": "Il volume dell'audio dei giochi"
  }
 }

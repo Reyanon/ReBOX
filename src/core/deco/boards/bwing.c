@@ -54,7 +54,7 @@ static uint8_t snd_r(void *ctx, uint16_t a)
 	(void)ctx;
 	if (a < 0x200) return s_sram[a];
 	if (a == 0xa000) return s_latch;
-	if (a >= 0xe000) return s_srom[(a - 0xe000) % s_srom_size];
+	if (a >= 0xe000) return s_srom[rbx_wrap((a - 0xe000), s_srom_size)];
 	return 0;
 }
 static void snd_w(void *ctx, uint16_t a, uint8_t v)
@@ -275,7 +275,7 @@ static void bw_render(void)
 		for (int x = 0; x < 256; x += 8) {   // (a tile's 8 pixels: one lookup)
 			const int tx = flipx ? 255 - x : x, ty = flipy ? 255 - y : y;
 			const uint8_t code = s_snap->vram[(tx >> 3) * 32 + (ty >> 3)];
-			const uint8_t *src = s_gfxchar.pix + (size_t)(code % s_gfxchar.count) * 64 + (ty & 7) * 8;
+			const uint8_t *src = s_gfxchar.pix + (size_t)(rbx_wrap(code, s_gfxchar.count)) * 64 + (ty & 7) * 8;
 			for (int k = 0; k < 8; k++) {
 				const uint8_t p = src[flipx ? 7 - k : k];
 				if (p) {
@@ -302,7 +302,7 @@ static void bw_render(void)
 			x = 240 - x;
 			y = 240 - y;
 		}
-		const uint8_t *src = s_gfxspr.pix + (size_t)(code % s_gfxspr.count) * 256;
+		const uint8_t *src = s_gfxspr.pix + (size_t)(rbx_wrap(code, s_gfxspr.count)) * 256;
 		const int hscale = (attrib & 0x10) ? 2 : 1;   // (prio_zoom_transpen: twice as tall)
 		for (int yy = 0; yy < 16 * hscale; yy++) {
 			const int dy = y + yy;

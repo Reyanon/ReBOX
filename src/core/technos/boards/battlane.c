@@ -140,7 +140,7 @@ static void bl_render(void)
 			const uint32_t idx = (row & 0xf) * 16 + (col & 0xf) + (row & 0x10) * 32 + (col & 0x10) * 16;
 			const uint8_t attr = s_snap->tile[idx + 0x400];
 			const rbx_gfx *g = &s_gtile[attr & 1];
-			const uint32_t code = s_snap->tile[idx] % g->count;
+			const uint32_t code = rbx_wrap(s_snap->tile[idx], g->count);
 			d[x - VIS_X0] = (uint16_t)(32 + ((attr >> 1) & 3) * 8 + g->pix[code * 256 + (ty & 15) * 16 + (tx & 15)]);
 		}
 	}

@@ -385,7 +385,7 @@ static void get_sprites(const uint16_t *buf)
 
 static inline uint8_t gfx_pix(const uint8_t *base, uint32_t count, uint32_t code, int x, int y)   // 16x16x4 packed msb
 {
-	const uint8_t byte = base[(code % count) * 128 + (uint32_t)y * 8 + (uint32_t)(x >> 1)];
+	const uint8_t byte = base[(rbx_wrap(code, count)) * 128 + (uint32_t)y * 8 + (uint32_t)(x >> 1)];
 	return (x & 1) ? (byte & 0x0f) : (byte >> 4);
 }
 

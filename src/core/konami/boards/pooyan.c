@@ -76,7 +76,7 @@ static void py_render(void)   // (screen_update)
 			const int code = s_vs.vram[0x400 + idx];
 			const int pen = (attr & 0x0f) * 16;
 			const int fx = (attr & 0x40) != 0, fy = (attr & 0x80) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
 			for (int i = 0; i < 8; i++)
 				d[col * 8 + i] = (uint16_t)(pen + src[fx ? 7 - i : i]);
 		}
@@ -85,7 +85,7 @@ static void py_render(void)   // (screen_update)
 		const int sx = s_vs.s0[offs], sy = 240 - s_vs.s1[offs + 1];
 		const int color = s_vs.s1[offs] & 0x0f;
 		const int flipx = !(s_vs.s1[offs] & 0x40), flipy = (s_vs.s1[offs] & 0x80) != 0;
-		const uint8_t *src = s_spr + ((uint32_t)s_vs.s0[offs + 1] % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)s_vs.s0[offs + 1], s_nspr)) * 256;
 		const uint8_t *lut = s_prom + 0x120 + color * 16;
 		for (int j = 0; j < 16; j++) {
 			const int yy = sy + j;

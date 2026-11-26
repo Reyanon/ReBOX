@@ -134,8 +134,8 @@ static void draw_bg(int y0, int y1)
 			if ((tx >> 5) != last) {
 				last = tx >> 5;
 				const uint32_t offs = ((tx >> 5) * 8 + (ty >> 5)) * 2;
-				const uint8_t attr = s_tilerom[(offs + 1) % s_tilerom_size];
-				const uint32_t code = (uint32_t)(s_tilerom[offs % s_tilerom_size] + ((attr & 1) << 8)) % s_gtile.count;
+				const uint8_t attr = s_tilerom[rbx_wrap((offs + 1), s_tilerom_size)];
+				const uint32_t code = rbx_wrap((uint32_t)(s_tilerom[rbx_wrap(offs, s_tilerom_size)] + ((attr & 1) << 8)), s_gtile.count);
 				const uint32_t py = (attr & 0x80) ? 31 - (ty & 31) : ty & 31;
 				src = s_gtile.pix + code * 1024 + py * 32;
 				fx = (attr & 0x40) ? 31 : 0;
@@ -160,7 +160,7 @@ static void draw_chars(int y0, int y1)
 				last = tx >> 3;
 				const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
 				const uint8_t c = s_snap->cram[idx];
-				const uint32_t code = (uint32_t)(s_snap->vram[idx] + ((c & 0xe0) << 2)) % s_gchar.count;
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] + ((c & 0xe0) << 2)), s_gchar.count);
 				src = s_gchar.pix + code * 64 + (ty & 7) * 8;
 				cbase = (c & 0x1f) * 4u;
 			}

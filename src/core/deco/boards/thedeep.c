@@ -214,7 +214,7 @@ static void td_render(void)
 			}
 			const int o = ((py >> 3) * 32 + (px >> 3)) * 2;
 			const int colour = s_snap->text[o + 1];
-			const uint32_t code = s_gfx8.count ? (uint32_t)(s_snap->text[o] + (colour << 8)) % s_gfx8.count : 0;
+			const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(s_snap->text[o] + (colour << 8)), s_gfx8.count) : 0;
 			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(px & 7)];
 			if (p)
 				d[x] = (uint16_t)(((colour & 0xf0) >> 4) * 4 + p);

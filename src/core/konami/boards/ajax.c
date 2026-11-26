@@ -229,7 +229,7 @@ static uint8_t port(int p) { return (uint8_t)rbx_port_read(p); }
 static void map_mainbank(void)
 {
 	const uint32_t e = t.mainbank;   // (entries 0-3 the ROM's first 32 KB, 4-11 its second half)
-	const uint32_t base = (e < 4 ? e * 0x2000u : 0x10000u + (e - 4) * 0x2000u) % s_rom_size;
+	const uint32_t base = rbx_wrap((e < 4 ? e * 0x2000u : 0x10000u + (e - 4) * 0x2000u), s_rom_size);
 	for (int p = 0; p < 0x20; p++)
 		s_cpu.rpage[0x60 + p] = s_rom + base + (uint32_t)p * 256;
 }
@@ -302,7 +302,7 @@ static void main_wr(void *ctx, uint16_t a, uint8_t v)
 // ---- the sub CPU's bus (sub_map) ----
 static void map_subbank(void)
 {
-	const uint32_t base = ((uint32_t)t.subbank * 0x2000u) % s_srom_size;
+	const uint32_t base = rbx_wrap(((uint32_t)t.subbank * 0x2000u), s_srom_size);
 	for (int p = 0; p < 0x20; p++)
 		s_sub.rpage[0x80 + p] = s_srom + base + (uint32_t)p * 256;
 }
@@ -319,9 +319,9 @@ static uint8_t sub_rd(void *ctx, uint16_t a)
 	if (a >= 0x4000 && a < 0x8000)
 		return k052109_read(&s_k109, a - 0x4000);
 	if (a >= 0x8000 && a < 0xa000)
-		return s_srom[((uint32_t)t.subbank * 0x2000u + (a - 0x8000)) % s_srom_size];
+		return s_srom[rbx_wrap(((uint32_t)t.subbank * 0x2000u + (a - 0x8000)), s_srom_size)];
 	if (a >= 0xa000)
-		return s_srom[(0x12000u + (a - 0xa000)) % s_srom_size];
+		return s_srom[rbx_wrap((0x12000u + (a - 0xa000)), s_srom_size)];
 	return 0;
 }
 

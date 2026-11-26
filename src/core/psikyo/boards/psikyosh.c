@@ -90,7 +90,7 @@ static inline uint32_t blend(uint32_t d, uint32_t s, uint32_t level)
 static void gfxbank_map(void)
 {
 	const uint32_t banks = s_gfx_size / 0x20000;
-	const uint32_t bank = banks ? (uint32_t)b.gfxbank % banks : 0;
+	const uint32_t bank = banks ? rbx_wrap((uint32_t)b.gfxbank, banks) : 0;
 	uint8_t *p = s_gfx + bank * 0x20000;
 	sh2_map(&s_cpu, s_vbase + 0x60000, s_vbase + 0x7ffff, p, 0x20000, 1, 0);
 	if (s_board == B_PS3)

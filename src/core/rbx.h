@@ -165,6 +165,9 @@ uint64_t rbx_io_nreads(void);   // (the worker's card reads: requests merged int
 
 // input ports: index by tag (-1 = none), current value (inputs, DIPs and defaults combined)
 int rbx_port_find(const char *tag);
+// a game whose dial aims while its joystick moves (Forgotten Worlds): the right stick's left / right turn it (set at
+// init; the frontend then offers the "second stick" keys, RBX_IN_RLEFT / RBX_IN_RRIGHT)
+void rbx_set_rstick_dial(int on);
 uint32_t rbx_port_read(int port);
 // set the IPT_CUSTOM bits of a port as line levels, 1 = asserted (EEPROM data line, sensors); active-low fields are inverted
 void rbx_port_custom(int port, uint32_t mask, uint32_t value);

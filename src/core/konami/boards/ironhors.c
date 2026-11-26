@@ -106,7 +106,7 @@ static void ih_render(void)   // (screen_update)
 			const int code = s_vs.vram[idx] + ((c & 0x40) << 2) + ((c & 0x20) << 4) + (s_vs.charbank << 10);
 			const int pen = ((c & 0x0f) + 16 * s_vs.palettebank) * 16;
 			const int fx = (c & 0x10) != 0, fy = (c & 0x20) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
 			for (int i = 0; i < n; i++) {
 				const int px = (tx + i) & 7;
 				d[x + i] = (uint16_t)(pen + src[fx ? 7 - px : px]);
@@ -126,10 +126,10 @@ static void ih_render(void)   // (screen_update)
 			flipx = !flipx;
 			flipy = !flipy;
 		}
-#define C8(c) (s_chr + ((uint32_t)(c) % s_nchr) * 64)
+#define C8(c) (s_chr + (rbx_wrap((uint32_t)(c), s_nchr)) * 64)
 		switch (sr[offs + 4] & 0x0c) {
 		case 0x00:   // (16x16)
-			draw_gfx(s_spr16 + ((uint32_t)(code / 4) % s_nspr16) * 256, 16, pen, flipx, flipy, sx, sy, bm, pitch);
+			draw_gfx(s_spr16 + (rbx_wrap((uint32_t)(code / 4), s_nspr16)) * 256, 16, pen, flipx, flipy, sx, sy, bm, pitch);
 			break;
 		case 0x04:   // (16x8)
 			if (s_vs.flip)
@@ -189,7 +189,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a >= 0x2000 && a < 0x4000)
 		return t.ram2[a - 0x2000];
 	if (a >= 0x4000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 

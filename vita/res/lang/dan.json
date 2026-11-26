@@ -349,6 +349,13 @@
   "2nd stick Right": "Pind 2 højre",
   "Pedal": "Pedal",
   "Pedal 2": "Pedal 2",
-  "Pedal 3": "Pedal 3"
+  "Pedal 3": "Pedal 3",
+  "Sound  >": "Lyd  >",
+  "SOUND": "LYD",
+  "Normalize": "Normaliser",
+  "Volume": "Lydstyrke",
+  "Volume and the automatic level of the sound": "Lydstyrke og automatisk lydniveau",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Til: stille og høje spil på et lignende niveau (følger spillets niveau). Fra: spillets eget niveau",
+  "The volume of the games' sound": "Lydstyrken af spillenes lyd"
  }
 }

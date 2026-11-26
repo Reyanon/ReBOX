@@ -512,7 +512,7 @@ static inline uint32_t tile_index(uint32_t code)
 {
 	if (code < s_ntiles)
 		return code;
-	return s_ntiles ? code % s_ntiles : 0;
+	return s_ntiles ? rbx_wrap(code, s_ntiles) : 0;
 }
 
 // one page drawn into the frame over the bitmap rectangle [x0, x1] x [y0, y1] with its scroll (the tilemap's

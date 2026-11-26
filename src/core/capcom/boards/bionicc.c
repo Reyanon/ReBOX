@@ -223,7 +223,7 @@ static void fg_line(int by, int category, int layer, uint16_t *d)
 			fy = (attr >> 6) & 1;
 		}
 		if (cat == category) {
-			const uint32_t code = ((uint32_t)(attr & 0x07) << 8 | (s_snap->fg[2 * i] & 0xffu)) % s_gfxfg.count;
+			const uint32_t code = rbx_wrap(((uint32_t)(attr & 0x07) << 8 | (s_snap->fg[2 * i] & 0xffu)), s_gfxfg.count);
 			const uint32_t py = fy ? 15 - (ty & 15) : (ty & 15);
 			const uint8_t *src = s_gfxfg.pix + code * 256 + py * 16;
 			const uint16_t m = layer ? s_fg_mask1[group] : s_fg_mask0[group];
@@ -253,7 +253,7 @@ static void bg_line(int by, uint16_t *d)   // 64x64 of 8x8, pen 15 transparent
 			n = VIS_W - x;
 		const uint32_t i = (ty >> 3) * 64 + (tx >> 3);
 		const uint16_t attr = s_snap->bg[2 * i + 1];
-		const uint32_t code = ((uint32_t)(attr & 0x07) << 8 | (s_snap->bg[2 * i] & 0xffu)) % s_gfxbg.count;
+		const uint32_t code = rbx_wrap(((uint32_t)(attr & 0x07) << 8 | (s_snap->bg[2 * i] & 0xffu)), s_gfxbg.count);
 		const uint32_t py = (attr & 0x40) ? 7 - (ty & 7) : (ty & 7);
 		const uint8_t *src = s_gfxbg.pix + code * 64 + py * 8;
 		const uint16_t c0 = (uint16_t)(((attr & 0x38) >> 3) * 16);
@@ -281,7 +281,7 @@ static void tx_line(int by, uint16_t *d)   // 32x32 of 8x8, 2 bits, pen 3 transp
 			n = VIS_W - x;
 		const uint32_t i = (ty >> 3) * 32 + (tx >> 3);
 		const uint16_t attr = s_snap->tx[i + 0x400];
-		const uint32_t code = (((uint32_t)(attr & 0xc0) << 2) | (s_snap->tx[i] & 0xffu)) % s_gfxtx.count;
+		const uint32_t code = rbx_wrap((((uint32_t)(attr & 0xc0) << 2) | (s_snap->tx[i] & 0xffu)), s_gfxtx.count);
 		const uint32_t py = (attr & 0x20) ? 7 - (ty & 7) : (ty & 7);
 		const uint8_t *src = s_gfxtx.pix + code * 64 + py * 8;
 		const uint16_t c0 = (uint16_t)(768 + (attr & 0xf) * 4);
@@ -301,7 +301,7 @@ static void draw_sprites(void)   // tigeroad_spr_device::draw_sprites (from the 
 {
 	for (int o = 0x280 - 4; o >= 0; o -= 4) {
 		const uint16_t *s = s_snap->spr + o;
-		const uint32_t code = s[0] % s_gfxspr.count;
+		const uint32_t code = rbx_wrap(s[0], s_gfxspr.count);
 		const uint16_t attr = s[1];
 		int sy = (int)((s[2] & 0x1ff) ^ 0x100) - 0x100, sx = (int)((s[3] & 0x1ff) ^ 0x100) - 0x100;
 		int flipx = attr & 0x02, flipy = attr & 0x01;

@@ -129,7 +129,7 @@ static void q_put(int kind, uint32_t v)
 static void map_bank(void)
 {
 	for (int p = 0; p < 0x20; p++)
-		s_cpu.rpage[0x60 + p] = s_rom + ((uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x60 + p] = s_rom + rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256), s_rom_size);
 }
 
 static uint8_t trackball_r(int i)
@@ -167,8 +167,8 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a < 0x6000)
 		return t.ram[a - 0x4000];
 	if (a < 0x8000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)) % s_rom_size];
-	return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)), s_rom_size)];
+	return s_rom[rbx_wrap(a, s_rom_size)];
 }
 
 static void main_wr(void *ctx, uint16_t a, uint8_t v)
@@ -223,7 +223,7 @@ static uint8_t snd_rd(void *ctx, uint16_t a)
 	if (a == 0x6000)
 		return t.soundlatch;
 	if (a >= 0x8000)
-		return s_srom[a % s_srom_size];
+		return s_srom[rbx_wrap(a, s_srom_size)];
 	return 0;
 }
 static void snd_wr(void *ctx, uint16_t a, uint8_t v)

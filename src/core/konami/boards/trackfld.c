@@ -104,7 +104,7 @@ static void tf_render(void)   // (screen_update)
 			const int code = s_vs.vram[idx] + 4 * (attr & 0xc0);
 			const int pen = 0x100 + (attr & 0x0f) * 16;
 			const int fx = (attr & 0x10) != 0, fy = (attr & 0x20) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
 			for (int i = 0; i < n; i++) {
 				const int px = (tx + i) & 7;
 				d[x + i] = (uint16_t)(pen + src[fx ? 7 - px : px]);
@@ -119,7 +119,7 @@ static void tf_render(void)   // (screen_update)
 		const int color = attr & 0x0f;
 		const int fx = !(attr & 0x40), fy = (attr & 0x80) != 0;
 		const int sx = spr[offs] - 1, sy = 240 - spr2[offs + 1] + 1;
-		const uint8_t *src = s_spr + ((uint32_t)code % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)code, s_nspr)) * 256;
 		const uint8_t *lut = s_prom + 0x20 + color * 16;
 		draw_sprite(src, lut, color * 16, fx, fy, sx, sy, bm, pitch);
 		draw_sprite(src, lut, color * 16, fx, fy, sx - 256, sy, bm, pitch);   // (the wraparound)
@@ -170,7 +170,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a >= 0x3000 && a < 0x4000)
 		return t.vram[a - 0x3000];
 	if (a >= 0x6000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 

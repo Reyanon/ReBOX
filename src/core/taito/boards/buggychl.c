@@ -313,7 +313,7 @@ static void draw_sprites(uint16_t *bm, int pitch, int flipx, int flipy)
 				uint32_t code = 8u * (uint32_t)(lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));
 				int realflipy = (lookup[pos + 1] & 0x80) ? !flip : flip;
 				code += (uint32_t)(realflipy ? (charline ^ 7) : charline);
-				const uint8_t *pen = s_sprgfx + (code % s_nsprlines) * 16;
+				const uint8_t *pen = s_sprgfx + (rbx_wrap(code, s_nsprlines)) * 16;
 				for (int x = 0; x < 16; x++) {
 					int col = pen[x];
 					if (col) {

@@ -163,7 +163,7 @@ static uint8_t oki_read_bank(void *user, uint32_t a)
 			off = a < 0x20000 ? a : (bank < max_bank ? 0x20000 + (uint32_t)bank * 0x20000 : size - 0x20000) + (a - 0x20000);
 		} else {
 			const uint32_t banks = size / 0x40000;
-			off = (banks ? (uint32_t)bank % banks : 0) * 0x40000 + a;
+			off = (banks ? rbx_wrap((uint32_t)bank, banks) : 0) * 0x40000 + a;
 		}
 	} else if (c == 0) {   // gtmr_oki1_map: 0x30000 fixed, 0x10000 banked (banks 0-2 = the first banked block)
 		if (a < 0x30000)
@@ -172,7 +172,7 @@ static uint8_t oki_read_bank(void *user, uint32_t a)
 			off = (bank < 3 ? 0x30000 : (uint32_t)bank * 0x10000) + (a - 0x30000);
 	} else {   // gtmr_oki2_map: 0x40000 banked
 		const uint32_t banks = size / 0x40000;
-		off = (banks ? (uint32_t)bank % banks : 0) * 0x40000 + a;
+		off = (banks ? rbx_wrap((uint32_t)bank, banks) : 0) * 0x40000 + a;
 	}
 	return off < size ? rom[off] : 0;
 }

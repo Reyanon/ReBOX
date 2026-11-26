@@ -9,6 +9,21 @@
 static int32_t s_env = 4096 << 8;   // the output gain's peak envelope of the input (both sides, x256): out_gain below
 static int32_t s_gain256 = 6 * 256;
 static int32_t s_gain_e = -1;       // the envelope level s_gain256 was worked out for (-1: none yet)
+// Sound options (user 11-26, issue #3: the level-following gain heard as the volume moving): Normalize off = a fixed
+// gain (GAIN_FIXED); Volume scales either (x256: 256 = 100%, the gain as before). s_gainv is the gain applied
+#define GAIN_FIXED (2 * 256)
+static int32_t s_norm = 1, s_vol256 = 256;
+static int32_t s_gainv = 6 * 256;
+static inline int32_t gain_applied(int32_t g256)
+{
+	return ((s_norm ? g256 : GAIN_FIXED) * s_vol256) >> 8;
+}
+static inline void gain_set_level(int normalize, int vol256)
+{
+	s_norm = normalize ? 1 : 0;
+	s_vol256 = vol256 < 0 ? 0 : vol256 > 512 ? 512 : vol256;
+	s_gainv = gain_applied(s_gain256);
+}
 // a DC blocker ahead of the gain (a one-pole high pass near 5 Hz): legacy AY outputs carry a large constant level
 // (B-Wings: 12000 of a 15000 peak), which the gain would take for loudness
 static int32_t s_dc[2];   // (x256)
@@ -26,6 +41,7 @@ static inline void gain_reset(void)
 	s_dc[0] = s_dc[1] = 0;
 	s_gain256 = 6 * 256;
 	s_gain_e = -1;
+	s_gainv = gain_applied(s_gain256);
 }
 
 // output gain: the sound was too quiet on the Vita speaker. x6 (x2 as ReSys12 / ReST-V, x2 more by user request
@@ -55,14 +71,16 @@ static inline void gain_track(int32_t l, int32_t r)
 		s_gain_e = e;
 		const int32_t g = (int32_t)((uint32_t)(24576 * 256) / (uint32_t)e);
 		s_gain256 = g > 6 * 256 ? 6 * 256 : g;
+		s_gainv = gain_applied(s_gain256);
 	}
 }
 // (ADR-161: in 32 bits, same values: |v| <= 32768 after the DC blocker and the gain <= 6 * 256, so v * gain fits; past
-// the knee e <= 6 * 32768 - KNEE, e * ROOM < 2^31)
+// the knee e <= 6 * 32768 - KNEE, e * ROOM < 2^31. With Volume up to 200%: the gain <= 12 * 256, v * gain < 2^27, and
+// e * ROOM < 3.1e9 fits the unsigned 32 bits)
 static inline int16_t out_gain(int32_t v)
 {
 	enum { KNEE = 24576, ROOM = 32767 - KNEE };
-	v = (v * s_gain256) >> 8;
+	v = (v * s_gainv) >> 8;
 	const int32_t m = v < 0 ? -v : v;
 	if (m <= KNEE)
 		return (int16_t)v;
@@ -79,6 +97,8 @@ static inline void gain_block(const int16_t *in, int n, uint32_t *ring, uint32_t
 {
 	enum { KNEE = 24576, ROOM = 32767 - KNEE };
 	int32_t dc0 = s_dc[0], dc1 = s_dc[1], env = s_env, g256 = s_gain256, ge = s_gain_e;
+	const int32_t norm = s_norm, vol = s_vol256;
+	int32_t gv = ((norm ? g256 : GAIN_FIXED) * vol) >> 8;   // (from the options each block: set from the menu's thread)
 	for (int i = 0; i < n; i++) {
 		int32_t x = in[i * 2] << 8, l, r;
 		dc0 += (x - dc0) >> 11;
@@ -103,11 +123,12 @@ static inline void gain_block(const int16_t *in, int n, uint32_t *ring, uint32_t
 				ge = e;
 				const int32_t g = (int32_t)((uint32_t)(24576 * 256) / (uint32_t)e);
 				g256 = g > 6 * 256 ? 6 * 256 : g;
+				gv = ((norm ? g256 : GAIN_FIXED) * vol) >> 8;
 			}
 		}
 		if (i >= nw)
 			continue;
-		int32_t o[2] = { (l * g256) >> 8, (r * g256) >> 8 };
+		int32_t o[2] = { (l * gv) >> 8, (r * gv) >> 8 };
 		for (int k = 0; k < 2; k++) {   // out_gain
 			const int32_t v = o[k], m = v < 0 ? -v : v;
 			if (m > KNEE) {
@@ -122,6 +143,7 @@ static inline void gain_block(const int16_t *in, int n, uint32_t *ring, uint32_t
 	s_env = env;
 	s_gain256 = g256;
 	s_gain_e = ge;
+	s_gainv = gv;
 }
 
 #endif

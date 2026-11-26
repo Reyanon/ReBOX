@@ -769,7 +769,7 @@ static uint16_t bank_rom16(uint32_t a)   // the banked ROM behind a cartridge ha
 	uint32_t size = (s_rom_size - base < 0x100000 ? s_rom_size - base : 0x100000) & ~0xfffu;
 	if (!size)
 		size = s_rom_size - base;
-	const uint32_t o = (a - 0x200000) % size;
+	const uint32_t o = rbx_wrap((a - 0x200000), size);
 	return *(const uint16_t *)(s_rom + base + (o & ~1u));
 }
 static void set_vectors(void)   // the system latch Q1: the vectors from the cartridge or the BIOS

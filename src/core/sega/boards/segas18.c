@@ -202,7 +202,7 @@ static void bank5987_w(uint32_t offset, uint16_t data, uint16_t mask)
 	if (offset < 8) {
 		const uint32_t maxbanks = (s_tiles_size / 3 / 8) >> 10;
 		if (maxbanks && data >= maxbanks)
-			data = (uint16_t)(data % maxbanks);
+			data = (uint16_t)(rbx_wrap(data, maxbanks));
 		b.tbank[offset] = (uint8_t)data;
 	} else {
 		const uint32_t maxbanks = s_spr_size >> 18;
@@ -670,7 +670,7 @@ static inline const uint8_t *tile_row(uint32_t code, int py)
 {
 	if (!s_tdec_n)
 		return s_tdec;
-	return s_tdec + (code % s_tdec_n) * 64 + (uint32_t)py * 8;   // (the gfx element wraps the code)
+	return s_tdec + (rbx_wrap(code, s_tdec_n)) * 64 + (uint32_t)py * 8;   // (the gfx element wraps the code)
 }
 
 // one layer's line of the 16B tilemaps (8 banks of 0x400 tiles)

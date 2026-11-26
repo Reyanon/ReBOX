@@ -406,11 +406,11 @@ static void r2dx_eeprom_w(uint8_t data)   // rdx_v33_eeprom_w
 static uint16_t v33_io_r(uint32_t a)
 {
 	switch (a) {
-	case 0x430: return s_math[(((uint32_t)b.dy & 0xff) << 8 | (b.dx & 0xff)) % s_math_size];   // angle_r
+	case 0x430: return s_math[rbx_wrap((((uint32_t)b.dy & 0xff) << 8 | (b.dx & 0xff)), s_math_size)];   // angle_r
 	case 0x432: return (uint16_t)(uint32_t)sqrt((double)b.sdist);                             // dist_r
 	case 0x434: case 0x436: {   // sin_r, cos_r
 		const uint32_t off = 0x10000 + (uint32_t)(b.angle & 0xff) * 4 + (a == 0x436 ? 2 : 0);
-		return (uint16_t)(s_math[off % s_math_size] | s_math[(off + 1) % s_math_size] << 8);
+		return (uint16_t)(s_math[rbx_wrap(off, s_math_size)] | s_math[rbx_wrap((off + 1), s_math_size)] << 8);
 	}
 	case 0x6c0: if (s_m == M_RDX_V33) return b.cop_spr_off; break;
 	case 0x6c2: if (s_m == M_RDX_V33) return b.sprite_prot_src_addr[0]; break;

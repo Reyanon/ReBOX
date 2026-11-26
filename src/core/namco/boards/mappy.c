@@ -305,7 +305,7 @@ static void mappy_draw_sprites(const snap_t *sn, uint16_t *bm, int pitch)
 		if (s3[offs + 1] & 2)   // (off)
 			continue;
 		int sprite = s1[offs];
-		const int color = s1[offs + 1] % s_spr_colors;
+		const int color = rbx_wrap(s1[offs + 1], s_spr_colors);
 		const int sx = s2[offs + 1] + 0x100 * (s3[offs + 1] & 1) - 40;
 		int sy = 256 - s2[offs] + 1;   // sprites are buffered and delayed by one scanline
 		int flipx = s3[offs] & 1, flipy = (s3[offs] & 2) >> 1;

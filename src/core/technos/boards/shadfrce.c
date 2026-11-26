@@ -277,7 +277,7 @@ static void draw_fg_line(int flip, int y, uint16_t *dst)   // 64x32 of 8x8, no s
 	for (int x = 0; x < VIS_W; x++) {
 		const int tx = (flip ? VIS_W - 1 - x : x) & 511;
 		const uint16_t *t = &s_snap->fg[((ty >> 3) * 64 + (tx >> 3)) * 2];
-		const uint32_t code = (uint32_t)((t[0] & 0x00ff) | (t[1] & 0x000f) << 8) % s_gfxfg.count;
+		const uint32_t code = rbx_wrap((uint32_t)((t[0] & 0x00ff) | (t[1] & 0x000f) << 8), s_gfxfg.count);
 		const uint8_t p = s_gfxfg.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
 		if (p)
 			dst[x] = (uint16_t)(((t[1] & 0x00f0) >> 4) * 64 + p);
@@ -304,7 +304,7 @@ static void draw_sprites(int y0, int y1)
 			pal ^= 0x60;
 		const uint16_t c0 = (uint16_t)(0x1000 + pal * 32);
 		for (int h = 0; h < height; h++) {
-			const uint32_t code = (tile + (uint32_t)h) % s_gfxspr.count;
+			const uint32_t code = rbx_wrap((tile + (uint32_t)h), s_gfxspr.count);
 			const int sy = ypos - h * 16 - 16 - y0;
 			for (int k = 0; k < 4; k++)
 				rbx_gfx_prio_transpen(&s_gfxspr, code, c0, flipx, flipy, xpos - (k & 1 ? 0x200 : 0), sy + (k & 2 ? 0x200 : 0),

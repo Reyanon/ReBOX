@@ -120,7 +120,7 @@ static uint8_t nmk112_read(void *user, uint32_t a)
 	if (!pages)
 		return 0;
 	const uint32_t bank = (a < 0x400) ? (a >> 8) & 3 : (a >> 16) & 3;   // (the table: 0x100 bytes of each bank)
-	const uint32_t page = b.okibank[c][bank] % pages;
+	const uint32_t page = rbx_wrap(b.okibank[c][bank], pages);
 	const uint32_t off = (a < 0x400) ? (a & 0xff) | (bank << 8) : (a & 0xffff);
 	return s_oki[c][(page << 16) | off];
 }
@@ -553,13 +553,13 @@ static int s_pal_valid;
 
 static inline uint8_t pix8(const uint8_t *g, uint32_t count, uint32_t code, int x, int y)   // gfx_8x8x4_packed_msb
 {
-	const uint8_t v = g[(code % count) * 32 + (uint32_t)y * 4 + (uint32_t)(x >> 1)];
+	const uint8_t v = g[(rbx_wrap(code, count)) * 32 + (uint32_t)y * 4 + (uint32_t)(x >> 1)];
 	return (x & 1) ? (v & 15) : (v >> 4);
 }
 static inline uint8_t pix16(const uint8_t *g, uint32_t count, uint32_t code, int x, int y)   // ..._col_2x2_group_packed_msb
 {
 	const uint32_t q = (uint32_t)((x >> 3) * 2 + (y >> 3));
-	const uint8_t v = g[(code % count) * 128 + q * 32 + (uint32_t)(y & 7) * 4 + (uint32_t)((x & 7) >> 1)];
+	const uint8_t v = g[(rbx_wrap(code, count)) * 128 + q * 32 + (uint32_t)(y & 7) * 4 + (uint32_t)((x & 7) >> 1)];
 	return (x & 1) ? (v & 15) : (v >> 4);
 }
 

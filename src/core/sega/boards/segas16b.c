@@ -494,7 +494,7 @@ static void z_bank(void)
 {
 	const uint32_t size = s_zrom_size > 0x10000 ? s_zrom_size - 0x10000 : 0;
 	for (int p = 0x80; p < 0xe0; p++) {
-		const uint32_t o = size ? 0x10000 + (b.zbank + (uint32_t)(p - 0x80) * 256) % size : 0;
+		const uint32_t o = size ? 0x10000 + rbx_wrap((b.zbank + (uint32_t)(p - 0x80) * 256), size) : 0;
 		s_zmap[p] = size && o + 256 <= s_zrom_size ? s_zrom + o : NULL;
 		if (s_zop) {
 			if (s_zmap[p])
@@ -551,7 +551,7 @@ static void upd7759_control_w(uint8_t data)
 		bankoffs += (data & 0x07) * 0x04000;
 		break;
 	}
-	b.zbank = (uint32_t)(bankoffs % size);
+	b.zbank = (uint32_t)(rbx_wrap(bankoffs, size));
 	z_bank();
 }
 static uint8_t z_in(z80 *z, uint8_t p)

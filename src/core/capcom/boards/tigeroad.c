@@ -246,7 +246,7 @@ static void bg_line(int by, int layer, uint16_t *d)
 		const uint32_t col = tx >> 5;
 		const uint16_t data = s_bgmap[(col % 8) + 8 * (rr % 8) + 0x40 * (col / 8) + 0x400 * (rr / 8)];
 		const uint32_t attr = data >> 8;
-		const uint32_t code = ((data & 0xffu) + ((attr & 0xc0) << 2) + ((uint32_t)s_snap->bank << 10)) % s_gfxbg.count;
+		const uint32_t code = rbx_wrap(((data & 0xffu) + ((attr & 0xc0) << 2) + ((uint32_t)s_snap->bank << 10)), s_gfxbg.count);
 		const int group = (attr & 0x10) ? 1 : 0, fx = (attr & 0x20) != 0;
 		const uint16_t m = layer ? s_bg_mask1[group] : s_bg_mask0[group];
 		if (m != 0xffff) {
@@ -272,7 +272,7 @@ static void fg_line(int by, uint16_t *d)   // 32x32 of 8x8, 2 bits, pen 3 transp
 		const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
 		const uint16_t data = s_snap->vram[(ty >> 3) * 32 + (tx >> 3)];
 		const uint32_t attr = data >> 8;
-		const uint32_t code = ((data & 0xffu) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5)) % s_gfxtx.count;
+		const uint32_t code = rbx_wrap(((data & 0xffu) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5)), s_gfxtx.count);
 		const uint32_t py = (attr & 0x10) ? 7 - (ty & 7) : (ty & 7);
 		const uint8_t *src = s_gfxtx.pix + code * 64 + py * 8;
 		const uint16_t c0 = (uint16_t)(0x300 + (attr & 0x0f) * 4);
@@ -288,7 +288,7 @@ static void draw_sprites(void)   // tigeroad_spr_device::draw_sprites with rev_y
 {
 	for (int o = 0x280 - 4; o >= 0; o -= 4) {
 		const uint16_t *s = s_snap->spr + o;
-		const uint32_t code = s[0] % s_gfxspr.count;
+		const uint32_t code = rbx_wrap(s[0], s_gfxspr.count);
 		const uint16_t attr = s[1];
 		int sy = (int)((s[2] & 0x1ff) ^ 0x100) - 0x100, sx = (int)((s[3] & 0x1ff) ^ 0x100) - 0x100;
 		int flipx = attr & 0x02, flipy = attr & 0x01;

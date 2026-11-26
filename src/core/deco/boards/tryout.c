@@ -211,7 +211,7 @@ static void to_render(void)
 		for (int x = 0; x < VIS_W; x++) {   // the text: 32x32 of 8x8 by columns (rows reversed), pen 0 clear
 			const int qx = tm_pos(x, flip ? -8 : 16, 256, flip);
 			const int off = ((qy >> 3) ^ 0x1f) + ((qx >> 3) << 5), attr = s_snap->videoram[off + 0x400];
-			const uint32_t code = s_gfx8.count ? (uint32_t)(s_snap->videoram[off] | ((attr & 3) << 8)) % s_gfx8.count : 0;
+			const uint32_t code = s_gfx8.count ? rbx_wrap((uint32_t)(s_snap->videoram[off] | ((attr & 3) << 8)), s_gfx8.count) : 0;
 			const uint8_t p = s_gfx8.pix[(code * 8 + (uint32_t)(qy & 7)) * 8 + (uint32_t)(qx & 7)];
 			if (p)
 				d[x] = (uint16_t)((((attr & 4) >> 2) + 6) * 4 + p);

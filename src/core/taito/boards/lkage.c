@@ -174,7 +174,7 @@ static uint8_t main_read(void *u, uint16_t a)
 		if (s_kind == LK_BOOT) return s_mcu_ready;
 		return 0;
 	case 0xf0a0:
-		if (s_kind == LK_MSM && s_data) return s_data[((s_exrom_offs[1] & 0x3f) << 8 | s_exrom_offs[0]) % s_data_size];
+		if (s_kind == LK_MSM && s_data) return s_data[rbx_wrap(((s_exrom_offs[1] & 0x3f) << 8 | s_exrom_offs[0]), s_data_size)];
 		return 0;
 	case 0xf0e0: return s_kind == LK_MSM ? taito68705_data_r(&s_mcu) : 0;
 	case 0xf0e1: return s_kind == LK_MSM ? mcu_status_r() : 0;

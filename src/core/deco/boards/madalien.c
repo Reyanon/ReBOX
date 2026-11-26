@@ -390,7 +390,7 @@ static void draw_edge(int second, int mode, int flipx, int flipy, int y0, int y1
 			const int tx = tm_coord(x, w, sx, flipx), col = tx >> 4;
 			const int section = mode == 0 ? 0 : mode == 1 ? 1 : mode == 2 ? (col >> 4) & 1 : !((col >> 4) & 1);
 			const int idx = (section << 8) | ((~col & 0x0f) << 3) | row;
-			const int code = map[idx] % s_tile_count;
+			const int code = rbx_wrap(map[idx], s_tile_count);
 			d[x] = (uint8_t)(color + s_tiles[code][(ty & 15) * 16 + (tx & 15)]);
 		}
 	}

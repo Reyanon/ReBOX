@@ -203,7 +203,7 @@ static void tile16_line(int which, int y, uint16_t *dst)
 	int x = 0;
 	while (x < VIS_W) {
 		const uint32_t i = row + (tx >> 4);
-		const uint32_t code = (vram[i] & 0x1fffu) % s_gfxbg.count;
+		const uint32_t code = rbx_wrap((vram[i] & 0x1fffu), s_gfxbg.count);
 		int px = (int)(tx & 15), n = flip ? px + 1 : 16 - px;
 		if (n > VIS_W - x)
 			n = VIS_W - x;
@@ -231,7 +231,7 @@ static void text_line(int y, uint16_t *dst)   // 64x32 of 8x8 (512x256)
 	int x = 0;
 	while (x < VIS_W) {
 		const uint16_t t = s_snap->charram[row + (tx >> 3)];
-		const uint32_t code = (t & 0x0fffu) % s_gfxtx.count;
+		const uint32_t code = rbx_wrap((t & 0x0fffu), s_gfxtx.count);
 		int px = (int)(tx & 7), n = flip ? px + 1 : 8 - px;
 		if (n > VIS_W - x)
 			n = VIS_W - x;

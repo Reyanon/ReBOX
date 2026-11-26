@@ -261,9 +261,9 @@ static uint8_t oki_nmk_read(void *user, uint32_t a)
 	uint32_t off;
 	if (s_nmk_paged[c] && a < 0x400) {
 		const int tb = (int)(a >> 8);
-		off = (uint32_t)(b.nmk_bank[c][tb] % pages) << 16 | (uint32_t)tb << 8 | (a & 0xff);
+		off = (uint32_t)(rbx_wrap(b.nmk_bank[c][tb], pages)) << 16 | (uint32_t)tb << 8 | (a & 0xff);
 	} else
-		off = (uint32_t)(b.nmk_bank[c][a >> 16] % pages) << 16 | (a & 0xffff);
+		off = (uint32_t)(rbx_wrap(b.nmk_bank[c][a >> 16], pages)) << 16 | (a & 0xffff);
 	return s_oki_rom[c][off];
 }
 static uint8_t oki_latch_read(void *user, uint32_t a)
@@ -272,7 +272,7 @@ static uint8_t oki_latch_read(void *user, uint32_t a)
 	const uint32_t banks = s_oki_size[c] / 0x20000;
 	if (!banks)
 		return 0;
-	const uint32_t bank = (a < 0x20000 ? b.oki_lo[c] : b.oki_hi[c]) % banks;
+	const uint32_t bank = rbx_wrap((a < 0x20000 ? b.oki_lo[c] : b.oki_hi[c]), banks);
 	return s_oki_rom[c][bank * 0x20000 + (a & 0x1ffff)];
 }
 static void nmk112_w(int offset, uint8_t data)
@@ -1135,7 +1135,7 @@ static void run_band(int band)
 					continue;
 				color = cp & 0x3f;
 			}
-			col[x] = (uint16_t)(sbase + pen + (color % scolors) * sgran);
+			col[x] = (uint16_t)(sbase + pen + (rbx_wrap(color, scolors)) * sgran);
 		}
 		memcpy(rbx_video.bitmap + y * rbx_video.pitch, col, sizeof(uint16_t) * (size_t)vw);
 	}

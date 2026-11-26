@@ -179,12 +179,12 @@ static void so_render(void)
 			}
 			const int idx = (py >> 3) * 32 + (px >> 3);
 			int attr = bg[0x400 + idx];
-			uint32_t code = s_gfxt.count ? (uint32_t)(bg[idx] + 256 * (attr & 7)) % s_gfxt.count : 0;
+			uint32_t code = s_gfxt.count ? rbx_wrap((uint32_t)(bg[idx] + 256 * (attr & 7)), s_gfxt.count) : 0;
 			uint8_t p = s_gfxt.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(px & 7)];
 			d[x] = (uint16_t)((attr >> 4) * 4 + p);
 			pr[x] = 0;
 			attr = txt[0x400 + idx];
-			code = s_gfx8.count ? (uint32_t)(txt[idx] + 256 * (attr & 3)) % s_gfx8.count : 0;
+			code = s_gfx8.count ? rbx_wrap((uint32_t)(txt[idx] + 256 * (attr & 3)), s_gfx8.count) : 0;
 			p = s_gfx8.pix[(code * 8 + (uint32_t)(py & 7)) * 8 + (uint32_t)(px & 7)];
 			if (p) {
 				d[x] = (uint16_t)(128 + (attr >> 4) * 4 + p);

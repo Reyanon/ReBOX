@@ -1111,6 +1111,7 @@ int main(int argc, char *argv[])
 	rbx_states_move_old();                      // the save states in states/
 	rbx_touch_init();
 	rbx_settings_load();
+	rbx_audio_set_level(g_settings.snd_normalize, g_settings.snd_volume);   // (Options > Sound)
 	rbx_bios_set(g_settings.bios_neogeo);   // (the Neo Geo BIOS chosen in Settings > BIOS)
 	rbx_lang_init();   // (the menus' language: its files installed when missing, then read)
 	// input engine (setting): RePad = the Bluetooth controller plugin from the app, unless it already runs (ur0:tai, or

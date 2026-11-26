@@ -419,7 +419,7 @@ static void draw_sprites_pri(int pri, int key)
 		int pal = spr[offs + 1] & 0x0f;
 		int sy = 240 - spr[offs + 0];
 		int flipx = (spr[offs + 1] >> 6) & 1, flipy = (spr[offs + 1] >> 7) & 1;
-		const uint8_t *g = s_sprites + (code % s_nsprites) * 256;
+		const uint8_t *g = s_sprites + (rbx_wrap(code, s_nsprites)) * 256;
 		const uint16_t base = (uint16_t)(256 + pal * 16);
 		int sx0 = spr[offs + 3];
 		for (int rep = 0; rep < (sx0 > 240 ? 2 : 1); rep++) {
@@ -472,7 +472,7 @@ static void ny_render(void)
 			uint32_t num = (uint32_t)(code + ((attr & 0xc0) << 2) + 0x400 * s_snap_char_bank);
 			int pal = attr & 0x0f, cat = (attr & 0x30) >> 4;
 			uint16_t m0 = tm0[s_snap_group[ti]];
-			const uint8_t *row = s_tiles + (num % s_ntiles) * 64 + (ly & 7) * 8;
+			const uint8_t *row = s_tiles + (rbx_wrap(num, s_ntiles)) * 64 + (ly & 7) * 8;
 			int8_t k0 = tkey[T(0, cat)], k1 = tkey[T(1, cat)];
 			for (int px = 0; px < 8; px++) {
 				int x = col * 8 + px;

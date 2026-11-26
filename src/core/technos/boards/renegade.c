@@ -93,7 +93,7 @@ static uint8_t snd_read(void *u, uint16_t a)
 		return t.latch;
 	}
 	if (a >= 0x2800 && a < 0x3000) return rbx_ym_read(0, a & 1);
-	if (a >= 0x8000) return s_srom[(a - 0x8000) % s_srom_size];
+	if (a >= 0x8000) return s_srom[rbx_wrap((a - 0x8000), s_srom_size)];
 	return 0;
 }
 static void snd_write(void *u, uint16_t a, uint8_t v)
@@ -143,7 +143,7 @@ static void sound_line(void)
 static void map_bank(void)
 {
 	for (int p = 0; p < 0x40; p++)
-		s_main.rpage[0x40 + p] = s_rom + ((uint32_t)t.bank * 0x4000 + (uint32_t)p * 256) % s_rom_size;
+		s_main.rpage[0x40 + p] = s_rom + rbx_wrap(((uint32_t)t.bank * 0x4000 + (uint32_t)p * 256), s_rom_size);
 }
 
 static int vblank(void) { return s_line < VIS_Y0 || s_line >= VIS_Y0 + VIS_H; }
@@ -152,7 +152,7 @@ static uint8_t main_read(void *u, uint16_t a)
 {
 	(void)u;
 	if (a >= 0x8000) return s_rom[a];
-	if (a >= 0x4000) return s_rom[((uint32_t)t.bank * 0x4000 + (a - 0x4000)) % s_rom_size];
+	if (a >= 0x4000) return s_rom[rbx_wrap(((uint32_t)t.bank * 0x4000 + (a - 0x4000)), s_rom_size)];
 	if (a < 0x1800) return t.ram[a];
 	if (a < 0x2000) return t.fgram[a - 0x1800];
 	if (a < 0x2800) return t.spr[a & 0x1ff];
@@ -242,7 +242,7 @@ static void rg_render(void)
 			const uint32_t idx = (ty >> 4) * 64 + (tx >> 4);
 			const uint8_t attr = s_snap->bgram[idx + 0x400];
 			const rbx_gfx *g = &s_tiles[attr & 7];
-			const uint32_t code = s_snap->bgram[idx] % g->count;
+			const uint32_t code = rbx_wrap(s_snap->bgram[idx], g->count);
 			d[x] = (uint16_t)(192 + (attr >> 5) * 8 + g->pix[code * 256 + (ty & 15) * 16 + (tx & 15)]);
 		}
 	}
@@ -274,7 +274,7 @@ static void rg_render(void)
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
 			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
 			const uint8_t attr = s_snap->fgram[idx + 0x400];
-			const uint32_t code = ((attr & 3u) << 8 | s_snap->fgram[idx]) % s_chars.count;
+			const uint32_t code = rbx_wrap(((attr & 3u) << 8 | s_snap->fgram[idx]), s_chars.count);
 			const uint8_t p = s_chars.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
 			if (p)
 				d[x] = (uint16_t)((attr >> 6) * 8 + p);

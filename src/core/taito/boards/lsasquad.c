@@ -254,7 +254,7 @@ static void draw_tile(uint32_t code, int color, int flip, int sx, int sy)
 {
 	if (sx <= -8 || sx >= SCREEN_W || sy <= VIS_Y0 - 8 || sy > VIS_Y1)
 		return;
-	const uint8_t *g = s_tiles + (code % s_ntiles) * 64;
+	const uint8_t *g = s_tiles + (rbx_wrap(code, s_ntiles)) * 64;
 	const uint16_t base = (uint16_t)(color * 16);
 	for (int ty = 0; ty < 8; ty++) {
 		int y = sy + ty;
@@ -350,7 +350,7 @@ static void draw_sprite16(uint32_t code, int color, int flipx, int flipy, int sx
 {
 	if (sx <= -16 || sx >= SCREEN_W || sy <= VIS_Y0 - 16 || sy > VIS_Y1)
 		return;
-	const uint8_t *g = s_sprites + (code % s_nsprites) * 256;
+	const uint8_t *g = s_sprites + (rbx_wrap(code, s_nsprites)) * 256;
 	const uint16_t base = (uint16_t)(256 + color * 16);
 	for (int ty = 0; ty < 16; ty++) {
 		int y = sy + ty;

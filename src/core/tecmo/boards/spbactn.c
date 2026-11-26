@@ -164,7 +164,7 @@ static void layer_line(int which, int y, uint16_t *dst)
 	const uint32_t ty = (uint32_t)y & 1023, row = (ty >> 3) * 64, fy = ty & 7;
 	for (int col = 0; col < VIS_W / 16; col++) {
 		const uint32_t i = row + (uint32_t)col;
-		const uint32_t code = vram[0x2000 + i] % gfx->count;
+		const uint32_t code = rbx_wrap(vram[0x2000 + i], gfx->count);
 		uint16_t *d = dst + col * 16;
 		if (!gfx->used[code]) {
 			memset(d, 0, 32);

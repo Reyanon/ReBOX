@@ -361,7 +361,7 @@ static uint8_t v25_r8(uint32_t a)
 		if (a == 0x4002)
 			return oki_read(&s_oki);
 		if (a >= 0x80000)
-			return s_zrom[(a - 0x80000) % s_zrom_size];
+			return s_zrom[rbx_wrap((a - 0x80000), s_zrom_size)];
 		return 0xff;
 	}
 	if (a >= 0x80000)

@@ -349,6 +349,13 @@
   "2nd stick Right": "2e stick rechts",
   "Pedal": "Pedaal",
   "Pedal 2": "Pedaal 2",
-  "Pedal 3": "Pedaal 3"
+  "Pedal 3": "Pedaal 3",
+  "Sound  >": "Geluid  >",
+  "SOUND": "GELUID",
+  "Normalize": "Normaliseren",
+  "Volume": "Volume",
+  "Volume and the automatic level of the sound": "Volume en automatisch geluidsniveau",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Aan: zachte en luide spellen op een gelijk niveau (volgt het niveau van het spel). Uit: het eigen niveau van het spel",
+  "The volume of the games' sound": "Het volume van het spelgeluid"
  }
 }

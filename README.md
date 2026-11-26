@@ -120,6 +120,7 @@ shows the other working MAME boards that are not ported yet, greyed out.
 |  | Classic boards (22 drivers: circusc, finalizr, gberet, gyruss, ...) | 75 | 82% |
 |  | Single-game boards (36 drivers: 88games, ajax, aliens, asterix, ...) | 177 | 93% |
 | **Sega** | System 16 | 210 | 89% |
+|  | System 1 / 2 | 92 | 98% |
 |  | Out Run | 27 | 100% |
 |  | System 24 | 27 | 100% |
 |  | System 32 | 54 | 86% |
@@ -135,8 +136,10 @@ shows the other working MAME boards that are not ported yet, greyed out.
 |  | Classic boards (1 drivers: kncljoe) | 3 | 100% |
 |  | Single-game boards (17 drivers: airraid, bloodbro, cabal, darkmist, ...) | 64 | 86% |
 | **Namco** | 8-bit | 33 | 100% |
+|  | Galaxian | 299 | 98% |
 |  | NA-1/NA-2 | 26 | 100% |
 |  | NB-1/NB-2 | 21 | 100% |
+|  | Pac-Man | 148 | 98% |
 |  | System 1 | 40 | 100% |
 |  | System 2 | 61 | 100% |
 |  | System 86 | 11 | 100% |
@@ -168,6 +171,7 @@ shows the other working MAME boards that are not ported yet, greyed out.
 |  | Toaplan 1 | 13 | 57% |
 |  | Twin Cobra | 20 | 100% |
 | **Seta** | Seta Hardware | 67 | 100% |
+|  | Seta 2 | 28 | 100% |
 | **Jaleco** | Mega System 1 | 54 | 98% |
 | **Psikyo** | 68EC020 | 17 | 89% |
 |  | PS3/PS5 | 14 | 88% |

@@ -261,7 +261,7 @@ static void text_line(int y, uint16_t *dst)   // 64x32 of 8x8, 2 bits (pen 3 tra
 	int x = 0;
 	while (x < VIS_W) {
 		const uint16_t t = s_snap->tx[(ty >> 3) * 64 + (tx >> 3)];
-		const uint32_t code = (t & 0x7ffu) % s_gfxtx.count;
+		const uint32_t code = rbx_wrap((t & 0x7ffu), s_gfxtx.count);
 		const uint32_t fy = (t & 0x800) ? 7 - (ty & 7) : (ty & 7);
 		const uint8_t *src = s_gfxtx.pix + code * 64 + fy * 8;
 		const uint16_t c0 = (uint16_t)(0x300 + (t >> 12) * 4);
@@ -289,7 +289,7 @@ static void draw_sprites(int pri, int pri_mask, int flipy_mask)
 			if (pri == 0 && !(attr & pri_mask))
 				continue;
 		}
-		const uint32_t code = spr[offs] % s_gfxspr.count;
+		const uint32_t code = rbx_wrap(spr[offs], s_gfxspr.count);
 		int sx = spr[offs + 3] & 0x1ff, sy = spr[offs + 2] & 0x1ff;
 		if (sy > 0x100)
 			sy -= 0x200;

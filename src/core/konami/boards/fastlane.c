@@ -88,7 +88,7 @@ static void draw_layer(int which, int scrollx, int scrolly, int opaque, int x0, 
 			int bank = ((attr >> (bit0 + 3)) & 1) | ((attr >> (bit1 + 2)) & 2) | ((attr >> (bit2 + 1)) & 4) | ((attr >> bit3) & 8);
 			bank = (bank & ~mask) | (k[4] & mask);
 			bank = ((attr & 0x80) >> 7) | (bank << 1) | ((k[3] & 1) << 5);
-			const uint32_t code = (uint32_t)(v[idx + 0x400] + bank * 256) % s_gfx_count;
+			const uint32_t code = rbx_wrap((uint32_t)(v[idx + 0x400] + bank * 256), s_gfx_count);
 			const uint8_t *src = s_gfx + code * 64 + (ty & 7) * 8 + (tx & 7);
 			const int pb = (1 + 64 * (attr & 0x0f)) * 16;
 			for (int i = 0; i < n; i++) {
@@ -132,7 +132,7 @@ static void fl_render(void)   // (screen_update)
 static void map_bank(void)
 {
 	for (int p = 0; p < 0x40; p++)
-		s_cpu.rpage[0x40 + p] = s_rom + (0x8000u + (uint32_t)t.mainbank * 0x4000 + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x40 + p] = s_rom + rbx_wrap((0x8000u + (uint32_t)t.mainbank * 0x4000 + (uint32_t)p * 256), s_rom_size);
 }
 
 static void cpu_lines(int set, int cleared)   // (the K007121's IRQ and NMI)
@@ -178,7 +178,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a < 0x4000)
 		return t.spr[a - 0x3000];
 	if (a < 0x8000)
-		return s_rom[(0x8000u + (uint32_t)t.mainbank * 0x4000 + (a - 0x4000)) % s_rom_size];
+		return s_rom[rbx_wrap((0x8000u + (uint32_t)t.mainbank * 0x4000 + (a - 0x4000)), s_rom_size)];
 	return s_rom[a - 0x8000];
 }
 

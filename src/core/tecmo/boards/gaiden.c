@@ -334,7 +334,7 @@ static void tile16_line(int layer, int y, uint16_t *dst)
 	int x = 0;
 	while (x < VIS_W) {   // (a tile's span at a time: the map runs right, or left when flipped)
 		const uint32_t i = row + (tx >> 4);
-		const uint32_t code = (vram[0x800 + i] & 0x0fffu) % gfx->count;
+		const uint32_t code = rbx_wrap((vram[0x800 + i] & 0x0fffu), gfx->count);
 		uint32_t color = (vram[i] & 0xf0u) >> 4;
 		if (layer == 1 && (vram[i] & 0x08))
 			color += 0x10;
@@ -363,7 +363,7 @@ static void text_line(int y, uint16_t *dst)   // 32x32 of 8x8, pen 0 transparent
 	int x = 0;
 	while (x < VIS_W) {
 		const uint32_t i = row + (tx >> 3);
-		const uint32_t code = (s_snap->tx[0x400 + i] & 0x07ffu) % s_gfxtx.count;
+		const uint32_t code = rbx_wrap((s_snap->tx[0x400 + i] & 0x07ffu), s_gfxtx.count);
 		int px = (int)(tx & 7), n = flip ? px + 1 : 8 - px;
 		if (n > VIS_W - x)
 			n = VIS_W - x;
@@ -399,13 +399,13 @@ static void db_layer_band(int band)   // (the layers' lines apart; the sprites a
 		const uint32_t vt = (uint32_t)by & 255;
 		for (int x = 0; x < VIS_W; x++) {   // BG (opaque, priority 1), set_scrolldx(-248)
 			const uint32_t u = (uint32_t)(x + s_snap->sx[2] + 248) & 1023, i = (vb >> 4) * 64 + (u >> 4);
-			const uint32_t code = (s_snap->bg[0x800 + i] & 0x0fffu) % s_gfxbg.count;
+			const uint32_t code = rbx_wrap((s_snap->bg[0x800 + i] & 0x0fffu), s_gfxbg.count);
 			d[x] = (uint16_t)(0x300 + ((s_snap->bg[i] & 0xf0u) >> 4) * 16 + s_gfxbg.pix[code * 256 + (vb & 15) * 16 + (u & 15)]);
 			pr[x] = 1;
 		}
 		for (int x = 0; x < VIS_W; x++) {   // FG (pen 15 transparent, priority 2), set_scrolldx(-252)
 			const uint32_t u = (uint32_t)(x + s_snap->sx[1] + 252) & 1023, i = (vf >> 4) * 64 + (u >> 4);
-			const uint32_t code = (s_snap->fg[0x800 + i] & 0x0fffu) % s_gfxfg.count;
+			const uint32_t code = rbx_wrap((s_snap->fg[0x800 + i] & 0x0fffu), s_gfxfg.count);
 			const uint8_t p = s_gfxfg.pix[code * 256 + (vf & 15) * 16 + (u & 15)];
 			if (p != 15) {
 				d[x] = (uint16_t)(0x200 + ((s_snap->fg[i] & 0xf0u) >> 4) * 16 + p);
@@ -414,7 +414,7 @@ static void db_layer_band(int band)   // (the layers' lines apart; the sprites a
 		}
 		for (int x = 0; x < VIS_W; x++) {   // text (pen 15 transparent, priority 4)
 			const uint32_t i = (vt >> 3) * 32 + ((uint32_t)x >> 3);
-			const uint32_t code = (s_snap->tx[0x400 + i] & 0x07ffu) % s_gfxtx.count;
+			const uint32_t code = rbx_wrap((s_snap->tx[0x400 + i] & 0x07ffu), s_gfxtx.count);
 			const uint8_t p = s_gfxtx.pix[code * 64 + (vt & 7) * 8 + (x & 7)];
 			if (p != 15) {
 				d[x] = (uint16_t)(((s_snap->tx[i] & 0xf0u) >> 4) * 16 + p);
@@ -430,7 +430,7 @@ static void db_draw(void)
 	decoband_run(&s_dbands);
 	const uint16_t *spr = s_snap->spr;   // (live)
 	for (int i = 0; i < 0x800 / 2; i += 4) {
-		const uint32_t code = ((spr[i + 0] & 0xffu) | (spr[i + 3] & 0x1fu) << 8) % s_gfxspr.count;
+		const uint32_t code = rbx_wrap(((spr[i + 0] & 0xffu) | (spr[i + 3] & 0x1fu) << 8), s_gfxspr.count);
 		const int y = 256 - (spr[i + 1] & 0xff) - 12 - VIS_Y0;
 		int x = spr[i + 2] & 0xff;
 		const uint16_t c0 = (uint16_t)(0x100 + (spr[0x400 + i] & 0x0f) * 16);

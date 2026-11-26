@@ -75,7 +75,7 @@ static void draw_tiles(int category, uint16_t *bm, int pitch)
 			const int code = s_vs.vram[idx] + ((c & 0x20) << 3);
 			const int pen = ((c & 0x0f) + 16 * s_vs.palettebank) * 16;
 			const int fx = (c & 0x40) != 0, fy = (c & 0x80) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
 			for (int i = 0; i < 8; i++)
 				d[col * 8 + i] = (uint16_t)(pen + src[fx ? 7 - i : i]);
 		}
@@ -156,7 +156,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a >= 0x2800 && a < 0x4000)
 		return t.ram[a - 0x2800];
 	if (a >= 0x4000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 

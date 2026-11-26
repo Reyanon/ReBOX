@@ -90,49 +90,70 @@ void sn76496_write(sn76496_t *p, uint8_t data)
 	}
 }
 
+static inline int32_t sn_out(const sn76496_t *p)
+{
+	int32_t o = (p->output[0] ? p->volume[0] : 0) + (p->output[1] ? p->volume[1] : 0) +
+	            (p->output[2] ? p->volume[2] : 0) + (p->output[3] ? p->volume[3] : 0);
+	return p->negate ? -o : o;
+}
+
+// one output sample from the native ones added up (div_count reached the divider)
+static inline void sn_emit(sn76496_t *p, int32_t *out, int max, int *n)
+{
+	int32_t v = p->div_acc / (int32_t)p->divider * p->gain / 256;
+	p->div_count = 0;
+	p->div_acc = 0;
+	if (p->dc_block) {
+		// one-pole DC blocker (the PSG output is unipolar)
+		p->dc += ((v << 8) - p->dc) >> 10;
+		v -= p->dc >> 8;
+	}
+	if (*n < max)
+		out[(*n)++] += v;
+}
+
 int sn76496_render(sn76496_t *p, uint32_t clocks, int32_t *out, int max)
 {
 	int n = 0;
 	p->frac += clocks;
 	while (p->frac >= 2) {
-		p->frac -= 2;
-		if (p->current_clock > 0)
-			p->current_clock--;
-		else {
-			p->current_clock = p->clock_divider - 1;
-			for (int i = 0; i < 3; i++) {
-				if (--p->count[i] <= 0) {
-					p->output[i] ^= 1;
-					p->count[i] = p->period[i];
-				}
-			}
-			if (--p->count[3] <= 0) {
-				if (((p->rng & (uint32_t)p->tap1) != 0) != (((p->rng & (uint32_t)p->tap2) != 0) && (p->reg[6] & 4))) {
-					p->rng >>= 1;
-					p->rng |= (uint32_t)p->feedback_mask;
-				} else
-					p->rng >>= 1;
-				p->output[3] = p->rng & 1;
-				p->count[3] = p->period[3];
-			}
-		}
-		int32_t o = (p->output[0] ? p->volume[0] : 0) + (p->output[1] ? p->volume[1] : 0) +
-		            (p->output[2] ? p->volume[2] : 0) + (p->output[3] ? p->volume[3] : 0);
-		if (p->negate)
-			o = -o;
-		p->div_acc += o;
-		if (++p->div_count < p->divider)
+		if (p->current_clock > 0) {
+			// the native samples up to the next divided clock (its outputs do not change before it) or the next
+			// output sample, added at once: the same sums as a sample at a time
+			uint32_t m = p->frac >> 1;
+			if (m > (uint32_t)p->current_clock)
+				m = (uint32_t)p->current_clock;
+			const uint32_t room = p->divider - p->div_count;
+			if (m > room)
+				m = room;
+			p->frac -= 2 * m;
+			p->current_clock -= (int32_t)m;
+			p->div_acc += sn_out(p) * (int32_t)m;
+			p->div_count += m;
+			if (p->div_count >= p->divider)
+				sn_emit(p, out, max, &n);
 			continue;
-		int32_t v = p->div_acc / (int32_t)p->divider * p->gain / 256;
-		p->div_count = 0;
-		p->div_acc = 0;
-		if (p->dc_block) {
-			// one-pole DC blocker (the PSG output is unipolar)
-			p->dc += ((v << 8) - p->dc) >> 10;
-			v -= p->dc >> 8;
 		}
-		if (n < max)
-			out[n++] += v;
+		p->frac -= 2;
+		p->current_clock = p->clock_divider - 1;
+		for (int i = 0; i < 3; i++) {
+			if (--p->count[i] <= 0) {
+				p->output[i] ^= 1;
+				p->count[i] = p->period[i];
+			}
+		}
+		if (--p->count[3] <= 0) {
+			if (((p->rng & (uint32_t)p->tap1) != 0) != (((p->rng & (uint32_t)p->tap2) != 0) && (p->reg[6] & 4))) {
+				p->rng >>= 1;
+				p->rng |= (uint32_t)p->feedback_mask;
+			} else
+				p->rng >>= 1;
+			p->output[3] = p->rng & 1;
+			p->count[3] = p->period[3];
+		}
+		p->div_acc += sn_out(p);
+		if (++p->div_count >= p->divider)
+			sn_emit(p, out, max, &n);
 	}
 	return n;
 }

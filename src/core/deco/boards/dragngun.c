@@ -408,7 +408,7 @@ static void zdraw(const int clip[4], uint32_t code, uint32_t color, int flipx, i
 	if (!hsize || !vsize || !sw || !sh)
 		return;
 	const uint32_t tiles = s_spr_size >> 8;
-	const uint8_t *src = s_spr + (size_t)(code % tiles) * 256;
+	const uint8_t *src = s_spr + (size_t)(rbx_wrap(code, tiles)) * 256;
 	const int pal = 16 * (int)(color % 32);
 	int dx = (16 << 16) / sw, dy = (16 << 16) / sh, ex = hpos + sw, ey = vpos + sh, xb = 0, yi = 0;
 	if (flipx) { xb = (sw - 1) * dx; dx = -dx; }

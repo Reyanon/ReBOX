@@ -79,7 +79,7 @@ static void draw_tilemap(int which, uint16_t *bm, int pitch)
 			int num = vram[idx + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5);
 			num += which ? s_vs.charbank[1] << 11 : (s_vs.charbank[0] & 2) << 10;
 			const int fl = (attr & 0x30) >> 4;   // (TILE_FLIPYX)
-			const uint8_t *src = gfx + ((uint32_t)num % n) * 64 + ((fl & 2) ? 7 - (ty & 7) : (ty & 7)) * 8;
+			const uint8_t *src = gfx + (rbx_wrap((uint32_t)num, n)) * 64 + ((fl & 2) ? 7 - (ty & 7) : (ty & 7)) * 8;
 			int cnt = 8 - (tx & 7);
 			if (cnt > VIS_W - x)
 				cnt = VIS_W - x;
@@ -128,7 +128,7 @@ static void draw_sprites(const uint8_t *source, int length, int set, int flipscr
 		for (int y = 0; y < height; y++)
 			for (int x = 0; x < width; x++) {
 				const int ex = flipx ? width - 1 - x : x, ey = flipy ? height - 1 - y : y;
-				const uint8_t *src = gfx + ((uint32_t)(number + ex + 2 * ey) % n) * 256;
+				const uint8_t *src = gfx + (rbx_wrap((uint32_t)(number + ex + 2 * ey), n)) * 256;
 				const int ox = sx + x * 16, oy = sy + y * 16;
 				for (int j = 0; j < 16; j++) {
 					const int yy = oy + j;
@@ -175,7 +175,7 @@ static uint8_t port(int p) { return (uint8_t)rbx_port_read(p); }
 static void map_bank(void)
 {
 	for (int p = 0; p < 0x20; p++)
-		s_cpu.rpage[0x80 + p] = s_rom + ((uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x80 + p] = s_rom + rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256), s_rom_size);
 }
 
 static void k005885_w(int which, int offset, uint8_t v)
@@ -203,9 +203,9 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a >= 0x7000 && a < 0x8000)
 		return t.spr1[a - 0x7000];
 	if (a >= 0x8000 && a < 0xa000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x8000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x8000)), s_rom_size)];
 	if (a >= 0xa000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 static void main_wr(void *ctx, uint16_t a, uint8_t v)
@@ -249,7 +249,7 @@ static uint8_t sub_rd(void *ctx, uint16_t a)
 	case 0x3000: return port(s_port_dsw[2]);
 	}
 	if (a >= 0x8000)
-		return s_srom[(a - 0x8000) % s_srom_size];
+		return s_srom[rbx_wrap((a - 0x8000), s_srom_size)];
 	return 0;
 }
 static void sub_wr(void *ctx, uint16_t a, uint8_t v)
@@ -289,7 +289,7 @@ static uint8_t snd_rd(void *ctx, uint16_t a)
 	if (a == 0x1000 || a == 0x1001)
 		return rbx_ym_read(0, a & 1);
 	if (a >= 0x8000)
-		return s_arom[(a - 0x8000) % s_arom_size];
+		return s_arom[rbx_wrap((a - 0x8000), s_arom_size)];
 	return 0;
 }
 static void snd_wr(void *ctx, uint16_t a, uint8_t v)

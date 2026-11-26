@@ -238,7 +238,7 @@ static uint8_t snd_r(void *u, uint8_t off)
 	(void)u;
 	switch (a.p2 & 0xf0) {
 	case 0x60: return a.latch;
-	case 0x70: return s_user1[(uint32_t)((a.p1 & 0x1f) << 8 | off) % s_user1_size];
+	case 0x70: return s_user1[rbx_wrap((uint32_t)((a.p1 & 0x1f) << 8 | off), s_user1_size)];
 	}
 	return 0xff;
 }

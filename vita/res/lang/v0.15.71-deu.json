@@ -1,0 +1,25 @@
+{
+ "code": "deu",
+ "name": "Deutsch",
+ "english": "German",
+ "strings": {
+  "A cheat of cheats/<set>.xml: off, or one of its values": "Ein Cheat aus cheats/<set>.xml: aus oder einer seiner Werte",
+  "Left/Right: change   Cheat files: cheats/<set>.xml": "Links/Rechts: Ändern   Cheat-Dateien: cheats/<set>.xml",
+  "No cheats: put %s.xml in cheats/": "Keine Cheats: %s.xml in cheats/ ablegen",
+  "Start stage, infinite health and the cheats of cheats/<set>.xml": "Startlevel, unendlich Energie und die Cheats aus cheats/<set>.xml",
+  "2nd stick Up": "2. Stick hoch",
+  "2nd stick Down": "2. Stick runter",
+  "2nd stick Left": "2. Stick links",
+  "2nd stick Right": "2. Stick rechts",
+  "Pedal": "Pedal",
+  "Pedal 2": "Pedal 2",
+  "Pedal 3": "Pedal 3",
+  "Sound  >": "Ton  >",
+  "SOUND": "TON",
+  "Normalize": "Normalisieren",
+  "Volume": "Lautstärke",
+  "Volume and the automatic level of the sound": "Lautstärke und automatische Pegelanpassung",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Ein: leise und laute Spiele etwa gleich laut (folgt dem Pegel des Spiels). Aus: der eigene Pegel des Spiels",
+  "The volume of the games' sound": "Die Lautstärke des Spieltons"
+ }
+}

@@ -76,7 +76,7 @@ static void draw_layer(int which, int x0, int x1, int scrollx, uint16_t *bm, int
 			const int code = vram[idx] + ((attr & 0xc0) << 2) + (which ? 0 : s_vs.charbank << 10);
 			const int pen = (attr & 0x0f) * 16;
 			const int fx = (attr & 0x10) != 0, fy = (attr & 0x20) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
 			for (int i = 0; i < n; i++) {
 				const int px = (tx + i) & 7;
 				d[x + i] = (uint16_t)(pen + src[fx ? 7 - px : px]);
@@ -121,8 +121,8 @@ static void fz_render(void)   // (screen_update)
 		int code = sr[offs] + ((sr[offs + 1] & 0x0f) << 8);
 		const int pen = 0x100 + ((sr[offs + 1] & 0xf0) >> 4) * 16;
 		const int size = sr[offs + 4] & 0x1c;
-#define S16(c, x, y) draw_gfx(s_spr + ((uint32_t)(c) % s_nspr) * 256, 16, pen, flipx, flipy, x, y, bm, pitch)
-#define S8(c, x, y) draw_gfx(s_chr + ((uint32_t)(c) % s_nchr) * 64, 8, pen, flipx, flipy, x, y, bm, pitch)
+#define S16(c, x, y) draw_gfx(s_spr + (rbx_wrap((uint32_t)(c), s_nspr)) * 256, 16, pen, flipx, flipy, x, y, bm, pitch)
+#define S8(c, x, y) draw_gfx(s_chr + (rbx_wrap((uint32_t)(c), s_nchr)) * 64, 8, pen, flipx, flipy, x, y, bm, pitch)
 		if (size >= 0x10) {
 			if (s_vs.flip) {
 				sx = 256 - sx;
@@ -201,7 +201,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a >= 0x2000 && a < 0x4000)
 		return t.ram[a - 0x2000];
 	if (a >= 0x4000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 

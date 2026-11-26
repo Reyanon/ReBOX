@@ -107,7 +107,7 @@ static void hs_render(void)   // (screen_update)
 			const int attr = s_vs.cram[idx];
 			const int code = s_vs.vram[idx] + ((attr & 0x80) << 1) + (s_roadf ? (attr & 0x60) << 4 : (attr & 0x40) << 3);
 			const int fx = (attr & 0x10) != 0, fy = !s_roadf && (attr & 0x20);
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
 			d[x] = (uint16_t)(0x100 + (attr & 0x0f) * 16 + src[fx ? 7 - (tx & 7) : (tx & 7)]);
 		}
 	}
@@ -124,7 +124,7 @@ static void hs_render(void)   // (screen_update)
 			flipy = !flipy;
 		}
 		sy += 1;   // (after the flip: a hardware "feature")
-		const uint8_t *src = s_spr + ((uint32_t)code % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)code, s_nspr)) * 256;
 		const uint8_t *lut = s_prom + 0x20 + color * 16;
 		draw_sprite(bm, pitch, src, lut, color * 16, flipx, flipy, sx, sy);
 		draw_sprite(bm, pitch, src, lut, color * 16, flipx, flipy, sx - 256, sy);   // (the wraparound)
@@ -170,7 +170,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a >= 0x2000 && a < 0x4000)
 		return t.ram[a - 0x2000];
 	if (a >= 0x4000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 

@@ -407,7 +407,7 @@ static void fix_line(int by, uint16_t *d)   // 32x32 of 8x8 (scan columns); pen 
 	for (int x = 0; x < VIS_W; x += 8) {
 		const uint32_t i = ((uint32_t)x >> 3) * 32 + (ty >> 3);
 		const uint32_t attr = s_snap->vram[2 * i + 1] & 0xff;
-		const uint32_t code = ((s_snap->vram[2 * i] & 0xff) | bank) % s_gfxtx.count;
+		const uint32_t code = rbx_wrap(((s_snap->vram[2 * i] & 0xff) | bank), s_gfxtx.count);
 		const int opaque = (attr >> 4) & 1;
 		if (!opaque && !s_gfxtx.used[code])
 			continue;

@@ -16,6 +16,8 @@ typedef struct {
 	// ---- configuration (not saved) ----
 	const uint8_t *rom;
 	uint32_t rom_mask;
+	// the sample space's 8 banks of 0x20000 bytes (seta2's x1_map: set by the board), NULL: rom[] whole
+	const uint8_t *bank[8];
 } x1_010_t;
 
 #define X1_010_STATE_SIZE ((uint32_t)(sizeof(((x1_010_t *)0)->reg) + sizeof(((x1_010_t *)0)->hi_word) + \

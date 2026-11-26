@@ -17,6 +17,8 @@ void rbx_audio_shutdown(void); // app exit: thread and port released
 void rbx_audio_push(const int16_t *samples, int frames);
 // (ADR-180) 1 = the resampling and the gain as before ADR-180 (scalar loop, a pair at a time): the data folder's "feaudold"
 void rbx_audio_set_old(int old);
+// Options > Sound: normalize = the level-following gain (else a fixed one), volume in percent (0..200, 100 = as before)
+void rbx_audio_set_level(int normalize, int volume);
 // (ADR-195) frames the picture is shown later than without the frame buffer (0 or 1): the ring's target fill grows by
 // as many frames of sound
 void rbx_audio_set_extra_frames(int frames);

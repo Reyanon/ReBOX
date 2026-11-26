@@ -450,7 +450,7 @@ static void bus_w8(uint32_t a, uint8_t v)
 static void snd_bank(void)
 {
 	const uint32_t max = s_sndrom_size / 0x4000 ? s_sndrom_size / 0x4000 : 1;
-	const uint32_t base = (b.soundbank % max) * 0x4000;
+	const uint32_t base = (rbx_wrap(b.soundbank, max)) * 0x4000;
 	for (int p = 0; p < 0x40; p++)
 		s_snd.rpage[p] = s_sndrom + base + (uint32_t)p * 256;
 }

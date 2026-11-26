@@ -111,7 +111,7 @@ static void mcu_out(void *u, int port, uint8_t v)
 static void map_bank(void)
 {
 	for (int p = 0; p < 0x40; p++)
-		s_mmap[0x80 + p] = s_rom + 0x10000 + ((uint32_t)t->bank * 0x4000 + p * 256) % (s_rom_size - 0x10000);
+		s_mmap[0x80 + p] = s_rom + 0x10000 + rbx_wrap((uint32_t)t->bank * 0x4000 + p * 256, s_rom_size - 0x10000);
 }
 
 static void control_w(uint8_t v)
@@ -136,7 +136,7 @@ static uint8_t main_read(void *u, uint16_t a)
 {
 	(void)u;
 	if (a < 0x8000) return s_rom[a];
-	if (a < 0xc000) return s_rom[0x10000 + ((uint32_t)t->bank * 0x4000 + (a - 0x8000)) % (s_rom_size - 0x10000)];
+	if (a < 0xc000) return s_rom[0x10000 + rbx_wrap((uint32_t)t->bank * 0x4000 + (a - 0x8000), s_rom_size - 0x10000)];
 	if (a == 0xc000)   // (SYSTEM bit 3: vblank)
 		rbx_port_custom(s_port[0], 0x08, (s_line < VIS_Y0 || s_line >= VIS_Y0 + VIS_H) ? 0x08u : 0);
 	if (a >= 0xc000 && a <= 0xc004) return (uint8_t)rbx_port_read(s_port[a - 0xc000]);
@@ -179,16 +179,23 @@ static void draw_bg(int which, int y, uint16_t *d, uint8_t *pri)
 	const int flip = s_snap->flip;
 	const uint32_t sx = which ? s_snap->sx2 : s_snap->sx, sy = which ? 0 : s_snap->sy;
 	const uint32_t ty = (uint32_t)(flip ? 255 - y + (int)sy : y + (int)sy) & 255;
+	uint32_t last = 0xffffffffu, pbase = 0, hflip = 0;
+	const uint8_t *row = NULL;
 	for (int x = 0; x < VIS_W; x++) {
 		const uint32_t tx = (uint32_t)(flip ? 255 - x + (int)sx : x + (int)sx) & 0xffff;
-		const uint32_t idx = (tx >> 5) * 8 + (ty >> 5);   // (TILEMAP_SCAN_COLS, 2048 x 8)
-		const uint32_t offs = (which ? 0x8000 : 0) + idx * 2;
-		const uint8_t attr = s_tilerom[(offs + 1) % s_tilerom_size];
-		const uint32_t code = (uint32_t)(s_tilerom[offs % s_tilerom_size] + (which ? 0 : (attr & 1) << 8)) % g->count;
-		const uint32_t color = (attr & 0x3c) >> 2;
-		const uint32_t px = (attr & 0x40) ? 31 - (tx & 31) : tx & 31, py = (attr & 0x80) ? 31 - (ty & 31) : ty & 31;
-		const uint8_t p = g->pix[code * 1024 + py * 32 + px];
-		const uint32_t pen = base + color * 16 + p;
+		if ((tx >> 5) != last) {   // (a tile's row, colour and flip looked up once for its 32 pixels)
+			last = tx >> 5;
+			const uint32_t idx = (tx >> 5) * 8 + (ty >> 5);   // (TILEMAP_SCAN_COLS, 2048 x 8)
+			const uint32_t offs = (which ? 0x8000 : 0) + idx * 2;
+			const uint8_t attr = s_tilerom[rbx_wrap(offs + 1, s_tilerom_size)];   // (rbx_wrap: no divide, the Vita has none)
+			const uint32_t code = rbx_wrap((uint32_t)(s_tilerom[rbx_wrap(offs, s_tilerom_size)] + (which ? 0 : (attr & 1) << 8)), g->count);
+			const uint32_t py = (attr & 0x80) ? 31 - (ty & 31) : ty & 31;
+			row = g->pix + code * 1024 + py * 32;
+			pbase = base + ((attr & 0x3c) >> 2) * 16;
+			hflip = attr & 0x40;
+		}
+		const uint8_t p = row[hflip ? 31 - (tx & 31) : tx & 31];
+		const uint32_t pen = pbase + p;
 		if (which) {
 			d[x] = (uint16_t)pen;
 			pri[x] = 1;
@@ -219,7 +226,7 @@ static void c43_render(void)
 		for (int o = 0; o < 0x1000; o += 32) {
 			const uint8_t *s = &s_snap->spr[o];
 			const uint8_t attr = s[1];
-			const uint32_t code = (uint32_t)(s[0] + ((attr & 0xe0) << 3)) % s_gspr.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s[0] + ((attr & 0xe0) << 3)), s_gspr.count);
 			const uint32_t color = attr & 0x0f;
 			int sx = s[3] - ((attr & 0x10) << 4), sy = s[2];
 			if (flip) {
@@ -251,14 +258,21 @@ static void c43_render(void)
 		for (int y = VIS_Y0; y < VIS_Y0 + VIS_H; y++) {
 			uint16_t *d = rbx_video.bitmap + (y - VIS_Y0) * rbx_video.pitch;
 			const uint32_t ty = (uint32_t)(flip ? 255 - y : y) & 255;
+			uint32_t last = 0xffffffffu, cbase = 0;
+			const uint8_t *row = NULL;
 			for (int x = 0; x < VIS_W; x++) {
 				const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
-				const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
-				const uint8_t c = s_snap->cram[idx];
-				const uint32_t code = (uint32_t)(s_snap->vram[idx] + ((c & 0xe0) << 3)) % s_gchar.count;
-				const uint8_t p = s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
+				if ((tx >> 3) != last) {   // (a character looked up once for its 8 pixels)
+					last = tx >> 3;
+					const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
+					const uint8_t c = s_snap->cram[idx];
+					const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] + ((c & 0xe0) << 3)), s_gchar.count);
+					row = s_gchar.pix + code * 64 + (ty & 7) * 8;
+					cbase = (uint32_t)(c & 0x1f) * 4;
+				}
+				const uint8_t p = row[tx & 7];
 				if (p)
-					d[x] = (uint16_t)((c & 0x1f) * 4 + p);
+					d[x] = (uint16_t)(cbase + p);
 			}
 		}
 }

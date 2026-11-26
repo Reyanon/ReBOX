@@ -1,0 +1,25 @@
+{
+ "code": "nld",
+ "name": "Nederlands",
+ "english": "Dutch",
+ "strings": {
+  "A cheat of cheats/<set>.xml: off, or one of its values": "Een cheat uit cheats/<set>.xml: uit, of een van de waarden",
+  "Left/Right: change   Cheat files: cheats/<set>.xml": "Links/Rechts: wijzigen   Cheatbestanden: cheats/<set>.xml",
+  "No cheats: put %s.xml in cheats/": "Geen cheats: zet %s.xml in cheats/",
+  "Start stage, infinite health and the cheats of cheats/<set>.xml": "Startlevel, oneindig energie en de cheats uit cheats/<set>.xml",
+  "2nd stick Up": "2e stick omhoog",
+  "2nd stick Down": "2e stick omlaag",
+  "2nd stick Left": "2e stick links",
+  "2nd stick Right": "2e stick rechts",
+  "Pedal": "Pedaal",
+  "Pedal 2": "Pedaal 2",
+  "Pedal 3": "Pedaal 3",
+  "Sound  >": "Geluid  >",
+  "SOUND": "GELUID",
+  "Normalize": "Normaliseren",
+  "Volume": "Volume",
+  "Volume and the automatic level of the sound": "Volume en automatisch geluidsniveau",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Aan: zachte en luide spellen op een gelijk niveau (volgt het niveau van het spel). Uit: het eigen niveau van het spel",
+  "The volume of the games' sound": "Het volume van het spelgeluid"
+ }
+}

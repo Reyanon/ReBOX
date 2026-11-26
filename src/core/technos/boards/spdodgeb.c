@@ -116,7 +116,7 @@ static uint8_t snd_read(void *u, uint16_t a)
 		m6809_set_irq(&s_snd, 0);
 		return t.latch;
 	}
-	if (a >= 0x8000) return s_srom[(a - 0x8000) % s_srom_size];
+	if (a >= 0x8000) return s_srom[rbx_wrap((a - 0x8000), s_srom_size)];
 	return 0;
 }
 static void snd_write(void *u, uint16_t a, uint8_t v)
@@ -272,7 +272,7 @@ static void draw_piece(const vseg *sg, const line_regs *r, int y0, int y1)
 			const uint32_t col = tx >> 3, row = ty >> 3;
 			const uint32_t idx = (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
 			const uint8_t attr = sg->vram[idx + 0x800];
-			const uint32_t code = (uint32_t)(sg->vram[idx] + ((attr & 0x1f) << 8)) % s_gchar.count;
+			const uint32_t code = rbx_wrap((uint32_t)(sg->vram[idx] + ((attr & 0x1f) << 8)), s_gchar.count);
 			d[x] = (uint16_t)((((attr & 0xe0) >> 5) + 8 * l->tpal) * 16 + s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)]);
 		}
 	}

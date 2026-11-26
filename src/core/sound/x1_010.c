@@ -72,7 +72,8 @@ void x1_010_render(x1_010_t *x, int32_t *l, int32_t *r, int n)
 					reg[R_STATUS] &= 0xfe;
 					break;
 				}
-				const int data = (int8_t)x->rom[(start + delta) & x->rom_mask];
+				const uint32_t a = start + delta;
+				const int data = (int8_t)(x->bank[0] ? x->bank[(a >> 17) & 7][a & 0x1ffff] : x->rom[a & x->rom_mask]);
 				l[i] += (data * vol_l) >> 8;
 				r[i] += (data * vol_r) >> 8;
 				smp_offs += (uint32_t)freq;

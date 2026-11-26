@@ -102,7 +102,7 @@ static void draw_layer(int which, int scrollx, int scrolly, int opaque, int cx0,
 			uint32_t code;
 			int color;
 			tile_info(which, (ty >> 3) * 32 + (tx >> 3), &code, &color);
-			const uint8_t *src = gfx + (code % count) * 64 + (ty & 7) * 8 + (tx & 7);
+			const uint8_t *src = gfx + (rbx_wrap(code, count)) * 64 + (ty & 7) * 8 + (tx & 7);
 			const int pb = base + color * 16;
 			for (int i = 0; i < n; i++) {
 				const int p = src[i];
@@ -203,7 +203,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a < 0x6000)
 		return (a >= 0x0d00 && a < 0x1000) ? 0xff : t.ram[a];
 	if (a < 0x8000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)), s_rom_size)];
 	return s_rom[0x18000 + (a - 0x8000)];
 }
 
@@ -239,7 +239,7 @@ static void main_wr(void *ctx, uint16_t a, uint8_t v)
 	if (a == 0x7000) {   // (bankswitch_w)
 		t.mainbank = v & 0x0f;
 		for (int p = 0; p < 0x20; p++)
-			s_cpu.rpage[0x60 + p] = s_rom + ((uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256) % s_rom_size;
+			s_cpu.rpage[0x60 + p] = s_rom + rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256), s_rom_size);
 		return;
 	}
 	if (a >= 0x0c00 && a < 0x6000 && !(a >= 0x0d00 && a < 0x1000))
@@ -257,7 +257,7 @@ static uint8_t snd_rd(void *ctx, uint16_t a)
 	if (a >= 0x6000 && a < 0x6800)
 		return t.sram[a - 0x6000];
 	if (a >= 0x8000)
-		return s_srom[(a - 0x8000) % s_srom_size];
+		return s_srom[rbx_wrap((a - 0x8000), s_srom_size)];
 	return 0xff;
 }
 static void snd_wr(void *ctx, uint16_t a, uint8_t v)

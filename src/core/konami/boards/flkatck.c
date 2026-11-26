@@ -99,7 +99,7 @@ static void draw_layer(int which, int scrollx, int scrolly, int opaque, int x0, 
 				code += 256u * (uint32_t)bank;
 				fy = (attr & 0x20) != 0;
 			}
-			const uint8_t *src = s_gfx + (code % s_gfx_count) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8 + (tx & 7);
+			const uint8_t *src = s_gfx + (rbx_wrap(code, s_gfx_count)) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8 + (tx & 7);
 			const int pb = ((attr & 0x0f) + 16) * 16;
 			for (int i = 0; i < n; i++) {
 				const int p = src[i];
@@ -162,7 +162,7 @@ static void q_put(int kind, uint32_t v)
 static void map_bank(void)
 {
 	for (int p = 0; p < 0x20; p++)
-		s_cpu.rpage[0x40 + p] = s_rom + ((uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256) % s_rom_size;
+		s_cpu.rpage[0x40 + p] = s_rom + rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (uint32_t)p * 256), s_rom_size);
 }
 
 static void cpu_lines(int set, int cleared)   // (the K007121's IRQ)
@@ -209,7 +209,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a < 0x4000)
 		return t.ram[a - 0x3000];
 	if (a < 0x6000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x4000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x4000)), s_rom_size)];
 	return s_rom[a];
 }
 

@@ -110,7 +110,7 @@ static void vg_render(void)
 			const uint32_t tx = (uint32_t)(flip ? 255 - x + s_snap->sx : x + s_snap->sx) & 511;
 			const uint32_t idx = (tx >> 4) * 32 + (ty >> 4);
 			const uint8_t c = s_snap->bg[idx + 0x400];
-			const uint32_t code = (uint32_t)(s_snap->bg[idx] + ((c & 0x80) << 1)) % s_gtile.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg[idx] + ((c & 0x80) << 1)), s_gtile.count);
 			const uint32_t px = (c & 0x20) ? 15 - (tx & 15) : tx & 15, py = (c & 0x40) ? 15 - (ty & 15) : ty & 15;
 			d[x] = (uint16_t)(64 * 4 + 16 * 16 + ((c & 0x1f) + 0x20 * s_snap->palbank) * 8 + s_gtile.pix[code * 256 + py * 16 + px]);
 		}
@@ -138,7 +138,7 @@ static void vg_render(void)
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
 			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
 			const uint8_t c = s_snap->fg[idx + 0x400];
-			const uint32_t code = (uint32_t)(s_snap->fg[idx] + ((c & 0x80) << 1)) % s_gchar.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_snap->fg[idx] + ((c & 0x80) << 1)), s_gchar.count);
 			const uint32_t pen = (c & 0x3f) * 4 + s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
 			if (s_ctab[pen] != 47)   // (configure_groups(gfx, 47))
 				d[x] = (uint16_t)pen;

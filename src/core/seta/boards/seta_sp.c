@@ -522,7 +522,7 @@ static void draw_layer(uint16_t *bm, int pitch, int w, int h)
 			const int uu = (flip ? -src_x - 1 : src_x) & 1023;
 			const uint16_t code = v[row * 64 + (uu >> 4)];
 			const uint16_t attr = v[row * 64 + (uu >> 4) + 0x800];
-			const uint8_t *src = tiles + (uint32_t)((code & 0x3fff) % ntiles) * 256
+			const uint8_t *src = tiles + (uint32_t)(rbx_wrap((code & 0x3fff), ntiles)) * 256
 				+ ((code & 0x4000) ? 15 - (vv & 15) : (vv & 15)) * 16;
 			const int base = (attr & 0x1f) * 16;
 			int cu = uu & 15;

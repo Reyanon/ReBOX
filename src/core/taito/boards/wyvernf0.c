@@ -210,7 +210,7 @@ static inline int tilemap_pixel(const uint8_t *vram, int u, int v)
 	int px = u & 7, py = v & 7;
 	if (code & 0x4000) px ^= 7;
 	if (code & 0x8000) py ^= 7;
-	int c = s_tiles[(uint32_t)(code & 0x3ff) % s_ntiles * 64 + py * 8 + px];
+	int c = s_tiles[rbx_wrap((uint32_t)(code & 0x3ff), s_ntiles) * 64 + py * 8 + px];
 	return c ? (((code & 0x3000) >> 12) << 4) | c : 0;
 }
 

@@ -349,6 +349,13 @@
   "2nd stick Right": "第2スティック 右",
   "Pedal": "ペダル",
   "Pedal 2": "ペダル 2",
-  "Pedal 3": "ペダル 3"
+  "Pedal 3": "ペダル 3",
+  "Sound  >": "サウンド  >",
+  "SOUND": "サウンド",
+  "Normalize": "ノーマライズ",
+  "Volume": "音量",
+  "Volume and the automatic level of the sound": "音量と自動音量調整",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "オン: 小さい音と大きい音のゲームを同じくらいの音量に (ゲームの音量に追従)。オフ: ゲーム本来の音量",
+  "The volume of the games' sound": "ゲームの音の音量"
  }
 }

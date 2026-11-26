@@ -11,6 +11,7 @@ list(APPEND RBX_CORE_SOURCES
   ${RBX_SEGA_DIR}/boards/segaorun.c
   ${RBX_SEGA_DIR}/boards/segas24.c
   ${RBX_SEGA_DIR}/boards/segas32.c
+  ${RBX_SEGA_DIR}/boards/system1.c
   ${RBX_SEGA_DIR}/video/s315_5313.c
   ${RBX_SEGA_DIR}/machine/fd1094.c
   ${RBX_SEGA_DIR}/machine/fd1089.c

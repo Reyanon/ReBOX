@@ -201,7 +201,7 @@ static uint8_t pro_r(uint16_t a)
 	if (a < 0x1000) return s_ram[a];
 	if (a >= 0x2000 && a < 0x4000) return s_rom[0xa000 + (a - 0x2000)];
 	if (s_io_sel && a >= 0x4000 && a < 0x8010)
-		return a < 0x8000 ? s_user1[(a - 0x4000) % s_user1_size] : deco16_io_r(a - 0x8000);
+		return a < 0x8000 ? s_user1[rbx_wrap((a - 0x4000), s_user1_size)] : deco16_io_r(a - 0x8000);
 	if (a >= 0x4000 && a < 0x4400) return s_cram[a & 0x3ff];
 	if (a >= 0x4800 && a < 0x4c00) return s_cram[a & 0x3ff];
 	if (a >= 0x4400 && a < 0x4800) return s_vram[a & 0x3ff];
@@ -270,7 +270,7 @@ static uint8_t main_r(void *ctx, uint16_t a)
 	if (s_k == K_LIBERATB) {
 		if (a >= 0xf000 && a < 0xf005) return deco16_io_r(a - 0xf000);
 	} else if (s_io_sel && a < 0x8010) {   // the view
-		if (a < 0x8000) return s_user1[(a - 0x4000) % s_user1_size];
+		if (a < 0x8000) return s_user1[rbx_wrap((a - 0x4000), s_user1_size)];
 		return deco16_io_r(a - 0x8000);
 	}
 	if (a < 0x4400) return s_cram[a & 0x3ff];
@@ -370,7 +370,7 @@ static void draw_back(const snap_t *s, uint32_t mask)
 			// the 512x512 map's four quarters from the pages io_ram[2..5]
 			const int page = (idx & 0x100) ? ((idx & 0x200) ? s->io_ram[5] : s->io_ram[4]) : ((idx & 0x200) ? s->io_ram[3] : s->io_ram[2]);
 			idx = (idx & 0xff) + (page << 8);
-			const uint8_t tile = s_user1[(uint32_t)idx % s_user1_size];
+			const uint8_t tile = s_user1[rbx_wrap((uint32_t)idx, s_user1_size)];
 			const rbx_gfx *g = tile > 0x7f ? &s_gfxt2 : &s_gfxt1;
 			const uint8_t *src = elem(g, tile & 0x7f) + (ty & 15) * 16;
 			int n = s->flip ? (tx & 15) + 1 : 16 - (tx & 15);
@@ -542,7 +542,7 @@ static void prosoccr_render(const snap_t *s)
 				int idx = (row & 0xf) + ((15 - (col & 0xf)) << 4) + ((row & 0x10) << 5) + ((col & 0x10) << 4);
 				const int page = (idx & 0x100) ? ((idx & 0x200) ? s->io_ram[5] : s->io_ram[4]) : ((idx & 0x200) ? s->io_ram[3] : s->io_ram[2]);
 				idx = (idx & 0xff) + (page << 8);
-				const uint8_t tile = s_user1[(uint32_t)idx % s_user1_size];
+				const uint8_t tile = s_user1[rbx_wrap((uint32_t)idx, s_user1_size)];
 				s_scr[y * 256 + x] = (uint16_t)(8 + elem(&s_gfxt1, tile & 0x7f)[(ty & 15) * 16 + (tx & 15)]);
 			}
 		}

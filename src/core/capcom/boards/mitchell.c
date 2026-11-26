@@ -204,7 +204,7 @@ static void mt_render(void)
 			const uint32_t tx = (uint32_t)(flip ? 511 - x : x) & 511;
 			const uint32_t idx = (ty >> 3) * 64 + (tx >> 3);
 			const uint8_t attr = s_snap->color[idx];
-			const uint32_t code = (uint32_t)(s_snap->vram[2 * idx] | s_snap->vram[2 * idx + 1] << 8) % s_gchar.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[2 * idx] | s_snap->vram[2 * idx + 1] << 8), s_gchar.count);
 			const uint32_t px = (attr & 0x80) ? 7 - (tx & 7) : tx & 7;
 			const uint8_t p = s_gchar.pix[code * 64 + (ty & 7) * 8 + px];
 			d[x - VIS_X0] = p == 15 ? 0 : (uint16_t)((attr & 0x7f) * 16 + p);

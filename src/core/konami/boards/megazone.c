@@ -86,7 +86,7 @@ static void mz_render(void)   // (screen_update)
 			const int c = cram0[offs];
 			const int code = vram0[offs] + ((c & 0x80) ? 256 : 0);
 			const int fx = (c >> 6) & 1, fy = (c >> 5) & 1;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64;
 			d[x] = (uint16_t)(0x100 + (c & 0x0f) * 16 + src[(fy ? 7 - (ty & 7) : (ty & 7)) * 8 + (fx ? 7 - (tx & 7) : (tx & 7))]);
 		}
 	}
@@ -95,7 +95,7 @@ static void mz_render(void)   // (screen_update)
 		const int sx = sr[offs + 3] + 32, sy = 255 - ((sr[offs + 1] + 16) & 0xff);
 		const int color = sr[offs] & 0x0f;
 		const int flipx = !(sr[offs] & 0x40), flipy = (sr[offs] & 0x80) != 0;
-		const uint8_t *src = s_spr + ((uint32_t)sr[offs + 2] % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)sr[offs + 2], s_nspr)) * 256;
 		const uint8_t *lut = s_prom + 0x20 + color * 16;
 		for (int j = 0; j < 16; j++) {
 			const int yy = sy + j;
@@ -119,7 +119,7 @@ static void mz_render(void)   // (screen_update)
 			const int c = cram1[offs];
 			const int code = vram1[offs] + ((c & 0x80) ? 256 : 0);
 			const int fx = (c >> 6) & 1, fy = (c >> 5) & 1;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64;
 			for (int j = 0; j < 8; j++) {
 				uint16_t *d = bm + (ty * 8 + j - VIS_Y0) * pitch + tx * 8;
 				for (int i = 0; i < 8; i++)
@@ -137,7 +137,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a >= 0x3800 && a < 0x4000)
 		return t.shared[a - 0x3800];
 	if (a >= 0x4000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 static void main_wr(void *ctx, uint16_t a, uint8_t v)

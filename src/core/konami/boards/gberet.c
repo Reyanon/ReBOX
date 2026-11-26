@@ -75,7 +75,7 @@ static void draw_tiles(int category_only, uint16_t *bm, int pitch)
 			const int code = s_vs.ram[0x800 + idx] + ((attr & 0x40) << 2);
 			const int pen = (attr & 0x0f) * 16;
 			const int fx = (attr & 0x10) != 0, fy = (attr & 0x20) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (y & 7) : (y & 7)) * 8;
 			const uint8_t *lut = s_prom + 0x20 + pen;
 			for (int i = 0; i < n; i++) {
 				const int px = (tx + i) & 7;
@@ -106,7 +106,7 @@ static void gb_render(void)   // (screen_update)
 		const int color = attr & 0x0f;
 		const int sx = sr[offs + 2] - 2 * (attr & 0x80), sy = sr[offs + 3];
 		const int flipx = (attr & 0x10) != 0, flipy = (attr & 0x20) != 0;
-		const uint8_t *src = s_spr + ((uint32_t)code % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)code, s_nspr)) * 256;
 		const uint8_t *lut = s_prom + 0x120 + color * 16;
 		for (int j = 0; j < 16; j++) {
 			const int yy = sy + j;
@@ -134,7 +134,7 @@ static uint8_t z_rd(void *u, uint16_t a)
 {
 	(void)u;
 	if (a < 0xc000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	if (a < 0xe000)
 		return t.ram[a - 0xc000];
 	if (a < 0xe040)
@@ -148,7 +148,7 @@ static uint8_t z_rd(void *u, uint16_t a)
 	case 0xf603: return port(s_port_system);
 	}
 	if (s_goemon && a >= 0xf800)
-		return s_rom[(0xc000u + (uint32_t)t.mainbank * 0x800u + (a - 0xf800)) % s_rom_size];
+		return s_rom[rbx_wrap((0xc000u + (uint32_t)t.mainbank * 0x800u + (a - 0xf800)), s_rom_size)];
 	return 0;
 }
 

@@ -210,7 +210,7 @@ static void set_bank(int b)
 {
 	s_bank = b & 0x0f;
 	const uint32_t nb = s_bank_size / 0x4000;
-	const uint32_t o = (uint32_t)(nb ? (uint32_t)s_bank % nb : 0) * 0x4000;
+	const uint32_t o = (uint32_t)(nb ? rbx_wrap((uint32_t)s_bank, nb) : 0) * 0x4000;
 	for (int p = 0; p < 0x40; p++)
 		s_cpu[0].rpage[0x40 + p] = s_bank_rom + o + (uint32_t)p * 256;
 }

@@ -83,7 +83,7 @@ static void map_banks(void)
 	for (int i = 5; i < 16; i++) {
 		const uint32_t b = (uint32_t)((p1[i] & 3) << 4 | (p2[i] & 0x0f));
 		for (int p = 0; p < 16; p++)
-			s_main.rpage[i * 16 + p] = s_rom + (b * 0x1000 + p * 256) % s_rom_size;
+			s_main.rpage[i * 16 + p] = s_rom + rbx_wrap((b * 0x1000 + p * 256), s_rom_size);
 	}
 }
 
@@ -143,7 +143,7 @@ static void draw_bg(int front, int y0, int y1)
 				last = tx >> 4;
 				const uint32_t ti = (tx >> 4) * 64 + (ty >> 4);
 				const uint8_t attr = s_snap->bg[2 * ti];
-				const uint32_t code = (uint32_t)(s_snap->bg[2 * ti + 1] + ((attr & 7) << 8)) % s_gtile.count;
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->bg[2 * ti + 1] + ((attr & 7) << 8)), s_gtile.count);
 				const uint32_t py = (attr & 8) ? 15 - (ty & 15) : ty & 15;
 				src = s_gtile.pix + code * 256 + py * 16;
 				const int grp = (attr & 0x10) >> 4;
@@ -174,7 +174,7 @@ static void draw_fg(int y0, int y1)
 				last = tx >> 3;
 				const uint32_t ti = (tx >> 3) * 32 + (ty >> 3);
 				const uint8_t attr = s_snap->fg[2 * ti];
-				const uint32_t code = (uint32_t)(s_snap->fg[2 * ti + 1] + ((attr & 3) << 8)) % s_gchar.count;
+				const uint32_t code = rbx_wrap((uint32_t)(s_snap->fg[2 * ti + 1] + ((attr & 3) << 8)), s_gchar.count);
 				src = s_gchar.pix + code * 64 + (ty & 7) * 8;
 				opaque = (attr & 0x40) != 0;   // (TILE_FORCE_LAYER0: opaque)
 				base = (uint16_t)(448 + ((attr & 0x3c) >> 2) * 4);

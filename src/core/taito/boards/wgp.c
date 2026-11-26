@@ -320,7 +320,7 @@ static void piv_layer_draw(uint16_t *bm, int pitch, int layer, int opaque, uint8
 				uint16_t attr = maprow[last_col + 0x8000];
 				fx = (attr & 0x40) ? 15 : 0;
 				int fy = (attr & 0x80) ? 15 : 0;
-				uint32_t c = code % s_piv_gfx.count;
+				uint32_t c = rbx_wrap(code, s_piv_gfx.count);
 				trow = s_piv_gfx.opaque[c] || opaque ? s_piv_gfx.pix + (size_t)c * 256 + (((src_y & 15) ^ fy) << 4) : NULL;
 				base = (uint16_t)((attr & 0x3f) * 16 + row_colbank);
 			}

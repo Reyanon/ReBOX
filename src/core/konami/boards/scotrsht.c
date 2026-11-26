@@ -77,7 +77,7 @@ static void ss_render(void)   // (screen_update)
 			const int code = s_vs.ram[0x800 + idx] + (s_vs.charbank << 9) + ((attr & 0x40) << 2);
 			const int pen = ((attr & 0x0f) + s_vs.palette_bank * 16) * 16;
 			const int fx = (attr & 0x10) != 0, fy = (attr & 0x20) != 0;
-			const uint8_t *src = s_chr + ((uint32_t)code % s_nchr) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
+			const uint8_t *src = s_chr + (rbx_wrap((uint32_t)code, s_nchr)) * 64 + (fy ? 7 - (ty & 7) : (ty & 7)) * 8;
 			for (int i = 0; i < 8; i++)
 				d[col * 8 + i] = (uint16_t)(pen + src[fx ? 7 - i : i]);
 		}
@@ -99,7 +99,7 @@ static void ss_render(void)   // (screen_update)
 		uint8_t trans[16];
 		for (int p = 0; p < 16; p++)
 			trans[p] = ctab(pen + p) == tcol;
-		const uint8_t *src = s_spr + ((uint32_t)code % s_nspr) * 256;
+		const uint8_t *src = s_spr + (rbx_wrap((uint32_t)code, s_nspr)) * 256;
 		for (int j = 0; j < 16; j++) {
 			const int yy = sy + j;
 			if (yy < VIS_Y0 || yy >= VIS_Y0 + VIS_H)
@@ -158,7 +158,7 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	case 0x3303: return port(s_port_dsw[0]);
 	}
 	if (a >= 0x4000)
-		return s_rom[a % s_rom_size];
+		return s_rom[rbx_wrap(a, s_rom_size)];
 	return 0;
 }
 

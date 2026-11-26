@@ -10,6 +10,9 @@ list(APPEND RBX_CORE_SOURCES
   ${RBX_NAMCO_DIR}/boards/skykid.c
   ${RBX_NAMCO_DIR}/boards/pacland.c
   ${RBX_NAMCO_DIR}/boards/mappy.c
+  ${RBX_NAMCO_DIR}/boards/pacman.c
+  ${RBX_NAMCO_DIR}/boards/galaxian.c
+  ${RBX_NAMCO_DIR}/boards/galaxian_a.c
   ${RBX_NAMCO_DIR}/boards/namcona1.c
   ${RBX_NAMCO_DIR}/boards/namconb1.c
   ${RBX_NAMCO_DIR}/machine/namcoio.c

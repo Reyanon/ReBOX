@@ -261,7 +261,7 @@ static void kc_render(void)
 			fy = !fy;
 		}
 		const rbx_gfx *g = &s_gfxspr[bank];
-		const uint8_t *src = g->pix + (size_t)(code % g->count) * 256;
+		const uint8_t *src = g->pix + (size_t)(rbx_wrap(code, g->count)) * 256;
 		for (int yy = 0; yy < 16; yy++) {
 			const int y = sy + yy - VIS_Y0;
 			if (y < 0 || y >= VIS_H)

@@ -246,7 +246,7 @@ static void draw_sprites(uint16_t *bm, int pitch, int prio)
 		int code = spr[offs + 1] & 0x3f;
 		int bank = s_m->banked ? s->bank : 0;
 		const uint8_t *src = s_sprites + ((size_t)bank * 64 + (size_t)code) * 256;
-		uint16_t base = (uint16_t)((spr[offs + 2] % s_ncolors) * s_gran);
+		uint16_t base = (uint16_t)((rbx_wrap(spr[offs + 2], s_ncolors)) * s_gran);
 		for (int pass = 0; pass < 2; pass++) {
 			int sx0 = pass ? x - 256 : x;
 			for (int yy = 0; yy < 16; yy++) {
@@ -294,7 +294,7 @@ static void ru_render(void)
 			if (!prio) {
 				uint8_t p = chars[s->videoram[idx] * 64 + (ty & 7) * 8 + (nx & 7)];
 				if (p)
-					pen = (uint16_t)((c % s_ncolors) * s_gran + p);
+					pen = (uint16_t)((rbx_wrap(c, s_ncolors)) * s_gran + p);
 			}
 			d[sx] = pen;
 			cat[sx] = (uint8_t)prio;

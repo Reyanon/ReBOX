@@ -187,6 +187,10 @@ void rbx_audio_set_extra_frames(int frames)
 	s_drc_target = DRC_TARGET + (frames > 0 ? frames : 0) * (RBX_AUDIO_RATE / 60);
 }
 static int16_t s_drc_out[(RBX_RESAMPLE_MAX_IN + RBX_RESAMPLE_MAX_IN / 64 + 4) * 2] __attribute__((aligned(16)));
+void rbx_audio_set_level(int normalize, int volume)
+{
+	gain_set_level(normalize, (volume * 256 + 50) / 100);
+}
 void rbx_audio_set_old(int old)
 {
 	s_block = !old;

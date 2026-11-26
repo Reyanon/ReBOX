@@ -216,7 +216,7 @@ static void draw_bg_line(const piece *pc, int y, uint16_t *dst)   // opaque (no 
 		const uint32_t col = tx >> 4;
 		const uint32_t idx = (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);   // bg0_scan
 		const uint16_t *t = &pc->bgram[idx * 2];
-		const uint32_t code = ((t[1] & 0x00ffu) | (t[0] & 0x000fu) << 8) % s_gfxbg.count;
+		const uint32_t code = rbx_wrap(((t[1] & 0x00ffu) | (t[0] & 0x000fu) << 8), s_gfxbg.count);
 		const uint16_t c0 = (uint16_t)(256 + ((t[0] & 0x0070) >> 4) * 16);
 		const int fx = (t[0] >> 7) & 1;
 		const uint8_t *src = s_gfxbg.pix + code * 256 + fy * 16;
@@ -237,7 +237,7 @@ static void draw_fg_line(const piece *pc, int y, uint16_t *dst)
 	for (int x = 0; x < VIS_W; x++) {
 		const int tx = (flip ? VIS_W - 1 - x : x) & 255;
 		const uint16_t *t = &pc->fgram[((ty >> 3) * 32 + (tx >> 3)) * 2];
-		const uint32_t code = (uint32_t)((t[1] & 0x00ff) | (t[0] & 0x000f) << 8) % s_gfxfg.count;
+		const uint32_t code = rbx_wrap((uint32_t)((t[1] & 0x00ff) | (t[0] & 0x000f) << 8), s_gfxfg.count);
 		const uint8_t p = s_gfxfg.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
 		if (p)
 			dst[x] = (uint16_t)(((t[0] & 0x00f0) >> 4) * 16 + p);

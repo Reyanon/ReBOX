@@ -430,7 +430,7 @@ static uint8_t dd_main_read(void *u, uint16_t a)   // base_map / ddragon2_main_m
 	if (a >= 0x4000) {
 		if (s_mach == M_DARK && t->bank == 4)
 			return darktowr_mcu_bank_r(a - 0x4000);
-		return s_rom_prg[(0x10000u + (uint32_t)t->bank * 0x4000 + (a - 0x4000)) % s_rom_size];
+		return s_rom_prg[rbx_wrap((0x10000u + (uint32_t)t->bank * 0x4000 + (a - 0x4000)), s_rom_size)];
 	}
 	if (s_mach == M_DD2) {
 		if (a < 0x1800) return t->ram[a];
@@ -480,7 +480,7 @@ static uint8_t cg_main_read(void *u, uint16_t a)
 {
 	(void)u;
 	if (a >= 0x8000) return s_rom[a];
-	if (a >= 0x4000) return s_rom[(0x10000u + (uint32_t)t->bank * 0x4000 + (a - 0x4000)) % s_rom_size];
+	if (a >= 0x4000) return s_rom[rbx_wrap((0x10000u + (uint32_t)t->bank * 0x4000 + (a - 0x4000)), s_rom_size)];
 	if (a < 0x2000) return t->ram[a];
 	if (a < 0x2800) return t->fgram[a - 0x2000];
 	if (a < 0x3000) return t->bgram[a - 0x2800];
@@ -527,7 +527,7 @@ static void map_bank(void)
 	if (s_mach == M_DARK && t->bank == 4)
 		bank = NULL;
 	else
-		bank = s_rom_prg + (0x10000u + (uint32_t)t->bank * 0x4000) % s_rom_size;
+		bank = s_rom_prg + rbx_wrap((0x10000u + (uint32_t)t->bank * 0x4000), s_rom_size);
 	for (int p = 0; p < 0x40; p++) {
 		const uint8_t *q = bank && (uint32_t)(bank - s_rom_prg) + (uint32_t)p * 256 + 256 <= s_rom_size ? bank + p * 256 : NULL;
 		if (s_main6809) s_main09.rpage[0x40 + p] = q; else s_main.rpage[0x40 + p] = q;
@@ -601,7 +601,7 @@ static uint8_t cgsub_read(void *u, uint16_t a)   // chinagat sub_map
 {
 	(void)u;
 	if (a >= 0x8000) return s_srom[a];
-	if (a >= 0x4000) return s_srom[(0x10000u + (uint32_t)t->subbank * 0x4000 + (a - 0x4000)) % s_srom_size];
+	if (a >= 0x4000) return s_srom[rbx_wrap((0x10000u + (uint32_t)t->subbank * 0x4000 + (a - 0x4000)), s_srom_size)];
 	if (a < 0x2000) return t->ram[a];
 	return 0;
 }
@@ -611,7 +611,7 @@ static void cgsub_write(void *u, uint16_t a, uint8_t v)
 	if (a < 0x2000) t->ram[a] = v;
 	else if (a == 0x2000) {
 		t->subbank = v & 7;
-		const uint8_t *b = s_srom + (0x10000u + (uint32_t)t->subbank * 0x4000) % s_srom_size;
+		const uint8_t *b = s_srom + rbx_wrap((0x10000u + (uint32_t)t->subbank * 0x4000), s_srom_size);
 		for (int p = 0; p < 0x40; p++) {
 			if (s_sub_kind == SUB_6309) s_sub6309.rpage[0x40 + p] = b + p * 256;
 			else s_sub09.rpage[0x40 + p] = b + p * 256;
@@ -718,7 +718,7 @@ static void draw_bg_line(const vseg *sg, int y, const line_regs *r, uint16_t *ds
 		const uint32_t col = tx >> 4;
 		const uint32_t off = ((col & 0x0f) | ((row & 0x0f) << 4) | ((col & 0x10) << 4) | ((row & 0x10) << 5)) * 2;
 		const uint8_t attr = vram[off];
-		const uint32_t code = (uint32_t)(vram[off | 1] | (attr & 7) << 8) % s_gfxtile.count;
+		const uint32_t code = rbx_wrap((uint32_t)(vram[off | 1] | (attr & 7) << 8), s_gfxtile.count);
 		const uint32_t px = attr & 0x40 ? 15 - (tx & 15) : tx & 15, py = attr & 0x80 ? 15 - fy : fy;
 		dst[x] = (uint16_t)(256 + ((attr >> 3) & 7) * 16 + s_gfxtile.pix[code * 256 + py * 16 + px]);
 	}

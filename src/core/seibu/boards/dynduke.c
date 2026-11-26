@@ -245,7 +245,7 @@ static void draw_band(int band)
 		const int fx = (w0 >> 13) & 1, fy = (w0 >> 14) & 1;
 		const int y = w0 & 0xff, x = (w2 & 0x100) ? (int)(w2 & 0x1ff) - 0x200 : (int)(w2 & 0x1ff);
 		const uint16_t base = (uint16_t)(0x300 + ((w0 >> 8) & 0x1f) * 16);
-		const uint8_t *src = s_spr.pix + (size_t)((w1 & 0x3fff) % s_spr.count) * 256;
+		const uint8_t *src = s_spr.pix + (size_t)(rbx_wrap((w1 & 0x3fff), s_spr.count)) * 256;
 		for (int j = 0; j < 16; j++) {
 			const int r = y + j - VIS_Y0;
 			if (r < r0 || r >= r1)

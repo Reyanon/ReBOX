@@ -1,0 +1,25 @@
+{
+ "code": "fra",
+ "name": "Français",
+ "english": "French",
+ "strings": {
+  "A cheat of cheats/<set>.xml: off, or one of its values": "Une triche de cheats/<set>.xml : désactivée ou l'une de ses valeurs",
+  "Left/Right: change   Cheat files: cheats/<set>.xml": "Gauche/Droite : changer   Fichiers de triche : cheats/<set>.xml",
+  "No cheats: put %s.xml in cheats/": "Aucune triche : placez %s.xml dans cheats/",
+  "Start stage, infinite health and the cheats of cheats/<set>.xml": "Niveau de départ, vie infinie et triches de cheats/<set>.xml",
+  "2nd stick Up": "2e stick haut",
+  "2nd stick Down": "2e stick bas",
+  "2nd stick Left": "2e stick gauche",
+  "2nd stick Right": "2e stick droite",
+  "Pedal": "Pédale",
+  "Pedal 2": "Pédale 2",
+  "Pedal 3": "Pédale 3",
+  "Sound  >": "Son  >",
+  "SOUND": "SON",
+  "Normalize": "Normaliser",
+  "Volume": "Volume",
+  "Volume and the automatic level of the sound": "Volume et niveau sonore automatique",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Activé : jeux calmes et bruyants à un niveau proche (suit le niveau du jeu). Désactivé : le niveau propre du jeu",
+  "The volume of the games' sound": "Le volume du son des jeux"
+ }
+}

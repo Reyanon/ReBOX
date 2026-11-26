@@ -209,7 +209,7 @@ static uint8_t rd(void *u, uint16_t a)
 			return k051649_scc_r(&s_scc, a & 0xff, 0);
 		if ((t.control & 0x60) == 0x60) {   // (ttlrom_r)
 			const uint8_t v = s_ttl[t.ttlrom_offset];
-			t.ttlrom_offset = (t.ttlrom_offset + 1) % s_ttl_size;
+			t.ttlrom_offset = rbx_wrap((t.ttlrom_offset + 1), s_ttl_size);
 			return v;
 		}
 		return t.vram[a - 0xe000];

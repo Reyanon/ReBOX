@@ -748,7 +748,7 @@ static tempsprite_t *s_list_end;   // (the list draw_sprites made: s_list .. s_l
 // one sprite on the screen lines cy0..cy1 (bm: the line VIS_Y0)
 static void sprite_mixdraw(uint16_t *bm, int pitch, const tempsprite_t *s, int use_mixer, int use_pri, int cy0, int cy1)
 {
-	uint32_t pal_base = s_spr_gran * (s->color % s_spr_colors);
+	uint32_t pal_base = s_spr_gran * (rbx_wrap(s->color, s_spr_colors));
 	uint32_t code = s->code < s_spr_ntiles ? s->code : s->code % s_spr_ntiles;
 	if (!s_spr_used[code])
 		return;

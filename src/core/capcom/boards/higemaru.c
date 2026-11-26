@@ -84,7 +84,7 @@ static void hg_render(void)
 			const uint32_t tx = (uint32_t)(flip ? 255 - x : x) & 255;
 			const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
 			const uint8_t attr = s_snap->cram[idx];
-			const uint32_t code = (uint32_t)(s_snap->vram[idx] | ((attr & 0x80) << 1)) % s_gchar.count;
+			const uint32_t code = rbx_wrap((uint32_t)(s_snap->vram[idx] | ((attr & 0x80) << 1)), s_gchar.count);
 			const uint32_t px = (attr & 0x20) ? 7 - (tx & 7) : tx & 7, py = (attr & 0x40) ? 7 - (ty & 7) : ty & 7;
 			d[x] = (uint16_t)((attr & 0x1f) * 4 + s_gchar.pix[code * 64 + py * 8 + px]);
 		}

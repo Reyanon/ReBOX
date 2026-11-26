@@ -149,7 +149,7 @@ static void draw_band(int band)
 		for (int x = 0; x < VIS_W; x++) {
 			const uint16_t data = s_snap.bg[(y >> 4) * 16 + (x >> 4)];
 			d[x] = (uint16_t)(512 + (data >> 12) * 16 +
-			                  s_bg.pix[(size_t)((data & 0xfff) % s_bg.count) * 256 + (size_t)(y & 15) * 16 + (x & 15)]);
+			                  s_bg.pix[(size_t)(rbx_wrap((data & 0xfff), s_bg.count)) * 256 + (size_t)(y & 15) * 16 + (x & 15)]);
 		}
 	}
 	// the sprites (transpen 15), the last in the RAM drawn first
@@ -162,7 +162,7 @@ static void draw_band(int band)
 		if (sx > 256)
 			sx -= 512;
 		const uint16_t base = (uint16_t)(256 + ((d2 & 0x7800) >> 11) * 16);
-		const uint8_t *src = s_spr.pix + (size_t)((d1 & 0xfff) % s_spr.count) * 256;
+		const uint8_t *src = s_spr.pix + (size_t)(rbx_wrap((d1 & 0xfff), s_spr.count)) * 256;
 		for (int j = 0; j < 16; j++) {
 			const int r = sy + j - VIS_Y0;
 			if (r < r0 || r >= r1)
@@ -183,7 +183,7 @@ static void draw_band(int band)
 		uint16_t *d = bm + r * pitch;
 		for (int x = 0; x < VIS_W; x++) {
 			const uint16_t data = s_snap.tx[(y >> 3) * 32 + (x >> 3)];
-			const uint8_t c = s_tx.pix[(size_t)((data & 0x3ff) % s_tx.count) * 64 + (size_t)(y & 7) * 8 + (x & 7)];
+			const uint8_t c = s_tx.pix[(size_t)(rbx_wrap((data & 0x3ff), s_tx.count)) * 64 + (size_t)(y & 7) * 8 + (x & 7)];
 			if (c != 3)
 				d[x] = (uint16_t)((data >> 10) * 4 + c);
 		}

@@ -337,7 +337,7 @@ static uint8_t me_rd(void *ctx, uint16_t a)   // (mainevt main_map; devstors: no
 	if (a < 0x6000)
 		return a >= 0x5e00 ? t.pal8[a - 0x5e00] : t.ram[a - 0x4000];
 	if (a < 0x8000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)), s_rom_size)];
 	return s_rom[a];
 }
 static void me_wr(void *ctx, uint16_t a, uint8_t v)
@@ -386,7 +386,7 @@ static uint8_t b9_rd(void *ctx, uint16_t a)   // (bottom9 main_map)
 	if (a < 0x6000)
 		return t.ram[a - 0x4000];
 	if (a < 0x8000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x6000)), s_rom_size)];
 	return s_rom[0x18000 + (a - 0x8000)];
 }
 static void b9_1f90_w(uint8_t v)   // (_1f90_w)
@@ -498,7 +498,7 @@ static uint8_t spy_rd(void *ctx, uint16_t a)
 		return vid_r(a - 0x2000);
 	}
 	if (a < 0x8000)
-		return s_rom[(0x10000u + (uint32_t)t.mainbank * 0x2000 + (a - 0x6000)) % s_rom_size];
+		return s_rom[rbx_wrap((0x10000u + (uint32_t)t.mainbank * 0x2000 + (a - 0x6000)), s_rom_size)];
 	return s_rom[a];
 }
 static void spy_3f90_w(uint8_t v)   // (_3f90_w)

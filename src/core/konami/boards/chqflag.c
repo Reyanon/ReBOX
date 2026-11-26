@@ -224,7 +224,7 @@ static uint8_t port(int p) { return (uint8_t)rbx_port_read(p); }
 
 static void map_bank(void)
 {
-	const uint32_t base = ((uint32_t)t.mainbank * 0x4000u) % s_rom_size;
+	const uint32_t base = rbx_wrap(((uint32_t)t.mainbank * 0x4000u), s_rom_size);
 	for (int p = 0; p < 0x40; p++)
 		s_cpu.rpage[0x40 + p] = s_rom + base + (uint32_t)p * 256;
 }
@@ -283,9 +283,9 @@ static uint8_t main_rd(void *ctx, uint16_t a)
 	if (a >= 0x3400 && a < 0x3420)
 		return k051733_read(&s_k733, a - 0x3400);
 	if (a >= 0x4000 && a < 0x8000)
-		return s_rom[((uint32_t)t.mainbank * 0x4000u + (a - 0x4000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x4000u + (a - 0x4000)), s_rom_size)];
 	if (a >= 0x8000)
-		return s_rom[(0x48000u + (a - 0x8000)) % s_rom_size];
+		return s_rom[rbx_wrap((0x48000u + (a - 0x8000)), s_rom_size)];
 	return 0;
 }
 

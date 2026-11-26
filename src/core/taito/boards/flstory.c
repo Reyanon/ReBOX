@@ -396,7 +396,7 @@ static void draw_sprites_fl(void)
 			flipy = !flipy;
 		} else
 			sy = victnine_style ? 240 - sy + 1 : 240 - sy - 1;
-		const uint8_t *g = s_sprites + (code % s_nsprites) * 256;
+		const uint8_t *g = s_sprites + (rbx_wrap(code, s_nsprites)) * 256;
 		const uint16_t base = (uint16_t)(256 + (s[1] & 0x0f) * 16);
 		for (int rep = 0; rep < (sx > 240 ? 2 : 1); rep++) {
 			int ox = rep ? sx - 256 : sx;

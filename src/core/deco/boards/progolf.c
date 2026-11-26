@@ -148,7 +148,7 @@ static void pg_render(void)
 	const int scroll = s_snap->scroll_lo | ((s_snap->scroll_hi & 3) << 8);
 	for (int x = 0; x < 128; x++)   // the map, opaque, colour 1 (twice: the wrap-around)
 		for (int y = 0; y < 32; y++) {
-			const uint8_t *t = s_gfxchar.pix + (size_t)(s_snap->vram[x * 32 + y] % s_gfxchar.count) * 64;
+			const uint8_t *t = s_gfxchar.pix + (size_t)(rbx_wrap(s_snap->vram[x * 32 + y], s_gfxchar.count)) * 64;
 			for (int w = 0; w < 2; w++) {
 				const int sx = 256 - x * 8 + scroll - w * 1024;
 				if (sx <= -8 || sx >= 256)

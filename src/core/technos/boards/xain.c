@@ -89,7 +89,7 @@ static uint8_t snd_read(void *u, uint16_t a)
 		m6809_set_irq(&s_snd, 0);
 		return t->latch;
 	}
-	if (a >= 0x4000) return s_zrom[a % s_zrom_size];
+	if (a >= 0x4000) return s_zrom[rbx_wrap(a, s_zrom_size)];
 	return 0;
 }
 static void snd_write(void *u, uint16_t a, uint8_t v)
@@ -215,7 +215,7 @@ static void draw_bg(const vseg *sg, int n, const line_regs *r, int y, int opaque
 		const uint32_t col = tx >> 4;
 		const uint32_t idx = (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 		const uint8_t attr = vram[idx | 0x400];
-		const uint32_t code = (uint32_t)(vram[idx] | (attr & 7) << 8) % g->count;
+		const uint32_t code = rbx_wrap((uint32_t)(vram[idx] | (attr & 7) << 8), g->count);
 		const uint32_t px = attr & 0x80 ? 15 - (tx & 15) : tx & 15;
 		const uint8_t p = g->pix[code * 256 + fy * 16 + px];
 		if (p || opaque)
@@ -230,7 +230,7 @@ static void draw_char(const vseg *sg, const line_regs *r, int y, int opaque, uin
 		const uint32_t tx = (uint32_t)(r->flip ? 255 - x : x) & 255;
 		const uint32_t idx = (ty >> 3) * 32 + (tx >> 3);
 		const uint8_t attr = sg->chr[idx | 0x400];
-		const uint32_t code = (uint32_t)(sg->chr[idx] | (attr & 3) << 8) % s_gchar.count;
+		const uint32_t code = rbx_wrap((uint32_t)(sg->chr[idx] | (attr & 3) << 8), s_gchar.count);
 		const uint8_t p = s_gchar.pix[code * 64 + (ty & 7) * 8 + (tx & 7)];
 		if (p || opaque)
 			d[x] = (uint16_t)(((attr & 0xe0) >> 5) * 16 + p);

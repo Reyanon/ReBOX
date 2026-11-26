@@ -349,6 +349,13 @@
   "2nd stick Right": "2. sauva oikealle",
   "Pedal": "Poljin",
   "Pedal 2": "Poljin 2",
-  "Pedal 3": "Poljin 3"
+  "Pedal 3": "Poljin 3",
+  "Sound  >": "Ääni  >",
+  "SOUND": "ÄÄNI",
+  "Normalize": "Normalisointi",
+  "Volume": "Äänenvoimakkuus",
+  "Volume and the automatic level of the sound": "Äänenvoimakkuus ja automaattinen äänitaso",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Päällä: hiljaiset ja kovat pelit samalle tasolle (seuraa pelin tasoa). Pois: pelin oma taso",
+  "The volume of the games' sound": "Pelien äänen voimakkuus"
  }
 }

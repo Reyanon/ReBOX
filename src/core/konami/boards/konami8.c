@@ -643,7 +643,7 @@ static uint8_t sur_rd(void *ctx, uint16_t a)
 	if (a < 0x2000)
 		return t.ram[a];
 	if (a < 0x4000)
-		return s_rom[((uint32_t)t.mainbank * 0x2000 + (a - 0x2000)) % s_rom_size];
+		return s_rom[rbx_wrap(((uint32_t)t.mainbank * 0x2000 + (a - 0x2000)), s_rom_size)];
 	if (a < 0x8000) {
 		switch (a) {
 		case 0x5f8c: case 0x5f8d: return (uint8_t)rbx_port_read(s_port_p[a - 0x5f8c]);
@@ -729,7 +729,7 @@ static uint8_t rg_rd(void *ctx, uint16_t a)
 		return 0;
 	if (a < 0x8000) {   // (entries 0-5 the ROM's 16 KB pages, 6 and 7 its first two again)
 		const uint32_t e = t.mainbank < 6 ? t.mainbank : t.mainbank - 6u;
-		return s_rom[(e * 0x4000 + (a - 0x4000)) % s_rom_size];
+		return s_rom[rbx_wrap((e * 0x4000 + (a - 0x4000)), s_rom_size)];
 	}
 	return s_rom[0x18000 + (a - 0x8000)];
 }

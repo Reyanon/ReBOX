@@ -237,7 +237,7 @@ static void layer_line(int which, int by, uint16_t *d)
 		if (n > VIS_W - x)
 			n = VIS_W - x;
 		const uint8_t *b = map + 2 * ((tx >> 4) * 16 + row);
-		const uint32_t code = ((uint32_t)b[0x10001] << 8 | b[1]) % gfx->count;
+		const uint32_t code = rbx_wrap(((uint32_t)b[0x10001] << 8 | b[1]), gfx->count);
 		const int attr = b[0x10000];
 		const uint16_t c0 = (uint16_t)(base + (b[0] % 16) * 16);
 		const uint32_t py = (attr & 2) ? 15 - (ty & 15) : (ty & 15);
@@ -261,7 +261,7 @@ static void tx_line(int by, uint16_t *d)   // 64x32 of 8x8, 2 bits, pen 3 transp
 	for (int x = 0; x < VIS_W; x++) {
 		const uint32_t tx = (uint32_t)(flip ? 511 - (x + VIS_X0) : x + VIS_X0) & 511;
 		const uint16_t t = s_snap->vram[(ty >> 3) * 64 + (tx >> 3)];
-		const uint32_t code = (t & 0x3ffu) % s_gfxtx.count;
+		const uint32_t code = rbx_wrap((t & 0x3ffu), s_gfxtx.count);
 		const uint32_t px = (t & 0x400) ? 7 - (tx & 7) : (tx & 7), py = (t & 0x800) ? 7 - (ty & 7) : (ty & 7);
 		const uint8_t p = s_gfxtx.pix[code * 64 + py * 8 + px];
 		if (p != 3)

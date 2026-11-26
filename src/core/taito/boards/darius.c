@@ -329,7 +329,7 @@ static void draw_text(uint16_t *bm, int pitch)
 			int idx = ty * 128 + col;
 			uint16_t code = fg[idx + 0x2000] & 0x7ff, attr = fg[idx];
 			if (code >= s_txtgfx.count)
-				code = (uint16_t)(code % s_txtgfx.count);
+				code = (uint16_t)(rbx_wrap(code, s_txtgfx.count));
 			if (!s_txtgfx.used[code])
 				continue;
 			int fx = (attr & 0x4000) ? 7 : 0, fy = (attr & 0x8000) ? 7 : 0;

@@ -665,9 +665,9 @@ enum { LOOK_RAM0, LOOK_RAM1, LOOK_NONE, LOOK_ROM };
 static inline uint32_t look(int how, uint32_t code)
 {
 	switch (how) {
-	case LOOK_RAM0: return b.look[0][code % s_look_n[0]];
-	case LOOK_RAM1: return b.look[1][code % s_look_n[1]];
-	case LOOK_ROM: return s_lookrom_n ? rbx_be16(s_lookrom + 2 * (code % s_lookrom_n)) : 0;
+	case LOOK_RAM0: return b.look[0][rbx_wrap(code, s_look_n[0])];
+	case LOOK_RAM1: return b.look[1][rbx_wrap(code, s_look_n[1])];
+	case LOOK_ROM: return s_lookrom_n ? rbx_be16(s_lookrom + 2 * (rbx_wrap(code, s_lookrom_n))) : 0;
 	default: return code;
 	}
 }
@@ -758,7 +758,7 @@ static void spikes91_sprites(void)
 		const int flipx = (s[i + 3] >> 15) & 1;
 		const uint32_t color = (s[i + 3] & 0x00f0) >> 4;
 		code |= (uint32_t)b.spikes91_lookup << 13;
-		const uint32_t t = s_lookrom_n ? rbx_be16(s_lookrom + 2 * (code % s_lookrom_n)) : 0;
+		const uint32_t t = s_lookrom_n ? rbx_be16(s_lookrom + 2 * (rbx_wrap(code, s_lookrom_n))) : 0;
 		op_add(1, t, color, flipx, 0, xpos, ypos, 0x10000, 0x10000, 0, 0);
 		op_add(1, t, color, flipx, 0, xpos, ypos + 512, 0x10000, 0x10000, 0, 0);
 	}
@@ -819,7 +819,7 @@ static void aerfboo2_sprites(int chip, int chip_disabled_pri)
 			const int sy = flipy ? ((oy + zoomy * (ysize - y) / 2 + 16) & 0x1ff) - 16 : ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
 			for (int x = 0; x <= xsize; x++) {
 				const int sx = flipx ? ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16 : ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
-				const uint32_t code = b.look[chip][map % s_look_n[chip]];
+				const uint32_t code = b.look[chip][rbx_wrap(map, s_look_n[chip])];
 				op_add(chip, code, color, flipx, flipy, sx, sy, (uint32_t)zoomx << 11, (uint32_t)zoomy << 11, 1, pri ? 0 : 2);
 				map++;
 			}

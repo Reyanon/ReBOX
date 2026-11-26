@@ -1,0 +1,25 @@
+{
+ "code": "dan",
+ "name": "Dansk",
+ "english": "Danish",
+ "strings": {
+  "A cheat of cheats/<set>.xml: off, or one of its values": "En snydekode fra cheats/<set>.xml: fra eller en af dens værdier",
+  "Left/Right: change   Cheat files: cheats/<set>.xml": "Venstre/Højre: skift   Snydefiler: cheats/<set>.xml",
+  "No cheats: put %s.xml in cheats/": "Ingen snydekoder: læg %s.xml i cheats/",
+  "Start stage, infinite health and the cheats of cheats/<set>.xml": "Startbane, uendeligt liv og snydekoderne fra cheats/<set>.xml",
+  "2nd stick Up": "Pind 2 op",
+  "2nd stick Down": "Pind 2 ned",
+  "2nd stick Left": "Pind 2 venstre",
+  "2nd stick Right": "Pind 2 højre",
+  "Pedal": "Pedal",
+  "Pedal 2": "Pedal 2",
+  "Pedal 3": "Pedal 3",
+  "Sound  >": "Lyd  >",
+  "SOUND": "LYD",
+  "Normalize": "Normaliser",
+  "Volume": "Lydstyrke",
+  "Volume and the automatic level of the sound": "Lydstyrke og automatisk lydniveau",
+  "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Til: stille og høje spil på et lignende niveau (følger spillets niveau). Fra: spillets eget niveau",
+  "The volume of the games' sound": "Lydstyrken af spillenes lyd"
+ }
+}

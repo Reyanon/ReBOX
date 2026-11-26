@@ -155,7 +155,7 @@ static void gx_line(const k056832_t *k, int layer, const gx_layer *g, int y, int
 	const int pixrow = (py & 7) * 8, trow = py & 7;
 	const int x0 = s_vis_x0, x1 = s_vis_x0 + s_vis_w - 1;
 	for (int x = x0; x <= x1;) {
-		const int mx = (x + sx) % g->width;
+		const int mx = rbx_wrap((x + sx), g->width);
 		int n = 8 - (mx & 7);
 		if (n > x1 - x + 1)
 			n = x1 - x + 1;
