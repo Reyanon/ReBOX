@@ -133,7 +133,26 @@ static void sound_frame_end(void)
 // ---- bus ----
 static inline int searchar(void) { return s_mach == M_SEARCHAR; }
 
-static uint16_t rotary(int i) { return (uint16_t)(~(1u << (rbx_port_read(s_port[5 + i]) & 0xf))); }
+// the 12-way rotary joysticks (searchar, ikari3: MAME's ROT1 / ROT2 positional ports, 0 .. 11) on the right stick
+static int s_rotgame, s_rotary[2];
+static rbx_rotary s_rot[2];
+// (a step of the value turns the player 45 degrees. Its facing, read at RAM s_face (68000 byte addresses - 0x040000;
+// found with the harness; 0 = up): searchar 0x197 / 0x19b, clockwise; ikari3w / u / j 0x04d / 0x05f, anticlockwise.
+// In both a step of the value turns the player anticlockwise. -1: not known)
+static int s_face[2], s_face_neg;
+static int sk_facing(int p)
+{
+	if (s_face[p] < 0)
+		return -1;
+	const uint16_t w = s_ram[s_face[p] >> 1];
+	const int f = (s_face[p] & 1 ? w : w >> 8) & 7;
+	return s_face_neg ? (8 - f) & 7 : f;
+}
+static uint16_t rotary(int i)
+{
+	const uint32_t v = s_rotgame ? (uint32_t)s_rotary[i] : rbx_port_read(s_port[5 + i]);
+	return (uint16_t)(~(1u << (v & 0xf)));
+}
 
 static uint16_t main_read16(uint32_t a)
 {
@@ -416,6 +435,8 @@ static void sk_reset(void)
 	rbx_ym_reset(0);
 	upd7759_reset(&s_upd);
 	s_mix_n = 0;
+	s_rotary[0] = s_rotary[1] = 0;
+	memset(s_rot, 0, sizeof(s_rot));
 	m68k_bus_irq_reset();
 	m68k_pulse_reset();
 	s_cpu_frac = s_z80_frac = s_ym_frac = 0;
@@ -499,6 +520,14 @@ static int sk_init(const rbx_game *g)
 	static const char *const names[7] = { "P1", "P2", "SYSTEM", "DSW1", "DSW2", "ROT1", "ROT2" };
 	for (int i = 0; i < 7; i++)
 		s_port[i] = rbx_port_find(names[i]);
+	s_rotgame = rbx_port_has(s_port[5], RBX_IPT_POSITIONAL);
+	// (the right stick aims: not the 8-way joystick sets, ikari3 / ikari3k, which aim with the joystick)
+	const int sar = !strcmp(g->set, "searchar") || (g->parent && !strcmp(g->parent, "searchar"));
+	const int ik = !strcmp(g->set, "ikari3w") || !strcmp(g->set, "ikari3u") || !strcmp(g->set, "ikari3j");
+	s_face[0] = sar ? 0x197 : ik ? 0x04d : -1;
+	s_face[1] = sar ? 0x19b : ik ? 0x05f : -1;
+	s_face_neg = ik;
+	rbx_set_rstick_dial(s_rotgame && (sar || ik));
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
 	m68k_set_mame_timing(1);   // (MAME's DIVx / MULx / ADDQ.W An times)
@@ -537,6 +566,9 @@ static void sk_exit(void)
 static void sk_frame(void)
 {
 	rbx_audio.frame_mhz = FRAME_MHZ;
+	if (s_rotgame)
+		for (int p = 0; p < 2; p++)
+			s_rotary[p] = rbx_rotary_turn(&s_rot[p], p + 1, 12, s_rotary[p], -1, 8, sk_facing(p));
 	for (int line = 0; line < LINES; line++) {
 		if (line == VIS_Y0 + VIS_H) {   // the vblank: the frame drawn, irq1_line_hold
 			vblank_capture();
@@ -573,6 +605,8 @@ static int sk_state(void *ctx, int load)
 	rc |= upd7759_state(&s_upd, ctx, load, "upd");
 	rc |= rbx_ym_state(0, ctx, load);
 	rc |= rbx_state_io(ctx, "frac", fr, sizeof(fr));
+	if (s_rotgame)
+		rc |= rbx_state_io(ctx, "rot", s_rotary, sizeof(s_rotary));
 	if (!rc && load) {
 		m68k_set_context(cpu);
 		m68k_bus_set_irq_pending(irq[0]);

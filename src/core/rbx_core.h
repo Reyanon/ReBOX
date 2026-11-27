@@ -25,6 +25,7 @@ int rbx_game_flags(int i);            // RBX_GF_* (rbx.h)
 int rbx_game_find(const char *set);   // index or -1
 int rbx_game_players(int i);          // players with controls
 int rbx_game_buttons(int i);          // buttons of player 1
+int rbx_game_has_test(int i);         // the game has a test switch (MAME IPT_SERVICE: the board's test menu)
 int rbx_game_twin_stick(int i);       // the game has a second joystick (MAME JOYSTICKRIGHT_*: RBX_IN_RUP ..)
 const char *rbx_game_button_label(int i, int b);   // button b's (0..5) name ("R Paddle Forward"), or the pedal it works ("Pedal"), or NULL
 
@@ -122,6 +123,10 @@ void rbx_set_input(int player, uint32_t bits);  // player 0..3
 #define RBX_SYS_SERVICE 4       // service coin
 void rbx_set_system(uint32_t bits);
 void rbx_set_analog(int player, int axis, int delta);  // axis 0 = x, 1 = y (trackball counts per frame)
+// the right analog stick of a player (0..3), -128..127 from the centre, y down, in the game's screen orientation (the
+// frontend turns it as the d-pad for Rotate Vertical): rotary joysticks aim with it, dials turn by it (rbx_rotary_frame,
+// rbx_dial of rbx.h). 0, 0 = centred or none
+void rbx_set_rstick(int player, int x, int y);
 
 // run one frame. fb receives the visible screen (rbx_screen size, cfg bytes_per_pixel, pitch in bytes; NULL = no drawing).
 // audio receives interleaved stereo int16 at the output rate; returns the number of stereo samples written

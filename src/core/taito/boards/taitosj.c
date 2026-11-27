@@ -257,19 +257,30 @@ static void characterram_w(uint32_t offset, uint8_t data)
 	s_sprdirty[bank][sp >> 3] |= (uint8_t)(1 << (sp & 7));
 }
 
+// Front Line, The Tin Star, Wild Western (MAME's WWEST_INPUT1 / 2): the joystick of IN0 / IN1 (MAME's "right" one)
+// moves, that of IN3 / IN4 (the "left" one, 8 positions of the aiming knob) aims. The ports keep MAME's fields (the
+// tables are generated); the two swap their joystick bits so that the left stick / d-pad moves and the right stick
+// (the "second stick" keys) aims
+static int s_swapsticks;
+static uint8_t sticks(int p, int other)
+{
+	const uint8_t v = port8(s_p_in[p]);
+	return s_swapsticks ? (uint8_t)((v & 0xf0) | (port8(s_p_in[other]) & 0x0f)) : v;
+}
+
 static uint8_t io_d4_r(int o)
 {
 	switch (o) {
 	case 0: case 1: case 2: case 3: return s_collision[o];
 	case 4: case 5: case 6: case 7: return gfxrom_r();
-	case 8: return port8(s_p_in[0]);
-	case 9: return port8(s_p_in[1]);
+	case 8: return sticks(0, 3);
+	case 9: return sticks(1, 4);
 	case 10: return port8(s_p_dsw1);
 	case 11: return (uint8_t)(port8(s_p_in[2]) | (s_alpine ? s_protection : 0));
-	case 12: return port8(s_p_in[3]);
+	case 12: return sticks(3, 0);
 	case 13:
 		rbx_port_custom(s_p_in[4], 0xf0, (uint32_t)s_input4_f0 << 4);
-		return port8(s_p_in[4]);
+		return sticks(4, 1);
 	case 15: snd_sync(); return ay8910_data_r(&s_ay[0]);
 	}
 	return 0;
@@ -1038,6 +1049,7 @@ static int sj_init(const rbx_game *g)
 	static const char *const in[5] = { "IN0", "IN1", "IN2", "IN3", "IN4" };
 	for (int i = 0; i < 5; i++)
 		s_p_in[i] = rbx_port_find(in[i]);
+	s_swapsticks = rbx_port_has(s_p_in[0], RBX_IPT_JOYSTICKRIGHT_LEFT) && rbx_port_has(s_p_in[3], RBX_IPT_JOYSTICK_LEFT);
 	s_p_dsw1 = rbx_port_find("DSW1");
 	s_p_dsw2 = rbx_port_find("DSW2");
 	s_p_dsw3 = rbx_port_find("DSW3");

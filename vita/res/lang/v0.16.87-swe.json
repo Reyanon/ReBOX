@@ -1,0 +1,11 @@
+{
+ "code": "swe",
+ "name": "Svenska",
+ "english": "Swedish",
+ "strings": {
+  "Test mode": "Testläge",
+  "The board's test menu (settings kept in the game's EEPROM)": "Kortets testmeny (inställningar sparas i spelets EEPROM)",
+  "Test switch": "Testbrytare",
+  "Service switch": "Servicebrytare"
+ }
+}

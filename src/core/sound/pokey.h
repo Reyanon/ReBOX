@@ -15,7 +15,8 @@
     The skipping engine: clocks in which no counter wraps, no borrow fires and the output is unchanged are
     advanced arithmetically (polynomial indices, prescalers, counters, pots, keyboard scan counter); only
     the clocks where something happens run the full MAME step_one_clock. The result is identical to stepping
-    every clock (build with -DPOKEY_REFERENCE to step every clock, for comparison).
+    every clock (build with -DPOKEY_REFERENCE to step every clock, for comparison). A chip left counting with every
+    volume at 0 goes round a cycle of events: whole cycles are skipped then (pokey.c, the silent loop; exact too).
 
     Left out: the keyboard callback (no key is ever pressed: the scan counter runs, KBCODE stays 0x09);
     the SOD / OCLK output callbacks (the serial shift registers and their IRQs are kept, the serial input

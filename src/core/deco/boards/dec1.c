@@ -53,7 +53,12 @@ static uint32_t s_frame;
 static uint64_t s_cpu_frac, s_snd_frac, s_ym1_frac, s_ym2_frac;
 static uint8_t (*s_pri_buf_hp)[VIS_W * VIS_H];
 #define s_pri_buf (*s_pri_buf_hp)
-static int s_rotary[2];
+static int s_rotary[2];                    // (Midnight Resistance: 0 .. 11, before the reverse)
+static rbx_rotary s_rot[2];
+// (a step of the value clockwise turns the player 45 degrees clockwise. Its facing, x4, 0 = up: RAM 0x1021bc /
+// 0x102238, midresj 0x1021be / 0x10223a; found with the harness. -1: none, the bootleg with a joystick and midres2)
+static int s_face[2];
+static int mr_facing(int p) { return s_face[p] < 0 ? -1 : (s_ram[s_face[p] >> 1] >> 10) & 7; }
 static struct {
 	bac06_t tile[3];
 	uint16_t spriteram[0x400], pal[0x400], pri;
@@ -460,6 +465,7 @@ static void d1_reset(void)
 	s_oki_hold = 0;
 	s_mix_n = s_ym2_n = 0;
 	s_rotary[0] = s_rotary[1] = 0;
+	memset(s_rot, 0, sizeof(s_rot));
 	m68k_bus_irq_reset();
 	m68k_pulse_reset();
 	s_line = 0;
@@ -592,6 +598,15 @@ static int d1_init(const rbx_game *g)
 		s_snd65.write = snd65_w;
 	}
 	s_port_in = rbx_port_find("INPUTS");
+	// (the rotary aims with the right stick; midres2 turns by its button 3 and midresbj by its joystick, reading the
+	// rotary for nothing)
+	s_face[0] = s_face[1] = -1;
+	if (s_var == V_MIDRES && strcmp(g->set, "midres2") && strcmp(g->set, "midresbj")) {
+		const int j = !strcmp(g->set, "midresj") ? 2 : 0;
+		s_face[0] = 0x21bc + j;
+		s_face[1] = 0x2238 + j;
+	}
+	rbx_set_rstick_dial(s_face[0] >= 0);
 	s_port_sys = rbx_port_find("SYSTEM");
 	s_port_dsw = rbx_port_find("DSW");
 	m68k_bus_swap16(s_rom, s_rom_size);
@@ -642,11 +657,8 @@ static void d1_frame(void)
 {
 	rbx_audio.frame_mhz = FRAME_MHZ;
 	if (s_var == V_MIDRES)
-		for (int p = 0; p < 2; p++) {
-			s_rotary[p] = (s_rotary[p] + rbx_analog(p + 1, RBX_IPT_POSITIONAL)) % 12;
-			if (s_rotary[p] < 0)
-				s_rotary[p] += 12;
-		}
+		for (int p = 0; p < 2; p++)   // (the rotary: the positional control, 12 a turn, on the right stick)
+			s_rotary[p] = rbx_rotary_turn(&s_rot[p], p + 1, 12, s_rotary[p], 1, 8, mr_facing(p));
 	for (int line = 0; line < LINES; line++) {
 		s_line = line;
 		if (line == VIS_Y0 + VIS_H) {   // irq6_line_hold at vblank

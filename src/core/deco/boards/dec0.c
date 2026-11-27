@@ -54,7 +54,12 @@ static int s_line;
 static uint32_t s_frame;
 static uint64_t s_cpu_frac, s_snd_frac, s_mcu_frac, s_ym1_frac, s_ym2_frac;
 static uint8_t s_pri_buf[VIS_W * VIS_H];
-static int s_rotary[2];                    // (Heavy Barrel: 0 .. 11)
+static int s_rotary[2];                    // (Heavy Barrel: 0 .. 11, before the reverse)
+static rbx_rotary s_rot[2];
+// (a step of the value clockwise turns the player 45 degrees clockwise. Its facing, x4, 0 = up: RAM 0xff8066 /
+// 0xff80aa in hbarrel, found with the harness; the US sets not checked (no ROMs): -1, the right stick turns only)
+static int s_hb_face;
+static int hb_facing(int p) { return s_hb_face ? (s_ram[p ? 0x55 : 0x33] >> 10) & 7 : -1; }
 // the uPD4701s (Birdie Try, Bandit): the counters (12 bits), their starts (reset_x / y), x reversed
 static int32_t s_tb[2][2], s_tb_start[2][2];
 static struct {
@@ -563,6 +568,7 @@ static void dc_reset(void)
 	s_oki_hold = 0;
 	s_mix_n = s_ym2_n = 0;
 	s_rotary[0] = s_rotary[1] = 0;
+	memset(s_rot, 0, sizeof(s_rot));
 	memset(s_tb, 0, sizeof(s_tb));
 	memset(s_tb_start, 0, sizeof(s_tb_start));
 	m68k_bus_irq_reset();
@@ -702,6 +708,8 @@ static int dc_init(const rbx_game *g)
 	s_port_sys = rbx_port_find("SYSTEM");
 	s_port_dsw = rbx_port_find("DSW");
 	s_port_vbl = rbx_port_find("VBLANK");
+	rbx_set_rstick_dial(s_var == V_HBARREL);   // (the rotary aims with the right stick)
+	s_hb_face = !strcmp(g->set, "hbarrel");
 	m68k_bus_swap16(s_rom, s_rom_size);
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
@@ -744,11 +752,8 @@ static void dc_frame(void)
 {
 	rbx_audio.frame_mhz = FRAME_MHZ;
 	if (s_var == V_HBARREL)
-		for (int p = 0; p < 2; p++) {   // (the rotary: the positional control, 12 a turn)
-			s_rotary[p] = (s_rotary[p] + rbx_analog(p + 1, RBX_IPT_POSITIONAL)) % 12;
-			if (s_rotary[p] < 0)
-				s_rotary[p] += 12;
-		}
+		for (int p = 0; p < 2; p++)   // (the rotary: the positional control, 12 a turn, on the right stick)
+			s_rotary[p] = rbx_rotary_turn(&s_rot[p], p + 1, 12, s_rotary[p], 1, 8, hb_facing(p));
 	if (s_var == V_BIRDTRY || s_var == V_BANDIT)
 		for (int p = 0; p < 2; p++) {   // (the trackballs: key delta 24 x sensitivity 50%; x reversed)
 			s_tb[p][0] -= rbx_analog_dpad(p + 1, RBX_IPT_TRACKBALL_X, 12);

@@ -1,0 +1,11 @@
+{
+ "code": "pol",
+ "name": "Polski",
+ "english": "Polish",
+ "strings": {
+  "Test mode": "Tryb testowy",
+  "The board's test menu (settings kept in the game's EEPROM)": "Menu testowe płyty (ustawienia w EEPROM gry)",
+  "Test switch": "Przełącznik testu",
+  "Service switch": "Przełącznik serwisowy"
+ }
+}

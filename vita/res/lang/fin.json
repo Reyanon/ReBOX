@@ -356,6 +356,10 @@
   "Volume": "Äänenvoimakkuus",
   "Volume and the automatic level of the sound": "Äänenvoimakkuus ja automaattinen äänitaso",
   "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Päällä: hiljaiset ja kovat pelit samalle tasolle (seuraa pelin tasoa). Pois: pelin oma taso",
-  "The volume of the games' sound": "Pelien äänen voimakkuus"
+  "The volume of the games' sound": "Pelien äänen voimakkuus",
+  "Test mode": "Testitila",
+  "The board's test menu (settings kept in the game's EEPROM)": "Piirilevyn testivalikko (asetukset pelin EEPROMissa)",
+  "Test switch": "Testikytkin",
+  "Service switch": "Huoltokytkin"
  }
 }

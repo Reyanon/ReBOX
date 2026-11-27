@@ -1,0 +1,11 @@
+{
+ "code": "nor",
+ "name": "Norsk",
+ "english": "Norwegian",
+ "strings": {
+  "Test mode": "Testmodus",
+  "The board's test menu (settings kept in the game's EEPROM)": "Kortets testmeny (innstillinger lagret i spillets EEPROM)",
+  "Test switch": "Testbryter",
+  "Service switch": "Servicebryter"
+ }
+}

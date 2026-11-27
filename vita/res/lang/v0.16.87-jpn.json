@@ -1,0 +1,11 @@
+{
+ "code": "jpn",
+ "name": "日本語",
+ "english": "Japanese",
+ "strings": {
+  "Test mode": "テストモード",
+  "The board's test menu (settings kept in the game's EEPROM)": "基板のテストメニュー（設定はゲームのEEPROMに保存）",
+  "Test switch": "テストスイッチ",
+  "Service switch": "サービススイッチ"
+ }
+}

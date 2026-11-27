@@ -1,0 +1,11 @@
+{
+ "code": "fra",
+ "name": "Français",
+ "english": "French",
+ "strings": {
+  "Test mode": "Mode test",
+  "The board's test menu (settings kept in the game's EEPROM)": "Le menu de test de la carte (réglages gardés dans l'EEPROM du jeu)",
+  "Test switch": "Bouton test",
+  "Service switch": "Bouton service"
+ }
+}

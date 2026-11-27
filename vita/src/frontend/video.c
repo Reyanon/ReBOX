@@ -102,18 +102,35 @@ int rbx_video_init(void)
 static vita2d_texture *s_scan;
 static int s_scan_h, s_scan_type = -1, s_scan_strength = -1, s_scan_dest_h;
 
-// Integer: the largest whole-number scale that fits (as ReST-V; usually 2x, 3x for the small screens)
-static int int_scale(void)
+// Integer: whole-number scales per axis (as ReST-V; usually 2x, 3x for the small screens). The height takes the
+// largest scale that fits; the width the whole number nearest to the picture's 4:3 (3:4 turned a quarter), so a
+// board drawing each pixel twice across (Sega System 1/2: 512 x 224) is not shown twice as wide
+static int int_scale_y(void)
 {
 	if (DISP_W <= 0 || DISP_H <= 0)
 		return 1;
-	const int kw = SCREEN_W / DISP_W, kh = SCREEN_H / DISP_H, k = kw < kh ? kw : kh;
+	const int k = SCREEN_H / DISP_H;
+	return k < 1 ? 1 : k;
+}
+
+static int int_scale_x(void)
+{
+	if (DISP_W <= 0 || DISP_H <= 0)
+		return 1;
+	const float shape = (s_rot & 1) ? 3.0f / 4.0f : 4.0f / 3.0f;
+	const float par = shape * (float)DISP_H / (float)DISP_W;   // (a game pixel's width over its height on the CRT)
+	// (rounded up from x.25: only a picture more than about 2.1 times as wide as high takes the smaller width scale;
+	// System 32's 416 x 224 and CPS's 384 x 224 keep 2x)
+	int k = (int)(int_scale_y() * par + 0.75f);
+	const int kw = SCREEN_W / DISP_W;
+	if (k > kw)
+		k = kw;
 	return k < 1 ? 1 : k;
 }
 
 static int dest_height(void)
 {
-	return g_settings.aspect == RBX_ASPECT_INT2X ? DISP_H * int_scale() : SCREEN_H;
+	return g_settings.aspect == RBX_ASPECT_INT2X ? DISP_H * int_scale_y() : SCREEN_H;
 }
 
 static void build_scanlines(void)
@@ -350,8 +367,8 @@ static void draw_scaled(vita2d_texture *tex)
 		h = SCREEN_H;
 		break;
 	case RBX_ASPECT_INT2X: // integer scale (usually 2x, 640x480)
-		w = (float)DISP_W * int_scale();
-		h = (float)DISP_H * int_scale();
+		w = (float)DISP_W * int_scale_x();
+		h = (float)DISP_H * int_scale_y();
 		break;
 	default: // fit height 544 and keep 4:3 (3:4 when turned a quarter) -> 725x544 / 408x544
 		h = SCREEN_H;

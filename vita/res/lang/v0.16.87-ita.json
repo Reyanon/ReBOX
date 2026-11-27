@@ -1,0 +1,11 @@
+{
+ "code": "ita",
+ "name": "Italiano",
+ "english": "Italian",
+ "strings": {
+  "Test mode": "Modalità test",
+  "The board's test menu (settings kept in the game's EEPROM)": "Il menu di test della scheda (impostazioni nella EEPROM del gioco)",
+  "Test switch": "Interruttore test",
+  "Service switch": "Interruttore service"
+ }
+}

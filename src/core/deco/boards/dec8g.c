@@ -54,7 +54,11 @@ static bac06_t s_tile;
 static rbx_gfx s_gfx8, s_gfx16, s_gfxspr;
 static uint32_t s_palette[1024];          // (from the PROMs)
 static uint8_t s_scroll[4];                // (Gondomania / Garyo Retsuden: x MSB, x LSB, y MSB, y LSB)
-static int s_rotary[2];                    // (Gondomania: 0 .. 11)
+static int s_rotary[2];                    // (Gondomania: 0 .. 11, before the reverse)
+static rbx_rotary s_rot[2];
+// (a step of the value clockwise turns the player 45 degrees clockwise. Its facing, 0 = up: RAM 0x7d / 0x7f in gondo,
+// gondou and makyosen, found with the harness)
+static int go_facing(int p) { return s_ram[p ? 0x7f : 0x7d] & 7; }
 static uint8_t (*s_pri_buf_hp)[256 * 240];
 #define s_pri_buf (*s_pri_buf_hp)
 static int s_port_in[4], s_port_coin, s_port_dsw[2];
@@ -442,6 +446,7 @@ static void gb_reset(void)
 	memset(s_sprbuf, 0, sizeof(s_sprbuf));
 	memset(s_scroll, 0, sizeof(s_scroll));
 	s_rotary[0] = s_rotary[1] = 0;
+	memset(s_rot, 0, sizeof(s_rot));
 	memset(s_tile.vram, 0, sizeof(s_tile.vram));
 	memset(s_tile.rowscroll, 0, sizeof(s_tile.rowscroll));
 	memset(s_tile.colscroll, 0, sizeof(s_tile.colscroll));
@@ -596,6 +601,7 @@ static int gb_init(const rbx_game *g)
 	s_port_in[2] = rbx_port_find("IN2");
 	s_port_in[3] = rbx_port_find("IN3");
 	s_port_coin = rbx_port_find("COIN");
+	rbx_set_rstick_dial(s_var == V_GONDO);   // (the rotary aims with the right stick)
 	s_port_dsw[0] = rbx_port_find("DSW0");
 	s_port_dsw[1] = rbx_port_find("DSW1");
 	gb_reset();
@@ -636,11 +642,8 @@ static void gb_frame(void)
 {
 	rbx_audio.frame_mhz = FRAME_MHZ;
 	if (s_var == V_GONDO)
-		for (int p = 0; p < 2; p++) {   // (the rotary: the positional control, 12 a turn)
-			s_rotary[p] = (s_rotary[p] + rbx_analog(p + 1, RBX_IPT_POSITIONAL)) % 12;
-			if (s_rotary[p] < 0)
-				s_rotary[p] += 12;
-		}
+		for (int p = 0; p < 2; p++)   // (the rotary: the positional control, 12 a turn, on the right stick)
+			s_rotary[p] = rbx_rotary_turn(&s_rot[p], p + 1, 12, s_rotary[p], 1, 8, go_facing(p));
 	for (int line = 0; line < LINES; line++) {
 		s_line = line;
 		if (line == VIS_Y0 + VIS_H || line == VIS_Y0) {   // vblank: the NMI gate, the MCU's INT0

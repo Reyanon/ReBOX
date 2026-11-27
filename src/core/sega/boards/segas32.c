@@ -3080,6 +3080,14 @@ static void rebase(void)
 }
 
 // ---- inputs ----
+// a trackball's counts this frame: the d-pad at MAME's PORT_KEYDELTA(30), the analog stick (up to +-9) 7 counts a step,
+// so a full tilt spins it as a hand does (SegaSonic: 15 a frame on the d-pad and 9 on the stick could not run fast)
+static int track_delta(int pl, int type)
+{
+	const int v = rbx_analog(pl, type);
+	return v ? v * 7 : rbx_analog_dpad(pl, type, 30);
+}
+
 static void analog_frame(void)
 {
 	if (s_board == BD_ANALOG) {
@@ -3113,9 +3121,9 @@ static void analog_frame(void)
 		return;
 	for (int i = 0; i < 3; i++) {
 		if (s_port_tr[2 * i] >= 0)
-			b.upd_x[i] = (uint16_t)((b.upd_x[i] - rbx_analog_dpad(i + 1, RBX_IPT_TRACKBALL_X, 15)) & 0xfff);   // (TRACKX: PORT_REVERSE)
+			b.upd_x[i] = (uint16_t)((b.upd_x[i] - track_delta(i + 1, RBX_IPT_TRACKBALL_X)) & 0xfff);   // (TRACKX: PORT_REVERSE)
 		if (s_port_tr[2 * i + 1] >= 0)
-			b.upd_y[i] = (uint16_t)((b.upd_y[i] + rbx_analog_dpad(i + 1, RBX_IPT_TRACKBALL_Y, 15)) & 0xfff);
+			b.upd_y[i] = (uint16_t)((b.upd_y[i] + track_delta(i + 1, RBX_IPT_TRACKBALL_Y)) & 0xfff);
 	}
 }
 

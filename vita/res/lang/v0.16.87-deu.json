@@ -1,0 +1,11 @@
+{
+ "code": "deu",
+ "name": "Deutsch",
+ "english": "German",
+ "strings": {
+  "Test mode": "Testmodus",
+  "The board's test menu (settings kept in the game's EEPROM)": "Das Testmenü der Platine (Einstellungen im EEPROM des Spiels)",
+  "Test switch": "Testschalter",
+  "Service switch": "Serviceschalter"
+ }
+}

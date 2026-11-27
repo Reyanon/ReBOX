@@ -1,0 +1,11 @@
+{
+ "code": "kor",
+ "name": "한국어",
+ "english": "Korean",
+ "strings": {
+  "Test mode": "테스트 모드",
+  "The board's test menu (settings kept in the game's EEPROM)": "기판의 테스트 메뉴 (설정은 게임의 EEPROM 에 저장)",
+  "Test switch": "테스트 스위치",
+  "Service switch": "서비스 스위치"
+ }
+}

@@ -15,6 +15,7 @@
 #include "../machine/sched.h"
 #include "../machine/necidle.h"
 #include "../machine/seibusnd.h"
+#include "../../rbx_prof.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -263,13 +264,17 @@ static int da_render_help(int helper) { return decoband_help(&s_bands, helper); 
 static int64_t s_run0[2];
 static necidle_t s_ni[2];
 static int s_ab[2];
+// (the sampled profile, ADR-155: the two V30s, the frame's sound end; the scheduler and the sound Z80 are "driver")
+enum { DA_PA_V30A = RBX_PA_DRV, DA_PA_V30B, DA_PA_SNDEND, DA_PA_END };
+static const char *const s_da_pa_names[] = { "v30 main", "v30 sub", "sound end" };
 static int v30_run(int i, int n)
 {
 	s_run0[i] = s_cpu[i].total;
 	s_ab[i] = 0;
-	if (necidle_probe(&s_ni[i], n, s_run0[i], &s_ab[i]))
-		return (int)(s_cpu[i].total - s_run0[i]);
-	nec_run_until(&s_cpu[i], s_run0[i] + n);
+	const unsigned pa = rbx_prof_enter(DA_PA_V30A + (unsigned)i);
+	if (!necidle_probe(&s_ni[i], n, s_run0[i], &s_ab[i]))
+		nec_run_until(&s_cpu[i], s_run0[i] + n);
+	rbx_prof_leave(pa);
 	return (int)(s_cpu[i].total - s_run0[i]);
 }
 static int run0(int n) { return v30_run(0, n); }
@@ -326,7 +331,9 @@ static void da_frame(void)
 {
 	rbx_audio.frame_mhz = 60000;
 	sched_run(T_VBLANK, fire);
+	const unsigned pa = rbx_prof_enter(DA_PA_SNDEND);
 	seibusnd_frame_end(s_frame_as);
+	rbx_prof_leave(pa);
 	sched_rebase(s_frame_as);
 	s_vbl_start -= s_frame_as;
 }
@@ -437,12 +444,14 @@ static int da_init(const rbx_game *g)
 	sc.adpcm_size[1] = a2s;
 	sc.adpcm_gain = 102;   // (0.40)
 	sc.coin_port = rbx_port_find("COIN");
+	sc.ym_async = !getenv("RBX_FG_NOASYNC");   // (the two YM2203s' samples on the rbx_aux worker: the same sound)
 	memset(&b, 0, sizeof(b));
 	if (seibusnd_init(&sc)) {
 		da_exit();
 		rbx_fail("%s: out of memory", g->set);
 		return -1;
 	}
+	rbx_prof_name(RBX_PA_DRV, s_da_pa_names, DA_PA_END - RBX_PA_DRV);
 	nec_init(&s_cpu[0], NEC_V30, NULL);
 	nec_init(&s_cpu[1], NEC_V30, NULL);
 	s_cpu[0].irq_ack = vector0;

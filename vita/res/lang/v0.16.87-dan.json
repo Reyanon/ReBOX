@@ -1,0 +1,11 @@
+{
+ "code": "dan",
+ "name": "Dansk",
+ "english": "Danish",
+ "strings": {
+  "Test mode": "Testtilstand",
+  "The board's test menu (settings kept in the game's EEPROM)": "Kortets testmenu (indstillinger gemt i spillets EEPROM)",
+  "Test switch": "Testkontakt",
+  "Service switch": "Servicekontakt"
+ }
+}

@@ -90,6 +90,11 @@ static int line_pos(void) { return s_slice_pos + m68k_cycles_run(); }
 // ---- main bus ----
 static void main_irq4(int state) { m68k_bus_set_line(4, state); }
 
+// the spinners (DIAL0 / DIAL1, 8 bits): MAME's key delta 10 x sensitivity 60% a frame; on the right stick, the left
+// stick and the d-pad (the game has no joystick)
+static uint8_t s_dial[2];
+#define BL_DIAL_STEP 6
+
 static uint16_t in_r(int n)
 {
 	uint16_t v = (uint16_t)(rbx_port_read(s_port[2 + n]) & ~0x70u);
@@ -110,7 +115,7 @@ static uint16_t main_read16(uint32_t a)
 	if (o >= 0x2000) return s_pal[(o & 0x3ff) >> 1];
 	switch (o & 0x1c00) {
 	case 0x1400: return (uint16_t)(0xff00 | jsa_main_response_r());
-	case 0x1800: return (uint16_t)rbx_port_read(s_port[(o >> 2) & 1]);
+	case 0x1800: return (uint16_t)((rbx_port_read(s_port[(o >> 2) & 1]) & 0xff00) | s_dial[(o >> 2) & 1]);
 	case 0x1c00: return in_r((o >> 1) & 1);
 	}
 	return 0xffff;
@@ -210,6 +215,8 @@ static void bl_render(void)
 static void bl_frame(void)
 {
 	rbx_audio.frame_mhz = FRAME_MHZ;
+	for (int p = 0; p < 2; p++)
+		s_dial[p] = (uint8_t)(s_dial[p] + rbx_dial(p + 1, BL_DIAL_STEP, 1));
 	jsa_set_test((rbx_port_read(s_port[2]) >> 7) & 1);
 	jsa_frame_begin();
 	for (int line = 0; line < LINES; line++) {
@@ -261,6 +268,7 @@ static void bl_reset(void)
 	amo_set_xscroll(&s_mo, 0);
 	amo_set_yscroll(&s_mo, 0);
 	s_eep_unlocked = 0;
+	s_dial[0] = s_dial[1] = 0;
 	m68k_bus_irq_reset();
 	jsa_reset();
 	s_mdebt = 0;
@@ -316,6 +324,7 @@ static int bl_init(const rbx_game *g)
 	static const char *const names[5] = { "DIAL0", "DIAL1", "IN0", "IN1", "JSA" };
 	for (int i = 0; i < 5; i++)
 		s_port[i] = rbx_port_find(names[i]);
+	rbx_set_rstick_dial(1);   // (the spinners turn with the right stick too)
 	jsa_config jc;
 	memset(&jc, 0, sizeof(jc));
 	jc.type = 1;
@@ -394,6 +403,7 @@ static int bl_state(void *ctx, int load)
 	rc |= rbx_state_io(ctx, "prio", s_prio, sizeof(s_prio));
 	rc |= rbx_state_io(ctx, "eeprom", s_eeprom, sizeof(s_eeprom));
 	rc |= rbx_state_io(ctx, "regs", regs, sizeof(regs));
+	rc |= rbx_state_io(ctx, "dial", s_dial, sizeof(s_dial));
 	rc |= jsa_state(ctx, load);
 	if (!rc && load) {
 		m68k_set_context(cpu);

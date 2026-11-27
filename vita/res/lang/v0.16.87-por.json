@@ -1,0 +1,11 @@
+{
+ "code": "por",
+ "name": "Português",
+ "english": "Portuguese",
+ "strings": {
+  "Test mode": "Modo de teste",
+  "The board's test menu (settings kept in the game's EEPROM)": "O menu de teste da placa (definições guardadas na EEPROM do jogo)",
+  "Test switch": "Interruptor de teste",
+  "Service switch": "Interruptor de serviço"
+ }
+}

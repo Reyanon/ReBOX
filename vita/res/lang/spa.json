@@ -356,6 +356,10 @@
   "Volume": "Volumen",
   "Volume and the automatic level of the sound": "Volumen y nivel de sonido automático",
   "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Activado: juegos suaves y fuertes a un nivel parecido (sigue el nivel del juego). Desactivado: el nivel propio del juego",
-  "The volume of the games' sound": "El volumen del sonido de los juegos"
+  "The volume of the games' sound": "El volumen del sonido de los juegos",
+  "Test mode": "Modo test",
+  "The board's test menu (settings kept in the game's EEPROM)": "El menú de test de la placa (ajustes guardados en la EEPROM del juego)",
+  "Test switch": "Interruptor de test",
+  "Service switch": "Interruptor de servicio"
  }
 }

@@ -356,6 +356,10 @@
   "Volume": "Lydstyrke",
   "Volume and the automatic level of the sound": "Lydstyrke og automatisk lydniveau",
   "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Til: stille og høje spil på et lignende niveau (følger spillets niveau). Fra: spillets eget niveau",
-  "The volume of the games' sound": "Lydstyrken af spillenes lyd"
+  "The volume of the games' sound": "Lydstyrken af spillenes lyd",
+  "Test mode": "Testtilstand",
+  "The board's test menu (settings kept in the game's EEPROM)": "Kortets testmenu (indstillinger gemt i spillets EEPROM)",
+  "Test switch": "Testkontakt",
+  "Service switch": "Servicekontakt"
  }
 }

@@ -32,9 +32,9 @@ rbx_settings g_settings = {
 	.start_stage = 0,
 	.port = {
 		{ .keymap = { RBX_KEY_SQUARE, RBX_KEY_CROSS, RBX_KEY_SELECT, RBX_KEY_START, RBX_KEY_CIRCLE, RBX_KEY_TRIANGLE, RBX_KEY_L,
-			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
+			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT, RBX_KEY_NONE, RBX_KEY_NONE }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
 		{ .keymap = { RBX_KEY_SQUARE, RBX_KEY_CROSS, RBX_KEY_SELECT, RBX_KEY_START, RBX_KEY_CIRCLE, RBX_KEY_TRIANGLE, RBX_KEY_L,
-			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
+			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT, RBX_KEY_NONE, RBX_KEY_NONE }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
 	},
 	.cheat_health = 0,
 	.dip_count = 2,
@@ -55,9 +55,10 @@ rbx_settings g_settings = {
 };
 
 static const char *const s_keymap_keys[RBX_ACT_COUNT] = { "key_attack", "key_jump", "key_coin", "key_start",
-	"key_b3", "key_b4", "key_b5", "key_b6", "key_rup", "key_rdown", "key_rleft", "key_rright" };
+	"key_b3", "key_b4", "key_b5", "key_b6", "key_rup", "key_rdown", "key_rleft", "key_rright", "key_test", "key_service" };
 static const char *const s_keymap2_keys[RBX_ACT_COUNT] = { "key2_attack", "key2_jump", "key2_coin", "key2_start",
-	"key2_b3", "key2_b4", "key2_b5", "key2_b6", "key2_rup", "key2_rdown", "key2_rleft", "key2_rright" };
+	"key2_b3", "key2_b4", "key2_b5", "key2_b6", "key2_rup", "key2_rdown", "key2_rleft", "key2_rright", "key2_test",
+	"key2_service" };
 
 // a stick as the d-pad, or pressing nothing
 void rbx_stick_preset(rbx_port *p, int st, int dpad)
@@ -81,6 +82,7 @@ void rbx_settings_default_port(int port)
 	p->keymap[RBX_ACT_B6] = RBX_KEY_R;
 	for (int d = 0; d < 4; d++)   // (the second joystick: the right stick)
 		p->keymap[RBX_ACT_R_UP + d] = RBX_KEY_RUP + d;
+	p->keymap[RBX_ACT_TEST] = p->keymap[RBX_ACT_SERVICE] = RBX_KEY_NONE;
 	p->turbo_key = RBX_KEY_NONE;
 	p->turbo_btn = 1;
 	p->turbo_speed = RBX_TURBO_FAST;

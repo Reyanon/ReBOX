@@ -649,12 +649,15 @@ static void act_remove(int a, int x) // (the ones after it move up)
 }
 // a twin-stick game's second joystick on the page (the running game's; not in list options)
 static int ctrl_twin(void) { return !s_list_mode && rbx_core_twin_stick(); }
-static int ctrl_acts(void) { return ctrl_buttons() + (ctrl_twin() ? 4 : 0) + 2; }
-// the actions on the page: the game's buttons, its second joystick (twin-stick games), coin, start
+// a game with a test switch: its test and service switches on the page (the running game's, the first player's)
+static int ctrl_test(void) { return !s_list_mode && s_kp == 0 && rbx_core_has_test(); }
+static int ctrl_acts(void) { return ctrl_buttons() + (ctrl_twin() ? 4 : 0) + 2 + (ctrl_test() ? 2 : 0); }
+// the actions on the page: the game's buttons, its second joystick (twin-stick games), coin, start, test, service
 static int act_of(int j)
 {
 	const int b = ctrl_buttons(), r = ctrl_twin() ? 4 : 0;
-	return j < b ? button_act(j) : j < b + r ? RBX_ACT_R_UP + (j - b) : j == b + r ? RBX_ACT_COIN : RBX_ACT_START;
+	return j < b ? button_act(j) : j < b + r ? RBX_ACT_R_UP + (j - b) : j == b + r ? RBX_ACT_COIN :
+	       j == b + r + 1 ? RBX_ACT_START : j == b + r + 2 ? RBX_ACT_TEST : RBX_ACT_SERVICE;
 }
 // an action the running game uses (its buttons, its second joystick, coin, start)
 static int act_used(int a)
@@ -750,7 +753,7 @@ static int row_kind(int i, int *act)
 static const char *act_name(int act)
 {
 	static const char *const n[RBX_ACT_COUNT] = { "Button 1", "Button 2", "Coin", "Start", "Button 3", "Button 4", "Button 5",
-		"Button 6", "2nd stick Up", "2nd stick Down", "2nd stick Left", "2nd stick Right" };
+		"Button 6", "2nd stick Up", "2nd stick Down", "2nd stick Left", "2nd stick Right", "Test switch", "Service switch" };
 	// a button's name in the running game: MAME's ("Button 2 (R Paddle Forward)") or a pedal it works ("Button 1 (Pedal)")
 	const int b = act == RBX_ACT_ATTACK ? 0 : act == RBX_ACT_JUMP ? 1 : act >= RBX_ACT_B3 && act <= RBX_ACT_B6 ? act - RBX_ACT_B3 + 2 : -1;
 	const char *what = b >= 0 && !s_list_mode ? rbx_core_button_label(b) : NULL;
@@ -800,6 +803,9 @@ static int key_uses(KeyUse *u)
 	}
 	u[n++] = (KeyUse){ prt()->keymap[RBX_ACT_COIN], RBX_ACT_COIN, "Coin" };
 	u[n++] = (KeyUse){ prt()->keymap[RBX_ACT_START], RBX_ACT_START, "Start" };
+	for (int a = RBX_ACT_TEST; a <= RBX_ACT_SERVICE; a++)
+		if (act_used(a) && prt()->keymap[a] < RBX_KEY_COUNT)
+			u[n++] = (KeyUse){ prt()->keymap[a], a, act_name(a) };
 	for (int a = 0; a < RBX_ACT_COUNT; a++)
 		for (int x = 0; x < RBX_KEY_EXTRA; x++)
 			if (prt()->keyx[a][x] < RBX_KEY_COUNT && act_used(a))
@@ -854,9 +860,11 @@ static void warn_clash(int key, int func)
 	(void)func;
 }
 
-// DIP switch page: the groups, Restore defaults, Back. Cheat page: (nbbatman family) two built-in cheats, the user cheat
+// DIP switch page: the groups, Test mode (a game with a test switch), Restore defaults, Back. Cheat page: (nbbatman family) two built-in cheats, the user cheat
 // file's cheats (cheats/<set>.xml), Back
-static int dip_items(void) { return rbx_core_dip_count() + 2; }
+static int dip_items(void) { return rbx_core_dip_count() + (rbx_core_has_test() ? 1 : 0) + 2; }
+static int dip_test_row(void) { return rbx_core_has_test() ? rbx_core_dip_count() : -1; }
+static int dips_open(void) { return rbx_core_dip_count() > 0 || rbx_core_has_test(); }
 enum { HK_STAGE, HK_HEALTH, HK_FILE, HK_BACK };
 static int cheat_rows(void) { return (rbx_core_has_cheats() ? 2 : 0) + rbx_core_cheat_count() + 1; }
 static int cheat_kind(int row, int *idx)
@@ -989,6 +997,8 @@ static const char *page_row_help(void)
 	case PAGE_DIPS:
 		if (s_sel < rbx_core_dip_count())
 			return "A DIP switch of the board, as on the cabinet. Some settings take effect after Reset game";
+		if (s_sel == dip_test_row())
+			return "The board's test menu (settings kept in the game's EEPROM)";
 		return s_sel == dip_items() - 2 ? "Every DIP switch back to the game's defaults" : NULL;
 	case PAGE_CHEATS: {
 		int ci = 0;
@@ -2195,7 +2205,7 @@ static rbx_menu_result confirm(void)
 		case M_SOUND: go_page(PAGE_SOUND); break;
 		case M_CONTROLS: go_page(PAGE_CONTROLS); break;
 		case M_DIPS:
-			if (rbx_core_dip_count() > 0)
+			if (dips_open())
 				go_page(PAGE_DIPS);
 			else
 				rbx_osd_show(T("No DIP switches for %s"), s_set);
@@ -2286,7 +2296,10 @@ static rbx_menu_result confirm(void)
 	}
 	case PAGE_DIPS:
 		if (s_sel == dip_items() - 1) go_page(PAGE_MAIN);
-		else if (s_sel == dip_items() - 2) {
+		else if (s_sel == dip_test_row()) {
+			rbx_core_test_pulse();   // (back to the game with the test switch pressed for a few frames)
+			return RBX_MENU_CLOSE;
+		} else if (s_sel == dip_items() - 2) {
 			rbx_core_dip_defaults();
 			save_dips();
 			s_changed = 1;
@@ -3484,7 +3497,7 @@ static void menu_paint(UiCanvas *c, int overlay)
 			}
 			if (k == M_CHEATS && !any_cheats())
 				name = "Cheats (none for this game)";
-			if (k == M_DIPS && rbx_core_dip_count() <= 0)
+			if (k == M_DIPS && !dips_open())
 				name = "DIP switches (none)";
 			item(c, px, ty, i, s_sel, name, k == M_GROUP ? s_group_name[g_settings.list_group] : NULL);
 			break;
@@ -3620,7 +3633,7 @@ static void menu_paint(UiCanvas *c, int overlay)
 				const int o = rbx_core_dip_get(i);
 				item(c, px, ty, i, s_sel, rbx_core_dip_name(i), o < 0 ? "?" : rbx_core_dip_option_name(i, o));
 			} else
-				item(c, px, ty, i, s_sel, i == n - 2 ? "Restore defaults" : "Back", NULL);
+				item(c, px, ty, i, s_sel, i == dip_test_row() ? "Test mode" : i == n - 2 ? "Restore defaults" : "Back", NULL);
 			break;
 		case PAGE_CHEATS: {
 			int ci = 0;

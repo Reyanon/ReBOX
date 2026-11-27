@@ -1,0 +1,11 @@
+{
+ "code": "nld",
+ "name": "Nederlands",
+ "english": "Dutch",
+ "strings": {
+  "Test mode": "Testmodus",
+  "The board's test menu (settings kept in the game's EEPROM)": "Het testmenu van het bord (instellingen in de EEPROM van het spel)",
+  "Test switch": "Testschakelaar",
+  "Service switch": "Serviceschakelaar"
+ }
+}

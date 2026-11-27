@@ -356,6 +356,10 @@
   "Volume": "Lautstärke",
   "Volume and the automatic level of the sound": "Lautstärke und automatische Pegelanpassung",
   "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Ein: leise und laute Spiele etwa gleich laut (folgt dem Pegel des Spiels). Aus: der eigene Pegel des Spiels",
-  "The volume of the games' sound": "Die Lautstärke des Spieltons"
+  "The volume of the games' sound": "Die Lautstärke des Spieltons",
+  "Test mode": "Testmodus",
+  "The board's test menu (settings kept in the game's EEPROM)": "Das Testmenü der Platine (Einstellungen im EEPROM des Spiels)",
+  "Test switch": "Testschalter",
+  "Service switch": "Serviceschalter"
  }
 }

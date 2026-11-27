@@ -1,0 +1,11 @@
+{
+ "code": "spa",
+ "name": "Español",
+ "english": "Spanish",
+ "strings": {
+  "Test mode": "Modo test",
+  "The board's test menu (settings kept in the game's EEPROM)": "El menú de test de la placa (ajustes guardados en la EEPROM del juego)",
+  "Test switch": "Interruptor de test",
+  "Service switch": "Interruptor de servicio"
+ }
+}

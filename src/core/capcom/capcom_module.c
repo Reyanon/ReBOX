@@ -7,6 +7,7 @@
 
 #include "gen/cps1.inc"
 #include "gen/cps2.inc"
+#include "cps2_wide.inc"
 #include "gen/cps3.inc"
 #include "gen/lastduel.inc"
 #include "gen/bionicc.inc"
@@ -53,6 +54,7 @@ extern const rbx_driver rbx_drv_sidearms;
 static const rbx_board_tab s_boards[] = {
 	{ cps1_games, CPS1_GAME_COUNT, &rbx_drv_cps1 },
 	{ cps2_games, CPS2_GAME_COUNT, &rbx_drv_cps1 },   // (one driver: CPS2 shares the CPS-A / CPS-B video)
+	{ cps2_wide_games, CPS2_WIDE_GAME_COUNT, &rbx_drv_cps1 },   // (CPS-2 WIDE v1: Vampire Saved)
 	{ cps3_games, CPS3_GAME_COUNT, &rbx_drv_cps3 },
 	{ lastduel_games, LASTDUEL_GAME_COUNT, &rbx_drv_lastduel },
 	{ bionicc_games, BIONICC_GAME_COUNT, &rbx_drv_bionicc },

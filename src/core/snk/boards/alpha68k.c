@@ -248,7 +248,19 @@ static void trigger_V(uint32_t offset)
 }
 
 // ---- bus ----
-static uint32_t rot(int i) { return ~(1u << (rbx_port_read(s_port[i]) & 31)); }
+// the 12-way rotary joysticks (timesold, btlfield: MAME's IN5 / IN6 positional ports, 0 .. 11) on the right stick
+static int s_rotgame, s_rotary[2];
+static rbx_rotary s_rot[2];
+// (the game reads the switch as it is, 12 directions: the player's facing is the value; AK_ROT_UP the value aiming up
+// on the screen, AK_ROT_CW 1 when a growing value turns it clockwise. Its copy in RAM 0x040016 / 0x040017 is 11 - value)
+#define AK_ROT_UP 11
+#define AK_ROT_CW -1
+static int ak_facing(int p) { return ((s_rotary[p] - AK_ROT_UP) * AK_ROT_CW % 12 + 12) % 12; }
+static uint32_t rot(int i)
+{
+	const uint32_t v = s_rotgame ? (uint32_t)s_rotary[i - 5] : rbx_port_read(s_port[i]);
+	return ~(1u << (v & 31));
+}
 
 static uint16_t control_1(void)
 {
@@ -517,6 +529,8 @@ static void ak_reset(void)
 	memset(s_spriteram, 0, sizeof(s_spriteram));
 	memset(s_pal, 0, sizeof(s_pal));
 	memset(s_palsh, 0, sizeof(s_palsh));
+	s_rotary[0] = s_rotary[1] = 0;
+	memset(s_rot, 0, sizeof(s_rot));
 	s_bank_base = s_outlatch = 0;
 	s_deposits1 = s_deposits2 = s_credits = s_coinvalue = s_mcu_data = s_mcu_latch = 0;
 	s_latch = s_zbank = s_nmi_mask = s_pa_latch = 0;
@@ -645,6 +659,8 @@ static int ak_init(const rbx_game *g)
 	static const char *const names[7] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6" };
 	for (int i = 0; i < 7; i++)
 		s_port[i] = rbx_port_find(names[i]);
+	s_rotgame = s_board == B_II && rbx_port_has(s_port[5], RBX_IPT_POSITIONAL);
+	rbx_set_rstick_dial(s_rotgame);
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
 	m68k_set_mame_timing(1);
@@ -681,6 +697,9 @@ static void ak_exit(void)
 static void ak_frame(void)
 {
 	rbx_audio.frame_mhz = FRAME_MHZ;
+	if (s_rotgame)
+		for (int p = 0; p < 2; p++)
+			s_rotary[p] = rbx_rotary_turn(&s_rot[p], p + 1, 12, s_rotary[p], AK_ROT_CW, 12, ak_facing(p));
 	const uint64_t irq2_step = (uint64_t)FRAME_MHZ * LINES;
 	for (int line = 0; line < LINES; line++) {
 		if (line == VIS_Y0 + VIS_H) {   // the vblank: the frame drawn, the IRQ held
@@ -728,6 +747,8 @@ static int ak_state(void *ctx, int load)
 	rc |= rbx_ym_state(0, ctx, load);
 	rc |= rbx_ym_state(1, ctx, load);
 	rc |= rbx_state_io(ctx, "frac", fr, sizeof(fr));
+	if (s_rotgame)
+		rc |= rbx_state_io(ctx, "rot", s_rotary, sizeof(s_rotary));
 	if (!rc && load) {
 		m68k_set_context(cpu);
 		m68k_bus_set_irq_pending(irq[0]);

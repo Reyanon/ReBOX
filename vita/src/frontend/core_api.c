@@ -13,6 +13,8 @@
 
 static uint32_t s_in[4];
 static uint32_t s_sys;
+static uint32_t s_keys_sys;   // (the test / service switch keys of the Controls page: kept apart from the medal coin)
+static int s_test_pulse;      // (frames the menu's "Test mode" still holds the test switch)
 
 void rbx_core_set_input(int index, int pressed)
 {
@@ -43,6 +45,19 @@ void rbx_core_set_input(int index, int pressed)
 void rbx_core_set_service(int test, int coin)
 {
 	s_sys = (test ? RBX_SYS_TEST : 0) | (coin ? RBX_SYS_SERVICE : 0);
+}
+
+void rbx_core_set_test_keys(int test, int service)
+{
+	s_keys_sys = (test ? RBX_SYS_TEST : 0) | (service ? RBX_SYS_SERVICE : 0);
+}
+
+void rbx_core_test_pulse(void) { s_test_pulse = 8; }
+
+int rbx_core_has_test(void)
+{
+	const int g = rbx_running_game();
+	return g >= 0 && rbx_game_has_test(g);
 }
 
 const char *rbx_core_game_set(int i) { return rbx_game_set(i); }
@@ -84,7 +99,12 @@ int rbx_core_run_frame(void *fb, int pitch, int16_t *audio, int max)
 {
 	for (int p = 0; p < 4; p++)
 		rbx_set_input(p, s_in[p]);
-	rbx_set_system(s_sys);
+	uint32_t sys = s_sys | s_keys_sys;
+	if (s_test_pulse > 0) {   // (pressed for a few frames, then let go: the boards' test switches are buttons)
+		s_test_pulse--;
+		sys |= RBX_SYS_TEST;
+	}
+	rbx_set_system(sys);
 	return rbx_run_frame(fb, pitch, audio, max);
 }
 

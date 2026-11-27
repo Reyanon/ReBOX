@@ -1,0 +1,11 @@
+{
+ "code": "fin",
+ "name": "Suomi",
+ "english": "Finnish",
+ "strings": {
+  "Test mode": "Testitila",
+  "The board's test menu (settings kept in the game's EEPROM)": "Piirilevyn testivalikko (asetukset pelin EEPROMissa)",
+  "Test switch": "Testikytkin",
+  "Service switch": "Huoltokytkin"
+ }
+}

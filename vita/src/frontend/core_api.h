@@ -33,6 +33,9 @@ void rbx_core_set_input(int index, int pressed);
 int rbx_core_twin_stick(void);   // the running game has a second joystick (Smash TV): the right stick is it
 const char *rbx_core_button_label(int b);   // what the running game's button b (0..) works besides a button ("Pedal"), or NULL
 void rbx_core_set_service(int test, int coin);   // test switch, service coin
+void rbx_core_set_test_keys(int test, int service);   // the test / service switch keys (the Controls page's)
+void rbx_core_test_pulse(void);   // the test switch pressed for a few frames (the menu's "Test mode")
+int rbx_core_has_test(void);      // the running game has a test switch (MAME IPT_SERVICE: the board's test menu)
 
 const char *rbx_core_game_set(int i);
 const char *rbx_core_game_parent(int i);

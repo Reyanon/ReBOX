@@ -109,6 +109,7 @@ static uint32_t s_araw_size;
 // ---- CPS2 ----
 #define CPS2_CLOCK 11800000      // (16 MHz x 0.7375: MAME's clock scale for the wait states not emulated)
 static int s_cps2, s_cps2_dead, s_cps2_vol;
+static int s_cps2_wide;   // (CPS-2 WIDE v1, src/core/capcom/cps2_wide.inc: program 6 MB, 19-bit sprite tiles)
 static struct {
 	uint16_t objram[2][0x1000];
 	uint16_t output[6];         // 0x400000: the object output (CPS2_OBJ_BASE, UNK1, PRI, UNK2, XOFFS, YOFFS)
@@ -451,6 +452,8 @@ static uint16_t c2_r16(uint32_t a)
 	a &= 0xfffffe;
 	if (a >= 0x400000 && a < 0x40000c)
 		return s_c2out[(a - 0x400000) >> 1];
+	if (s_cps2_wide && a >= 0x400000 && a < 0x600000)   // (cps2_wide_map: ROM around the output registers)
+		return ((const uint16_t *)s_rom)[a >> 1];
 	if (a >= 0x618000 && a < 0x61a000)
 		return (uint16_t)(q.shared[0][(a - 0x618000) >> 1] | 0xff00);
 	if (a == 0x664000)
@@ -801,7 +804,8 @@ static void draw_sprites2(int y0, int y1)
 	for (int i = 0; i <= last; i += 4) {
 		int x = base[i + 0], y = base[i + 1];
 		const int priority = (x >> 13) & 7;
-		const int code = base[i + 2] + ((y & 0x6000) << 3);
+		// (CPS-2 WIDE v1: the y-word's bit 12 is the 19th tile bit, moved to bit 15 after the list was walked)
+		const int code = base[i + 2] + ((s_cps2_wide ? ((y & 0x1000) ? (y | 0x8000) : y) & 0xe000 : (y & 0x6000)) << 3);
 		const int colour = base[i + 3], col = colour & 0x1f;
 		const int flipx = (colour >> 5) & 1, flipy = (colour >> 6) & 1;
 		if (colour & 0x80) {
@@ -1076,11 +1080,8 @@ static void qsound_frame(void);
 static void cps2_frame(void);
 static void upd_frame(void)   // (upd4701_device::update: the dials' movement this frame counted)
 {
-	for (int p = 0; p < 2; p++) {
-		const uint32_t in = rbx_input(p + 1);
-		const int d = ((in & RBX_IN_RRIGHT) ? UPD_STEP : 0) - ((in & RBX_IN_RLEFT) ? UPD_STEP : 0);
-		s_ud.cnt[p] = (uint16_t)(s_ud.cnt[p] + d);
-	}
+	for (int p = 0; p < 2; p++)   // (the right stick by how far it is pushed, else its keys at the full step)
+		s_ud.cnt[p] = (uint16_t)(s_ud.cnt[p] + rbx_dial(p + 1, UPD_STEP, 0));
 }
 
 static void cps1_frame(void)
@@ -1262,7 +1263,8 @@ static int cps1_supported(const char *machine)
 {
 	return !strcmp(machine, "cps1_10MHz") || !strcmp(machine, "cps1_12MHz") || !strcmp(machine, "forgottn") ||
 	       !strcmp(machine, "qsound") || !strcmp(machine, "pang3") || !strcmp(machine, "cps2") ||
-	       !strcmp(machine, "cps2comm") || !strcmp(machine, "dead_cps2") || !strcmp(machine, "dead_cps2comm");
+	       !strcmp(machine, "cps2comm") || !strcmp(machine, "dead_cps2") || !strcmp(machine, "dead_cps2comm") ||
+	       !strcmp(machine, "cps2wide");
 }
 
 static void c2_unshuffle(uint64_t *buf, int len)
@@ -1319,7 +1321,9 @@ static int cps1_init(const rbx_game *g)
 		rbx_fail("%s: machine %s not emulated", g->set, g->machine);
 		return -1;
 	}
-	s_cps2 = !strcmp(g->machine, "cps2") || !strcmp(g->machine, "cps2comm") || !strncmp(g->machine, "dead_cps2", 9);
+	s_cps2_wide = !strcmp(g->machine, "cps2wide");
+	s_cps2 = !strcmp(g->machine, "cps2") || !strcmp(g->machine, "cps2comm") || !strncmp(g->machine, "dead_cps2", 9) ||
+	         s_cps2_wide;
 	s_cps2_dead = !strncmp(g->machine, "dead_cps2", 9);
 	s_cfg = NULL;
 	for (const struct CPS1config *c = cps1_config_table; c->name; c++)
@@ -1426,6 +1430,8 @@ static int cps1_init(const rbx_game *g)
 	m68k_bus.write8 = s_cps2 ? c2_w8 : main_w8;
 	m68k_bus.write16 = s_cps2 ? c2_w16 : main_w16;
 	m68k_bus_map(0, 0x3fffff, s_rom, s_rom_size, 1, 0);
+	if (s_cps2_wide && s_rom_size >= 0x600000)   // (the page with the output registers through c2_r16)
+		m68k_bus_map(0x410000, 0x5fffff, s_rom + 0x410000, 0x1f0000, 1, 0);
 	m68k_bus_map(0x900000, 0x92ffff, b.gfxram, 0x30000, 1, 1);
 	m68k_bus_map(0xff0000, 0xffffff, b.ram, 0x10000, 1, 1);
 	if (s_cps2) {

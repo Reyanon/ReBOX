@@ -356,6 +356,10 @@
   "Volume": "Głośność",
   "Volume and the automatic level of the sound": "Głośność i automatyczny poziom dźwięku",
   "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Wł.: ciche i głośne gry na podobnym poziomie (podąża za poziomem gry). Wył.: własny poziom gry",
-  "The volume of the games' sound": "Głośność dźwięku gier"
+  "The volume of the games' sound": "Głośność dźwięku gier",
+  "Test mode": "Tryb testowy",
+  "The board's test menu (settings kept in the game's EEPROM)": "Menu testowe płyty (ustawienia w EEPROM gry)",
+  "Test switch": "Przełącznik testu",
+  "Service switch": "Przełącznik serwisowy"
  }
 }

@@ -520,20 +520,43 @@ static uint32_t next_event(const pokey_t *p)
 #endif
 }
 
+// (v + n) mod m for v < m; the division only for a long n (the clocks between events are mostly a few: the
+// Cortex-A9 has no divide instruction)
+static inline uint32_t add_mod(uint32_t v, uint32_t n, uint32_t m)
+{
+	if (n >= m)
+		n %= m;
+	v += n;
+	return v >= m ? v - m : v;
+}
+
+// c + n prescaler clocks of the period div: the ticks, c left at the rest
+static inline uint32_t prescale(int32_t *c, uint32_t n, uint32_t div)
+{
+	uint32_t v = (uint32_t)*c + n, t = 0;
+	if (v >= div) {
+		if (v < 2 * div) {
+			v -= div;
+			t = 1;
+		} else {
+			t = v / div;
+			v -= t * div;
+		}
+	}
+	*c = (int32_t)v;
+	return t;
+}
+
 // n clocks without an event (n < the clocks next_event gave)
 static void fast_forward(pokey_t *p, uint32_t n)
 {
 	if (p->SKCTL & SK_RESET) {
-		p->p4 = (p->p4 + n % 0x0f) % 0x0f;
-		p->p5 = (p->p5 + n % 0x1f) % 0x1f;
-		p->p9 = (p->p9 + n % 0x1ff) % 0x1ff;
-		p->p17 = (p->p17 + n % P17_LEN) % P17_LEN;
-		const uint32_t c28 = (uint32_t)p->clock_cnt[CLK_28] + n;
-		const uint32_t t28 = c28 / DIV_64;
-		p->clock_cnt[CLK_28] = (int32_t)(c28 % DIV_64);
-		const uint32_t c114 = (uint32_t)p->clock_cnt[CLK_114] + n;
-		const uint32_t t114 = c114 / DIV_15;
-		p->clock_cnt[CLK_114] = (int32_t)(c114 % DIV_15);
+		p->p4 = add_mod(p->p4, n, 0x0f);
+		p->p5 = add_mod(p->p5, n, 0x1f);
+		p->p9 = add_mod(p->p9, n, 0x1ff);
+		p->p17 = add_mod(p->p17, n, P17_LEN);
+		const uint32_t t28 = prescale(&p->clock_cnt[CLK_28], n, DIV_64);
+		const uint32_t t114 = prescale(&p->clock_cnt[CLK_114], n, DIV_15);
 		const uint32_t b = (p->AUDCTL & CLK_15KHZ) ? t114 : t28;
 
 		p->counter[CHAN1] = (int32_t)(((uint32_t)p->counter[CHAN1] + ((p->AUDCTL & CH1_HICLK) ? n : b)) & 0xff);
@@ -562,13 +585,88 @@ static void fast_forward(pokey_t *p, uint32_t n)
 			p->borrow_cnt[ch] -= (int32_t)n;
 }
 
+// ---- the silent loop ----
+// A chip left counting with every volume at 0 (Atari System 1's games park it so: AUDCTL 0x78, AUDF 0, a borrow
+// every few clocks) has a constant output, and while nothing but its counters runs, its channels' counters and
+// borrows go round a cycle. Once two event clocks show the same counters and borrows, whole cycles are skipped:
+// only the polynomial indices, the prescalers and the keyboard scan move (arithmetically). Exact, as the channels'
+// outputs (which follow the polynomials) and the filter samples are made right by the cycles run after the skip:
+// QUIET_TAIL (2 x 31) cycles, the poly5 gate's period twice, and the skipped number a multiple of it, so a
+// PURE channel's toggles come out even (see pokey_advance).
+#define QUIET_TAIL 62
+
+static int quiet_loop(const pokey_t *p)
+{
+	if (!(p->SKCTL & SK_RESET) || (p->SKCTL & (SK_OCLK | SK_ICLK | SK_TWOTONE)) || p->pot_counter < 228 ||
+	    (p->IRQEN & (IRQ_TIMR1 | IRQ_TIMR2 | IRQ_TIMR4)))
+		return 0;
+	for (int ch = 0; ch < 4; ch++)
+		if (p->AUDC[ch] & VOLUME_MASK)
+			return 0;
+	return 1;
+}
+
+// what decides the events to come in a silent loop: the counters, the borrows, the base prescaler if a channel
+// counts with it
+static void quiet_shape(const pokey_t *p, int32_t *sh)
+{
+	for (int ch = 0; ch < 4; ch++) {
+		sh[ch] = p->counter[ch];
+		sh[4 + ch] = p->borrow_cnt[ch];
+	}
+	const uint8_t a = p->AUDCTL;
+	const int base = (a & CLK_15KHZ) ? CLK_114 : CLK_28;
+	sh[8] = (a & (CH1_HICLK | CH3_HICLK | CH12_JOINED | CH34_JOINED)) == (CH1_HICLK | CH3_HICLK | CH12_JOINED | CH34_JOINED)
+	            ? -1 : p->clock_cnt[base];
+}
+
+// c clocks of whole cycles skipped: the output constant
+static void quiet_skip(pokey_t *p, uint32_t c, int16_t *out, int *pn, int max)
+{
+	p->p4 = add_mod(p->p4, c, 0x0f);
+	p->p5 = add_mod(p->p5, c, 0x1f);
+	p->p9 = add_mod(p->p9, c, 0x1ff);
+	p->p17 = add_mod(p->p17, c, P17_LEN);
+	(void)prescale(&p->clock_cnt[CLK_28], c, DIV_64);
+	const uint32_t t114 = prescale(&p->clock_cnt[CLK_114], c, DIV_15);
+	if (p->SKCTL & SK_KEYSCAN)
+		p->kbd_cnt = (uint8_t)((p->kbd_cnt + t114) & 63);
+	const uint32_t lv = (uint32_t)p->level;
+	int n = *pn;
+	const uint32_t s = POKEY_DIVIDER - p->sub;
+	if (c >= s) {
+		p->acc += lv * s;
+		if (n < max)
+			out[n++] = (int16_t)(p->acc / POKEY_DIVIDER);
+		c -= s;
+		for (uint32_t k = c / POKEY_DIVIDER; k; k--)
+			if (n < max)
+				out[n++] = (int16_t)lv;
+		c %= POKEY_DIVIDER;
+		p->sub = 0;
+		p->acc = 0;
+	}
+	p->acc += lv * c;
+	p->sub += c;
+	*pn = n;
+}
+
 int pokey_advance(pokey_t *p, uint32_t clocks, int16_t *out, int max)
 {
 	int n = 0;
 	uint32_t lag = 0;   // quiet clocks not yet applied to the counters
+	// the silent loop's search: 1 no snapshot yet, 2 a snapshot taken (at qleft clocks left), 0 off
+#ifdef POKEY_REFERENCE
+	int qs = 0;
+#else
+	int qs = quiet_loop(p);
+#endif
+	int32_t qsnap[9];
+	uint32_t qleft = 0, qev = 0;
 	while (clocks) {
 		const uint32_t s = POKEY_DIVIDER - p->sub;
 		const uint32_t k = p->ev;
+		int stepped = 0;
 		if (k <= s && k <= clocks) {
 			const uint32_t q = k - 1;
 			p->acc += (uint32_t)p->level * q;
@@ -582,6 +680,7 @@ int pokey_advance(pokey_t *p, uint32_t clocks, int16_t *out, int max)
 			p->sub += k;
 			clocks -= k;
 			p->ev = next_event(p);
+			stepped = 1;
 		} else {
 			const uint32_t m = s < clocks ? s : clocks;
 			p->acc += (uint32_t)p->level * m;
@@ -595,6 +694,27 @@ int pokey_advance(pokey_t *p, uint32_t clocks, int16_t *out, int max)
 				out[n++] = (int16_t)(p->acc / POKEY_DIVIDER);
 			p->sub = 0;
 			p->acc = 0;
+		}
+		if (qs && stepped) {   // (just after an event clock: nothing lagging)
+			int32_t sh[9];
+			quiet_shape(p, sh);
+			if (p->out_raw)
+				qs = 1;
+			else if (qs == 1 || ++qev > 1024) {
+				memcpy(qsnap, sh, sizeof(qsnap));
+				qleft = clocks;
+				qev = 0;
+				qs = 2;
+			} else if (!memcmp(qsnap, sh, sizeof(qsnap))) {
+				// a cycle of per clocks: skip whole ones (a multiple of QUIET_TAIL), QUIET_TAIL of them still run
+				const uint32_t per = qleft - clocks, q = clocks / per;
+				if (q >= 2 * QUIET_TAIL) {
+					const uint32_t c = (q - QUIET_TAIL) / QUIET_TAIL * QUIET_TAIL * per;
+					quiet_skip(p, c, out, &n, max);
+					clocks -= c;
+				}
+				qs = 0;
+			}
 		}
 	}
 	if (lag)

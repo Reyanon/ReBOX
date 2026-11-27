@@ -7,7 +7,8 @@
     an ADC0809 (joysticks, pedal) with its IRQ 2, the trackballs of Marble Madness, the scanline IRQ 3 of the later
     boards (timers in the motion object list). Sound: 6502 at 1.79 MHz with a YM2151 and a POKEY, and on the speech
     boards a TMS5220C behind a 6522 VIA.
-    The screen is drawn in pieces up to the beam, as MAME's partial updates.
+    The screen is drawn in pieces up to the beam, as MAME's partial updates (recorded by the emulation, drawn on the
+    render thread). The YM2151 makes its samples on the rbx_aux worker.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "../../rbx.h"
@@ -100,8 +101,7 @@ static int16_t *s_pk_buf, *s_tms_buf;
 static int s_pk_n, s_pk_cap, s_tms_n, s_tms_cap;
 
 // ---- video buffers ----
-static uint16_t *s_frame, *s_mobm;
-static struct { uint16_t frame[VIS_W * VIS_H]; uint32_t pal[0x400]; } *s_snap;
+static uint16_t *s_mobm;             // (the render thread's MO bitmap)
 
 static void update_partial(int vpos);
 static void pokey_sync(void);
@@ -473,50 +473,115 @@ static inline uint32_t irgb_4444(uint16_t raw)
 	return r << 16 | g << 8 | b;
 }
 
-static void draw_lines(int y0, int y1)
+// the playfield's tile lookup by its PROM entry (bank << 7 | the tile's bits 8-14): the graphics, the code's high
+// byte, the color (filled at the init from s_pflookup)
+static struct { const uint8_t *pix; uint32_t count, codehi; uint16_t color; } s_pft[256];
+
+static void pft_init(void)
 {
-	const int scrollx = s_xscroll & 511;
-	for (int y = y0; y <= y1; y++) {   // the playfield (64x64, by rows)
-		uint16_t *d = s_frame + y * VIS_W;
-		const int ty = (y + s_scrolly) & 511;
-		const int row = ty >> 3, py = ty & 7;
+	for (int i = 0; i < 256; i++) {
+		const uint16_t lookup = s_pflookup[i];
+		const int gi = (lookup >> 8) & 15;
+		s_pft[i].pix = s_gfx[gi].pix;
+		s_pft[i].count = s_gfx[gi].count;
+		s_pft[i].codehi = (uint32_t)(lookup & 0xff) << 8;
+		// (the banks' gfx elements have the color base 256)
+		s_pft[i].color = (uint16_t)((gi ? 256 : 0) + (0x20 + (((lookup >> 12) & 15) << s_color_shift[gi])) * 8);
+	}
+}
+
+// The screen's pieces (MAME's partial updates up to the beam) are recorded by the emulation (the registers and, when
+// they changed, the RAM they draw from) and drawn on the render thread: the same pixels
+typedef struct {
+	int16_t y0, y1;
+	uint16_t xscroll, prio;
+	int32_t scrolly;
+	uint8_t tile_bank;
+	uint16_t pf, al, mo;   // their snapshots in the pools
+} seg_t;
+typedef struct {
+	seg_t seg[VIS_H];
+	int nseg;
+	uint16_t *pf, *al, *mo;   // the snapshots: the playfield (0x1000 words), the alphanumerics (0x800), the MO bank (0x100)
+	int npf, nal, nmo, cpf, cal, cmo;
+	uint32_t pal[0x400];
+} rec_t;
+static rec_t *s_rec[2];      // [0] the frame being recorded, [1] the last one (the render thread's)
+static int s_pf_dirty, s_al_dirty, s_mo_dirty, s_mo_snapbank;
+static amo_t *s_mo_r;        // (the render thread's copy of the MO state: its scratch)
+
+static void draw_lines(const rec_t *r, const seg_t *sg, uint16_t *bm, int pitch)
+{
+	const int y0 = sg->y0, y1 = sg->y1;
+	const int scrollx = sg->xscroll & 511;
+	const uint16_t *pfram = r->pf + (size_t)sg->pf * 0x1000, *alram = r->al + (size_t)sg->al * 0x800;
+	const int prio_pens = sg->prio;
+	for (int y = y0; y <= y1; y++) {   // the playfield (64x64, by rows): a tile's row at a time
+		uint16_t *d = bm + y * pitch;
+		const int ty = (y + sg->scrolly) & 511;
+		const int py = ty & 7;
+		const uint16_t *prow = pfram + (ty >> 3) * 64;
+		const int tb = sg->tile_bank << 7;
 		int x = 0, tx = scrollx;
 		while (x < VIS_W) {
-			const uint16_t data = s_pf[row * 64 + (tx >> 3)];
-			const uint16_t lookup = s_pflookup[((data >> 8) & 0x7f) | (s_tile_bank << 7)];
-			const int gi = (lookup >> 8) & 15;
-			const rbx_gfx *g = &s_gfx[gi];
-			const uint32_t code = rbx_wrap(((uint32_t)(lookup & 0xff) << 8) | (data & 0xff), g->count);
-			// (the banks' gfx elements have the color base 256)
-			const uint16_t color = (uint16_t)((gi ? 256 : 0) + (0x20 + (((lookup >> 12) & 15) << s_color_shift[gi])) * 8);
-			const uint8_t *src = g->pix + code * 64 + py * 8;
-			const int flip = data >> 15;
-			for (int px = tx & 7; px < 8 && x < VIS_W; px++, x++, tx++)
-				d[x] = (uint16_t)(color + src[flip ? 7 - px : px]);
-			tx &= 511;
+			const uint16_t data = prow[tx >> 3];
+			const int li = ((data >> 8) & 0x7f) | tb;
+			const uint32_t code = rbx_wrap(s_pft[li].codehi | (data & 0xff), s_pft[li].count);
+			const uint16_t color = s_pft[li].color;
+			const uint8_t *src = s_pft[li].pix + code * 64 + py * 8;
+			const int px0 = tx & 7;
+			int n = 8 - px0;
+			if (n > VIS_W - x)
+				n = VIS_W - x;
+			uint16_t *dd = d + x;
+			if (n == 8) {
+				if (data & 0x8000)
+					for (int k = 0; k < 8; k++)
+						dd[k] = (uint16_t)(color + src[7 - k]);
+				else
+					for (int k = 0; k < 8; k++)
+						dd[k] = (uint16_t)(color + src[k]);
+			} else if (data & 0x8000) {
+				for (int k = 0; k < n; k++)
+					dd[k] = (uint16_t)(color + src[7 - px0 - k]);
+			} else {
+				for (int k = 0; k < n; k++)
+					dd[k] = (uint16_t)(color + src[px0 + k]);
+			}
+			x += n;
+			tx = (tx + n) & 511;
 		}
 	}
-	amo_draw(&s_mo, s_mob, NULL, s_mobm, VIS_W, 0, VIS_W - 1, y0, y1);
+	s_mo_r->bank = 0;   // (the snapshot is the bank's 0x100 words)
+	amo_draw(s_mo_r, r->mo + (size_t)sg->mo * 0x100, NULL, s_mobm, VIS_W, 0, VIS_W - 1, y0, y1);
 	for (int y = y0; y <= y1; y++) {   // merge the motion objects
 		const uint16_t *mo = s_mobm + y * VIS_W;
-		uint16_t *pf = s_frame + y * VIS_W;
+		uint16_t *pf = bm + y * pitch;
 		for (int x = 0; x < VIS_W; x++) {
+			if (!(x & 3)) {   // (4 empty pixels at once)
+				uint64_t q;
+				memcpy(&q, mo + x, 8);
+				if (q == ~0ull) {
+					x += 3;
+					continue;
+				}
+			}
 			const uint16_t m = mo[x];
 			if (m == 0xffff)
 				continue;
 			if (m & 0xf000) {
 				if ((m & 0x0f) != 1)
 					pf[x] = (uint16_t)(0x300 + ((pf[x] & 0x0f) << 4) + (m & 0x0f));
-			} else if ((pf[x] & 0xf8) != 0 || !(s_prio_pens & (1 << (pf[x] & 0x07))))
+			} else if ((pf[x] & 0xf8) != 0 || !(prio_pens & (1 << (pf[x] & 0x07))))
 				pf[x] = m;
 		}
 	}
 	const rbx_gfx *ag = &s_gfx[0];
 	for (int y = y0; y <= y1; y++) {   // the alphanumerics (64x32, by rows)
-		uint16_t *d = s_frame + y * VIS_W;
+		uint16_t *d = bm + y * pitch;
 		const int row = y >> 3, py = y & 7;
 		for (int col = 0; col < VIS_W / 8; col++) {
-			const uint16_t data = s_alpha[row * 64 + col];
+			const uint16_t data = alram[row * 64 + col];
 			const uint32_t code = rbx_wrap(data & 0x3ff, ag->count);
 			const int opaque = data & 0x2000;
 			if (!opaque && !ag->used[code])
@@ -531,13 +596,53 @@ static void draw_lines(int y0, int y1)
 	}
 }
 
-static void update_partial(int vpos)
+// a pool's next snapshot (grown as needed: a few a frame, Road Blasters' MO bank about 60); NULL: out of memory
+static uint16_t *snap_add(uint16_t **pool, int *n, int *cap, int words)
+{
+	if (*n == *cap) {
+		const int nc = *cap ? *cap * 2 : 4;
+		uint16_t *p = (uint16_t *)realloc(*pool, (size_t)nc * (size_t)words * 2);
+		if (!p)
+			return NULL;
+		*pool = p;
+		*cap = nc;
+	}
+	return *pool + (size_t)(*n)++ * (size_t)words;
+}
+
+static void update_partial(int vpos)   // screen().update_partial(vpos): the piece recorded
 {
 	if (vpos > VIS_H - 1)
 		vpos = VIS_H - 1;
 	if (vpos <= s_last_drawn)
 		return;
-	draw_lines(s_last_drawn + 1, vpos);
+	rec_t *r = s_rec[0];
+	uint16_t *p;
+	if ((s_pf_dirty || !r->npf) && (p = snap_add(&r->pf, &r->npf, &r->cpf, 0x1000)) != NULL) {
+		memcpy(p, s_pf, sizeof(s_pf));
+		s_pf_dirty = 0;
+	}
+	if ((s_al_dirty || !r->nal) && (p = snap_add(&r->al, &r->nal, &r->cal, 0x800)) != NULL) {
+		memcpy(p, s_alpha, sizeof(s_alpha));
+		s_al_dirty = 0;
+	}
+	if ((s_mo_dirty || !r->nmo || s_mo.bank != s_mo_snapbank) && (p = snap_add(&r->mo, &r->nmo, &r->cmo, 0x100)) != NULL) {
+		memcpy(p, s_mob + (s_mo.bank & 7) * 0x100, 0x100 * 2);
+		s_mo_dirty = 0;
+		s_mo_snapbank = s_mo.bank;
+	}
+	if (!r->npf || !r->nal || !r->nmo)
+		return;   // (out of memory: nothing drawn)
+	seg_t *sg = &r->seg[r->nseg++];
+	sg->y0 = (int16_t)(s_last_drawn + 1);
+	sg->y1 = (int16_t)vpos;
+	sg->xscroll = s_xscroll;
+	sg->prio = s_prio_pens;
+	sg->scrolly = s_scrolly;
+	sg->tile_bank = s_tile_bank;
+	sg->pf = (uint16_t)(r->npf - 1);
+	sg->al = (uint16_t)(r->nal - 1);
+	sg->mo = (uint16_t)(r->nmo - 1);
 	s_last_drawn = vpos;
 }
 
@@ -671,6 +776,8 @@ static void spriteram_w(uint32_t offset, uint16_t data, uint16_t mask)
 		} else
 			update_partial(s_line + 2);
 	}
+	if (oldword != newword)
+		s_mo_dirty = 1;
 	s_mob[offset] = (uint16_t)newword;
 }
 
@@ -682,8 +789,20 @@ static void main_write16m(uint32_t a, uint16_t v, uint16_t mask)
 			slap_tap(a);
 		return;
 	}
-	if (a >= 0xa02000 && a < 0xa03000) {
-		spriteram_w((a - 0xa02000) >> 1, v, mask);
+	if (a >= 0xa00000 && a < 0xa04000) {
+		if (a >= 0xa02000 && a < 0xa03000)
+			spriteram_w((a - 0xa02000) >> 1, v, mask);
+		else {   // the playfield, the alphanumerics: their next piece takes a new snapshot
+			uint16_t *w = a < 0xa02000 ? &s_pf[(a - 0xa00000) >> 1] : &s_alpha[(a - 0xa03000) >> 1];
+			const uint16_t n = (uint16_t)((*w & ~mask) | (v & mask));
+			if (n != *w) {
+				*w = n;
+				if (a < 0xa02000)
+					s_pf_dirty = 1;
+				else
+					s_al_dirty = 1;
+			}
+		}
 		return;
 	}
 	switch (a >> 16) {
@@ -741,17 +860,22 @@ static void main_write8(uint32_t a, uint8_t v) { main_write16m(a & ~1u, (uint16_
 static void capture(void)
 {
 	rbx_video_wait_idle();
-	memcpy(s_snap->frame, s_frame, sizeof(s_snap->frame));
+	rec_t *t = s_rec[1];   // (the frame's pieces to the render thread, the last frame's pools to be refilled)
+	s_rec[1] = s_rec[0];
+	s_rec[0] = t;
+	t->nseg = t->npf = t->nal = t->nmo = 0;
 	for (int i = 0; i < 0x400; i++)
-		s_snap->pal[i] = irgb_4444(s_pal[i]);
+		s_rec[1]->pal[i] = irgb_4444(s_pal[i]);
+	memcpy(s_mo_r, &s_mo, sizeof(s_mo));
 	rbx_video_frame_done();
 }
 
 static void sy_render(void)
 {
-	for (int y = 0; y < VIS_H; y++)
-		memcpy(rbx_video.bitmap + y * rbx_video.pitch, s_snap->frame + y * VIS_W, VIS_W * 2);
-	memcpy(rbx_video.palette, s_snap->pal, sizeof(s_snap->pal));
+	const rec_t *r = s_rec[1];
+	for (int i = 0; i < r->nseg; i++)
+		draw_lines(r, &r->seg[i], rbx_video.bitmap, rbx_video.pitch);
+	memcpy(rbx_video.palette, r->pal, sizeof(r->pal));
 }
 
 static void sy_frame(void)
@@ -812,13 +936,20 @@ static void sy_frame(void)
 		s_int3off -= LINES;
 	pokey_sync();
 	tms_sync();
+	rbx_ym_async_take_lr(0, s_ym_l, s_ym_r, s_ym_n);
+	// (sample i of the others: i * n / s_ym_n, stepped without a divide)
+	int pi = 0, pr = 0, ti = 0, tr = 0;
 	for (int i = 0; i < s_ym_n; i++) {
 		int32_t o = 0;
 		if (s_pk_n)
-			o += s_pk_buf[(int)((int64_t)i * s_pk_n / s_ym_n)];
+			o += s_pk_buf[pi];
 		if (s_tms_n)
-			o += s_tms_buf[(int)((int64_t)i * s_tms_n / s_ym_n)];
+			o += s_tms_buf[ti];
 		rbx_audio_put_stereo(s_ym_l[i] + o, s_ym_r[i] + o);
+		for (pr += s_pk_n; pr >= s_ym_n; pr -= s_ym_n)
+			pi++;
+		for (tr += s_tms_n; tr >= s_ym_n; tr -= s_ym_n)
+			ti++;
 	}
 	memset(s_ym_l, 0, sizeof(int32_t) * (size_t)s_ym_n);
 	memset(s_ym_r, 0, sizeof(int32_t) * (size_t)s_ym_n);
@@ -881,6 +1012,8 @@ static void sy_reset(void)
 	s_pq = s_sndacc = 0;
 	s_line = 0;
 	s_last_drawn = -1;
+	s_rec[0]->nseg = s_rec[0]->npf = s_rec[0]->nal = s_rec[0]->nmo = 0;
+	s_pf_dirty = s_al_dirty = s_mo_dirty = 1;
 	s_bankselect = 0xff;   // (video_start), then machine_reset: bankselect_w(0)
 	bankselect_w(0);
 	irq2_update();
@@ -924,6 +1057,7 @@ static int sy_init(const rbx_game *g)
 	}
 	uint16_t motable[256];
 	decode_gfx(proms, tiles, ts, s_pflookup, motable);
+	pft_init();
 	static const amo_config moc = {
 		8, 1, 1, 0, 0, 0,     // banks, linked, split, reverse, swapxy, nextneighbor
 		0, 0, 0x38, 0x100, 0, // slipheight, slipoffset, maxperline, palettebase, transpen
@@ -952,16 +1086,18 @@ static int sy_init(const rbx_game *g)
 		return -1;
 	}
 	s_cart = (uint16_t *)calloc(0x80000, sizeof(uint16_t));
-	s_frame = (uint16_t *)calloc(VIS_W * VIS_H, sizeof(uint16_t));
 	s_mobm = (uint16_t *)calloc(VIS_W * VIS_H, sizeof(uint16_t));
-	s_snap = calloc(1, sizeof(*s_snap));
+	s_rec[0] = (rec_t *)calloc(1, sizeof(rec_t));
+	s_rec[1] = (rec_t *)calloc(1, sizeof(rec_t));
+	s_mo_r = (amo_t *)calloc(1, sizeof(amo_t));
 	rbx_ym_config yc;
 	memset(&yc, 0, sizeof(yc));
 	yc.type = RBX_YM2151;
 	yc.clock = YM_CLOCK;
 	yc.gain[0] = yc.gain[1] = 123;   // 0.48
 	yc.irq = ym_irq;
-	int rc = !s_cart || !s_frame || !s_mobm || !s_snap || rbx_ym_init(0, &yc);
+	// (the YM2151's samples made on the worker: the same samples, the frame's largest sound cost)
+	int rc = !s_cart || !s_mobm || !s_rec[0] || !s_rec[1] || !s_mo_r || rbx_ym_init(0, &yc) || rbx_ym_set_async(0, 2);
 	if (!rc) {
 		s_ym_cap = (int)(rbx_ym_rate(0) / 50) + 256;
 		s_ym_l = (int32_t *)calloc((size_t)s_ym_cap, sizeof(int32_t));
@@ -1005,9 +1141,11 @@ static int sy_init(const rbx_game *g)
 	m68k_bus_map(0, 0x7ffff, s_rom, 0x80000, 1, 0);
 	m68k_bus_map(0x400000, 0x401fff, s_ram, sizeof(s_ram), 1, 1);
 	m68k_bus_map(0x900000, 0x9fffff, s_cart, 0x100000, 1, 1);
-	m68k_bus_map(0xa00000, 0xa01fff, s_pf, sizeof(s_pf), 1, 1);
-	m68k_bus_map(0xa02000, 0xa02fff, s_mob, sizeof(s_mob), 1, 0);   // (writes: the timers, the partial updates)
-	m68k_bus_map(0xa03000, 0xa03fff, s_alpha, sizeof(s_alpha), 1, 1);
+	// (writes through the handler: the playfield's and the alphanumerics' for the pieces' snapshots, the MO's for the
+	// timers and the partial updates)
+	m68k_bus_map(0xa00000, 0xa01fff, s_pf, sizeof(s_pf), 1, 0);
+	m68k_bus_map(0xa02000, 0xa02fff, s_mob, sizeof(s_mob), 1, 0);
+	m68k_bus_map(0xa03000, 0xa03fff, s_alpha, sizeof(s_alpha), 1, 0);
 	m68k_bus_map(0xb00000, 0xb007ff, s_pal, sizeof(s_pal), 1, 1);
 	m68k_bus.read8 = main_read8;
 	m68k_bus.read16 = main_read16;
@@ -1019,6 +1157,7 @@ static int sy_init(const rbx_game *g)
 
 static void sy_exit(void)
 {
+	rbx_video_wait_idle();
 	if (s_nv_path[0]) {
 		FILE *f = fopen(s_nv_path, "wb");
 		if (f) {
@@ -1034,15 +1173,22 @@ static void sy_exit(void)
 		rbx_gfx_free(&s_gfx[i]);
 	s_ngfx = 0;
 	free(s_cart);
-	free(s_frame);
 	free(s_mobm);
-	free(s_snap);
+	for (int i = 0; i < 2; i++)
+		if (s_rec[i]) {
+			free(s_rec[i]->pf);
+			free(s_rec[i]->al);
+			free(s_rec[i]->mo);
+			free(s_rec[i]);
+			s_rec[i] = NULL;
+		}
+	free(s_mo_r);   // (its lookups are s_mo's)
+	s_mo_r = NULL;
 	free(s_ym_l);
 	free(s_ym_r);
 	free(s_pk_buf);
 	free(s_tms_buf);
-	s_cart = s_frame = s_mobm = NULL;
-	s_snap = NULL;
+	s_cart = s_mobm = NULL;
 	s_ym_l = s_ym_r = NULL;
 	s_pk_buf = s_tms_buf = NULL;
 }

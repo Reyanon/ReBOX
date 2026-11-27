@@ -165,9 +165,24 @@ uint64_t rbx_io_nreads(void);   // (the worker's card reads: requests merged int
 
 // input ports: index by tag (-1 = none), current value (inputs, DIPs and defaults combined)
 int rbx_port_find(const char *tag);
-// a game whose dial aims while its joystick moves (Forgotten Worlds): the right stick's left / right turn it (set at
-// init; the frontend then offers the "second stick" keys, RBX_IN_RLEFT / RBX_IN_RRIGHT)
+int rbx_port_has(int port, int type);   // a field of that RBX_IPT_* type in the port (0: none, or no such port)
+// a game whose dial or rotary joystick aims while its joystick moves (Forgotten Worlds, Heavy Barrel): the right stick
+// works it (set at init; the frontend then offers the "second stick" keys, RBX_IN_RLEFT / RBX_IN_RRIGHT)
 void rbx_set_rstick_dial(int on);
+// a rotary joystick (MAME IPT_POSITIONAL with PORT_WRAPS, the SNK / Data East LS-30 type: 8, 12 or 16 positions a
+// turn), once a frame: the switch's position value (0 .. n-1) after this frame. The games count the steps (each turns
+// the player one of its dirs directions), so the driver gives the player's facing read from the game's RAM (0 ..
+// dirs-1, clockwise on the screen from up; -1 = not known). The right stick past a dead zone aims (absolute): a step
+// towards its direction the short way, the next once the facing has changed; centred, or the facing unknown, the
+// "second stick" left / right (RBX_IN_RLEFT / RRIGHT, any keys; the right stick's by default) turn the player
+// anticlockwise / clockwise, a step at once and then every few frames while held. cw = 1 when a growing value turns
+// the player clockwise (-1 the other way). The driver keeps the value (its state) and r (zeroed at reset; not state)
+typedef struct { uint8_t hold, wait, last; } rbx_rotary;
+int rbx_rotary_turn(rbx_rotary *r, int player, int n, int value, int cw, int dirs, int facing);
+// a spinner (MAME IPT_DIAL): its counts this frame, + = clockwise / right. The right stick's left / right by how far it
+// is pushed (up to step), else the "second stick" keys at step; dpad: a game without a joystick, also rbx_analog_dpad
+// (the left stick and the d-pad)
+int rbx_dial(int player, int step, int dpad);
 uint32_t rbx_port_read(int port);
 // set the IPT_CUSTOM bits of a port as line levels, 1 = asserted (EEPROM data line, sensors); active-low fields are inverted
 void rbx_port_custom(int port, uint32_t mask, uint32_t value);

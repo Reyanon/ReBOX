@@ -409,6 +409,10 @@
   "Volume": "볼륨",
   "Volume and the automatic level of the sound": "볼륨과 소리 크기 자동 조절",
   "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "켜기: 작은 소리와 큰 소리 게임을 비슷한 크기로 (게임 소리 크기를 따라감). 끄기: 게임 본래 크기",
-  "The volume of the games' sound": "게임 소리의 볼륨"
+  "The volume of the games' sound": "게임 소리의 볼륨",
+  "Test mode": "테스트 모드",
+  "The board's test menu (settings kept in the game's EEPROM)": "기판의 테스트 메뉴 (설정은 게임의 EEPROM 에 저장)",
+  "Test switch": "테스트 스위치",
+  "Service switch": "서비스 스위치"
  }
 }

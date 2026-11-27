@@ -9,6 +9,7 @@
 #include "cheat_cpu.h"
 #include "cpu/tms57002/tms57002.h"
 
+#include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -296,6 +297,16 @@ int rbx_game_twin_stick(int i)
 		for (const rbx_ipt_port *p = g->ports; p->tag; p++)
 			for (int f = p->first; f < p->first + p->count; f++)
 				if (g->fields[f].type >= RBX_IPT_JOYSTICKRIGHT_UP && g->fields[f].type <= RBX_IPT_JOYSTICKRIGHT_RIGHT)
+					return 1;
+	return 0;
+}
+int rbx_game_has_test(int i)   // (a MAME IPT_SERVICE field: the board's test menu switch)
+{
+	const rbx_game *g = game_at(i, NULL);
+	if (g)
+		for (const rbx_ipt_port *p = g->ports; p->tag; p++)
+			for (int f = p->first; f < p->first + p->count; f++)
+				if (g->fields[f].type == RBX_IPT_SERVICE)
 					return 1;
 	return 0;
 }
@@ -1688,6 +1699,7 @@ static uint32_t s_dip_val[MAX_FIELDS];      // current value of each DIP / confi
 static uint8_t s_impulse[MAX_FIELDS], s_prev_on[MAX_FIELDS];
 static uint32_t s_in_player[4], s_in_sys;
 static int s_analog[4][2];
+static int s_rstick[4][2];   // (the right stick, rbx_set_rstick)
 
 int rbx_port_find(const char *tag)
 {
@@ -1695,6 +1707,17 @@ int rbx_port_find(const char *tag)
 		if (!strcmp(s_game->ports[i].tag, tag))
 			return i;
 	return -1;
+}
+
+int rbx_port_has(int port, int type)
+{
+	if (!s_game || port < 0 || port >= s_nports)
+		return 0;
+	const rbx_ipt_port *pt = &s_game->ports[port];
+	for (int i = pt->first; i < pt->first + pt->count; i++)
+		if (s_game->fields[i].type == type)
+			return 1;
+	return 0;
 }
 
 uint32_t rbx_port_read(int port)
@@ -1750,6 +1773,76 @@ void rbx_set_input(int player, uint32_t bits) { if (player >= 0 && player < 4) s
 uint32_t rbx_input_bits(int player) { return player >= 1 && player <= 4 ? s_in_player[player - 1] : 0; }
 void rbx_set_system(uint32_t bits) { s_in_sys = bits; }
 void rbx_set_analog(int player, int axis, int delta) { if (player >= 0 && player < 4 && axis >= 0 && axis < 2) s_analog[player][axis] = delta; }
+void rbx_set_rstick(int player, int x, int y)
+{
+	if (player >= 0 && player < 4) {
+		s_rstick[player][0] = x;
+		s_rstick[player][1] = y;
+	}
+}
+
+// ---- rotary joysticks and dials on the right stick ----
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+#define RSTICK_AIM 40    // (radius from the centre that aims; below the frontend's stick-as-keys 48 an axis)
+#define RSTICK_DEAD 24    // (a dial's dead zone on x)
+#define ROT_REPEAT 4      // (frames a step while a rotate key is held: 15 positions a second)
+#define ROT_SETTLE 8      // (frames at most waiting for the game to turn after a step it was given)
+int rbx_rotary_turn(rbx_rotary *r, int player, int n, int value, int cw, int dirs, int facing)
+{
+	if (player < 1 || player > 4 || n < 2)
+		return value;
+	const int sg = cw < 0 ? -1 : 1;
+	const int x = s_rstick[player - 1][0], y = s_rstick[player - 1][1];
+	int d = 0;
+	if (r->wait && (facing != r->last || !--r->wait))   // (the last step taken, or given up waiting)
+		r->wait = 0;
+	if (facing >= 0 && dirs >= 2 && x * x + y * y >= RSTICK_AIM * RSTICK_AIM) {
+		// the stick's angle clockwise from up (y grows down) as the nearest of the game's directions; a step towards it
+		// the short way, the next once the game has turned
+		const double a = atan2((double)x, (double)-y);   // -pi .. pi
+		int t = (int)floor(a * dirs / (2.0 * M_PI) + 0.5) % dirs;
+		if (t < 0)
+			t += dirs;
+		const int diff = (t - facing % dirs + dirs) % dirs;
+		if (diff && !r->wait) {
+			d = diff <= dirs / 2 ? 1 : -1;
+			r->wait = ROT_SETTLE;
+			r->last = (uint8_t)facing;
+		}
+		r->hold = 0;
+	} else {
+		const uint32_t in = s_in_player[player - 1];
+		const int k = ((in & RBX_IN_RRIGHT) ? 1 : 0) - ((in & RBX_IN_RLEFT) ? 1 : 0);
+		if (!k)
+			r->hold = 0;
+		else {
+			if (!r->hold)
+				d = k;
+			r->hold = (uint8_t)((r->hold + 1) % ROT_REPEAT);
+		}
+	}
+	return d ? ((value + d * sg) % n + n) % n : value;
+}
+
+int rbx_dial(int player, int step, int dpad)
+{
+	if (player < 1 || player > 4)
+		return 0;
+	const int x = s_rstick[player - 1][0];
+	if (x > RSTICK_DEAD || x < -RSTICK_DEAD) {   // (by how far: 1 .. step)
+		const int m = (x < 0 ? -x : x) - RSTICK_DEAD, span = 127 - RSTICK_DEAD;
+		int v = (m * step + span / 2) / span;
+		v = v < 1 ? 1 : v > step ? step : v;
+		return x < 0 ? -v : v;
+	}
+	const uint32_t in = s_in_player[player - 1];
+	const int k = ((in & RBX_IN_RRIGHT) ? 1 : 0) - ((in & RBX_IN_RLEFT) ? 1 : 0);
+	if (k)
+		return k * step;
+	return dpad ? rbx_analog_dpad(player, RBX_IPT_DIAL, step) : 0;
+}
 
 static int field_pressed(const rbx_ipt_field *f)
 {
@@ -1815,7 +1908,9 @@ static void update_ports(void)
 			uint32_t fv = f->def;
 			if (f->type == RBX_IPT_DIPSWITCH || f->type == RBX_IPT_CONFIG) {
 				fv = s_dip_val[i];
-			} else if (f->type >= RBX_IPT_SERVICE && f->type <= RBX_IPT_BUTTON6) {
+			} else if ((f->type >= RBX_IPT_SERVICE && f->type <= RBX_IPT_BUTTON6) ||
+			           (f->type >= RBX_IPT_JOYSTICKRIGHT_UP && f->type <= RBX_IPT_JOYSTICKRIGHT_RIGHT)) {
+				// (the second joystick's fields too: they are past BUTTON6 in the list, and read nothing before)
 				int on = field_pressed(f);
 				if (f->impulse) {
 					if (on && !s_prev_on[i])

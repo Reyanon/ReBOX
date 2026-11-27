@@ -356,6 +356,10 @@
   "Volume": "Volume",
   "Volume and the automatic level of the sound": "Volume en automatisch geluidsniveau",
   "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level": "Aan: zachte en luide spellen op een gelijk niveau (volgt het niveau van het spel). Uit: het eigen niveau van het spel",
-  "The volume of the games' sound": "Het volume van het spelgeluid"
+  "The volume of the games' sound": "Het volume van het spelgeluid",
+  "Test mode": "Testmodus",
+  "The board's test menu (settings kept in the game's EEPROM)": "Het testmenu van het bord (instellingen in de EEPROM van het spel)",
+  "Test switch": "Testschakelaar",
+  "Service switch": "Serviceschakelaar"
  }
 }
