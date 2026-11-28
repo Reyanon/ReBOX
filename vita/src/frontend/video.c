@@ -102,31 +102,32 @@ int rbx_video_init(void)
 static vita2d_texture *s_scan;
 static int s_scan_h, s_scan_type = -1, s_scan_strength = -1, s_scan_dest_h;
 
-// Integer: whole-number scales per axis (as ReST-V; usually 2x, 3x for the small screens). The height takes the
-// largest scale that fits; the width the whole number nearest to the picture's 4:3 (3:4 turned a quarter), so a
-// board drawing each pixel twice across (Sega System 1/2: 512 x 224) is not shown twice as wide
-static int int_scale_y(void)
+// Integer: the largest whole-number scale that fits, the same across and down (as ReST-V; usually 2x, 3x for the small
+// screens). A board drawing each pixel twice across (Sega System 1/2: 512 x 224; a game pixel under 0.7 of its height
+// wide on the 4:3 CRT, or over 1.43 turned a quarter) takes the largest scale down and the whole number nearest to its
+// pixels' shape across: 512 x 448, not 512 x 224 (v0.16.87 rounded every game's width up: 256 x 224 went 3x wide)
+static void int_scales(int *kx, int *ky)
 {
+	*kx = *ky = 1;
 	if (DISP_W <= 0 || DISP_H <= 0)
-		return 1;
-	const int k = SCREEN_H / DISP_H;
-	return k < 1 ? 1 : k;
-}
-
-static int int_scale_x(void)
-{
-	if (DISP_W <= 0 || DISP_H <= 0)
-		return 1;
+		return;
+	const int kw = SCREEN_W / DISP_W, kh = SCREEN_H / DISP_H;
 	const float shape = (s_rot & 1) ? 3.0f / 4.0f : 4.0f / 3.0f;
 	const float par = shape * (float)DISP_H / (float)DISP_W;   // (a game pixel's width over its height on the CRT)
-	// (rounded up from x.25: only a picture more than about 2.1 times as wide as high takes the smaller width scale;
-	// System 32's 416 x 224 and CPS's 384 x 224 keep 2x)
-	int k = (int)(int_scale_y() * par + 0.75f);
-	const int kw = SCREEN_W / DISP_W;
-	if (k > kw)
-		k = kw;
-	return k < 1 ? 1 : k;
+	if (par < 0.7f || par > 1.43f) {
+		*ky = kh;
+		*kx = (int)(kh * par + 0.5f);
+		if (*kx > kw)
+			*kx = kw;
+	} else
+		*kx = *ky = kw < kh ? kw : kh;
+	if (*kx < 1)
+		*kx = 1;
+	if (*ky < 1)
+		*ky = 1;
 }
+static int int_scale_x(void) { int kx, ky; int_scales(&kx, &ky); return kx; }
+static int int_scale_y(void) { int kx, ky; int_scales(&kx, &ky); return ky; }
 
 static int dest_height(void)
 {

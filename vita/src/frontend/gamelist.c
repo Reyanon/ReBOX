@@ -434,69 +434,7 @@ int rbx_gamelist_rom_dirs(const char *const *dirs, int ndirs, const char **out, 
 	return n;
 }
 
-// ---- the folders chosen in Settings ----
-#define FOLDERS_PATH RBX_DATA_DIR "folders.cfg"
-static char s_folder[RBX_FOLDERS][160];
-static int s_rom_changed;
-static const char *const k_folder_key[RBX_FOLDERS] = { "rom1", "rom2", "snap", "marquee" };
-
-void rbx_folders_load(void)
-{
-	FILE *f = fopen(FOLDERS_PATH, "r");
-	if (!f)
-		return;
-	char line[256];
-	while (fgets(line, sizeof(line), f)) {
-		line[strcspn(line, "\r\n")] = 0;
-		char *eq = strchr(line, '=');
-		if (!eq)
-			continue;
-		*eq = 0;
-		for (int k = 0; k < RBX_FOLDERS; k++)
-			if (!strcmp(line, k_folder_key[k]))
-				snprintf(s_folder[k], sizeof(s_folder[k]), "%s", eq + 1);
-	}
-	fclose(f);
-	for (int k = 0; k < RBX_FOLDERS; k++)
-		if (s_folder[k][0])
-			RBX_LOG("folders: %s %s", k_folder_key[k], s_folder[k]);
-}
-
-const char *rbx_folder(int k) { return k >= 0 && k < RBX_FOLDERS ? s_folder[k] : ""; }
-
-void rbx_folder_set(int k, const char *path)
-{
-	if (k < 0 || k >= RBX_FOLDERS)
-		return;
-	char p[160];
-	snprintf(p, sizeof(p), "%s", path ? path : "");
-	const size_t l = strlen(p);
-	if (l && p[l - 1] != '/' && p[l - 1] != ':' && l + 1 < sizeof(p))
-		strcat(p, "/");   // (a folder ends in "/", as the ROM folders)
-	if (!strcmp(p, s_folder[k]))
-		return;
-	memcpy(s_folder[k], p, sizeof(p));
-	if (k == RBX_FOLDER_ROM1 || k == RBX_FOLDER_ROM2)
-		s_rom_changed = 1;
-	FILE *f = fopen(FOLDERS_PATH, "w");
-	if (!f) {
-		RBX_LOG("folders: save failed %s", FOLDERS_PATH);
-		return;
-	}
-	for (int i = 0; i < RBX_FOLDERS; i++)
-		fprintf(f, "%s=%s\n", k_folder_key[i], s_folder[i]);
-	fclose(f);
-	RBX_LOG("folders: %s %s", k_folder_key[k], s_folder[k]);
-}
-
-int rbx_folders_rom_changed(void)
-{
-	const int c = s_rom_changed;
-	s_rom_changed = 0;
-	return c;
-}
-
-
+// ---- the folders chosen in Settings (folders.c): the browser's list, the pictures in them ----
 int rbx_folder_list(const char *dir, char (*names)[64], int max, const char *const *exts, int *files)
 {
 	if (files)
@@ -546,25 +484,26 @@ static int exists(const char *p)
 	return sceIoGetstat(p, &st) >= 0 && !SCE_S_ISDIR(st.st_mode);
 }
 
-// a picture in a chosen folder: <set>.png / .jpg, else the title as RetroArch names thumbnails (&*/:`<>?\|" made _)
-static int folder_media(int k, const char *set, const char *title, char *out, int size)
+// a picture in the chosen folders of kind, in their order: in each <set>.png / .jpg, else the title as RetroArch names
+// thumbnails (&*/:`<>?\|" made _)
+static int folder_media(int kind, const char *set, const char *title, char *out, int size)
 {
-	const char *dir = s_folder[k];
-	if (!dir[0])
-		return 0;
 	static const char *const ext[2] = { "png", "jpg" };
-	for (int e = 0; e < 2; e++) {
-		snprintf(out, (size_t)size, "%s%s.%s", dir, set, ext[e]);
-		if (exists(out))
-			return 1;
-	}
+	char t[160] = "";
 	if (title && title[0]) {
-		char t[160];
 		snprintf(t, sizeof(t), "%s", title);
 		for (char *q = t; *q; q++)
-			if (strchr("&*/:`<>?\|\"", *q))
+			if (strchr("&*/:`<>?\\|\"", *q))
 				*q = '_';
+	}
+	for (int k = 0; k < rbx_folder_count(kind); k++) {
+		const char *dir = rbx_folder(kind, k);
 		for (int e = 0; e < 2; e++) {
+			snprintf(out, (size_t)size, "%s%s.%s", dir, set, ext[e]);
+			if (exists(out))
+				return 1;
+		}
+		for (int e = 0; t[0] && e < 2; e++) {
 			snprintf(out, (size_t)size, "%s%s.%s", dir, t, ext[e]);
 			if (exists(out))
 				return 1;

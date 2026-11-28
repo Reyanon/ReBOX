@@ -191,6 +191,10 @@ int rbx_analog(int player, int type);
 // rbx_analog, or without that device moving the d-pad's: step counts a frame (left / right for x axes and dials, up /
 // down for y axes), as MAME's key delta x sensitivity / 100 (games with only a dial / trackball play on the d-pad)
 int rbx_analog_dpad(int player, int type, int step);
+// a throttle lever (MAME IPT_AD_STICK_Z) as the general inputs Throttle Up / Down leave it (rbx_core.h RBX_GEN_*):
+// the game's first AD_STICK_Z field's rest value at start, then moved by those keys a step a frame and held where they
+// leave it (0 .. 255). A driver that reads it makes the game list the two keys
+int rbx_throttle(void);
 // raw control bits of a player (RBX_IN_* of rbx_core.h), for digital fallbacks of analog controls (steering, pedals)
 uint32_t rbx_player_input(int player);
 // raw controls of a player (1-4) as RBX_IN_* bits of rbx_core.h (pedals and other inputs the ioport model lacks);

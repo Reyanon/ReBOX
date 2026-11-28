@@ -15,7 +15,6 @@
 
 #define NAME_LEN 24
 #define MAX_NAMES 8192
-#define MAX_DIRS 16
 
 typedef struct {
 	char (*names)[NAME_LEN];
@@ -99,9 +98,11 @@ static int cmp_found(const void *a, const void *b)
 
 int rbx_games_scan(const char *const *dirs, int ndirs, rbx_game_found *out, int max, int *npresent)
 {
-	dir_list lists[MAX_DIRS];
-	if (ndirs > MAX_DIRS)
-		ndirs = MAX_DIRS;
+	dir_list one, *lists = ndirs > 1 ? (dir_list *)calloc((size_t)ndirs, sizeof(dir_list)) : &one;   // (any number of folders)
+	if (!lists) {
+		lists = &one;
+		ndirs = 1;
+	}
 	for (int i = 0; i < ndirs; i++)
 		read_dir(dirs[i], &lists[i]);
 	int n = 0, present = 0;
@@ -124,6 +125,8 @@ int rbx_games_scan(const char *const *dirs, int ndirs, rbx_game_found *out, int 
 		rbx_log("games: %d of %d listed (RBX_GAMES_MAX)", n, rbx_game_count());
 	for (int i = 0; i < ndirs; i++)
 		free(lists[i].names);
+	if (lists != &one)
+		free(lists);
 	qsort(out, (size_t)n, sizeof(out[0]), cmp_found);
 	if (npresent)
 		*npresent = present;

@@ -122,6 +122,22 @@ void rbx_set_input(int player, uint32_t bits);  // player 0..3
 #define RBX_SYS_TILT    2
 #define RBX_SYS_SERVICE 4       // service coin
 void rbx_set_system(uint32_t bits);
+// general inputs (MAME's "general inputs"): the cabinet's switches and controls that no player's controls have. Their
+// order and ids are kept (the frontends' settings name them by rbx_general_id); new ones go at the end
+enum {
+	RBX_GEN_TEST,                       // the test / service mode switch (IPT_SERVICE: the board's test menu)
+	RBX_GEN_SERVICE1, RBX_GEN_SERVICE2, RBX_GEN_SERVICE3, RBX_GEN_SERVICE4,   // service coins (IPT_SERVICE1..4)
+	RBX_GEN_TILT, RBX_GEN_DOOR,
+	RBX_GEN_COIN3, RBX_GEN_COIN4,       // the third / fourth coin slots
+	RBX_GEN_PEDAL1, RBX_GEN_PEDAL2, RBX_GEN_PEDAL3,   // a pedal pressed fully (a game whose button 1 / 2 / 3 is its pedal)
+	RBX_GEN_THROTTLE_UP, RBX_GEN_THROTTLE_DOWN,       // a throttle lever (IPT_AD_STICK_Z), held where the keys leave it
+	RBX_GEN_GAMBLE_HIGH, RBX_GEN_GAMBLE_LOW, RBX_GEN_GAMBLE_HALF, RBX_GEN_GAMBLE_KEYIN, RBX_GEN_GAMBLE_KEYOUT,
+	RBX_GEN_COUNT
+};
+const char *rbx_general_name(int g);   // English name ("Test switch", "Throttle Up"), NULL past the last
+const char *rbx_general_id(int g);     // a short fixed id for settings files ("test", "throttle_up")
+int rbx_game_general(int i, int g);    // game i has general input g (the running game: one its driver works)
+void rbx_set_general(int g, int on);   // general input g held (each frame, as rbx_set_input)
 void rbx_set_analog(int player, int axis, int delta);  // axis 0 = x, 1 = y (trackball counts per frame)
 // the right analog stick of a player (0..3), -128..127 from the centre, y down, in the game's screen orientation (the
 // frontend turns it as the d-pad for Rotate Vertical): rotary joysticks aim with it, dials turn by it (rbx_rotary_frame,

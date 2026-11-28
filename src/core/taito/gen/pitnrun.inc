@@ -94,7 +94,94 @@ static const rbx_rom_region pitnrun_romr_pitnrunb[] = {
 	{ "proms", 0x60, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load pitnrun_roml_jumpkun[] = {
+	{ RBX_ROM_LOAD, 0, "pr1.5d.2764", 0x0, 0x2000, 0xb0eabe9f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pr2.5c.2764", 0x2000, 0x2000, 0xd9240413, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pr3.5b.2764", 0x4000, 0x2000, 0x105e3fec, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pr4.5a.2764", 0x6000, 0x2000, 0x3a17ca88, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "snd1.2732", 0x0, 0x1000, 0x1290f316, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "snd2.2732", 0x1000, 0x1000, 0xec5e4489, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "obj1.1k.2764", 0x0, 0x2000, 0x8929abfd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "obj2.1m.2764", 0x2000, 0x2000, 0xc7bf5819, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "obj3.1n.2764", 0x4000, 0x2000, 0x5eeec986, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 4, "chr1.6d.2764", 0x0, 0x2000, 0x3c93d4ee, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 4, "chr2.6f.2764", 0x2000, 0x2000, 0x154fad33, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 5, "bsc2.3m.2764", 0x0, 0x1000, 0x25445f17, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 5, "bsc1.3p.2764", 0x1000, 0x1000, 0x39ca2c37, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 7, "8h.82s123.bin", 0x0, 0x20, 0xe54a6fe6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 7, "8l.82s123.bin", 0x20, 0x20, 0x624830d5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 7, "8j.82s123.bin", 0x40, 0x20, 0x223a6990, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region pitnrun_romr_jumpkun[] = {
+	{ "maincpu", 0x8000, 0x00 },
+	{ "audiocpu", 0x2000, 0x00 },
+	{ "mcu", 0x800, 0x00 },
+	{ "sprites", 0x6000, 0x00 },
+	{ "bgtiles", 0x4000, 0x00 },
+	{ "fgtiles", 0x2000, 0x00 },
+	{ "spot", 0x2000, 0x00 },
+	{ "proms", 0x60, 0x00 },
+	{ NULL, 0, 0 }
+};
 
+static const rbx_ipt_setting pitnrun_ips_jumpkun[] = {
+	{ 0x0, "2 Coins / 1 Credit" },
+	{ 0x1, "1 Coin / 1 Credit" },
+	{ 0x2, "1 Coin / 2 Credits" },
+	{ 0x3, "1 Coin / 3 Credits" },
+	{ 0x4, "1 Coin / 4 Credits" },
+	{ 0x5, "1 Coin / 5 Credits" },
+	{ 0x6, "1 Coin / 6 Credits" },
+	{ 0x7, "1 Coin / 7 Credits" },
+	{ 0x0, "Off" },
+	{ 0x8, "On" },
+	{ 0x0, "2" },
+	{ 0x10, "4" },
+	{ 0x0, "Off" },
+	{ 0x20, "On" },
+	{ 0x0, "Upright" },
+	{ 0x40, "Cocktail" },
+	{ 0x0, "Off" },
+	{ 0x80, "On" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field pitnrun_ipf_jumpkun[] = {
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_SERVICE1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xf0, 0xf0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xc0, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xc0, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_BUTTON2, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x7, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 0, 8, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 12, 2, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 14, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Invincibility (Cheat)", 16, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_TILT, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port pitnrun_ipp_jumpkun[] = {
+	{ "SYSTEM", 0, 5 },
+	{ "INPUTS", 5, 7 },
+	{ "COCKTAIL", 12, 7 },
+	{ "DSW", 19, 6 },
+	{ "TILT", 25, 1 },
+	{ NULL, 0, 0 }
+};
 static const rbx_ipt_setting pitnrun_ips_pitnrun[] = {
 	{ 0x0, "2 Coins / 1 Credit" },
 	{ 0x1, "1 Coin / 1 Credit" },
@@ -157,5 +244,6 @@ static const rbx_game pitnrun_games[] = {
 	{ "pitnrun", NULL, "Pit & Run - F-1 Race (rev 1)", "1984", "Taito", "Pit & Run", "pitnrun_mcu", 90, RBX_GF_IMPERFECT_SND, pitnrun_romr_pitnrun, pitnrun_roml_pitnrun, pitnrun_ipp_pitnrun, pitnrun_ipf_pitnrun, pitnrun_ips_pitnrun },
 	{ "pitnruna", "pitnrun", "Pit & Run - F-1 Race", "1984", "Taito", "Pit & Run", "pitnrun_mcu", 90, RBX_GF_IMPERFECT_SND, pitnrun_romr_pitnruna, pitnrun_roml_pitnruna, pitnrun_ipp_pitnrun, pitnrun_ipf_pitnrun, pitnrun_ips_pitnrun },
 	{ "pitnrunb", "pitnrun", "Pit & Run - F-1 Race (location test?)", "1984", "Taito", "Pit & Run", "pitnrun_mcu", 90, RBX_GF_IMPERFECT_SND, pitnrun_romr_pitnrunb, pitnrun_roml_pitnrunb, pitnrun_ipp_pitnrun, pitnrun_ipf_pitnrun, pitnrun_ips_pitnrun },
+	{ "jumpkun", NULL, "Jump Kun (prototype)", "1984", "Kaneko", "Pit & Run", "pitnrun", 90, RBX_GF_IMPERFECT_SND, pitnrun_romr_jumpkun, pitnrun_roml_jumpkun, pitnrun_ipp_jumpkun, pitnrun_ipf_jumpkun, pitnrun_ips_jumpkun },
 };
-#define PITNRUN_GAME_COUNT 3
+#define PITNRUN_GAME_COUNT 4

@@ -1,4 +1,5 @@
-// The folder browser (Settings' ROM / snap / marquee folder rows, user 11-24): a screen of its own over the menu. Included
+// The folder browser (Settings' ROM / snap / marquee folder rows and their Add rows, user 11-24 / 11-28): a screen of
+// its own over the menu. Included
 // by menu.c (its theme, shapes, keys and touch). GPL-2.0-or-later.
 //
 // The folders are rows drawn once each into small textures and placed by the GPU (rbx_video_strips, as the game list),
@@ -102,8 +103,8 @@ typedef struct { int x0, x1, act; } FbButton;  // a footer button
 enum { FBA_OPEN = 1, FBA_BACK, FBA_USE, FBA_NONE };
 
 // the screen under the rows: background, header (title, path, what is here), footer buttons; the empty folder's note
-static void fb_paint(UiCanvas *c, const char *title, const char *path, int n, int files, int kind, FbCrumb *cr, int *ncr,
-                     FbButton *bt, int *nbt, int ok_key, int back_key)
+static void fb_paint(UiCanvas *c, const char *title, const char *path, int n, int files, int kind, int adding, FbCrumb *cr,
+                     int *ncr, FbButton *bt, int *nbt, int ok_key, int back_key)
 {
 	const Theme *th = theme();
 	ui_fill_rows(c, theme_rows(0), 0, 0, SCREEN_W, SCREEN_H);
@@ -117,7 +118,7 @@ static void fb_paint(UiCanvas *c, const char *title, const char *path, int n, in
 	char info[96];
 	if (!path[0])
 		snprintf(info, sizeof(info), "%s", T("Choose a storage"));
-	else if (kind == RBX_FOLDER_ROM1 || kind == RBX_FOLDER_ROM2)
+	else if (kind == RBX_FOLDER_ROM)
 		snprintf(info, sizeof(info), T("%d folders, %d zip files"), n, files);
 	else
 		snprintf(info, sizeof(info), T("%d folders, %d pictures"), n, files);
@@ -202,14 +203,14 @@ static void fb_paint(UiCanvas *c, const char *title, const char *path, int n, in
 	{
 		struct { int key, act; const char *label; } b[4] = {
 			{ ok_key, FBA_OPEN, "Open" }, { back_key, FBA_BACK, path[0] ? "Up" : "Cancel" },
-			{ 0x10, FBA_USE, "Use this folder" }, { 0x13, FBA_NONE, "Not set" } };
+			{ 0x10, FBA_USE, "Use this folder" }, { 0x13, FBA_NONE, "Remove" } };
 		// (user 11-25: the same gap above and below: the pills centred in the band under its line, the text on their
 		// middle; a 0.8 line's middle is 6 px above its baseline)
 		const int band0 = FB_Y1 + 8, h = 28, top = band0 + (SCREEN_H - band0 - h) / 2, y = top + h / 2 + 6;
 		int x = FB_X - 8;
 		for (int i = 0; i < 4; i++) {
-			if (b[i].act == FBA_USE && !path[0])
-				continue;
+			if ((b[i].act == FBA_USE && !path[0]) || (b[i].act == FBA_NONE && adding))
+				continue;   // (Remove: a folder of the list only, not one being added)
 			// (the button's icon, then its label: the pill as wide as both with the same margin at each end)
 			static const int keys[4] = { RBX_KEY_TRIANGLE, RBX_KEY_CIRCLE, RBX_KEY_CROSS, RBX_KEY_SQUARE };
 			const char *label = T(b[i].label);
@@ -228,17 +229,23 @@ static void fb_paint(UiCanvas *c, const char *title, const char *path, int n, in
 		rrect(c, SCREEN_W - 18, FB_Y0 + 6, 6, FB_VIEW - 12, 3, th->bar_track);
 }
 
-// the browser: start at the folder k has (else ux0:). 1 = k set (a folder or none), 0 = left as it was
-static int folder_browse(int k)
+// the browser for folder i of kind (i == its count: one added): it starts at that folder (adding: at the kind's last
+// folder, else ux0:). Returns the folder's index once set, -1 when removed, -2 when left as it was
+static int folder_browse(int kind, int i)
 {
 	static const char *const zips[] = { "zip", "7z", NULL }, *const pics[] = { "png", "jpg", "jpeg", NULL };
-	static const char *const titles[RBX_FOLDERS] = { "ROM folder 1", "ROM folder 2", "Snap folder", "Marquee folder" };
-	const char *const *exts = k == RBX_FOLDER_ROM1 || k == RBX_FOLDER_ROM2 ? zips : pics;
+	static const char *const titles[RBX_FOLDER_KINDS] = { "ROM folder", "Snap folder", "Marquee folder" };
+	static const char *const add_titles[RBX_FOLDER_KINDS] = { "Add ROM folder", "Add snap folder", "Add marquee folder" };
+	if (kind < 0 || kind >= RBX_FOLDER_KINDS || i < 0 || i > rbx_folder_count(kind))
+		return -2;
+	const int adding = i == rbx_folder_count(kind);
+	const char *const *exts = kind == RBX_FOLDER_ROM ? zips : pics;
+	const char *start = rbx_folder(kind, adding ? i - 1 : i);
 	const int o_ok = g_settings.menu_confirm == RBX_CONFIRM_CIRCLE;
 	const uint32_t ok = o_ok ? SCE_CTRL_CIRCLE : SCE_CTRL_CROSS, back = o_ok ? SCE_CTRL_CROSS : SCE_CTRL_CIRCLE;
 	const int ok_key = o_ok ? 0x11 : 0x12, back_key = o_ok ? 0x12 : 0x11;
 	char path[160];
-	snprintf(path, sizeof(path), "%s", rbx_folder(k)[0] ? rbx_folder(k) : "ux0:");
+	snprintf(path, sizeof(path), "%s", start[0] ? start : "ux0:");
 	for (;;) {   // (a folder no longer there: the nearest one above it)
 		const SceUID d = path[0] ? sceIoDopen(path) : 0;
 		if (d >= 0) {
@@ -268,7 +275,7 @@ static int folder_browse(int k)
 		s_fb_bar = ui_canvas(-1, 0, 0, FB_W, FB_ROW_H);
 	if (!s_fb_thumb)
 		s_fb_thumb = ui_canvas(-1, 0, 0, 6, FB_VIEW);
-	int n = 0, files = 0, sel = 0, gen = 0, result = 0, painted = 0, bar_gen = -1, thumb_h = -1;
+	int n = 0, files = 0, sel = 0, gen = 0, result = -2, painted = 0, bar_gen = -1, thumb_h = -1;
 	float pos = 0, hy = 0, vel = 0, slide = 0, stick = 0;
 	int follow = 1, t_down = 0, t_moved = 0, t_y0 = 0, t_x0 = 0, t_last = 0, dragging = 0;
 	float t_pos0 = 0;
@@ -298,7 +305,8 @@ static int folder_browse(int k)
 			painted = 0;
 		}
 		if (!painted) {
-			fb_paint(c, T(titles[k]), path, n, files, k, cr, &ncr, bt, &nbt, ok_key, back_key);
+			fb_paint(c, T(adding ? add_titles[kind] : titles[kind]), path, n, files, kind, adding, cr, &ncr, bt, &nbt, ok_key,
+			         back_key);
 			ui_commit(c);
 			painted = 1;
 		}
@@ -334,7 +342,7 @@ static int folder_browse(int k)
 		if (pressed_raw & ok) act = FBA_OPEN;
 		else if (pressed_raw & back) act = FBA_BACK;
 		else if (pressed_raw & SCE_CTRL_TRIANGLE) act = FBA_USE;
-		else if (pressed_raw & SCE_CTRL_SQUARE) act = FBA_NONE;
+		else if ((pressed_raw & SCE_CTRL_SQUARE) && !adding) act = FBA_NONE;
 		else if (pressed_raw & SCE_CTRL_START) done = 1;
 		if (move && n) {
 			if (!follow) {   // (after a drag the cursor may be out of sight: from the row nearest it)
@@ -435,12 +443,11 @@ static int folder_browse(int k)
 				relist = 1;
 			}
 		} else if (act == FBA_USE && path[0]) {
-			rbx_folder_set(k, path);
-			result = 1;
+			result = rbx_folder_set(kind, i, path);
 			done = 1;
-		} else if (act == FBA_NONE) {
-			rbx_folder_set(k, "");
-			result = 1;
+		} else if (act == FBA_NONE && !adding) {
+			rbx_folder_remove(kind, i);
+			result = -1;
 			done = 1;
 		}
 		if (relist || done)

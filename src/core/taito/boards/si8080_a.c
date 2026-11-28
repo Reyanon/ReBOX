@@ -26,7 +26,7 @@
 
 #define FS ((double)SIA_RATE)
 #define NCHAN 6
-#define MAXSAMP 10
+#define MAXSAMP 16
 
 typedef struct { int16_t *data; uint32_t len; } sample_t;
 
@@ -145,6 +145,25 @@ static const synth_t lrescue_synth[] = {
 	{ 1.00f, 0, 0, 0.35f, 3000, 500, 0.6f, 0, 0 },
 	{ 0.04f, 0, 0, 0.7f, 180, 180, 0.02f, 0, 0 },
 	{ 0.04f, 0, 0, 0.7f, 260, 260, 0.02f, 0, 0 },
+};
+static const char *const ozmawars_names[] = { "ow0", "ow1", "ow2", "ow3", "ow4", "ow5", "ow6", "ow7", "ow8", "ow9",
+                                              "ow10", "ow11", "ow12", "ow13", "ow14", NULL };
+static const synth_t ozmawars_synth[] = {
+	{ 0.30f, 0.4f, 0.0002f, 0.4f, 1800, 400, 0.10f, 0, 0 },      // shoot
+	{ 1.20f, 1.0f, 0.0012f, 0, 0, 0, 0.40f, 0, 0 },              // die
+	{ 0.40f, 0, 0, 0.45f, 400, 600, 0, 0, 0 },                   // docking 1-4
+	{ 0.40f, 0, 0, 0.45f, 500, 700, 0, 0, 0 },
+	{ 0.40f, 0, 0, 0.45f, 600, 800, 0, 0, 0 },
+	{ 0.40f, 0, 0, 0.45f, 700, 900, 0, 0, 0 },
+	{ 0.60f, 0, 0, 0.40f, 300, 1200, 0, 6, 0 },                  // refuel
+	{ 1.00f, 0.5f, 0.0010f, 0.3f, 2500, 300, 0.5f, 0, 0 },       // comet
+	{ 0.35f, 0.3f, 0.0004f, 0.5f, 900, 150, 0.15f, 0, 0 },       // hit invader
+	{ 0.35f, 0.8f, 0.0006f, 0, 0, 0, 0.15f, 0, 0 },              // hit meteor
+	{ 0.80f, 0, 0, 0.5f, 90, 70, 0, 0, 4 },                      // stage with invaders (loop)
+	{ 0.80f, 0, 0, 0.4f, 300, 500, 0, 0, 3 },                    // globe-thing (loop)
+	{ 0.80f, 0, 0, 0.4f, 200, 250, 0, 0, 5 },                    // not sure
+	{ 0.80f, 0, 0, 0.5f, 120, 160, 0, 0, 6 },                    // stage with wheels (loop)
+	{ 0.80f, 0.5f, 0.0020f, 0, 0, 0, 0, 0, 0 },                  // meteor stage (loop)
 };
 static const char *const lupin3_names[] = { "cap", "bark", "walk1", "walk2", "warp", "extend", "kick", NULL };
 static const synth_t lupin3_synth[] = {
@@ -368,6 +387,9 @@ int sia_init(int board, const char *set)
 	case SIA_LUPIN3:
 		load_samples("lupin3", lupin3_names, lupin3_synth);
 		break;
+	case SIA_OZMAWARS:
+		load_samples("ozmawars", ozmawars_names, ozmawars_synth);
+		break;
 	case SIA_SCHASER: case SIA_CRASHRD: case SIA_POLARIS: case SIA_NONE:
 		break;
 	default:
@@ -393,6 +415,8 @@ void sia_reset(void)
 	for (int i = 0; i < NCHAN; i++)
 		A.ch[i].idx = -1;
 	A.lupin3_step = 2;
+	if (s_board == SIA_DARTHVDR)
+		A.lupin3_step = 3;   // (darthvdr's m_fleet_step)
 	A.lfsr_lo = A.lfsr_hi = 1;
 	A.rng = 1;
 	lp_set(&A.spk_hp, 0.02);
@@ -555,6 +579,100 @@ void sia_write(int which, uint8_t data, sia_latch *l)
 			if (BIT(r2, 4)) sample_start(3, 7, 0);   // Death
 			l->flip_screen = BIT(data, 5) & l->cab;
 			A.port2_last = data;
+		}
+		break;
+	case SIA_SPACERNG:
+		if (which == 1)
+			invadpt2_sh_port_1_w(data, l);
+		else {   // spacerng_sh_port_2_w
+			if (BIT(r2, 0)) sample_start(4, 3, 0);   // FLEET
+			if (BIT(r2, 1)) sample_start(4, 4, 0);
+			if (BIT(r2, 2)) sample_start(4, 5, 0);
+			if (BIT(r2, 3)) sample_start(4, 6, 0);
+			if (BIT(r2, 4)) sample_start(3, 7, 0);   // SAUCER HIT
+			l->flip_screen = BIT(~data, 5) & l->cab;
+			A.port2_last = data;
+		}
+		break;
+	case SIA_OZMAWARS:   // (A.snd_en: m_sound_enable)
+		if (which == 1) {   // ozmawars_port03_w
+			A.port1_last = data;
+			l->screen_red = BIT(data, 2);
+			A.snd_en = BIT(data, 5);
+			if (A.snd_en) {
+				if (BIT(r1, 0)) sample_start(4, 11, 1);   // the globe-thing after the comet
+				if (BIT(r1, 1)) sample_start(0, 0, 0);    // fire
+				if (BIT(r1, 2)) sample_start(1, 1, 0);    // die
+				if (BIT(r1, 3)) sample_start(2, 8, 0);    // hit inv
+				if (BIT(r1, 4)) sample_start(4, 6, 0);    // refuel
+			} else
+				sample_stop(4);
+		} else if (which == 3) {   // ozmawars_port04_w
+			if (A.snd_en) {
+				if (data == 0x01) sample_start(4, 13, 1);   // stage with wheels
+				if (data == 0x15) sample_start(4, 10, 1);   // stage with invaders
+				if (data == 0x17) sample_start(3, 9, 0);    // meteor hit
+				if (data == 0x1f) sample_start(4, 14, 1);   // meteor stage
+			}
+			if (data == 0)
+				sample_stop(4);
+		} else {   // ozmawars_port05_w
+			A.port2_last = data;
+			l->flip_screen = BIT(data, 5) & l->cab;
+			l->color_map = BIT(data, 5);
+			if (A.snd_en) {
+				if (BIT(r2, 0)) sample_start(4, 2, 0);   // docking 1
+				if (BIT(r2, 1)) sample_start(4, 3, 0);   // docking 2
+				if (BIT(r2, 2)) sample_start(4, 4, 0);   // docking 3
+				if (BIT(r2, 3)) sample_start(4, 5, 0);   // docking 4
+				if (BIT(r2, 4)) sample_start(4, 7, 0);   // comet
+			}
+		}
+		break;
+	case SIA_YOSAKDON:
+		if (which == 1) {
+			if (BIT(r1, 0)) sample_start(0, 3, 0);   // Game Over
+			if (BIT(r1, 1)) sample_start(2, 0, 0);   // Bird dead
+			if (BIT(r1, 2)) sample_start(0, 1, 0);   // Rifle being fired
+			if (BIT(r1, 3)) sample_start(1, 2, 0);   // Man dead
+			if (BIT(r1, 4)) sample_start(5, 8, 0);   // Bonus Man?
+			A.mute = !BIT(data, 5);
+			A.port1_last = data;
+		} else {
+			if (BIT(r2, 0)) sample_start(1, 6, 0);   // Ready? , Game Over
+			if (BIT(r2, 2)) sample_start(3, 7, 0);   // Big bird dead
+			A.sn_on = BIT(data, 3);                  // Big bird (enable_w(BIT(~data, 3)))
+			if (BIT(r2, 4)) sample_start(2, 7, 0);   // Game Over
+			l->flip_screen = BIT(data, 5) & l->cab;
+			A.port2_last = data;
+		}
+		break;
+	case SIA_DARTHVDR:   // darthvdr_08_w (A.lupin3_step: m_fleet_step)
+		A.mute = !BIT(data, 0);
+		if (BIT(r1, 1)) sample_start(0, 0, 0);   // Shoot
+		if (BIT(r1, 2)) sample_start(3, 7, 0);   // Hit UFO
+		if (BIT(r1, 4)) sample_start(5, 8, 0);   // Bonus
+		A.sn_on = BIT(data, 5);                  // UFO (enable_w(BIT(~data, 5)))
+		if (BIT(r1, 6)) sample_start(1, 1, 0);   // Death
+		if (BIT(r1, 7)) sample_start(2, 2, 0);   // Hit
+		if (BIT(r1, 3)) {
+			sample_start(4, A.lupin3_step, 0);   // Fleet move in 4 steps
+			if (++A.lupin3_step > 6)
+				A.lupin3_step = 3;
+		}
+		A.port1_last = data;
+		break;
+	case SIA_ROLLINGC:
+		if (which == 1)
+			invadpt2_sh_port_1_w(data, l);
+		else if (which == 2)
+			invadpt2_sh_port_2_w(data, l);
+		else {   // rollingc_sh_port_w (A.last_effect: m_port_3_last)
+			uint8_t r3 = data & ~A.last_effect;
+			if (BIT(r3, 1)) sample_start(4, 0, 0);   // Steering
+			if (BIT(r3, 2)) sample_start(0, 1, 0);   // Collision
+			if (BIT(r3, 4)) sample_start(1, 8, 0);   // Computer car is starting to move
+			A.last_effect = data;
 		}
 		break;
 	case SIA_LUPIN3:
@@ -795,7 +913,8 @@ int16_t sia_sample(void)
 		}
 		out = (float)mix * (s_board == SIA_LRESCUE ? 0.75f : 1.0f) * 0.7f;
 		if (s_board == SIA_INVADERS || s_board == SIA_INVADPT2 || s_board == SIA_SPCEWARS || s_board == SIA_SCHASERCV ||
-		    s_board == SIA_BALLBOMB || s_board == SIA_INDIANBT || s_board == SIA_INDIANBTBR || s_board == SIA_LUPIN3)
+		    s_board == SIA_BALLBOMB || s_board == SIA_INDIANBT || s_board == SIA_INDIANBTBR || s_board == SIA_LUPIN3 ||
+		    s_board == SIA_SPACERNG || s_board == SIA_YOSAKDON || s_board == SIA_DARTHVDR || s_board == SIA_ROLLINGC)
 			out += sn_saucer() * 16000.0f;
 		if (s_board == SIA_SPCEWARS || s_board == SIA_LRESCUE || s_board == SIA_SCHASERCV)
 			out += hp_run(&A.spk_hp, A.speaker ? 1.0f : 0.0f) * 32767.0f * 0.25f;

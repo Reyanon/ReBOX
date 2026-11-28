@@ -5,6 +5,8 @@
     sprites and the spotlight mode (clip square + mask ROM) as in MAME's screen_update.
     Sound: the analog sound effects triggered through the noise latch ($a800-$a807) are not emulated in MAME either
     (silence here); the two AY-3-8910 are.
+    Machines: pitnrun_mcu (Pit & Run) and pitnrun (Jump Kun: no MCU, the inputs at $b800 and nothing at $c804 /
+    $d000 / $d800, as MAME's main_map).
     The TILT input (MAME: master reset hack) and the watchdog are not emulated.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
@@ -37,6 +39,7 @@ static uint8_t *s_main_rom, *s_audio_rom, *s_spot, *s_prom;
 static uint8_t s_ram[0x800], s_vram0[0x800], s_vram1[0x1000], s_spr[0x100], s_audio_ram[0x400];
 static zcpu s_main, s_audio;
 static m68705_t s_mcu;
+static int s_has_mcu;   // pitnrun_mcu, else pitnrun (no MCU)
 static uint8_t s_mainlatch, s_nmi, s_nmi_line, s_h_heed, s_v_heed, s_ha, s_scrolly, s_soundlatch;
 static uint16_t s_scroll;
 static uint8_t s_fromz80, s_toz80, s_zaccept, s_zready, s_porta_in, s_porta_out;
@@ -99,6 +102,7 @@ static uint8_t main_read(void *u, uint16_t a)
 	if (a == 0xa800) return port8(s_p_system);
 	if (a == 0xb000) return port8(s_p_dsw);
 	if (a == 0xb800) return (uint8_t)~port8((s_mainlatch & 0x40) ? s_p_cocktail : s_p_inputs);   // LS157 mux, inverted
+	if (!s_has_mcu) return 0;
 	if (a == 0xd000) { s_zaccept = 1; return s_toz80; }
 	if (a == 0xd800) return (uint8_t)~((s_zready << 1) | s_zaccept);
 	return 0;
@@ -120,6 +124,7 @@ static void main_write(void *u, uint16_t a, uint8_t v)
 	case 0xc801: s_scroll = (uint16_t)((s_scroll & 0x00ff) | v << 8); return;
 	case 0xc802: s_scrolly = v; return;
 	case 0xc804:   // to the MCU
+		if (!s_has_mcu) return;
 		s_zready = 1;
 		m68705_set_irq_line(&s_mcu, 1);
 		s_fromz80 = v;
@@ -368,7 +373,8 @@ static void pr_reset(void)
 	memset(&s_audio, 0, sizeof(s_audio));
 	zcpu_init(&s_main, main_read, main_write, no_in, no_out);
 	zcpu_init(&s_audio, audio_read, audio_write, audio_in, audio_out);
-	m68705_reset(&s_mcu);
+	if (s_has_mcu)
+		m68705_reset(&s_mcu);
 	s_mainlatch = s_nmi = s_nmi_line = 0;
 	s_h_heed = s_v_heed = s_ha = s_scrolly = s_soundlatch = 0;
 	s_scroll = 0;
@@ -376,7 +382,8 @@ static void pr_reset(void)
 	s_zaccept = 1;
 	s_zready = 0;
 	s_address = 0;
-	m68705_set_irq_line(&s_mcu, 0);
+	if (s_has_mcu)
+		m68705_set_irq_line(&s_mcu, 0);
 	s_frac_audio = s_frac_mcu = 0;
 	ay8910_reset(&s_ay[0]);
 	ay8910_reset(&s_ay[1]);
@@ -406,18 +413,19 @@ static int pr_init(const rbx_game *g)
 	uint32_t msize, asize, usize, ssize, bsize, fsize, spsize, psize;
 	s_main_rom = rbx_region("maincpu", &msize);
 	s_audio_rom = rbx_region("audiocpu", &asize);
-	uint8_t *mcu = rbx_region("mcu", &usize);
+	s_has_mcu = !strcmp(g->machine, "pitnrun_mcu");
+	uint8_t *mcu = s_has_mcu ? rbx_region("mcu", &usize) : NULL;
 	uint8_t *spr = rbx_region("sprites", &ssize);
 	uint8_t *bg = rbx_region("bgtiles", &bsize);
 	uint8_t *fg = rbx_region("fgtiles", &fsize);
 	s_spot = rbx_region("spot", &spsize);
 	s_prom = rbx_region("proms", &psize);
-	if (!s_main_rom || msize < 0x8000 || !s_audio_rom || asize < 0x2000 || !mcu || !spr || ssize < 0x6000 || !bg ||
+	if (!s_main_rom || msize < 0x8000 || !s_audio_rom || asize < 0x2000 || (s_has_mcu && !mcu) || !spr || ssize < 0x6000 || !bg ||
 	    bsize < 0x4000 || !fg || fsize < 0x2000 || !s_spot || spsize < 0x2000 || !s_prom || psize < 0x60) {
 		rbx_fail("%s: ROM regions missing", g->set);
 		return -1;
 	}
-	if (m68705_init(&s_mcu, M68705_P5, mcu, usize)) {
+	if (s_has_mcu && m68705_init(&s_mcu, M68705_P5, mcu, usize)) {
 		rbx_fail("%s: MCU ROM missing", g->set);
 		return -1;
 	}
@@ -506,7 +514,8 @@ static void pr_frame(void)
 		for (int s = 0; s < SLICES; s++) {
 			int last = s == SLICES - 1;
 			zcpu_run(&s_main, MAIN_LINE / SLICES);
-			m68705_execute(&s_mcu, uc / SLICES + (last ? uc % SLICES : 0));
+			if (s_has_mcu)
+				m68705_execute(&s_mcu, uc / SLICES + (last ? uc % SLICES : 0));
 			zcpu_run(&s_audio, ac / SLICES + (last ? ac % SLICES : 0));
 		}
 	}
@@ -543,7 +552,8 @@ static int pr_state(void *ctx, int load)
 	rc |= rbx_state_io(ctx, "vram1", s_vram1, sizeof(s_vram1));
 	rc |= rbx_state_io(ctx, "spr", s_spr, sizeof(s_spr));
 	rc |= rbx_state_io(ctx, "audram", s_audio_ram, sizeof(s_audio_ram));
-	rc |= rbx_state_io(ctx, "m68705", &s_mcu.st, sizeof(s_mcu.st));
+	if (s_has_mcu)
+		rc |= rbx_state_io(ctx, "m68705", &s_mcu.st, sizeof(s_mcu.st));
 	rc |= rbx_state_io(ctx, "ay0", &s_ay[0], ay8910_state_size());
 	rc |= rbx_state_io(ctx, "ay1", &s_ay[1], ay8910_state_size());
 	uint8_t v[16] = { s_mainlatch, s_nmi, s_nmi_line, s_h_heed, s_v_heed, s_ha, s_scrolly, s_soundlatch,
@@ -564,7 +574,6 @@ static int pr_state(void *ctx, int load)
 
 static int pr_save(void *ctx) { return pr_state(ctx, 0); }
 static int pr_load(void *ctx) { return pr_state(ctx, 1); }
-// "pitnrun" (jumpkun, no MCU) is not in the game table (not a Taito set)
-static int pr_supported(const char *machine) { return !strcmp(machine, "pitnrun_mcu"); }
+static int pr_supported(const char *machine) { return !strcmp(machine, "pitnrun_mcu") || !strcmp(machine, "pitnrun"); }
 
 const rbx_driver rbx_drv_pitnrun = { "Pit & Run", pr_init, pr_exit, pr_reset, pr_frame, pr_save, pr_load, pr_supported, pr_render };

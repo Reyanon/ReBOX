@@ -1,0 +1,54 @@
+{
+"name":"Capcom",
+"order":9,
+"games":[
+{
+"rompath":"/roms/sfach.zip",
+"title":"Street Fighter Alpha: Warriors' Dreams (CPS Changer, Publicity USA 950727)",
+"board":"CPS1",
+"publisher":"Capcom",
+"year":"1995",
+"genre":"Game Console",
+"marquee":"/marquee/sfach.png",
+"snap":"/snap/sfach.png",
+"video":"/video/sfach.mp4",
+"description":null
+},
+{
+"rompath":"/roms/sfzbch.zip",
+"title":"Street Fighter Zero (CPS Changer, Brazil 950727)",
+"board":"CPS1",
+"publisher":"Capcom",
+"year":"1995",
+"genre":"Game Console",
+"marquee":"/marquee/sfzbch.png",
+"snap":"/snap/sfzbch.png",
+"video":"/video/sfzbch.mp4",
+"description":null
+},
+{
+"rompath":"/roms/sfzch.zip",
+"title":"Street Fighter Zero (CPS Changer, Japan 951020)",
+"board":"CPS1",
+"publisher":"Capcom",
+"year":"1995",
+"genre":"Game Console",
+"marquee":"/marquee/sfzch.png",
+"snap":"/snap/sfzch.png",
+"video":"/video/sfzch.mp4",
+"description":null
+},
+{
+"rompath":"/roms/wofch.zip",
+"title":"Tenchi wo Kurau II: Sekiheki no Tatakai (CPS Changer, Japan 921031)",
+"board":"CPS1",
+"publisher":"Capcom",
+"year":"1994",
+"genre":"Game Console",
+"marquee":"/marquee/wofch.png",
+"snap":"/snap/wofch.png",
+"video":"/video/wofch.mp4",
+"description":null
+}
+]
+}

@@ -49,6 +49,10 @@ static uint32_t s_pcm_size, s_pcm2_size;
 static int s_loffire;
 static int s_fd1094_on, s_road_priority, s_gprider_hack, s_lastsurv, s_motor, s_smgp;
 static uint8_t s_adc_reverse[8];
+// the analog channels found by their fields (0: by the channel as before, stick X on 0 and Y reversed on 1): a throttle
+// (IPT_AD_STICK_Z, After Burner's channel 2, Thunder Blade's 1), Thunder Blade's stick X reversed and Y on channel 2
+enum { ADC_BY_CHANNEL, ADC_THROTTLE, ADC_X, ADC_X_REV, ADC_Y };
+static uint8_t s_adc_kind[8];
 static fd1094_t s_fd1094;
 static int s_port_io0a, s_port_io0b, s_port_io1[4], s_port_adc[8], s_port_mux[4];
 
@@ -275,8 +279,7 @@ static void adc_poll(void)
 		if (s_adc_reverse[which])
 			v = (uint8_t)(255 - v);
 		b.adc_result = v;
-		b.adc_intr = 1;
-	}
+		b.adc_intr = 1;	}
 }
 static uint8_t adc_r(void)
 {
@@ -1193,8 +1196,14 @@ static void analog_frame(void)
 		if (p < 0)
 			continue;
 		const int def = (int)(rbx_port_read(p) & 0xff);
+		if (s_adc_kind[i] == ADC_THROTTLE) {   // (the throttle lever: the general inputs' keys, held where they leave it)
+			b.adc_val[i] = (uint8_t)rbx_throttle();
+			continue;
+		}
 		int type = -1;
-		if (i == 0) type = RBX_IPT_AD_STICK_X;
+		if (s_adc_kind[i] == ADC_X) type = RBX_IPT_AD_STICK_X;
+		else if (s_adc_kind[i] == ADC_Y) type = RBX_IPT_AD_STICK_Y;
+		else if (i == 0) type = RBX_IPT_AD_STICK_X;
 		else if (i == 1) type = RBX_IPT_AD_STICK_Y;
 		if (type < 0) {
 			b.adc_val[i] = (uint8_t)def;
@@ -1202,8 +1211,10 @@ static void analog_frame(void)
 		}
 		const int d = rbx_analog_dpad(1, type, 4);
 		int v = b.adc_val[i];
+		// (MAME PORT_REVERSE: After Burner's stick Y on channel 1, Thunder Blade's stick X)
+		const int rev = s_adc_kind[i] ? s_adc_kind[i] == ADC_X_REV : i == 1;
 		if (d)
-			v += (i == 1) ? -d : d;
+			v += rev ? -d : d;
 		else if (v < def)
 			v = v + 4 > def ? def : v + 4;
 		else if (v > def)
@@ -1348,6 +1359,12 @@ static int xbd_init(const rbx_game *g)
 		for (int i = 0; i < 8; i++) {
 			snprintf(tag, sizeof(tag), "mainpcb:ADC%d", i);
 			s_port_adc[i] = rbx_port_find(tag);
+			// (thndrbld's PORT_REVERSE on stick X: its set and clones, "thndrbd1", "thndrbldd")
+			const int thunder = !strncmp(g->set, "thndrb", 6);
+			s_adc_kind[i] = rbx_port_has(s_port_adc[i], RBX_IPT_AD_STICK_Z) ? ADC_THROTTLE
+			              : i == 0 && thunder && rbx_port_has(s_port_adc[i], RBX_IPT_AD_STICK_X) ? ADC_X_REV
+			              : i >= 2 && rbx_port_has(s_port_adc[i], RBX_IPT_AD_STICK_X) ? ADC_X
+			              : i >= 2 && rbx_port_has(s_port_adc[i], RBX_IPT_AD_STICK_Y) ? ADC_Y : ADC_BY_CHANNEL;
 		}
 	}
 	// sound: YM2151 0.15 (L / R), the SegaPCM 0.35

@@ -16,6 +16,8 @@
 #ifdef RBX_ENABLE_LOG
 // once per frame from the loop that reads the pad: the buttons the script presses now
 uint32_t rbx_testpad_step(void);
+// the buttons the script pressed at its last step (for code that reads the devices itself, as the key capture)
+uint32_t rbx_testpad_last(void);
 // the touch the script makes now (1, x, y in screen pixels) or 0
 int rbx_testpad_touch(int *x, int *y);
 // (ADR-161) the test files the frame loop looked for on the memory card (keys, shotgame, shotfb), looked for instead by a
@@ -27,6 +29,7 @@ void rbx_testfiles_stop(void);
 int rbx_testfile_seen(const char *path);
 #else
 static inline uint32_t rbx_testpad_step(void) { return 0; }
+static inline uint32_t rbx_testpad_last(void) { return 0; }
 static inline int rbx_testpad_touch(int *x, int *y) { (void)x; (void)y; return 0; }
 static inline void rbx_testfiles_start(void) {}
 static inline void rbx_testfiles_stop(void) {}

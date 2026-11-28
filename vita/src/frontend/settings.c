@@ -1,6 +1,7 @@
 #include "frontend/settings.h"
 #include "frontend/neon.h"
 #include "common/re_pad.h"
+#include "rbx_core.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,9 +33,9 @@ rbx_settings g_settings = {
 	.start_stage = 0,
 	.port = {
 		{ .keymap = { RBX_KEY_SQUARE, RBX_KEY_CROSS, RBX_KEY_SELECT, RBX_KEY_START, RBX_KEY_CIRCLE, RBX_KEY_TRIANGLE, RBX_KEY_L,
-			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT, RBX_KEY_NONE, RBX_KEY_NONE }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
+			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
 		{ .keymap = { RBX_KEY_SQUARE, RBX_KEY_CROSS, RBX_KEY_SELECT, RBX_KEY_START, RBX_KEY_CIRCLE, RBX_KEY_TRIANGLE, RBX_KEY_L,
-			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT, RBX_KEY_NONE, RBX_KEY_NONE }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
+			RBX_KEY_R, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT }, .turbo_key = RBX_KEY_NONE, .turbo_btn = 1, .turbo_speed = RBX_TURBO_FAST },
 	},
 	.cheat_health = 0,
 	.dip_count = 2,
@@ -55,10 +56,9 @@ rbx_settings g_settings = {
 };
 
 static const char *const s_keymap_keys[RBX_ACT_COUNT] = { "key_attack", "key_jump", "key_coin", "key_start",
-	"key_b3", "key_b4", "key_b5", "key_b6", "key_rup", "key_rdown", "key_rleft", "key_rright", "key_test", "key_service" };
+	"key_b3", "key_b4", "key_b5", "key_b6", "key_rup", "key_rdown", "key_rleft", "key_rright" };
 static const char *const s_keymap2_keys[RBX_ACT_COUNT] = { "key2_attack", "key2_jump", "key2_coin", "key2_start",
-	"key2_b3", "key2_b4", "key2_b5", "key2_b6", "key2_rup", "key2_rdown", "key2_rleft", "key2_rright", "key2_test",
-	"key2_service" };
+	"key2_b3", "key2_b4", "key2_b5", "key2_b6", "key2_rup", "key2_rdown", "key2_rleft", "key2_rright" };
 
 // a stick as the d-pad, or pressing nothing
 void rbx_stick_preset(rbx_port *p, int st, int dpad)
@@ -82,7 +82,6 @@ void rbx_settings_default_port(int port)
 	p->keymap[RBX_ACT_B6] = RBX_KEY_R;
 	for (int d = 0; d < 4; d++)   // (the second joystick: the right stick)
 		p->keymap[RBX_ACT_R_UP + d] = RBX_KEY_RUP + d;
-	p->keymap[RBX_ACT_TEST] = p->keymap[RBX_ACT_SERVICE] = RBX_KEY_NONE;
 	p->turbo_key = RBX_KEY_NONE;
 	p->turbo_btn = 1;
 	p->turbo_speed = RBX_TURBO_FAST;
@@ -160,6 +159,100 @@ const char *rbx_key_name(int key)
 		"R-Stick Right", "L-Stick", "R-Stick",
 	};
 	return (key >= 0 && key < RBX_KEY_COUNT) ? n[key] : "None";
+}
+
+_Static_assert(RBX_GEN_COUNT <= RBX_GEN_MAX, "RBX_GEN_MAX: the core's general inputs");
+uint32_t rbx_keys_of(uint32_t buttons)
+{
+	uint32_t k = 0;
+	for (int i = 0; i < RBX_KEY_LANY; i++)
+		if (buttons & rbx_key_mask(i))
+			k |= 1u << i;
+	return k;
+}
+
+const char *rbx_gen_key_text(const rbx_gen_key *k, char *buf, int len)
+{
+	if (!k->keys) {
+		snprintf(buf, len, "None");
+		return buf;
+	}
+	int n = snprintf(buf, len, "%s (", re_pad_profile_name(k->prof));
+	int first = 1;
+	// (Select / Start first, as the system keys are written: SELECT+L)
+	static const int order[RBX_KEY_LANY] = { RBX_KEY_SELECT, RBX_KEY_START, RBX_KEY_L, RBX_KEY_R, RBX_KEY_L2, RBX_KEY_R2,
+		RBX_KEY_L3, RBX_KEY_R3, RBX_KEY_CROSS, RBX_KEY_CIRCLE, RBX_KEY_SQUARE, RBX_KEY_TRIANGLE, RBX_KEY_LUP, RBX_KEY_LDOWN,
+		RBX_KEY_LLEFT, RBX_KEY_LRIGHT, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT };
+	for (int j = 0; j < RBX_KEY_LANY && n < len; j++)
+		if (k->keys & (1u << order[j])) {
+			char kn[24];
+			snprintf(kn, sizeof(kn), "%s", rbx_key_name(order[j]));
+			for (char *c = kn; *c; c++)
+				if (*c >= 'a' && *c <= 'z')
+					*c = (char)(*c - 'a' + 'A');
+			n += snprintf(buf + n, len - n, "%s%s", first ? "" : "+", kn);
+			first = 0;
+		}
+	if (n < len)
+		snprintf(buf + n, len - n, ")");
+	return buf;
+}
+
+// a General Key Mapping line: "<id>[.<n>]" (n: its more keys, 1..), its value "<profile key>:<key>[+<key>]" (bad: no key)
+static void read_gen(const char *key, const char *val)
+{
+	char id[32];
+	snprintf(id, sizeof(id), "%s", key);
+	char *dot = strchr(id, '.');
+	const int slot = dot ? atoi(dot + 1) : 0;
+	if (dot)
+		*dot = 0;
+	int g = 0;
+	while (g < RBX_GEN_COUNT && strcmp(id, rbx_general_id(g)))
+		g++;
+	const char *colon = strchr(val, ':');
+	if (g == RBX_GEN_COUNT || !colon || slot < 0 || slot >= RBX_GEN_KEYS)
+		return;
+	int prof = 0;
+	while (prof < RBX_PROFILES && (strlen(re_pad_profile_key(prof)) != (size_t)(colon - val) ||
+		strncmp(val, re_pad_profile_key(prof), colon - val)))
+		prof++;
+	if (prof == RBX_PROFILES)
+		return;
+	uint32_t keys = 0;
+	int n = 0;
+	for (const char *p = colon + 1; *p && n < 2; n++) {
+		const int k = atoi(p);
+		if (k < 0 || k >= RBX_KEY_LANY)
+			return;
+		keys |= 1u << k;
+		p = strchr(p, '+');
+		if (!p)
+			break;
+		p++;
+	}
+	g_settings.gen[g][slot].prof = prof;
+	g_settings.gen[g][slot].keys = keys;
+}
+static void write_gen(FILE *f)
+{
+	for (int g = 0; g < RBX_GEN_COUNT; g++)
+	for (int s = 0, n = 0; s < RBX_GEN_KEYS; s++) {   // (the more keys numbered from 1 again, packed)
+		const rbx_gen_key *k = &g_settings.gen[g][s];
+		if (!k->keys)
+			continue;
+		if (s == 0)
+			fprintf(f, "gen_%s=%s:", rbx_general_id(g), re_pad_profile_key(k->prof));
+		else
+			fprintf(f, "gen_%s.%d=%s:", rbx_general_id(g), ++n, re_pad_profile_key(k->prof));
+		int first = 1;
+		for (int i = 0; i < RBX_KEY_LANY; i++)
+			if (k->keys & (1u << i)) {
+				fprintf(f, "%s%d", first ? "" : "+", i);
+				first = 0;
+			}
+		fprintf(f, "\n");
+	}
 }
 
 static int clampi(int v, int lo, int hi)
@@ -350,6 +443,16 @@ static int read_port(const char *key, int val)
 				return 1;
 			}
 		}
+		// (v0.16.87's Test switch / Service switch keys on a device's page: now General Key Mapping's, kept there
+		// unless it has its own)
+		const int tg = !strcmp(key, "key_test") ? RBX_GEN_TEST : !strcmp(key, "key_service") ? RBX_GEN_SERVICE1 : -1;
+		if (tg >= 0) {
+			if (val >= 0 && val < RBX_KEY_LANY && !g_settings.gen[tg][0].keys) {
+				g_settings.gen[tg][0].prof = (int)(p - g_settings.port);
+				g_settings.gen[tg][0].keys = 1u << val;
+			}
+			return 1;
+		}
 		return 0;
 	}
 	return 1;
@@ -520,6 +623,7 @@ void rbx_settings_load(void)
 		else if (!strcmp(key, "pad_p2")) g_settings.pad_src[1] = clampi(val, 0, RE_PAD_SRC_COUNT - 1);
 		else if (!strcmp(key, "pad_p2_added")) g_settings.p2_added = val != 0;
 		else if (!strcmp(key, "input_engine")) g_settings.input_engine = clampi(val, 0, RE_PAD_ENGINE_COUNT - 1);
+		else if (!strncmp(key, "gen_", 4)) read_gen(key + 4, sval);   // (General Key Mapping)
 		else if (!strncmp(key, "dip", 3)) read_dips(key, val); // (nbbatman-only era file: nbbatman's DIP)
 	}
 	fclose(f);
@@ -612,6 +716,7 @@ void rbx_settings_save(void)
 		fprintf(f, "bios_neogeo=%s\n", g_settings.bios_neogeo);
 	fprintf(f, "pad_p1=%d\npad_p2=%d\ninput_engine=%d\n", g_settings.pad_src[0], g_settings.pad_src[1], g_settings.input_engine);
 	fprintf(f, "pad_p2_added=%d\n", g_settings.p2_added);
+	write_gen(f);
 	fclose(f);
 	if (!s_game[0])
 		return;

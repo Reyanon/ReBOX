@@ -49,30 +49,63 @@
 #define ROM_DIR      RBX_DATA_DIR "roms/" // where the user puts ROMs (created at startup)
 // ROM folder candidates: roms/, then the data folder itself; first hit per game (rbx_games.c)
 // the ROM folders: roms/, the data folder, then the other folders the game lists' "rompath"s name (user 11-22)
-#define ROM_DIRS_MAX 18
-static const char *k_rom_dirs[ROM_DIRS_MAX] = { ROM_DIR, RBX_DATA_DIR };
+// (user 11-28: any number of folders from Settings: the list is the app's own copies, made again only between games,
+// as the core holds the pointers while a game runs)
+#define ROM_DIRS_LIST 16   // (the game lists' folders at most)
+static const char *s_rom_dir0[2] = { ROM_DIR, RBX_DATA_DIR };
+static const char **k_rom_dirs = s_rom_dir0;
 static int s_rom_dirs = 2;
 #define ROM_DIRS s_rom_dirs
-// the ROM folders again: roms/, the data folder, the two chosen in Settings, then the game lists' (menu.c calls it
-// when a chosen folder changes). Returns how many
-int rbx_rom_dirs_refresh(void)
+static int rom_dir_known(const char *const *v, int n, const char *d)
 {
-	int n = 2;
-	for (int k = RBX_FOLDER_ROM1; k <= RBX_FOLDER_ROM2; k++) {
-		const char *d = rbx_folder(k);
-		int known = !d[0];
-		for (int i = 0; i < n && !known; i++)
-			known = !strcasecmp(k_rom_dirs[i], d);
-		if (!known) {
-			k_rom_dirs[n++] = d;
-			RBX_LOG("roms: also in %s (Settings)", d);
-		}
+	for (int i = 0; i < n; i++)
+		if (!strcasecmp(v[i], d))
+			return 1;
+	return 0;
+}
+// the ROM folders again: roms/, the data folder, those chosen in Settings in their order, then the game lists' (menu.c
+// calls it between games when a chosen folder changes). Returns how many; dirs (may be NULL): set to the list
+int rbx_rom_dirs_refresh(const char *const **dirs)
+{
+	const int nset = rbx_folder_count(RBX_FOLDER_ROM);
+	const char **v = (const char **)malloc((size_t)(2 + nset + ROM_DIRS_LIST) * sizeof(*v));
+	if (!v) {
+		if (dirs)
+			*dirs = k_rom_dirs;
+		return s_rom_dirs;
+	}
+	int n = 0;
+	v[n++] = ROM_DIR;
+	v[n++] = RBX_DATA_DIR;
+	for (int k = 0; k < nset; k++) {
+		const char *d = rbx_folder(RBX_FOLDER_ROM, k);
+		if (!d[0] || rom_dir_known(v, n, d))
+			continue;
+		char *c = strdup(d);
+		if (!c)
+			break;
+		v[n++] = c;
+		RBX_LOG("roms: also in %s (Settings)", d);
 	}
 	const int m = n;
-	n += rbx_gamelist_rom_dirs(k_rom_dirs, m, k_rom_dirs + m, ROM_DIRS_MAX - m);
-	for (int i = m; i < n; i++)
-		RBX_LOG("roms: also in %s (game list)", k_rom_dirs[i]);
+	const char *gl[ROM_DIRS_LIST];
+	const int ng = rbx_gamelist_rom_dirs(v, m, gl, ROM_DIRS_LIST);
+	for (int i = 0; i < ng; i++) {   // (the game list keeps its own: copied too, as the others)
+		char *c = strdup(gl[i]);
+		if (!c)
+			break;
+		v[n++] = c;
+		RBX_LOG("roms: also in %s (game list)", c);
+	}
+	if (k_rom_dirs != s_rom_dir0) {   // (the last list: its copies, after the first two)
+		for (int i = 2; i < s_rom_dirs; i++)
+			free((void *)k_rom_dirs[i]);
+		free(k_rom_dirs);
+	}
+	k_rom_dirs = v;
 	s_rom_dirs = n;
+	if (dirs)
+		*dirs = k_rom_dirs;
 	return n;
 }
 static int s_kctrl_restarted;   // started again by rbx_kctrl_init (the first start after boot)
@@ -507,13 +540,10 @@ static int run_game(const rbx_game_found *game)
 	rbx_loading_title(rbx_core_game_title(game->game));
 	rbx_loading_progress(0);
 	rbx_settings_load_game(set);
-	static const char *dirs[ROM_DIRS_MAX];
-	for (int i = 0; i < ROM_DIRS; i++)
-		dirs[i] = k_rom_dirs[i];
 	fe_config cfg = {
 		.c = {
 			.set = set,
-			.rom_dirs = dirs,
+			.rom_dirs = k_rom_dirs,   // (kept as they are until the game ends: rbx_rom_dirs_refresh runs between games)
 			.rom_dir_count = ROM_DIRS,
 			.sample_rate = RBX_AUDIO_RATE,
 			.bytes_per_pixel = 2,
@@ -1124,7 +1154,7 @@ int main(int argc, char *argv[])
 	RBX_LOG("input engine: %s, RePad %s", re_pad_engine_name(g_settings.input_engine), re_pad_plugin() ? "running" : "not running");
 	rbx_gamelist_load();   // (the lists' ROM folders join the scan)
 	rbx_folders_load();
-	rbx_rom_dirs_refresh();
+	rbx_rom_dirs_refresh(NULL);
 	rbx_menu_init();
 	rbx_loading_prepare(); // (the loading screen's background, decoded once now rather than when a game is chosen)
 #ifdef RBX_ENABLE_LOG

@@ -1,4 +1,4 @@
-/*  Space Invaders family (Intel 8080, Taito sets of MAME src/mame/midw8080/8080bw.cpp): internals shared by
+/*  Space Invaders family (Intel 8080, MAME src/mame/midw8080/8080bw.cpp): internals shared by
     the machine part (si8080.c) and the sound part (si8080_a.c).
     This file is part of ReBOX. GPL-2.0-or-later.
 */
@@ -21,6 +21,11 @@ enum {
 	SIA_BALLBOMB,    // invaders samples + note music
 	SIA_INDIANBT,    // invaders samples + note music
 	SIA_INDIANBTBR,  // invaders samples
+	SIA_SPACERNG,    // invadpt2 with spacerng_sh_port_2_w
+	SIA_OZMAWARS,    // "ozmawars" samples (ozmawars_port03_w / 04 / 05)
+	SIA_YOSAKDON,    // SN76477 + invaders samples (yosakdon_state::sh_port_1_w / 2)
+	SIA_DARTHVDR,    // SN76477 + invaders samples (darthvdr_08_w)
+	SIA_ROLLINGC,    // invadpt2 + rollingc_sh_port_w
 	SIA_NONE
 };
 

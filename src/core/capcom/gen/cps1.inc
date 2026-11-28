@@ -7670,6 +7670,149 @@ static const rbx_rom_region cps1_romr_cps1mult[] = {
 	{ "oki", 0x400000, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load cps1_roml_wofch[] = {
+	{ RBX_ROM_LOAD, 0, "tk2=ch=_23.8f", 0x0, 0x80000, 0x4e0b8dee, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "tk2=ch=_22.7f", 0x80000, 0x80000, 0xd0937a8d, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 1, "tk2-1m.3a", 0x0, 0x80000, 0x0d9cb9bf, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "tk2-3m.5a", 0x2, 0x80000, 0x45227027, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "tk2-2m.4a", 0x4, 0x80000, 0xc5ca2460, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "tk2-4m.6a", 0x6, 0x80000, 0xe349551c, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "tk2=ch=_05.7a", 0x200000, 0x80000, 0xe4a44d53, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "tk2=ch=_06.8a", 0x200002, 0x80000, 0x58066ba8, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "tk2=ch=_07.9a", 0x200004, 0x80000, 0xcc9006c9, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "tk2=ch=_08.10a", 0x200006, 0x80000, 0xd4a19a02, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "tk2_qa.5k", 0x0, 0x8000, 0xc9183a0d, 1, 0, 0, 0 },
+	{ RBX_ROM_CONTINUE, 2, NULL, 0x10000, 0x18000, 0, 0, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "tk2-q1.1k", 0x0, 0x80000, 0x611268cf, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "tk2-q2.2k", 0x80000, 0x80000, 0x20f55ca9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "tk2-q3.3k", 0x100000, 0x80000, 0xbfcf6f52, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "tk2-q4.4k", 0x180000, 0x80000, 0x36642e88, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 8, "dl-1425.bin", 0x0, 0x2000, 0xd6cf5ef5, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region cps1_romr_wofch[] = {
+	{ "maincpu", 0x400000, 0x00 },
+	{ "gfx", 0x400000, 0x00 },
+	{ "audiocpu", 0x28000, 0x00 },
+	{ "qsound", 0x200000, 0x00 },
+	{ "aboardplds", 0x200, 0x00 },
+	{ "bboardplds", 0x200, 0x00 },
+	{ "cboardplds", 0x200, 0x00 },
+	{ "dboardplds", 0x200, 0x00 },
+	{ "qsound:dsp", 0x2000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load cps1_roml_sfzch[] = {
+	{ RBX_ROM_LOAD, 0, "sfzch23", 0x0, 0x80000, 0x1140743f, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "sfza22", 0x80000, 0x80000, 0x8d9b2480, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "sfzch21", 0x100000, 0x80000, 0x5435225d, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "sfza20", 0x180000, 0x80000, 0x806e8f38, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_01.3a", 0x0, 0x80000, 0x0dd53e62, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_02.4a", 0x2, 0x80000, 0x94c31e3f, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_03.5a", 0x4, 0x80000, 0x9584ac85, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_04.6a", 0x6, 0x80000, 0xb983624c, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_05.7a", 0x200000, 0x80000, 0x2b47b645, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_06.8a", 0x200002, 0x80000, 0x74fd9fb1, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_07.9a", 0x200004, 0x80000, 0xbb2c734d, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_08.10a", 0x200006, 0x80000, 0x454f7868, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_10.3c", 0x400000, 0x80000, 0x2a7d675e, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_11.4c", 0x400002, 0x80000, 0xe35546c8, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_12.5c", 0x400004, 0x80000, 0xf122693a, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_13.6c", 0x400006, 0x80000, 0x7cf942c8, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_14.7c", 0x600000, 0x80000, 0x09038c81, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_15.8c", 0x600002, 0x80000, 0x1aa17391, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_16.9c", 0x600004, 0x80000, 0x19a5abd6, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_17.10c", 0x600006, 0x80000, 0x248b3b73, 2, 6, 0, 0 },
+	{ RBX_ROM_COPY, 2, NULL, 0x0, 0x8000, 0, 0, 0, 0, 0x1000000 },
+	{ RBX_ROM_LOAD, 3, "sfz_09.12a", 0x0, 0x8000, 0xc772628b, 1, 0, 0, 0 },
+	{ RBX_ROM_CONTINUE, 3, NULL, 0x10000, 0x8000, 0, 0, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 4, "sfz_18.11c", 0x0, 0x20000, 0x61022b2d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 4, "sfz_19.12c", 0x20000, 0x20000, 0x3b5886d5, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region cps1_romr_sfzch[] = {
+	{ "maincpu", 0x400000, 0x00 },
+	{ "gfx", 0x800000, 0x00 },
+	{ "stars", 0x8000, 0x00 },
+	{ "audiocpu", 0x18000, 0x00 },
+	{ "oki", 0x40000, 0x00 },
+	{ "bboardplds", 0x200, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load cps1_roml_sfach[] = {
+	{ RBX_ROM_LOAD, 0, "sfach23", 0x0, 0x80000, 0x02a1a853, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "sfza22", 0x80000, 0x80000, 0x8d9b2480, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "sfzch21", 0x100000, 0x80000, 0x5435225d, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "sfza20", 0x180000, 0x80000, 0x806e8f38, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz01", 0x0, 0x80000, 0x0dd53e62, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz02", 0x2, 0x80000, 0x94c31e3f, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz03", 0x4, 0x80000, 0x9584ac85, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz04", 0x6, 0x80000, 0xb983624c, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz05", 0x200000, 0x80000, 0x2b47b645, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz06", 0x200002, 0x80000, 0x74fd9fb1, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz07", 0x200004, 0x80000, 0xbb2c734d, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz08", 0x200006, 0x80000, 0x454f7868, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz10", 0x400000, 0x80000, 0x2a7d675e, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz11", 0x400002, 0x80000, 0xe35546c8, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz12", 0x400004, 0x80000, 0xf122693a, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz13", 0x400006, 0x80000, 0x7cf942c8, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz14", 0x600000, 0x80000, 0x09038c81, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz15", 0x600002, 0x80000, 0x1aa17391, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz16", 0x600004, 0x80000, 0x19a5abd6, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz17", 0x600006, 0x80000, 0x248b3b73, 2, 6, 0, 0 },
+	{ RBX_ROM_COPY, 2, NULL, 0x0, 0x8000, 0, 0, 0, 0, 0x1000000 },
+	{ RBX_ROM_LOAD, 3, "sfz09", 0x0, 0x8000, 0xc772628b, 1, 0, 0, 0 },
+	{ RBX_ROM_CONTINUE, 3, NULL, 0x10000, 0x8000, 0, 0, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 4, "sfz18", 0x0, 0x20000, 0x61022b2d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 4, "sfz19", 0x20000, 0x20000, 0x3b5886d5, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region cps1_romr_sfach[] = {
+	{ "maincpu", 0x400000, 0x00 },
+	{ "gfx", 0x800000, 0x00 },
+	{ "stars", 0x8000, 0x00 },
+	{ "audiocpu", 0x18000, 0x00 },
+	{ "oki", 0x40000, 0x00 },
+	{ "bboardplds", 0x200, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load cps1_roml_sfzbch[] = {
+	{ RBX_ROM_LOAD, 0, "sfzbch23", 0x0, 0x80000, 0x53699f68, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "sfza22", 0x80000, 0x80000, 0x8d9b2480, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "sfzch21", 0x100000, 0x80000, 0x5435225d, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 0, "sfza20", 0x180000, 0x80000, 0x806e8f38, 2, 0, 1, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_01.3a", 0x0, 0x80000, 0x0dd53e62, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_02.4a", 0x2, 0x80000, 0x94c31e3f, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_03.5a", 0x4, 0x80000, 0x9584ac85, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_04.6a", 0x6, 0x80000, 0xb983624c, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_05.7a", 0x200000, 0x80000, 0x2b47b645, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_06.8a", 0x200002, 0x80000, 0x74fd9fb1, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_07.9a", 0x200004, 0x80000, 0xbb2c734d, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_08.10a", 0x200006, 0x80000, 0x454f7868, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_10.3c", 0x400000, 0x80000, 0x2a7d675e, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_11.4c", 0x400002, 0x80000, 0xe35546c8, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_12.5c", 0x400004, 0x80000, 0xf122693a, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_13.6c", 0x400006, 0x80000, 0x7cf942c8, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_14.7c", 0x600000, 0x80000, 0x09038c81, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_15.8c", 0x600002, 0x80000, 0x1aa17391, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_16.9c", 0x600004, 0x80000, 0x19a5abd6, 2, 6, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "sfz_17.10c", 0x600006, 0x80000, 0x248b3b73, 2, 6, 0, 0 },
+	{ RBX_ROM_COPY, 2, NULL, 0x0, 0x8000, 0, 0, 0, 0, 0x1000000 },
+	{ RBX_ROM_LOAD, 3, "sfz_09.12a", 0x0, 0x8000, 0xc772628b, 1, 0, 0, 0 },
+	{ RBX_ROM_CONTINUE, 3, NULL, 0x10000, 0x8000, 0, 0, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 4, "sfz_18.11c", 0x0, 0x20000, 0x61022b2d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 4, "sfz_19.12c", 0x20000, 0x20000, 0x3b5886d5, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region cps1_romr_sfzbch[] = {
+	{ "maincpu", 0x400000, 0x00 },
+	{ "gfx", 0x800000, 0x00 },
+	{ "stars", 0x8000, 0x00 },
+	{ "audiocpu", 0x18000, 0x00 },
+	{ "oki", 0x40000, 0x00 },
+	{ "bboardplds", 0x200, 0x00 },
+	{ NULL, 0, 0 }
+};
 
 static const rbx_ipt_setting cps1_ips_1941[] = {
 	{ 0x40, "Off" },
@@ -13217,6 +13360,56 @@ static const rbx_ipt_port cps1_ipp_sf2rb[] = {
 	{ "DSWC", 39, 8 },
 	{ NULL, 0, 0 }
 };
+static const rbx_ipt_setting cps1_ips_sfzch[] = {
+	{ 0xff, "Off" },
+	{ 0x0, "On" },
+	{ 0xff, "Off" },
+	{ 0x0, "On" },
+	{ 0xff, "Off" },
+	{ 0x0, "On" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field cps1_ipf_sfzch[] = {
+	{ 0x1, 0x1, RBX_IPT_BUTTON5, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON5, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON7, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON7, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_BUTTON6, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_BUTTON6, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_BUTTON2, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_BUTTON3, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_BUTTON4, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x100, 0x100, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x200, 0x200, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x400, 0x400, RBX_IPT_JOYSTICK_DOWN, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x800, 0x800, RBX_IPT_JOYSTICK_UP, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1000, 0x1000, RBX_IPT_BUTTON1, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2000, 0x2000, RBX_IPT_BUTTON2, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4000, 0x4000, RBX_IPT_BUTTON3, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8000, 0x8000, RBX_IPT_BUTTON4, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port cps1_ipp_sfzch[] = {
+	{ "IN0", 0, 8 },
+	{ "DSWA", 8, 1 },
+	{ "DSWB", 9, 1 },
+	{ "DSWC", 10, 1 },
+	{ "IN1", 11, 16 },
+	{ "IN2", 27, 1 },
+	{ "IN3", 28, 1 },
+	{ NULL, 0, 0 }
+};
 static const rbx_ipt_setting cps1_ips_slammast[] = {
 	{ 0x8, "Off" },
 	{ 0x0, "On" },
@@ -13924,6 +14117,62 @@ static const rbx_ipt_port cps1_ipp_wof[] = {
 	{ "EEPROMOUT", 38, 3 },
 	{ NULL, 0, 0 }
 };
+static const rbx_ipt_setting cps1_ips_wofch[] = {
+	{ 0xff, "Off" },
+	{ 0x0, "On" },
+	{ 0xff, "Off" },
+	{ 0x0, "On" },
+	{ 0xff, "Off" },
+	{ 0x0, "On" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field cps1_ipf_wofch[] = {
+	{ 0x1, 0x1, RBX_IPT_BUTTON5, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON5, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON7, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON7, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_BUTTON6, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_BUTTON6, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_BUTTON2, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_BUTTON3, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_BUTTON4, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x100, 0x100, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x200, 0x200, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x400, 0x400, RBX_IPT_JOYSTICK_DOWN, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x800, 0x800, RBX_IPT_JOYSTICK_UP, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1000, 0x1000, RBX_IPT_BUTTON1, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2000, 0x2000, RBX_IPT_BUTTON2, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4000, 0x4000, RBX_IPT_BUTTON3, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8000, 0x8000, RBX_IPT_BUTTON4, 2, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_OUTPUT, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port cps1_ipp_wofch[] = {
+	{ "IN0", 0, 8 },
+	{ "DSWA", 8, 1 },
+	{ "DSWB", 9, 1 },
+	{ "DSWC", 10, 1 },
+	{ "IN1", 11, 16 },
+	{ "IN2", 27, 1 },
+	{ "IN3", 28, 1 },
+	{ "EEPROMIN", 29, 1 },
+	{ "EEPROMOUT", 30, 3 },
+	{ NULL, 0, 0 }
+};
 static const rbx_ipt_setting cps1_ips_wofhfh[] = {
 	{ 0x3, "1 Coin / 1 Credit" },
 	{ 0x2, "1 Coin / 2 Credits" },
@@ -14240,5 +14489,9 @@ static const rbx_game cps1_games[] = {
 	{ "pang3b4", "pang3", "Pang! 3 (bootleg, set 4)", "1995", "bootleg", "Capcom CPS1", "cps1_12MHz", 0, 0, cps1_romr_pang3b4, cps1_roml_pang3b4, cps1_ipp_pang3b4, cps1_ipf_pang3b4, cps1_ips_pang3b4 },
 	{ "pang3b5", "pang3", "Pang! 3 (bootleg, set 5)", "1995", "bootleg", "Capcom CPS1", "pang3", 0, 0, cps1_romr_pang3b5, cps1_roml_pang3b5, cps1_ipp_pang3, cps1_ipf_pang3, cps1_ips_pang3 },
 	{ "cps1mult", NULL, "CPS1 Multi Game", "20??", "bootleg", "Capcom CPS1", "cps1_12MHz", 0, RBX_GF_NOT_WORKING, cps1_romr_cps1mult, cps1_roml_cps1mult, cps1_ipp_sf2, cps1_ipf_sf2, cps1_ips_sf2 },
+	{ "wofch", NULL, "Tenchi wo Kurau II: Sekiheki no Tatakai (CPS Changer, Japan 921031)", "1994", "Capcom", "Capcom CPS1", "qsound", 0, 0, cps1_romr_wofch, cps1_roml_wofch, cps1_ipp_wofch, cps1_ipf_wofch, cps1_ips_wofch },
+	{ "sfzch", NULL, "Street Fighter Zero (CPS Changer, Japan 951020)", "1995", "Capcom", "Capcom CPS1", "cps1_12MHz", 0, 0, cps1_romr_sfzch, cps1_roml_sfzch, cps1_ipp_sfzch, cps1_ipf_sfzch, cps1_ips_sfzch },
+	{ "sfach", "sfzch", "Street Fighter Alpha: Warriors' Dreams (CPS Changer, Publicity USA 950727)", "1995", "Capcom", "Capcom CPS1", "cps1_12MHz", 0, 0, cps1_romr_sfach, cps1_roml_sfach, cps1_ipp_sfzch, cps1_ipf_sfzch, cps1_ips_sfzch },
+	{ "sfzbch", "sfzch", "Street Fighter Zero (CPS Changer, Brazil 950727)", "1995", "Capcom", "Capcom CPS1", "cps1_12MHz", 0, 0, cps1_romr_sfzbch, cps1_roml_sfzbch, cps1_ipp_sfzch, cps1_ipf_sfzch, cps1_ips_sfzch },
 };
-#define CPS1_GAME_COUNT 229
+#define CPS1_GAME_COUNT 233

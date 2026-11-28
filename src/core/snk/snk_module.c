@@ -11,6 +11,7 @@
 #include "gen/alpha68k.inc"
 #include "gen/alpha68k_i.inc"
 #include "gen/alpha68k_n.inc"
+#include "hacks.inc"   // (Neo Geo hacks added on request, ADR-232)
 
 extern const rbx_driver rbx_drv_neogeo;
 extern const rbx_driver rbx_drv_snk68;
@@ -20,6 +21,7 @@ extern const rbx_driver rbx_drv_alpha68k_n;
 
 static const rbx_board_tab s_boards[] = {
 	{ neogeo_games, NEOGEO_GAME_COUNT, &rbx_drv_neogeo },
+	{ neogeo_hack_games, NEOGEO_HACK_GAME_COUNT, &rbx_drv_neogeo },
 	{ snk68_games, SNK68_GAME_COUNT, &rbx_drv_snk68 },
 	{ prehisle_games, PREHISLE_GAME_COUNT, &rbx_drv_prehisle },
 	{ alpha68k_games, ALPHA68K_GAME_COUNT, &rbx_drv_alpha68k },

@@ -302,9 +302,10 @@ used.
 | Marquees (*Marquee* border) | `ux0:data/rebox/marquee/<set>.png` (or `.jpg`) |
 | MAME cheats | `ux0:data/rebox/cheats/cheat.zip`, or `ux0:data/rebox/cheats/<set>.xml` (see [Cheats](#cheats)) |
 
-**Other folders.** Settings > Folders adds two more ROM folders (for example RetroArch's) and a snap and a marquee
-folder. Pictures there are found by set name (`<set>.png` / `.jpg`) or by RetroArch's thumbnail names (the game's
-title). The game lists' paths do not need to change.
+**Other folders.** Settings > Folders has a list each for ROM folders (for example RetroArch's), snap folders and
+marquee folders: add as many as you like, change or remove them (Square). They are searched in their order, ROM folders
+after `roms/`. Pictures there are found by set name (`<set>.png` / `.jpg`) or by RetroArch's thumbnail names (the
+game's title). The game lists' paths do not need to change.
 
 **Game list entries.** Each game in a list names its files:
 

@@ -81,6 +81,82 @@ static const rbx_rom_region roundup_romr_ttfitter[] = {
 	{ "proms", 0x20, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load roundup_roml_thepit[] = {
+	{ RBX_ROM_LOAD, 0, "pit1.bin", 0x0, 0x1000, 0x71affecc, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pit2.bin", 0x1000, 0x1000, 0x894063cd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pit3.bin", 0x2000, 0x1000, 0x1b488543, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pit4.bin", 0x3000, 0x1000, 0xe941e848, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pit5.bin", 0x4000, 0x1000, 0xe0643c95, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "pit6.bin", 0x0, 0x800, 0x1b79dfb6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "pit8.bin", 0x0, 0x800, 0x69502afc, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "pit7.bin", 0x1000, 0x800, 0xd901b353, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "82s123.ic4", 0x0, 0x20, 0xa758b567, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_thepit[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x1800, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_thepitu1[] = {
+	{ RBX_ROM_LOAD, 0, "p38b.ic38", 0x0, 0x1000, 0x7315e1bc, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "p39b.ic39", 0x1000, 0x1000, 0xc9cc30fe, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "p40b.ic40", 0x2000, 0x1000, 0x986738b5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "p41b.ic41", 0x3000, 0x1000, 0x31ceb0a1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "p33b.ic33", 0x4000, 0x1000, 0x614ec454, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "p30.ic30", 0x0, 0x800, 0x1b79dfb6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "p9.ic9", 0x0, 0x800, 0x69502afc, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "p8.ic8", 0x1000, 0x800, 0x2ddd5045, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "82s123.ic4", 0x0, 0x20, 0xa758b567, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_thepitu1[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x1800, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_thepitu2[] = {
+	{ RBX_ROM_LOAD, 0, "p38.ic38", 0x0, 0x1000, 0x332723e2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "p39.ic39", 0x1000, 0x1000, 0x4fdc11b7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "p40.ic40", 0x2000, 0x1000, 0xe4327d0e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "p41.ic41", 0x3000, 0x1000, 0x7d5df97c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "p33.ic33", 0x4000, 0x1000, 0x396d9856, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "p30.ic30", 0x0, 0x800, 0x1b79dfb6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "p9b.ic9", 0x0, 0x800, 0x69502afc, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "p8b.ic8", 0x1000, 0x800, 0x2ddd5045, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "82s123.ic4", 0x0, 0x20, 0xa758b567, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_thepitu2[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x1800, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_thepitu3[] = {
+	{ RBX_ROM_LOAD, 0, "pi-38.ic38", 0x0, 0x1000, 0x71affecc, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pi-39.ic39", 0x1000, 0x1000, 0x894063cd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pi-40.ic40", 0x2000, 0x1000, 0x1b488543, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pi-41.ic41", 0x3000, 0x1000, 0xf33aab67, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "pi-33.ic33", 0x4000, 0x1000, 0x394ef216, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "pi-30.ic30", 0x0, 0x800, 0x1b79dfb6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "pi-9.ic9", 0x0, 0x800, 0x69502afc, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "pi-8.ic8", 0x1000, 0x800, 0x2ddd5045, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "82s123.ic4", 0x0, 0x20, 0xa758b567, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_thepitu3[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x1800, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
 static const rbx_rom_load roundup_roml_thepitj[] = {
 	{ RBX_ROM_LOAD, 0, "pit01.ic38", 0x0, 0x1000, 0x87c269bf, 1, 0, 0, 0 },
 	{ RBX_ROM_LOAD, 0, "pit02.ic39", 0x1000, 0x1000, 0xe1dfd360, 1, 0, 0, 0 },
@@ -95,6 +171,25 @@ static const rbx_rom_load roundup_roml_thepitj[] = {
 	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
 };
 static const rbx_rom_region roundup_romr_thepitj[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x1800, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_thehole[] = {
+	{ RBX_ROM_LOAD, 0, "1.6e", 0x0, 0x1000, 0x71affecc, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2.8e", 0x1000, 0x1000, 0x894063cd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3.9e", 0x2000, 0x1000, 0x5b2a28dd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4.10e", 0x3000, 0x1000, 0x61af8a42, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5.10d", 0x4000, 0x1000, 0xbc03f14d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "6.6d", 0x0, 0x800, 0x1b79dfb6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "8.3l", 0x0, 0x800, 0x2ff010ca, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "7.1l", 0x1000, 0x800, 0xd901b353, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "74s288.5a", 0x0, 0x20, 0xa758b567, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_thehole[] = {
 	{ "maincpu", 0x10000, 0x00 },
 	{ "audiocpu", 0x10000, 0x00 },
 	{ "gfx", 0x1800, 0x00 },
@@ -262,7 +357,255 @@ static const rbx_rom_region roundup_romr_funnymou[] = {
 	{ "proms", 0x40, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load roundup_roml_machomou[] = {
+	{ RBX_ROM_LOAD, 0, "mm1.2g", 0x0, 0x1000, 0x91f116be, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mm2.2h", 0x1000, 0x1000, 0x3aa88c9b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mm3.2i", 0x2000, 0x1000, 0x3b66b519, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mm4.2j", 0x3000, 0x1000, 0xd4f99896, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mm5.3f", 0x4000, 0x1000, 0x5bfc3874, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "mm6.e6", 0x0, 0x1000, 0x20816913, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "mm8.3c", 0x0, 0x1000, 0x062e77cb, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "mm9.3a", 0x1000, 0x1000, 0xa2f0cfb3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "mm7.3d", 0x2000, 0x1000, 0xa6f60ed2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "mm-pr1.1", 0x0, 0x20, 0xe4babc1f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "mm-pr2.2", 0x20, 0x20, 0x9a4919ed, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_machomou[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x3000, 0x00 },
+	{ "proms", 0x40, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_desertdn[] = {
+	{ RBX_ROM_LOAD, 0, "rs5.bin", 0x0, 0x1000, 0x3a48f53e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rs6.bin", 0x1000, 0x1000, 0x3b6125e9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rs7.bin", 0x2000, 0x1000, 0x2f793ca4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rs8.bin", 0x3000, 0x1000, 0x52674db3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rs2.bin", 0x4000, 0x1000, 0xd0b78243, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rs3.bin", 0x5000, 0x1000, 0x54a0d133, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rs4.bin", 0x6000, 0x1000, 0x72d79d62, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "rs9.bin", 0x0, 0x1000, 0x6daf40ca, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "rs10.bin", 0x1000, 0x1000, 0xf4fc2c53, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "rs0.bin", 0x0, 0x1000, 0x8eb856e8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "rs1.bin", 0x1000, 0x1000, 0xc051b090, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "mb7051.8j", 0x0, 0x20, 0xa14111f4, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_desertdn[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x2000, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_intrepid[] = {
+	{ RBX_ROM_LOAD, 0, "ic19.1", 0x0, 0x1000, 0x7d927b23, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic18.2", 0x1000, 0x1000, 0xdcc22542, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic17.3", 0x2000, 0x1000, 0xfd11081e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic16.4", 0x3000, 0x1000, 0x74a51841, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic15.5", 0x4000, 0x1000, 0x4fef643d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "ic22.7", 0x0, 0x800, 0x1a7cc392, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "ic23.6", 0x800, 0x800, 0x91ca7097, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ic9.9", 0x0, 0x1000, 0x8c70d18d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ic8.8", 0x1000, 0x1000, 0x04d067d3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "ic3.prm", 0x0, 0x20, 0x927ff40a, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_intrepid[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x2000, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_intrepid2[] = {
+	{ RBX_ROM_LOAD, 0, "intrepid.001", 0x0, 0x1000, 0x9505df1e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "intrepid.002", 0x1000, 0x1000, 0x27e9f53f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "intrepid.003", 0x2000, 0x1000, 0xda082ed7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "intrepid.004", 0x3000, 0x1000, 0x60acecd9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "intrepid.005", 0x4000, 0x1000, 0x7c868725, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "intrepid.007", 0x0, 0x800, 0xf85ead07, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "intrepid.006", 0x800, 0x800, 0x9eb6c61b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ic9.9", 0x0, 0x1000, 0x8c70d18d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ic8.8", 0x1000, 0x1000, 0x04d067d3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "ic3.prm", 0x0, 0x20, 0x927ff40a, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_intrepid2[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x2000, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_intrepidb[] = {
+	{ RBX_ROM_LOAD, 0, "ic38.bin", 0x0, 0x1000, 0xb23e632a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic39.bin", 0x1000, 0x1000, 0xfd75b90e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic40.bin", 0x2000, 0x1000, 0x86a9b6de, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic41.bin", 0x3000, 0x1000, 0xfb6373c2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic33.bin", 0x4000, 0x1000, 0x7c868725, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "ic22.bin", 0x0, 0x800, 0xf85ead07, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "ic23.bin", 0x800, 0x800, 0x9eb6c61b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ic9.9", 0x0, 0x1000, 0x8c70d18d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ic8.8", 0x1000, 0x1000, 0x04d067d3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "82s123.ic4", 0x0, 0x20, 0xaa1f7f5e, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_intrepidb[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x2000, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_intrepidb3[] = {
+	{ RBX_ROM_LOAD, 0, "1intrepid.prg", 0x0, 0x1000, 0xb23e632a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2intrepid.prg", 0x1000, 0x1000, 0xfd75b90e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3intrepid.prg", 0x2000, 0x1000, 0x86a9b6de, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4intrepidb.prg", 0x3000, 0x1000, 0x137d0648, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5intrepid.prg", 0x4000, 0x1000, 0x7c868725, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "7intrepid.prg", 0x0, 0x800, 0xf85ead07, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "6intrepid.prg", 0x800, 0x800, 0x9eb6c61b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "9intrepid.prg", 0x0, 0x1000, 0x8c70d18d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "8intrepid.prg", 0x1000, 0x1000, 0x04d067d3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "82s123.ic4", 0x0, 0x20, 0xaa1f7f5e, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_intrepidb3[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x2000, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_intrepidb2[] = {
+	{ RBX_ROM_LOAD, 0, "1intrepid.prg", 0x0, 0x1000, 0xb23e632a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2intrepid.prg", 0x1000, 0x1000, 0xfd75b90e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3intrepid.prg", 0x2000, 0x1000, 0x86a9b6de, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4intrepid.prg", 0x3000, 0x1000, 0x28abf634, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5intrepid.prg", 0x4000, 0x1000, 0x7c868725, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "7intrepid.prg", 0x0, 0x800, 0xf85ead07, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "6intrepid.prg", 0x800, 0x800, 0x9eb6c61b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "9intrepid.prg", 0x0, 0x1000, 0x8c70d18d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "8intrepid.prg", 0x1000, 0x1000, 0x04d067d3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "82s123.ic4", 0x0, 0x20, 0xaa1f7f5e, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_intrepidb2[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x2000, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_zaryavos[] = {
+	{ RBX_ROM_LOAD, 0, "zv1.rom", 0x0, 0x1000, 0xb7eec75d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "zv2.rom", 0x1000, 0x1000, 0x000aa722, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "zv3.rom", 0x2000, 0x1000, 0x9b8b431a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "zv4.rom", 0x3000, 0x1000, 0x3636d5bf, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "zv5.rom", 0x4000, 0x1000, 0xc5d405a7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "zv6.rom", 0x5000, 0x1000, 0xd07778a1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "zv7.rom", 0x6000, 0x1000, 0x63d75e5e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "zv8.rom", 0x7000, 0x1000, 0xb87a286a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "zvprom.rom", 0x0, 0x20, 0x364e5700, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_zaryavos[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x2000, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load roundup_roml_rtriv[] = {
+	{ RBX_ROM_LOAD, 0, "rtriv-e.p1", 0x0, 0x1000, 0xf3c74f58, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rtriv-e.p2", 0x1000, 0x1000, 0xd6ba213f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rtriv-e.p3", 0x2000, 0x1000, 0xb8cf20cd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rtriv-i.fc1", 0x3000, 0x1000, 0xbe5dca69, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "ngames7.22", 0x0, 0x800, 0x871e5a03, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ngames8.8", 0x1000, 0x1000, 0xf7644e1d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ngames9.9", 0x0, 0x1000, 0xdb553afc, 1, 0, 0, 0 },
+	{ RBX_ROM_RELOAD, 2, NULL, 0x1000, 0x1000, 0, 0, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rtriv-1f.d0", 0x0, 0x8000, 0x84787af0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rtriv-1f.d1", 0x8000, 0x8000, 0xff718059, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rtriv-1f.l0", 0x10000, 0x8000, 0xea43fdea, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rtriv-1f.l1", 0x18000, 0x8000, 0x6e15f4e2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rtriv-1f.l2", 0x20000, 0x8000, 0xecb9fc3c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rtriv-1f.t0", 0x28000, 0x8000, 0xca82b8a6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rtriv-1f.t1", 0x30000, 0x8000, 0x56c24a9c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rtriv-1f.t2", 0x38000, 0x8000, 0xe62917cf, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 4, "rtriv.ic3", 0x0, 0x20, 0x927ff40a, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region roundup_romr_rtriv[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "gfx", 0x2000, 0x00 },
+	{ "questions", 0x40000, 0x00 },
+	{ "proms", 0x20, 0x00 },
+	{ NULL, 0, 0 }
+};
 
+static const rbx_ipt_setting roundup_ips_desertdn[] = {
+	{ 0x2, "2 Coins / 1 Credit" },
+	{ 0x1, "1 Coin / 1 Credit" },
+	{ 0x0, "1 Coin / 2 Credits" },
+	{ 0x3, "1 Coin / 3 Credits" },
+	{ 0x0, "3" },
+	{ 0x4, "4" },
+	{ 0x8, "5" },
+	{ 0xc, "6" },
+	{ 0x10, "Cocktail" },
+	{ 0x0, "Upright" },
+	{ 0x0, "Off" },
+	{ 0x20, "On" },
+	{ 0x0, "Slow" },
+	{ 0x40, "Fast" },
+	{ 0x0, "Off" },
+	{ 0x80, "On" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field roundup_ipf_desertdn[] = {
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0xc, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 4, 4, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Timer Speed", 12, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Invulnerability (Cheat)", 14, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port roundup_ipp_desertdn[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 8 },
+	{ "DSW", 16, 6 },
+	{ "IN2", 22, 8 },
+	{ NULL, 0, 0 }
+};
 static const rbx_ipt_setting roundup_ips_dockman[] = {
 	{ 0x0, "2 Coins / 1 Credit" },
 	{ 0x1, "1 Coin / 1 Credit" },
@@ -379,6 +722,124 @@ static const rbx_ipt_port roundup_ipp_fitter[] = {
 	{ "IN2", 22, 8 },
 	{ NULL, 0, 0 }
 };
+static const rbx_ipt_setting roundup_ips_intrepid[] = {
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Off" },
+	{ 0x2, "On" },
+	{ 0x4, "Upright" },
+	{ 0x0, "Cocktail" },
+	{ 0x8, "Easy" },
+	{ 0x0, "Hard" },
+	{ 0x0, "10000" },
+	{ 0x10, "30000" },
+	{ 0x20, "3" },
+	{ 0x0, "5" },
+	{ 0x80, "2 Coins / 1 Credit" },
+	{ 0x40, "1 Coin / 1 Credit" },
+	{ 0xc0, "1 Coin / 2 Credits" },
+	{ 0x0, "Free Play" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field roundup_ipf_intrepid[] = {
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Invulnerability (Cheat)", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0xc0, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 12, 4, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port roundup_ipp_intrepid[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 8 },
+	{ "DSW", 16, 7 },
+	{ "IN2", 23, 8 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting roundup_ips_intrepidb[] = {
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Off" },
+	{ 0x2, "On" },
+	{ 0x4, "Upright" },
+	{ 0x0, "Cocktail" },
+	{ 0x8, "Easy" },
+	{ 0x0, "Hard" },
+	{ 0x0, "10000" },
+	{ 0x10, "30000" },
+	{ 0x80, "2 Coins / 1 Credit" },
+	{ 0x40, "1 Coin / 1 Credit" },
+	{ 0xc0, "1 Coin / 2 Credits" },
+	{ 0x0, "Free Play" },
+	{ 0x20, "2" },
+	{ 0x0, "3" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field roundup_ipf_intrepidb[] = {
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Invulnerability (Cheat)", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "Demo Sounds", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0xc0, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 10, 4, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 14, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_JOYSTICK_DOWN, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_UP, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_BUTTON1, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port roundup_ipp_intrepidb[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 8 },
+	{ "DSW", 16, 7 },
+	{ "IN2", 23, 8 },
+	{ NULL, 0, 0 }
+};
 static const rbx_ipt_setting roundup_ips_roundup[] = {
 	{ 0x0, "2 Coins / 1 Credit" },
 	{ 0x1, "1 Coin / 1 Credit" },
@@ -435,6 +896,69 @@ static const rbx_ipt_port roundup_ipp_roundup[] = {
 	{ "IN1", 8, 8 },
 	{ "DSW", 16, 6 },
 	{ "IN2", 22, 8 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting roundup_ips_rtriv[] = {
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "2 Coins / 1 Credit" },
+	{ 0x2, "1 Coin / 1 Credit" },
+	{ 0x0, "No" },
+	{ 0x4, "Yes" },
+	{ 0x8, "Upright" },
+	{ 0x0, "Cocktail" },
+	{ 0x10, "Vertical" },
+	{ 0x0, "Horizontal" },
+	{ 0x20, "Number of Wrong Answer" },
+	{ 0x0, "Number of Good Answer for Bonus Question" },
+	{ 0x0, "2" },
+	{ 0x40, "3" },
+	{ 0x80, "4" },
+	{ 0xc0, "5" },
+	{ 0x0, "4" },
+	{ 0x40, "5" },
+	{ 0x80, "6" },
+	{ 0xc0, "7" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field roundup_ipf_rtriv[] = {
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON3, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON4, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Show Correct Answer", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Monitor", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Gaming Option", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0xc0, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Gaming Option Number", 12, 8, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_BUTTON1, 2, 0, 0, "", 20, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_BUTTON2, 2, 0, 0, "", 20, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON3, 2, 0, 0, "", 20, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_BUTTON4, 2, 0, 0, "", 20, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNKNOWN, 1, 0, 0, "", 20, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 20, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 20, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 20, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port roundup_ipp_rtriv[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 8 },
+	{ "DSW", 16, 7 },
+	{ "IN2", 23, 8 },
 	{ NULL, 0, 0 }
 };
 static const rbx_ipt_setting roundup_ips_suprmous[] = {
@@ -561,7 +1085,12 @@ static const rbx_game roundup_games[] = {
 	{ "fitter", "roundup", "Fitter", "1981", "Taito", "Round-Up / The Pit", "roundup", 90, 0, roundup_romr_fitter, roundup_roml_fitter, roundup_ipp_fitter, roundup_ipf_fitter, roundup_ips_fitter },
 	{ "fitterbl", "roundup", "Fitter (bootleg of Round-Up)", "1981", "bootleg", "Round-Up / The Pit", "roundup", 90, 0, roundup_romr_fitterbl, roundup_roml_fitterbl, roundup_ipp_fitter, roundup_ipf_fitter, roundup_ips_fitter },
 	{ "ttfitter", "roundup", "T.T Fitter (Japan)", "1981", "Taito", "Round-Up / The Pit", "roundup", 90, 0, roundup_romr_ttfitter, roundup_roml_ttfitter, roundup_ipp_fitter, roundup_ipf_fitter, roundup_ips_fitter },
+	{ "thepit", NULL, "The Pit", "1982", "Zilec Electronics", "Round-Up / The Pit", "thepit", 90, 0, roundup_romr_thepit, roundup_roml_thepit, roundup_ipp_thepit, roundup_ipf_thepit, roundup_ips_thepit },
+	{ "thepitu1", "thepit", "The Pit (US set 1)", "1982", "Zilec Electronics (Centuri license)", "Round-Up / The Pit", "thepit", 90, 0, roundup_romr_thepitu1, roundup_roml_thepitu1, roundup_ipp_thepit, roundup_ipf_thepit, roundup_ips_thepit },
+	{ "thepitu2", "thepit", "The Pit (US set 2)", "1982", "Zilec Electronics (Centuri license)", "Round-Up / The Pit", "thepit", 90, 0, roundup_romr_thepitu2, roundup_roml_thepitu2, roundup_ipp_thepit, roundup_ipf_thepit, roundup_ips_thepit },
+	{ "thepitu3", "thepit", "The Pit (US set 3)", "1982", "Zilec Electronics (Centuri license)", "Round-Up / The Pit", "thepit", 90, 0, roundup_romr_thepitu3, roundup_roml_thepitu3, roundup_ipp_thepit, roundup_ipf_thepit, roundup_ips_thepit },
 	{ "thepitj", "thepit", "The Pit (Japan)", "1982", "Zilec Electronics (Taito license)", "Round-Up / The Pit", "thepit", 90, 0, roundup_romr_thepitj, roundup_roml_thepitj, roundup_ipp_thepit, roundup_ipf_thepit, roundup_ips_thepit },
+	{ "thehole", "thepit", "The Hole (bootleg of The Pit)", "1982", "bootleg", "Round-Up / The Pit", "thepit", 90, 0, roundup_romr_thehole, roundup_roml_thehole, roundup_ipp_thepit, roundup_ipf_thepit, roundup_ips_thepit },
 	{ "dockman", NULL, "Dock Man (set 1)", "1982", "Taito", "Round-Up / The Pit", "intrepid", 90, 0, roundup_romr_dockman, roundup_roml_dockman, roundup_ipp_dockman, roundup_ipf_dockman, roundup_ips_dockman },
 	{ "dockmanb", "dockman", "Dock Man (set 2)", "1982", "Taito", "Round-Up / The Pit", "dockmanb", 90, 0, roundup_romr_dockmanb, roundup_roml_dockmanb, roundup_ipp_dockman, roundup_ipf_dockman, roundup_ips_dockman },
 	{ "dockmanc", "dockman", "Dock Man (set 3)", "1982", "Taito", "Round-Up / The Pit", "dockmanb", 90, RBX_GF_IMPERFECT_GFX, roundup_romr_dockmanc, roundup_roml_dockmanc, roundup_ipp_dockman, roundup_ipf_dockman, roundup_ips_dockman },
@@ -570,5 +1099,14 @@ static const rbx_game roundup_games[] = {
 	{ "theportr", "dockman", "The Porter (bootleg of Port Man)", "1982", "bootleg", "Round-Up / The Pit", "theportr", 90, RBX_GF_NOT_WORKING, roundup_romr_theportr, roundup_roml_theportr, roundup_ipp_dockman, roundup_ipf_dockman, roundup_ips_dockman },
 	{ "suprmous", NULL, "Super Mouse", "1982", "Taito", "Round-Up / The Pit", "suprmous", 90, 0, roundup_romr_suprmous, roundup_roml_suprmous, roundup_ipp_suprmous, roundup_ipf_suprmous, roundup_ips_suprmous },
 	{ "funnymou", "suprmous", "Funny Mouse (Japan)", "1982", "Taito (Chuo license)", "Round-Up / The Pit", "suprmous", 90, 0, roundup_romr_funnymou, roundup_roml_funnymou, roundup_ipp_suprmous, roundup_ipf_suprmous, roundup_ips_suprmous },
+	{ "machomou", NULL, "Macho Mouse", "1982", "Techstar", "Round-Up / The Pit", "suprmous", 90, 0, roundup_romr_machomou, roundup_roml_machomou, roundup_ipp_suprmous, roundup_ipf_suprmous, roundup_ips_suprmous },
+	{ "desertdn", NULL, "Desert Dan", "1982", "Kawakusu (Video Optics license)", "Round-Up / The Pit", "desertdn", 0, 0, roundup_romr_desertdn, roundup_roml_desertdn, roundup_ipp_desertdn, roundup_ipf_desertdn, roundup_ips_desertdn },
+	{ "intrepid", NULL, "Intrepid (set 1)", "1983", "Nova Games", "Round-Up / The Pit", "intrepid", 90, 0, roundup_romr_intrepid, roundup_roml_intrepid, roundup_ipp_intrepid, roundup_ipf_intrepid, roundup_ips_intrepid },
+	{ "intrepid2", "intrepid", "Intrepid (set 2)", "1983", "Nova Games", "Round-Up / The Pit", "intrepid", 90, 0, roundup_romr_intrepid2, roundup_roml_intrepid2, roundup_ipp_intrepid, roundup_ipf_intrepid, roundup_ips_intrepid },
+	{ "intrepidb", "intrepid", "Intrepid (Elsys bootleg, set 1)", "1984", "bootleg (Elsys)", "Round-Up / The Pit", "intrepid", 90, 0, roundup_romr_intrepidb, roundup_roml_intrepidb, roundup_ipp_intrepidb, roundup_ipf_intrepidb, roundup_ips_intrepidb },
+	{ "intrepidb3", "intrepid", "Intrepid (Elsys bootleg, set 2)", "1984", "bootleg (Elsys)", "Round-Up / The Pit", "intrepid", 90, 0, roundup_romr_intrepidb3, roundup_roml_intrepidb3, roundup_ipp_intrepidb, roundup_ipf_intrepidb, roundup_ips_intrepidb },
+	{ "intrepidb2", "intrepid", "Intrepid (Loris bootleg)", "1984", "bootleg (Loris)", "Round-Up / The Pit", "intrepid", 90, 0, roundup_romr_intrepidb2, roundup_roml_intrepidb2, roundup_ipp_intrepidb, roundup_ipf_intrepidb, roundup_ips_intrepidb },
+	{ "zaryavos", NULL, "Zarya Vostoka", "1984", "Nova Games of Canada", "Round-Up / The Pit", "intrepid", 90, RBX_GF_NOT_WORKING, roundup_romr_zaryavos, roundup_roml_zaryavos, roundup_ipp_intrepid, roundup_ipf_intrepid, roundup_ips_intrepid },
+	{ "rtriv", NULL, "Romar Triv", "198?", "Romar", "Round-Up / The Pit", "rtriv", 90, 0, roundup_romr_rtriv, roundup_roml_rtriv, roundup_ipp_rtriv, roundup_ipf_rtriv, roundup_ips_rtriv },
 };
-#define ROUNDUP_GAME_COUNT 13
+#define ROUNDUP_GAME_COUNT 27

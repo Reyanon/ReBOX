@@ -138,9 +138,13 @@ int rbx_testfile_seen(const char *path)
 	return 1;   // (not watched: the caller looks)
 }
 
+static uint32_t s_last;   // (the buttons the last step pressed)
+uint32_t rbx_testpad_last(void) { return s_last; }
+
 uint32_t rbx_testpad_step(void)
 {
 	s_ton = 0;
+	s_last = 0;
 	if (s_i >= s_n) {
 		if (++s_poll % 30 == 0 && rbx_testfile_seen(KEYS_PATH)) {
 			SceIoStat st;
@@ -166,6 +170,7 @@ uint32_t rbx_testpad_step(void)
 		if (s_i == s_n)
 			RBX_LOG("testpad: done");
 	}
+	s_last = b;
 	return b;
 }
 

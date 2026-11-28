@@ -3103,6 +3103,9 @@ static void analog_frame(void)
 				const uint32_t in = rbx_input_bits(pl);
 				const uint32_t btn = t == RBX_IPT_PEDAL ? RBX_IN_B1 : t == RBX_IPT_PEDAL2 ? RBX_IN_B2 : RBX_IN_B3;
 				v = (in & btn) ? mx : (int)s_an[ch].def;
+			} else if (t == RBX_IPT_AD_STICK_Z && pl == 1) {   // (Air Rescue's throttle: the general inputs' keys)
+				v = rbx_throttle();
+				v = v > mx ? mx : v;
 			} else {
 				const int d = rbx_analog_dpad(pl, t, 8);
 				if (d)

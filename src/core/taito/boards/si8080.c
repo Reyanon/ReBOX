@@ -1,4 +1,4 @@
-/*  Space Invaders family on the Intel 8080 (Taito sets and their clones), ported from MAME
+/*  Space Invaders family on the Intel 8080, ported from MAME
     src/mame/midw8080/8080bw.cpp, 8080bw_v.cpp, mw8080bw.cpp, mw8080bw_v.cpp (license BSD-3-Clause,
     copyright-holders: Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni, Lee Taylor, Valerio Verrando, Zsolt Vasvari,
     Aaron Giles, Jonathan Gevaryahu, hap, Robbbert; thanks-to: Michael Strutts, Marco Cassili) and
@@ -7,10 +7,17 @@
     Memory and I/O maps, the interrupt generator (RST 1 at vpos 0x60, RST 2 at vpos 0xe0 through the INTE line),
     the MB14241 shifter, the watchdogs and the screen updates (colour PROMs, scattered colour RAM, Polaris clouds)
     follow MAME. Sound: si8080_a.c. Straight Flush (M6800 CPU) is not emulated.
+    The other makers' machines of 8080bw.cpp / mw8080bw.cpp (ADR-233): cosmicmo, cosmicbat, invasion, spacerng,
+    spcewarla, starw1, astropal, attackfc / attackfcu (MAME init_attackfc), ozmawars, vortex (init_vortex, its colour
+    screen), yosakdon, darthvdr (its own map and the vblank IRQ with RST 7) and invmulti (the bank latch, the
+    93C46 in 8-bit mode, init_invmulti), rollingc / mraker (the two scattered colour RAMs, 3-bit + intensity
+    palette), as MAME's memory / I/O maps. Not emulated: spacecom, cosmo, invrvnge (M6802
+    sound CPU), shuttlei, claybust, orbite, cane.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "../../rbx.h"
 #include "../../cpu/i8080/i8080.h"
+#include "../../machine/eepromser.h"
 #include "si8080.h"
 
 #include <stdlib.h>
@@ -25,12 +32,18 @@
 #define VCOUNTER_START_VBLANK 0xda
 #define LINE_RATE 15600   // pixel clock 4.992 MHz / 320
 
-enum { MAP_MW, MAP_SCHASER, MAP_ESCMARS };
+enum { MAP_MW, MAP_SCHASER, MAP_ESCMARS, MAP_SMALL, MAP_DARTHVDR, MAP_INVMULTI, MAP_ROLLINGC };
 enum { IO_INVADERS, IO_INVNOMB, IO_INVADPT2, IO_SPCEWARS, IO_LRESCUE, IO_LRESCUEM2, IO_SCHASER, IO_SCHASERCV,
-       IO_CRASHRD, IO_LUPIN3, IO_POLARIS, IO_BALLBOMB, IO_INDIANBT, IO_INDIANBTBR, IO_STEELWKR };
-enum { SCR_MW, SCR_INVADERS, SCR_INVADPT2, SCR_BALLBOMB, SCR_SCHASER, SCR_SCHASERCV, SCR_POLARIS, SCR_INDIANBT, SCR_LUPIN3 };
-enum { PAL_BW, PAL_RBG, PAL_RGB };
-enum { CAB_NONE, CAB_PORT, CAB_IN2_BIT2, CAB_IN2_BIT6 };   // where the flip screen logic reads the cabinet type
+       IO_CRASHRD, IO_LUPIN3, IO_POLARIS, IO_BALLBOMB, IO_INDIANBT, IO_INDIANBTBR, IO_STEELWKR,
+       IO_SPCEWARLA, IO_STARW1, IO_ASTROPAL, IO_INVASION, IO_ATTACKFC, IO_ATTACKFCU, IO_OZMAWARS, IO_VORTEX,
+       IO_YOSAKDON, IO_DARTHVDR, IO_ROLLINGC, IO_MRAKER };
+enum { SCR_MW, SCR_INVADERS, SCR_INVADPT2, SCR_BALLBOMB, SCR_SCHASER, SCR_SCHASERCV, SCR_POLARIS, SCR_INDIANBT, SCR_LUPIN3,
+       SCR_VORTEX, SCR_ROLLINGC };
+enum { PAL_BW, PAL_RBG, PAL_RGB, PAL_ROLLINGC };
+// where the flip screen logic reads the cabinet type; CAB_COSMICMO: the invaders audio's flip AND IN2 bit 2,
+// CAB_NOFLIP: the invaders audio's flip output not connected (invasion)
+enum { CAB_NONE, CAB_PORT, CAB_IN2_BIT2, CAB_IN2_BIT6, CAB_COSMICMO, CAB_NOFLIP };
+enum { IRQ_MW, IRQ_VBLANK_RST7 };   // mw8080bw interrupt_trigger / darthvdr: IRQ at vblank, RST 7, cleared by the ack
 
 typedef struct {
 	const char *name;
@@ -38,6 +51,7 @@ typedef struct {
 	int watchdog;       // vblanks, 0 = none
 	uint32_t clock;
 	int cab;
+	int irq;
 } machine_t;
 
 static const machine_t s_machines[] = {
@@ -58,6 +72,23 @@ static const machine_t s_machines[] = {
 	{ "indianbt",   MAP_MW,      IO_INDIANBT,   SCR_INDIANBT,  PAL_RGB, SIA_INDIANBT,   0,   1996800, CAB_PORT },
 	{ "indianbtbr", MAP_SCHASER, IO_INDIANBTBR, SCR_INDIANBT,  PAL_RGB, SIA_INDIANBTBR, 0,   1996800, CAB_PORT },
 	{ "steelwkr",   MAP_MW,      IO_STEELWKR,   SCR_INVADPT2,  PAL_RBG, SIA_INVADPT2,   0,   1996800, CAB_PORT },
+	// other makers' machines (ADR-233)
+	{ "cosmicmo",   MAP_MW,      IO_INVADERS,   SCR_INVADERS,  PAL_BW,  SIA_INVADERS,   255, 1996800, CAB_COSMICMO },
+	{ "cosmicbat",  MAP_MW,      IO_INVADERS,   SCR_INVADERS,  PAL_BW,  SIA_INVADERS,   255, 2000000, CAB_PORT },
+	{ "invasion",   MAP_MW,      IO_INVASION,   SCR_INVADERS,  PAL_BW,  SIA_INVADERS,   255, 1996800, CAB_NOFLIP },
+	{ "spacerng",   MAP_MW,      IO_INVADPT2,   SCR_INVADPT2,  PAL_RBG, SIA_SPACERNG,   255, 1996800, CAB_PORT },
+	{ "spcewarla",  MAP_MW,      IO_SPCEWARLA,  SCR_INVADPT2,  PAL_RBG, SIA_SPCEWARS,   255, 1996800, CAB_PORT },
+	{ "starw1",     MAP_MW,      IO_STARW1,     SCR_INVADPT2,  PAL_RBG, SIA_INVADPT2,   255, 1996800, CAB_PORT },
+	{ "astropal",   MAP_MW,      IO_ASTROPAL,   SCR_INVADERS,  PAL_BW,  SIA_INVADERS,   255, 1996800, CAB_PORT },
+	{ "attackfc",   MAP_MW,      IO_ATTACKFC,   SCR_MW,        PAL_BW,  SIA_NONE,       0,   1996800, CAB_NONE },
+	{ "attackfcu",  MAP_MW,      IO_ATTACKFCU,  SCR_MW,        PAL_BW,  SIA_NONE,       0,   1996800, CAB_NONE },
+	{ "ozmawars",   MAP_MW,      IO_OZMAWARS,   SCR_INVADPT2,  PAL_RBG, SIA_OZMAWARS,   255, 1996800, CAB_PORT },
+	{ "vortex",     MAP_MW,      IO_VORTEX,     SCR_VORTEX,    PAL_BW,  SIA_INVADERS,   255, 1996800, CAB_PORT },
+	{ "yosakdon",   MAP_SMALL,   IO_YOSAKDON,   SCR_INVADERS,  PAL_BW,  SIA_YOSAKDON,   0,   1996800, CAB_PORT },
+	{ "darthvdr",   MAP_DARTHVDR, IO_DARTHVDR,  SCR_INVADERS,  PAL_BW,  SIA_DARTHVDR,   0,   1996800, CAB_PORT, IRQ_VBLANK_RST7 },
+	{ "invmulti",   MAP_INVMULTI, IO_INVADERS,  SCR_INVADERS,  PAL_BW,  SIA_INVADERS,   255, 1996800, CAB_PORT },
+	{ "rollingc",   MAP_ROLLINGC, IO_ROLLINGC,  SCR_ROLLINGC,  PAL_ROLLINGC, SIA_ROLLINGC, 0, 1996800, CAB_PORT },
+	{ "mraker",     MAP_ROLLINGC, IO_MRAKER,    SCR_ROLLINGC,  PAL_ROLLINGC, SIA_NONE,   0,   1996800, CAB_NONE },
 	// "sflush" (Straight Flush) runs on a Motorola 6800: not emulated
 };
 
@@ -91,7 +122,12 @@ static uint32_t s_rom_size;
 static const uint8_t *s_prom, *s_cloud;
 static uint32_t s_prom_size;
 static uint8_t s_ram[0x2000];
+static uint8_t s_ram1800[0x800];   // darthvdr's RAM at 0x1800 (its video RAM, s_ram, is at 0x4000)
+static uint8_t s_bank;             // invmulti bank latch
+static eepser_t s_eeprom;          // invmulti 93C46 (8-bit)
+static uint64_t s_cycles;          // CPU clocks since reset (the EEPROM's time)
 static uint8_t s_colorram[0x800];   // m_scattered_colorram
+static uint8_t s_colorram2[0x400];  // rollingc m_scattered_colorram2
 static uint8_t s_zero[0x100];
 static uint16_t s_shift_data;
 static uint8_t s_shift_count;
@@ -102,16 +138,17 @@ static uint8_t s_cloud_speed, s_cloud_pos;
 static uint32_t s_rand;
 static sia_latch s_latch;
 static uint64_t s_frac;
-static int s_port_in[3], s_port_cab, s_port_contp[2], s_port_p2gate;
-static int s_ck[3];
-static uint32_t s_ck_mask[3];
-static int s_ck_shift[3];
+static int s_port_in[4], s_port_cab, s_port_contp[2], s_port_p2gate;
+static int s_ck[4];
+static uint32_t s_ck_mask[4];
+static int s_ck_shift[4];
 static uint8_t *s_overlay;   // palette index of a lit pixel, HPIX x VPIX (B&W screens)
 
 // snapshot for the renderer
 typedef struct {
 	uint8_t ram[0x2000];
 	uint8_t colorram[0x800];
+	uint8_t colorram2[0x400];
 	sia_latch l;
 	uint8_t cloud_pos;
 } snap_t;
@@ -159,6 +196,10 @@ static void latch_cab(void)
 	default: s_latch.cab = 0; break;
 	}
 	s_latch.cab_invaders = (uint8_t)cab_cocktail();
+	if (s_m->cab == CAB_COSMICMO)
+		s_latch.cab_invaders = (uint8_t)((port_in(2) >> 2) & 1);
+	else if (s_m->cab == CAB_NOFLIP)
+		s_latch.cab_invaders = 0;
 }
 
 static void sound_w(int which, uint8_t data)
@@ -225,6 +266,48 @@ static uint8_t io_r(void *u, uint8_t p)
 		if (p == 0)
 			return 0;
 		break;
+	case IO_SPCEWARLA:
+		switch (p) {
+		case 0: return port_in(0);
+		case 1: return port_in(1);
+		case 2: return port_in(2);
+		case 6: return shift_result_r();
+		}
+		return 0;
+	case IO_STARW1:
+		return p == 1 ? port_in(1) : p == 2 ? port_in(2) : 0;
+	case IO_ASTROPAL:
+		switch (p & 7) {
+		case 0: case 4: return port_in(0);
+		case 1: case 5: return port_in(1);
+		case 3: case 7: return port_in(3);
+		}
+		return 0;
+	case IO_INVASION:
+		return port_in(p & 3);
+	case IO_ATTACKFC:
+		return p == 0 ? port_in(0) : p == 3 ? shift_result_r() : 0;
+	case IO_ATTACKFCU:
+		return p == 1 ? port_in(0) : p == 3 ? shift_result_r() : 0;
+	case IO_OZMAWARS:
+		return p <= 2 ? port_in(p) : 0;
+	case IO_VORTEX:   // A9 (A1 of the I/O) inverted
+		if (p >= 8)
+			return 0;
+		switch (p & 3) {
+		case 2: return port_in(0);
+		case 3: return port_in(1);
+		case 0: return port_in(2);
+		default: return shift_result_r();
+		}
+	case IO_YOSAKDON:
+		return p == 1 ? port_in(0) : p == 2 ? port_in(1) : 0;
+	case IO_DARTHVDR:
+		return p == 0 ? port_in(1) : p == 1 ? port_in(2) : 0;
+	case IO_ROLLINGC:
+		return p <= 2 ? port_in(p) : 0;
+	case IO_MRAKER:
+		return p >= 1 && p <= 3 ? port_in(p - 1) : 0;
 	case IO_LRESCUEM2:
 		if (p == 3)
 			return 0;
@@ -266,6 +349,69 @@ static void io_w(void *u, uint8_t p, uint8_t d)
 		if (p == 3) sound_w(1, d);
 		else if (p == 5) sound_w(2, d);
 		return;
+	case IO_SPCEWARLA:
+		switch (p) {
+		case 0x04: sound_w(1, d); break;
+		case 0x05: sound_w(2, d); break;
+		case 0x06: watchdog_w(); break;
+		case 0x08: shift_count_w(d); break;
+		case 0x0c: shift_data_w(d); break;
+		}
+		return;
+	case IO_STARW1:
+		switch (p) {
+		case 4: sound_w(1, d); break;
+		case 5: sound_w(2, d); break;
+		case 6: watchdog_w(); break;
+		}
+		return;
+	case IO_ASTROPAL: case IO_INVASION:
+		switch (p & 7) {
+		case 3: sound_w(1, d); break;
+		case 5: sound_w(2, d); break;
+		case 6: watchdog_w(); break;
+		}
+		return;
+	case IO_ATTACKFC: case IO_ATTACKFCU:
+		if (p == 3) shift_data_w(d);
+		else if (p == 7) shift_count_w(d);
+		return;
+	case IO_OZMAWARS:
+		switch (p) {
+		case 3: sound_w(1, d); break;
+		case 4: sound_w(3, d); break;
+		case 5: sound_w(2, d); break;
+		case 6: watchdog_w(); break;
+		}
+		return;
+	case IO_VORTEX:
+		switch (p) {
+		case 0: shift_count_w(d); break;
+		case 1: sound_w(1, d); break;
+		case 6: shift_data_w(d); break;
+		case 7: sound_w(2, d); break;
+		case 4: watchdog_w(); break;
+		}
+		return;
+	case IO_YOSAKDON:
+		if (p == 3) sound_w(1, d);
+		else if (p == 5) sound_w(2, d);
+		return;
+	case IO_DARTHVDR:
+		if (p == 0)   // darthvdr_00_w
+			s_latch.flip_screen = (uint8_t)(d & 1 & cab_cocktail());
+		else if (p == 8)
+			sound_w(1, d);
+		return;
+	case IO_ROLLINGC:
+		if (p == 0) sound_w(3, d);   // rollingc_sh_port_w
+		else if (p == 3) sound_w(1, d);
+		else if (p == 5) sound_w(2, d);
+		return;
+	case IO_MRAKER:
+		if (p == 0)   // mraker_sh_port1_w
+			s_latch.flip_screen = d & 1;
+		return;
 	default:
 		break;
 	}
@@ -285,9 +431,21 @@ static void io_w(void *u, uint8_t p, uint8_t d)
 }
 
 // ---- memory ----
+static void build_pages(void);
+
 static uint8_t mem_r(void *u, uint16_t a)
 {
 	(void)u;
+	if (s_m->map == MAP_INVMULTI && (a & 0xe000) == 0x6000)   // eeprom_r
+		return (uint8_t)eepser_do_read_93cxx(&s_eeprom, (int64_t)s_cycles);
+	if (s_m->map == MAP_ROLLINGC) {   // scattered_colorram_r / scattered_colorram2_r
+		uint16_t o = a & 0x1fff, i = (uint16_t)((o & 0x1f) | ((o & 0x1f00) >> 3));
+		if ((a & 0xe000) == 0xa000)
+			return s_colorram[i];
+		if ((a & 0xe000) == 0xe000)
+			return s_colorram2[i];
+		return 0;
+	}
 	if (s_m->map == MAP_SCHASER && a >= 0xc000 && a < 0xe000) {
 		uint16_t o = a - 0xc000;
 		return s_colorram[(o & 0x1f) | ((o & 0x1f80) >> 2)];
@@ -298,6 +456,40 @@ static uint8_t mem_r(void *u, uint16_t a)
 static void mem_w(void *u, uint16_t a, uint8_t d)
 {
 	(void)u;
+	switch (s_m->map) {
+	case MAP_SMALL:
+		if ((a & 0xe000) == 0x2000)
+			s_ram[a & 0x1fff] = d;
+		return;
+	case MAP_ROLLINGC: {
+		uint16_t o = a & 0x1fff, i = (uint16_t)((o & 0x1f) | ((o & 0x1f00) >> 3));
+		if ((a & 0xe000) == 0x2000)
+			s_ram[o] = d;
+		else if ((a & 0xe000) == 0xa000)
+			s_colorram[i] = d;
+		else if ((a & 0xe000) == 0xe000)
+			s_colorram2[i] = d;
+		return;
+	}
+	case MAP_DARTHVDR:
+		if (a >= 0x1800 && a < 0x2000)
+			s_ram1800[a & 0x7ff] = d;
+		else if ((a & 0xe000) == 0x4000)
+			s_ram[a & 0x1fff] = d;
+		return;
+	case MAP_INVMULTI:
+		if ((a & 0x6000) == 0x2000)
+			s_ram[a & 0x1fff] = d;
+		else if ((a & 0xe000) == 0x6000) {   // eeprom_w: d0 DI, d6 CS, d4 CLK
+			eepser_di_write(&s_eeprom, d & 1);
+			eepser_cs_write(&s_eeprom, (d >> 6) & 1, (int64_t)s_cycles);
+			eepser_clk_write(&s_eeprom, (d >> 4) & 1, (int64_t)s_cycles);
+		} else if ((a & 0xe000) == 0xe000) {   // bank_w: bitswap<3>(data, 6, 4, 0)
+			s_bank = (uint8_t)(((d >> 6) & 1) << 2 | ((d >> 4) & 1) << 1 | (d & 1));
+			build_pages();
+		}
+		return;
+	}
 	if (s_m->map == MAP_MW)
 		a &= 0x7fff;
 	if ((a & 0xe000) == 0x2000 || (s_m->map == MAP_MW && (a & 0xe000) == 0x6000)) {
@@ -315,6 +507,34 @@ static void build_pages(void)
 	for (int p = 0; p < 256; p++) {
 		uint32_t a = (uint32_t)p << 8;
 		const uint8_t *pg = NULL;
+		if (s_m->map == MAP_SMALL) {   // yosakdon: ROM 0000-1fff, RAM 2000-3fff, nothing else
+			s_cpu.rpage[p] = a < 0x2000 ? s_rom + a : a < 0x4000 ? s_ram + (a - 0x2000) : s_zero;
+			continue;
+		}
+		if (s_m->map == MAP_ROLLINGC) {   // ROM 0000-1fff, RAM, ROM 4000-5fff, colour RAMs a000 / e000
+			uint32_t t = a & 0xe000;
+			s_cpu.rpage[p] = a < 0x2000 ? s_rom + a : a < 0x4000 ? s_ram + (a - 0x2000) : a < 0x6000 ? s_rom + a :
+			                 (t == 0xa000 || t == 0xe000) ? NULL : s_zero;
+			continue;
+		}
+		if (s_m->map == MAP_DARTHVDR) {
+			s_cpu.rpage[p] = a < 0x1800 ? s_rom + a : a < 0x2000 ? s_ram1800 + (a - 0x1800) :
+			                 (a & 0xe000) == 0x4000 ? s_ram + (a - 0x4000) : s_zero;
+			continue;
+		}
+		if (s_m->map == MAP_INVMULTI) {   // banks of 0x4000 bytes, mirror 0x8000
+			uint32_t m = a & 0x7fff;
+			if (m < 0x2000)
+				pg = s_rom + (uint32_t)s_bank * 0x4000 + m;
+			else if (m < 0x4000)
+				pg = s_ram + (m - 0x2000);
+			else if (m < 0x6000)
+				pg = s_rom + 0x2000 + (uint32_t)s_bank * 0x4000 + (m - 0x4000);
+			else
+				pg = a >= 0xe000 ? s_zero : NULL;   // (0x6000-0x7fff: the EEPROM; 0xe000: write only)
+			s_cpu.rpage[p] = pg;
+			continue;
+		}
 		uint32_t m = s_m->map == MAP_MW ? (a & 0x7fff) : a;
 		uint32_t rom_end = s_m->map == MAP_ESCMARS ? 0x5800 : 0x6000;
 		if (m < 0x2000)
@@ -342,6 +562,10 @@ static uint8_t irq_ack(void *u, int line)
 	(void)u;
 	if (line != I8080_INTR_LINE)
 		return 0xff;
+	if (s_m->irq == IRQ_VBLANK_RST7) {   // darthvdr_interrupt_vector
+		i8080_set_input(&s_cpu, I8080_INTR_LINE, 0);
+		return 0xff;
+	}
 	uint8_t counter = vpos_to_counter(s_line);
 	uint8_t vector = (uint8_t)(0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3));
 	i8080_set_input(&s_cpu, I8080_INTR_LINE, 0);
@@ -387,6 +611,7 @@ static void render_clone(const snap_t *s)
 	int clear = 0;
 	switch (s_m->screen) {
 	case SCR_BALLBOMB: case SCR_SCHASERCV: clear = 2; break;
+	case SCR_ROLLINGC: clear = 0; break;
 	case SCR_SCHASER: clear = s->l.schaser_bg_disable ? 0 : 2; break;
 	case SCR_POLARIS: clear = 6; break;
 	}
@@ -422,6 +647,12 @@ static void render_clone(const snap_t *s)
 		case SCR_LUPIN3:
 			fore = ~scat & 7;
 			break;
+		case SCR_ROLLINGC: {
+			int i2 = (offs & 0x1f) | ((offs & 0x1f00) >> 3);
+			fore = s->colorram[i2] & 0x0f;
+			back = s->colorram2[i2] & 0x0f;
+			break;
+		}
 		case SCR_POLARIS: {
 			uint8_t pm = prom ? prom[caddr] : 0;
 			back = (pm & 1) ? 6 : 2;
@@ -455,10 +686,31 @@ static void render_clone(const snap_t *s)
 			put(bm, flip, row, x, (uint16_t)clear);
 }
 
+static void render_vortex(const snap_t *s)
+{
+	// screen_update_vortex: the colour of 8 pixels from bit 0 of the next byte (green / red) and x bit 5 (blue)
+	uint16_t *bm = rbx_video.bitmap;
+	int flip = s->l.flip_screen;
+	for (int row = 0; row < VPIX; row++) {
+		int y = row + VCOUNTER_START_NO_VBLANK;
+		for (int x = 0; x < 4; x++)
+			put(bm, flip, row, x, 0);
+		for (int col = 0; col < 32; col++) {
+			int offs = (y << 5) | col, x0 = col * 8 + 4;
+			uint8_t d = s->ram[offs];
+			uint16_t c = (uint16_t)(8 + ((s->ram[(offs + 1) & 0x1fff] & 1) << 1) + ((x0 >> 5) & 1));
+			for (int b = 0; b < 8; b++)
+				put(bm, flip, row, x0 + b, (d >> b) & 1 ? c : 0);
+		}
+	}
+}
+
 static void si_render(void)
 {
 	const snap_t *s = s_snap;
-	if (s_m->screen == SCR_MW)
+	if (s_m->screen == SCR_VORTEX)
+		render_vortex(s);
+	else if (s_m->screen == SCR_MW)
 		render_bw(s, 0);
 	else if (s_m->screen == SCR_INVADERS)
 		render_bw(s, 1);
@@ -470,8 +722,10 @@ static void vblank_capture(void)
 {
 	rbx_video_wait_idle();
 	memcpy(s_snap->ram, s_ram, sizeof(s_ram));
-	if (s_m->map == MAP_SCHASER)
+	if (s_m->map == MAP_SCHASER || s_m->map == MAP_ROLLINGC)
 		memcpy(s_snap->colorram, s_colorram, sizeof(s_colorram));
+	if (s_m->map == MAP_ROLLINGC)
+		memcpy(s_snap->colorram2, s_colorram2, sizeof(s_colorram2));
 	s_snap->l = s_latch;
 	s_snap->cloud_pos = s_cloud_pos;
 	rbx_video_frame_done();
@@ -490,6 +744,21 @@ static void setup_palette(const rbx_game *g)
 	if (s_m->pal == PAL_BW) {
 		rbx_video.palette[0] = 0;
 		rbx_video.palette[1] = 0xffffff;
+	}
+	if (s_m->pal == PAL_ROLLINGC) {   // rollingc_palette: 3-bit + intensity, pens 5 and 6 as MAME sets them
+		for (int i = 0; i < 8; i++) {
+			uint32_t r = (i >> 2) & 1, gg = (i >> 1) & 1, b = i & 1;
+			rbx_video.palette[i] = (r ? 0x7f0000u : 0) | (gg ? 0x7f00u : 0) | (b ? 0x7fu : 0);
+			rbx_video.palette[i | 8] = (r ? 0xff0000u : 0) | (gg ? 0xff00u : 0) | (b ? 0xffu : 0);
+		}
+		rbx_video.palette[5] = 0xff0080;
+		rbx_video.palette[6] = 0xff8000;
+	}
+	if (s_m->screen == SCR_VORTEX) {   // pens 8-11: red, magenta, green, cyan
+		rbx_video.palette[8] = 0xff0000;
+		rbx_video.palette[9] = 0xff00ff;
+		rbx_video.palette[10] = 0x00ff00;
+		rbx_video.palette[11] = 0x00ffff;
 	}
 	// colour overlay: the lit pixels take the colour of the overlay rectangle over them (multiply blend on white)
 	const ov_rect *ov = NULL;
@@ -532,6 +801,11 @@ static void machine_reset(void)
 	s_shift_data = 0;
 	s_shift_count = 0;
 	s_wd_count = 0;
+	s_cycles = 0;
+	if (s_m->map == MAP_INVMULTI) {   // machine_start: bank 0
+		s_bank = 0;
+		build_pages();
+	}
 	uint8_t cab = s_latch.cab, cabi = s_latch.cab_invaders;
 	memset(&s_latch, 0, sizeof(s_latch));
 	s_latch.cab = cab;
@@ -542,6 +816,8 @@ static void machine_reset(void)
 static void si_reset(void)
 {
 	memset(s_ram, 0, sizeof(s_ram));
+	memset(s_ram1800, 0, sizeof(s_ram1800));
+	memset(s_colorram2, 0, sizeof(s_colorram2));
 	memset(s_colorram, 0, sizeof(s_colorram));
 	i8080_init(&s_cpu, 0);
 	s_int_enable = 1;   // mw8080bw_state: m_int_enable(true)
@@ -585,14 +861,51 @@ static int si_init(const rbx_game *g)
 		rbx_fail("%s: ROM regions missing", g->set);
 		return -1;
 	}
+	if (!strcmp(g->set, "attackfc")) {   // init_attackfc: swap A8 / A9
+		for (uint32_t i = 0; i + 0x400 <= s_rom_size; i += 0x400)
+			for (uint32_t j = 0; j < 0x100; j++) {
+				uint8_t t = s_rom[i + 0x100 + j];
+				s_rom[i + 0x100 + j] = s_rom[i + 0x200 + j];
+				s_rom[i + 0x200 + j] = t;
+			}
+	} else if (!strcmp(g->set, "vortex")) {   // init_vortex: A0 A3 A9 (A3 A9 from 0x6000) inverted
+		uint8_t *buf = (uint8_t *)malloc(s_rom_size);
+		if (!buf) {
+			rbx_fail("%s: out of memory", g->set);
+			return -1;
+		}
+		for (uint32_t x = 0; x < s_rom_size; x++)
+			buf[x ^ ((x & 0xe000) < 0x6000 ? 0x0209u : 0x0208u)] = s_rom[x];
+		memcpy(s_rom, buf, s_rom_size);
+		free(buf);
+	} else if (s_m->map == MAP_INVMULTI) {   // init_invmulti: unscramble user1 into maincpu
+		uint32_t usize;
+		const uint8_t *src = rbx_region("user1", &usize);
+		if (!src || s_rom_size < usize || usize < 0x20000) {
+			rbx_fail("%s: ROM regions missing", g->set);
+			return -1;
+		}
+		for (uint32_t i = 0; i < usize; i++) {
+			uint32_t h = (i >> 8) & 0xff;   // bitswap<8>(h, 7,3,4,5,0,6,1,2)
+			uint32_t hs = ((h >> 7) & 1) << 7 | ((h >> 3) & 1) << 6 | ((h >> 4) & 1) << 5 | ((h >> 5) & 1) << 4 |
+			              (h & 1) << 3 | ((h >> 6) & 1) << 2 | ((h >> 1) & 1) << 1 | ((h >> 2) & 1);
+			uint8_t v = src[(i & 0x100ff) | (hs << 8)];   // bitswap<8>(v, 0,6,5,7,4,3,1,2)
+			s_rom[i] = (uint8_t)((v & 1) << 7 | ((v >> 6) & 1) << 6 | ((v >> 5) & 1) << 5 | ((v >> 7) & 1) << 4 |
+			                     ((v >> 4) & 1) << 3 | ((v >> 3) & 1) << 2 | ((v >> 1) & 1) << 1 | ((v >> 2) & 1));
+		}
+		eepser_init(&s_eeprom, EEPSER_93CXX, 64, 8, s_m->clock);
+		eepser_default(&s_eeprom, NULL, 0);
+		eepser_nv_load(&s_eeprom, g->set);
+	}
 	s_prom = rbx_region("proms", &s_prom_size);
 	uint32_t csize;
 	s_cloud = rbx_region("user1", &csize);
 	if (s_m->screen != SCR_POLARIS)
 		s_cloud = NULL;
 	s_port_in[0] = rbx_port_find("IN0");
-	s_port_in[1] = rbx_port_find("IN1");
-	s_port_in[2] = rbx_port_find("IN2");
+	s_port_in[1] = rbx_port_find(s_m->io == IO_DARTHVDR ? "P1" : "IN1");
+	s_port_in[2] = rbx_port_find(s_m->io == IO_DARTHVDR ? "P2" : "IN2");
+	s_port_in[3] = rbx_port_find("IN3");
 	s_port_cab = rbx_port_find("CAB");
 	s_port_contp[0] = rbx_port_find("CONTP1");
 	s_port_contp[1] = rbx_port_find("CONTP2");
@@ -606,6 +919,7 @@ static int si_init(const rbx_game *g)
 				pt2 = 1;
 	}
 	find_custom(g, 0, CK_NONE);
+	find_custom(g, 3, CK_NONE);
 	find_custom(g, 1, pt2 ? CK_PT2_1 : CK_P1);
 	find_custom(g, 2, pt2 ? CK_PT2_2 : s_port_p2gate >= 0 ? CK_SICV : CK_CAB);
 	s_snap = (snap_t *)calloc(1, sizeof(snap_t));
@@ -637,6 +951,8 @@ static int si_init(const rbx_game *g)
 
 static void si_exit(void)
 {
+	if (s_m && s_m->map == MAP_INVMULTI)
+		eepser_nv_save(&s_eeprom);
 	sia_exit();
 	free(s_snap);
 	s_snap = NULL;
@@ -648,7 +964,10 @@ static void si_frame(void)
 {
 	for (int line = 0; line < VTOTAL; line++) {
 		s_line = line;
-		if (line == 0x60 || line == VBSTART) {
+		if (s_m->irq == IRQ_VBLANK_RST7) {
+			if (line == VBSTART)   // screen_vblank -> set_inputline(0, ASSERT_LINE)
+				i8080_set_input(&s_cpu, I8080_INTR_LINE, 1);
+		} else if (line == 0x60 || line == VBSTART) {
 			// interrupt_trigger: counter 0x80 (vpos 0x60) and 0xda (vpos 0xe0)
 			i8080_set_input(&s_cpu, I8080_INTR_LINE, s_int_enable);
 		}
@@ -664,7 +983,7 @@ static void si_frame(void)
 			}
 		}
 		for (int half = 0; half < 2; half++) {
-			i8080_run(&s_cpu, rbx_line_cycles(&s_frac, s_m->clock, LINE_RATE * 2, 1000));
+			s_cycles += (uint64_t)i8080_run(&s_cpu, rbx_line_cycles(&s_frac, s_m->clock, LINE_RATE * 2, 1000));
 			rbx_audio_put(sia_sample());
 		}
 	}
@@ -686,6 +1005,17 @@ static int si_state(void *ctx, int load)
 	rc |= rbx_state_io(ctx, "frac", &s_frac, sizeof(s_frac));
 	rc |= rbx_state_io(ctx, "rand", &s_rand, sizeof(s_rand));
 	rc |= sia_state(ctx, load);
+	if (s_m->map == MAP_DARTHVDR)
+		rc |= rbx_state_io(ctx, "ram1800", s_ram1800, sizeof(s_ram1800));
+	if (s_m->map == MAP_ROLLINGC)
+		rc |= rbx_state_io(ctx, "colorram2", s_colorram2, sizeof(s_colorram2));
+	if (s_m->map == MAP_INVMULTI) {
+		rc |= rbx_state_io(ctx, "bank", &s_bank, 1);
+		rc |= rbx_state_io(ctx, "cycles", &s_cycles, sizeof(s_cycles));
+		rc |= eepser_state(&s_eeprom, ctx, load, "eeprom");
+		if (load && !rc)
+			build_pages();
+	}
 	return rc ? -1 : 0;
 }
 

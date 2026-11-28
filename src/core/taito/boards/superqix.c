@@ -9,7 +9,7 @@
       pbillianb   pbillian without the MCU (inputs on the 0x0c00 ports)
       sqix        Z80 + i8751 (cpu/mcs51), two AY-3-8910 (single output), bitmap layer
       sqix_8031   sqix with the bootleg 8031 + external ROM and its port 1 multiplexer
-      sqix_nomcu  sqix without the MCU (sqixb2)
+      sqix_nomcu  sqix without the MCU (sqixb2; perestro / perestrof with MAME's init_perestro decryption)
     Interleave: 8 slices per scanline between the Z80 and the MCU (MAME synchronizes on every semaphore access and
     boosts the interleave for 250 us after a Z80 -> 68705 write).
     This file is part of ReBOX. GPL-2.0-or-later.
@@ -612,6 +612,33 @@ static void vblank_capture(void)
 
 // ---- graphics decoding ----
 // packed 4 bpp, high nibble first: 8x8 tiles of 32 bytes (gfx_8x8x4_packed_msb / pbillian_charlayout)
+// MAME init_perestro: the program's address lines A0-A3 shuffled, the graphics' by bit swaps
+static void unshuffle16(uint8_t *p, uint32_t len, const uint8_t *tab)
+{
+	uint8_t t[16];
+	for (uint32_t i = 0; i + 16 <= len; i += 16) {
+		memcpy(t, p + i, 16);
+		for (int j = 0; j < 16; j++)
+			p[i + j] = t[tab[j]];
+	}
+}
+static void perestro_decrypt(uint8_t *rom, uint32_t rlen, uint8_t *g1, uint32_t l1, uint8_t *g2, uint32_t l2,
+                             uint8_t *g3, uint32_t l3)
+{
+	static const uint8_t conv[16] = { 0xc, 0x9, 0xb, 0xa, 0x8, 0xd, 0xf, 0xe, 0x4, 0x1, 0x3, 0x2, 0x0, 0x5, 0x7, 0x6 };
+	uint8_t t1[16], t2[16], t3[16];
+	for (int j = 0; j < 16; j++) {
+		int b0 = j & 1, b1 = j >> 1 & 1, b2 = j >> 2 & 1, b3 = j >> 3 & 1;
+		t1[j] = (uint8_t)(b3 << 3 | b2 << 2 | b0 << 1 | b1);   // bitswap<8>(j, 7,6,5,4, 3,2,0,1)
+		t2[j] = (uint8_t)(b0 << 3 | b1 << 2 | b2 << 1 | b3);   // bitswap<8>(j, 7,6,5,4, 0,1,2,3)
+		t3[j] = (uint8_t)(b1 << 3 | b0 << 2 | b3 << 1 | b2);   // bitswap<8>(j, 7,6,5,4, 1,0,3,2)
+	}
+	unshuffle16(rom, rlen, conv);
+	unshuffle16(g1, l1, t1);
+	unshuffle16(g2, l2, t2);
+	unshuffle16(g3, l3, t3);
+}
+
 static uint8_t *decode8(const uint8_t *src, int n, uint8_t **used)
 {
 	uint8_t *d = (uint8_t *)malloc((size_t)n * 64);
@@ -734,6 +761,14 @@ static int sq_init(const rbx_game *g)
 	if (!s_rom || !gfx1) {
 		rbx_fail("%s: ROM regions missing", g->set);
 		return -1;
+	}
+	if (!strcmp(g->set, "perestro") || !strcmp(g->set, "perestrof")) {
+		uint8_t *gfx2 = rbx_region("gfx2", &g2), *gfx3 = rbx_region("gfx3", &g3);
+		if (!gfx2 || !gfx3) {
+			rbx_fail("%s: ROM regions missing", g->set);
+			return -1;
+		}
+		perestro_decrypt(s_rom, s_rom_size, gfx1, g1, gfx2, g2, gfx3, g3);
 	}
 	if (s_has_mcu) {
 		s_mcu_rom = rbx_region("mcu", &msize);

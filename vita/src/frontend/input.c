@@ -21,9 +21,9 @@ void rbx_input_init(void)
 // game inputs of each player, in RBX_ACT_* order
 static const int s_act_input[2][RBX_ACT_COUNT] = {
 	{ RBX_IN_P1_B1, RBX_IN_P1_B2, RBX_IN_P1_COIN, RBX_IN_P1_START, RBX_IN_P1_B3, RBX_IN_P1_B4, RBX_IN_P1_B5, RBX_IN_P1_B6,
-	  RBX_IN_P1_RUP, RBX_IN_P1_RDOWN, RBX_IN_P1_RLEFT, RBX_IN_P1_RRIGHT, -1, -1 },
+	  RBX_IN_P1_RUP, RBX_IN_P1_RDOWN, RBX_IN_P1_RLEFT, RBX_IN_P1_RRIGHT },
 	{ RBX_IN_P2_B1, RBX_IN_P2_B2, RBX_IN_P2_COIN, RBX_IN_P2_START, RBX_IN_P2_B3, RBX_IN_P2_B4, RBX_IN_P2_B5, RBX_IN_P2_B6,
-	  RBX_IN_P2_RUP, RBX_IN_P2_RDOWN, RBX_IN_P2_RLEFT, RBX_IN_P2_RRIGHT, -1, -1 },
+	  RBX_IN_P2_RUP, RBX_IN_P2_RDOWN, RBX_IN_P2_RLEFT, RBX_IN_P2_RRIGHT },
 };
 static const int s_dir_input[2][4] = {
 	{ RBX_IN_P1_UP, RBX_IN_P1_DOWN, RBX_IN_P1_LEFT, RBX_IN_P1_RIGHT },
@@ -32,10 +32,11 @@ static const int s_dir_input[2][4] = {
 
 // one player: its controller (re_pad) with its own port settings (keys, stick, turbo, combo keys). raw = the
 // controller's buttons (system combos), b = with the touch buttons (1P)
-static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b)
+// gmask = the keys a General Key Mapping key of two keys holds now (kept from the player's own keys)
+static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b, uint32_t gmask)
 {
 	// the sticks' directions count as keys
-	b = (b & ~RBX_STICK_BITS) | rbx_stick_bits(pad->lx, pad->ly, pad->rx, pad->ry);
+	b = ((b & ~RBX_STICK_BITS) | rbx_stick_bits(pad->lx, pad->ly, pad->rx, pad->ry)) & ~gmask;
 	// this player's buttons, stick, turbo and combo keys: those of the device it reads (they go with the device)
 	const rbx_port *pr = &g_settings.port[re_pad_player_profile(pl)];
 	int up = (b & SCE_CTRL_UP) != 0, down = (b & SCE_CTRL_DOWN) != 0;
@@ -45,14 +46,10 @@ static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b)
 	static const int s_btn_act[RBX_TURBO_BUTTONS] = { RBX_ACT_ATTACK, RBX_ACT_JUMP, RBX_ACT_B3, RBX_ACT_B4, RBX_ACT_B5, RBX_ACT_B6 };
 	int stick_act[RBX_ACT_COUNT] = { 0 };
 	// a twin-stick game (Smash TV): its second joystick is four actions (the right stick at first, any keys)
-	const int nact = rbx_core_twin_stick() ? RBX_ACT_R_RIGHT + 1 : RBX_ACT_R_UP;
-	// the test / service switches: the first player's keys, for a game with a test switch
-	const int tact = pl == 0 && rbx_core_has_test();
+	const int nact = rbx_core_twin_stick() ? RBX_ACT_COUNT : RBX_ACT_R_UP;
 	uint32_t keyed = rbx_key_mask(pr->turbo_key);
 	for (int a = 0; a < nact; a++)
 		keyed |= rbx_act_bits(pr, a);
-	if (tact)
-		keyed |= rbx_act_bits(pr, RBX_ACT_TEST) | rbx_act_bits(pr, RBX_ACT_SERVICE);
 	for (int st = 0; st < 2; st++) {
 		const int x = st ? pad->rx : pad->lx, y = st ? pad->ry : pad->ly;
 		const int on[RBX_SDIR_COUNT] = { y < 128 - STICK_DEAD, y > 128 + STICK_DEAD, x < 128 - STICK_DEAD, x > 128 + STICK_DEAD };
@@ -87,7 +84,7 @@ static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b)
 	// the right stick as it is, for rotary joysticks (aim) and dials (turn) of the "second stick" games: while the
 	// second stick's left / right are the right stick's (as they are at first), in the screen's directions
 	int rx = 0, ry = 0;
-	if (nact > RBX_ACT_R_UP && (rbx_act_bits(pr, RBX_ACT_R_LEFT) & rbx_key_mask(RBX_KEY_RLEFT)) &&
+	if (nact == RBX_ACT_COUNT && (rbx_act_bits(pr, RBX_ACT_R_LEFT) & rbx_key_mask(RBX_KEY_RLEFT)) &&
 	    (rbx_act_bits(pr, RBX_ACT_R_RIGHT) & rbx_key_mask(RBX_KEY_RRIGHT))) {
 		rx = pad->rx - 128;
 		ry = pad->ry - 128;
@@ -156,12 +153,6 @@ static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b)
 		}
 		on_act[a] = on;
 	}
-	if (tact) {
-		on_act[RBX_ACT_TEST] = (game & rbx_act_bits(pr, RBX_ACT_TEST)) != 0;
-		on_act[RBX_ACT_SERVICE] = (game & rbx_act_bits(pr, RBX_ACT_SERVICE)) != 0;
-	}
-	if (pl == 0)
-		rbx_core_set_test_keys(on_act[RBX_ACT_TEST], on_act[RBX_ACT_SERVICE]);
 	if (rbx_input_rot && re_pad_port(pl) == 0 && !re_pad_is_tv()) {
 		// the second joystick turned like the first (Rotate Vertical L / R)
 		int *r = on_act + RBX_ACT_R_UP;
@@ -173,8 +164,41 @@ static void map_player(int pl, const SceCtrlData *pad, uint32_t raw, uint32_t b)
 		}
 	}
 	for (int a = 0; a < RBX_ACT_COUNT; a++)
-		if (s_act_input[pl][a] >= 0)
-			rbx_core_set_input(s_act_input[pl][a], on_act[a]);
+		rbx_core_set_input(s_act_input[pl][a], on_act[a]);
+}
+
+// General Key Mapping (MAME's general inputs): the general inputs held on the players' devices, 1 << RBX_GEN_*. A key of
+// two keys holds while both are held; then a key of one of those two keys alone (on that device) does not, and the two
+// are kept from the player's own keys (gmask, SCE bits: SELECT+Triangle as the test switch inserts no coin while held).
+// pd / bb: players 0..3's pads and buttons (with the touch buttons)
+static uint32_t general_poll(const SceCtrlData *const *pd, const uint32_t *bb, uint32_t *gmask)
+{
+	uint32_t held = 0;
+	for (int pl = 0; pl < 4; pl++) {
+		gmask[pl] = 0;
+		if (re_pad_port(pl) < 0)
+			continue;
+		const int prof = re_pad_player_profile(pl);
+		const uint32_t keys = rbx_keys_of((bb[pl] & ~RBX_STICK_BITS) |
+			rbx_stick_bits(pd[pl]->lx, pd[pl]->ly, pd[pl]->rx, pd[pl]->ry));
+		uint32_t pair = 0;   // (the keys of the two-key ones held)
+		for (int g = 0; g < RBX_GEN_COUNT * RBX_GEN_KEYS; g++) {   // (every key of every general input)
+			const rbx_gen_key *k = &g_settings.gen[g / RBX_GEN_KEYS][g % RBX_GEN_KEYS];
+			if (k->keys && k->prof == prof && (k->keys & (k->keys - 1)) && (keys & k->keys) == k->keys) {
+				held |= 1u << (g / RBX_GEN_KEYS);
+				pair |= k->keys;
+			}
+		}
+		for (int g = 0; g < RBX_GEN_COUNT * RBX_GEN_KEYS; g++) {
+			const rbx_gen_key *k = &g_settings.gen[g / RBX_GEN_KEYS][g % RBX_GEN_KEYS];
+			if (k->keys && k->prof == prof && !(k->keys & (k->keys - 1)) && (keys & k->keys) && !(pair & k->keys))
+				held |= 1u << (g / RBX_GEN_KEYS);
+		}
+		for (int i = 0; i < RBX_KEY_LANY; i++)
+			if (pair & (1u << i))
+				gmask[pl] |= rbx_key_mask(i);
+	}
+	return held;
 }
 
 uint32_t rbx_input_poll(void)
@@ -205,16 +229,24 @@ uint32_t rbx_input_poll(void)
 		else
 			b |= tb;
 	}
-	map_player(0, &p1, p1.buttons, b);
-	map_player(1, &p2, p2.buttons, b2);
+	// General Key Mapping: every player's device (3P / 4P read for these alone)
+	SceCtrlData p3, p4;
+	re_pad_read(2, &p3);
+	re_pad_read(3, &p4);
+	const SceCtrlData *pd[4] = { &p1, &p2, &p3, &p4 };
+	const uint32_t bb[4] = { b, b2, p3.buttons, p4.buttons };
+	uint32_t gmask[4];
+	rbx_core_set_general(general_poll(pd, bb, gmask));
+	map_player(0, &p1, p1.buttons, b, gmask[0]);
+	map_player(1, &p2, p2.buttons, b2, gmask[1]);
 	return all.buttons;
 }
 
 void rbx_input_release(void)
 {
+	rbx_core_set_general(0);
 	for (int i = 0; i < RBX_IN_DIGITAL_COUNT; i++)
 		rbx_core_set_input(i, 0);
-	rbx_core_set_test_keys(0, 0);
 	for (int p = 0; p < 2; p++) {
 		rbx_set_analog(p, 0, 0);
 		rbx_set_analog(p, 1, 0);

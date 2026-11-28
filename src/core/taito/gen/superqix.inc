@@ -151,6 +151,34 @@ static const rbx_rom_region superqix_romr_sqixb2[] = {
 	{ "gfx3", 0x10000, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load superqix_roml_perestro[] = {
+	{ RBX_ROM_LOAD, 0, "rom1.bin", 0x0, 0x20000, 0x0cbf96c1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "rom4.bin", 0x0, 0x10000, 0xc56122a8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "rom2.bin", 0x0, 0x20000, 0x36f93701, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rom3a.bin", 0x0, 0x10000, 0x7a2a563f, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region superqix_romr_perestro[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "gfx1", 0x10000, 0x00 },
+	{ "gfx2", 0x20000, 0x00 },
+	{ "gfx3", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load superqix_roml_perestrof[] = {
+	{ RBX_ROM_LOAD, 0, "rom1.bin", 0x0, 0x20000, 0x0cbf96c1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "rom4.bin", 0x0, 0x10000, 0xc56122a8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "rom2.bin", 0x0, 0x20000, 0x36f93701, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 3, "rom3.bin", 0x0, 0x10000, 0x00c91d5a, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region superqix_romr_perestrof[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "gfx1", 0x10000, 0x00 },
+	{ "gfx2", 0x20000, 0x00 },
+	{ "gfx3", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
 
 static const rbx_ipt_setting superqix_ips_hotsmash[] = {
 	{ 0x1, "Off" },
@@ -504,5 +532,7 @@ static const rbx_game superqix_games[] = {
 	{ "sqixu", "sqix", "Super Qix (US)", "1987", "Kaneko / Taito (Romstar license)", "Super Qix", "sqix", 90, 0, superqix_romr_sqixu, superqix_roml_sqixu, superqix_ipp_superqix, superqix_ipf_superqix, superqix_ips_superqix },
 	{ "sqixb1", "sqix", "Super Qix (bootleg of V1.0, 8031 MCU)", "1987", "bootleg", "Super Qix", "sqix_8031", 90, 0, superqix_romr_sqixb1, superqix_roml_sqixb1, superqix_ipp_superqix, superqix_ipf_superqix, superqix_ips_superqix },
 	{ "sqixb2", "sqix", "Super Qix (bootleg, No MCU)", "1987", "bootleg", "Super Qix", "sqix_nomcu", 90, 0, superqix_romr_sqixb2, superqix_roml_sqixb2, superqix_ipp_superqix, superqix_ipf_superqix, superqix_ips_superqix },
+	{ "perestro", NULL, "Perestroika Girls", "1994", "Promat", "Super Qix", "sqix_nomcu", 90, 0, superqix_romr_perestro, superqix_roml_perestro, superqix_ipp_superqix, superqix_ipf_superqix, superqix_ips_superqix },
+	{ "perestrof", "perestro", "Perestroika Girls (Fuuki license)", "1993", "Promat (Fuuki license)", "Super Qix", "sqix_nomcu", 90, 0, superqix_romr_perestrof, superqix_roml_perestrof, superqix_ipp_superqix, superqix_ipf_superqix, superqix_ips_superqix },
 };
-#define SUPERQIX_GAME_COUNT 9
+#define SUPERQIX_GAME_COUNT 11

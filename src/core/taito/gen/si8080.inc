@@ -132,6 +132,22 @@ static const rbx_rom_region si8080_romr_invaderl[] = {
 	{ "maincpu", 0x10000, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load si8080_roml_invadernc[] = {
+	{ RBX_ROM_LOAD, 0, "1.ic65", 0x0, 0x400, 0x499f253a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2.ic66", 0x400, 0x400, 0x4b7f232e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3.ic67", 0x800, 0x400, 0x5c6bdd47, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "7.ic57", 0x1000, 0x400, 0x5a7bbf1f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4.ic70", 0x1400, 0x400, 0x455b1fa7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5.ic71", 0x1800, 0x400, 0xb9ea71a0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "6.ic72", 0x1c00, 0x400, 0x2c68e0b4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "82s137_1.ic17", 0x0, 0x400, 0x1eb2bc60, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invadernc[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x400, 0x00 },
+	{ NULL, 0, 0 }
+};
 static const rbx_rom_load si8080_roml_spcewars[] = {
 	{ RBX_ROM_LOAD, 0, "sanritsu.1", 0x0, 0x400, 0xca331679, 1, 0, 0, 0 },
 	{ RBX_ROM_LOAD, 0, "sanritsu.2", 0x400, 0x400, 0x48dc791c, 1, 0, 0, 0 },
@@ -148,6 +164,25 @@ static const rbx_rom_region si8080_romr_spcewars[] = {
 	{ "maincpu", 0x10000, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load si8080_roml_spcewarla[] = {
+	{ RBX_ROM_LOAD, 0, "ps1.bin", 0x0, 0x400, 0x222f6913, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ps2.bin", 0x400, 0x400, 0x48dc791c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ps3.bin", 0x800, 0x400, 0x58ddc18c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ps4.bin", 0xc00, 0x400, 0x1da5e383, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ps5.bin", 0x1000, 0x400, 0x3b6d9f23, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ps6.bin", 0x1400, 0x400, 0x50be9b7a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ps7.bin", 0x1800, 0x400, 0x7b8efd7c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ps8.bin", 0x1c00, 0x400, 0x64fdc3e1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ps9.bin", 0x4000, 0x400, 0xb2f29601, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "cv01_1.bin", 0x0, 0x400, 0xaac24f34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "cv02_2.bin", 0x400, 0x400, 0x2bdf83a0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spcewarla[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
 static const rbx_rom_load si8080_roml_spceking[] = {
 	{ RBX_ROM_LOAD, 0, "invaders.h", 0x0, 0x800, 0x734f5ad8, 1, 0, 0, 0 },
 	{ RBX_ROM_LOAD, 0, "spcekng2", 0x800, 0x800, 0x96dcdd42, 1, 0, 0, 0 },
@@ -156,6 +191,42 @@ static const rbx_rom_load si8080_roml_spceking[] = {
 	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
 };
 static const rbx_rom_region si8080_romr_spceking[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_spcebttl[] = {
+	{ RBX_ROM_LOAD, 0, "1", 0x0, 0x400, 0x86bb8cb6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2", 0x400, 0x400, 0xfebe6d1a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3", 0x800, 0x400, 0xe11ef4ae, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4", 0x1400, 0x400, 0x1293b826, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5", 0x1800, 0x400, 0x3c89b4d5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "6", 0x1c00, 0x400, 0xe154f4e5, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spcebttl[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_cosmicmo[] = {
+	{ RBX_ROM_LOAD, 0, "ii-1.h1", 0x0, 0x400, 0xd6e4e5da, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ii-2.h2", 0x400, 0x400, 0x8f7988e6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ii-3.h3", 0x800, 0x400, 0x2d2e9dc8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ii-4.h4", 0xc00, 0x400, 0x26cae456, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ii-5.h5", 0x4000, 0x400, 0xb13f228e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ii-6.h6", 0x4400, 0x400, 0x4ae1b9c4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ii-7.h7", 0x4800, 0x400, 0x6a13b15b, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_cosmicmo[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_cosmicm2[] = {
+	{ RBX_ROM_LOAD, 0, "3907.bin", 0x0, 0x1000, 0xbbffede6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3906.bin", 0x4000, 0x1000, 0xb841f894, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_cosmicm2[] = {
 	{ "maincpu", 0x10000, 0x00 },
 	{ NULL, 0, 0 }
 };
@@ -174,6 +245,28 @@ static const rbx_rom_region si8080_romr_sinvzen[] = {
 	{ "maincpu", 0x10000, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load si8080_roml_spaceat2[] = {
+	{ RBX_ROM_LOAD, 0, "spaceatt.h", 0x0, 0x800, 0xa31d0756, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "spaceatt.g", 0x800, 0x800, 0xf41241f7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "spaceatt.f", 0x1000, 0x800, 0x4c060223, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "spaceatt.e", 0x1800, 0x800, 0x7cf6f604, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spaceat2[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invader4[] = {
+	{ RBX_ROM_LOAD, 0, "spin4.a", 0x0, 0x800, 0xbb386dfe, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "spin4.b", 0x800, 0x800, 0x63afa11d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "spin4.c", 0x1000, 0x800, 0x22b0317c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "spin4.d", 0x1800, 0x800, 0x9102fd68, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invader4[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
 static const rbx_rom_load si8080_roml_ultrainv[] = {
 	{ RBX_ROM_LOAD, 0, "in-01.bin", 0x0, 0x400, 0xdb9de599, 1, 0, 0, 0 },
 	{ RBX_ROM_LOAD, 0, "in-02.bin", 0x400, 0x400, 0xfebe6d1a, 1, 0, 0, 0 },
@@ -184,6 +277,333 @@ static const rbx_rom_load si8080_roml_ultrainv[] = {
 	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
 };
 static const rbx_rom_region si8080_romr_ultrainv[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_spaceatt[] = {
+	{ RBX_ROM_LOAD, 0, "h", 0x0, 0x400, 0xd0c32d72, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv02.bin", 0x400, 0x400, 0x0e159534, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "f", 0x800, 0x400, 0x483e651e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "c", 0x1400, 0x400, 0x1293b826, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "b", 0x1800, 0x400, 0x6fc782aa, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "a", 0x1c00, 0x400, 0x211ac4a3, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spaceatt[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_spaceattbp[] = {
+	{ RBX_ROM_LOAD, 0, "06e.bin", 0x0, 0x400, 0x68301d05, 1, 0, 3, 0 },
+	{ RBX_ROM_LOAD, 0, "12l.bin", 0x0, 0x400, 0xc5a5228f, 1, 0, 2, 0 },
+	{ RBX_ROM_LOAD, 0, "05de.bin", 0x400, 0x400, 0x42032c14, 1, 0, 3, 0 },
+	{ RBX_ROM_LOAD, 0, "11hl.bin", 0x400, 0x400, 0xd5d3811a, 1, 0, 2, 0 },
+	{ RBX_ROM_LOAD, 0, "04d.bin", 0x800, 0x400, 0x5f5e540c, 1, 0, 3, 0 },
+	{ RBX_ROM_LOAD, 0, "10h.bin", 0x800, 0x400, 0x9d5ef6f1, 1, 0, 2, 0 },
+	{ RBX_ROM_LOAD, 0, "03b.bin", 0x1400, 0x400, 0x89e13008, 1, 0, 3, 0 },
+	{ RBX_ROM_LOAD, 0, "09g.bin", 0x1400, 0x400, 0xc16f5503, 1, 0, 2, 0 },
+	{ RBX_ROM_LOAD, 0, "02ab.bin", 0x1800, 0x400, 0xffa166c2, 1, 0, 3, 0 },
+	{ RBX_ROM_LOAD, 0, "08f.bin", 0x1800, 0x400, 0xb5fa1a2b, 1, 0, 2, 0 },
+	{ RBX_ROM_LOAD, 0, "01a.bin", 0x1c00, 0x400, 0x44f8e99c, 1, 0, 3, 0 },
+	{ RBX_ROM_LOAD, 0, "07ef.bin", 0x1c00, 0x400, 0x9560880d, 1, 0, 2, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spaceattbp[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_spaceatt2k[] = {
+	{ RBX_ROM_LOAD, 0, "h1.bin", 0x0, 0x800, 0x734f5ad8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "g1.bin", 0x800, 0x800, 0x6bfaca4a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "f1.bin", 0x1000, 0x800, 0x0ccead96, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "e1.bin", 0x1800, 0x800, 0x19971ca7, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spaceatt2k[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_cosmicin[] = {
+	{ RBX_ROM_LOAD, 0, "cn7472n-7921.bin", 0x0, 0x800, 0x734f5ad8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "cn7471n-7918.bin", 0x800, 0x800, 0x6bfaca4a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "cn7470n-7918.bin", 0x1000, 0x800, 0x0ccead96, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "cn7469n-7921.bin", 0x1800, 0x800, 0x5733048c, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_cosmicin[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_galmonst[] = {
+	{ RBX_ROM_LOAD, 0, "h.5m", 0x0, 0x400, 0x8a0395e9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "g.5n", 0x400, 0x400, 0x6183ed16, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "f.5p", 0x800, 0x400, 0xb6047fdd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "c.5t", 0x1400, 0x400, 0xe88e8c96, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "b.5u", 0x1800, 0x400, 0x34678b80, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "a.5v", 0x1c00, 0x400, 0x05a6806b, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_galmonst[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_spacecom[] = {
+	{ RBX_ROM_LOAD, 0, "1f.ic67", 0x0, 0x400, 0x703f2cbe, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2g.ic82", 0x400, 0x400, 0x7269b719, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3f.ic68", 0x800, 0x400, 0x6badac4f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4g.ic83", 0xc00, 0x400, 0x75b59ea7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5f.ic69", 0x1000, 0x400, 0x84b61117, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "6g.ic84", 0x1400, 0x400, 0xde383625, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "7f.ic70", 0x1800, 0x400, 0x5a23dbc8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "8g.ic85", 0x1c00, 0x400, 0xa5a467e3, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spacecom[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_spacerng[] = {
+	{ RBX_ROM_LOAD, 0, "sr1.u36", 0x0, 0x800, 0xb984f52d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sr2.u35", 0x800, 0x800, 0x4b4f07e6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sr3.u34", 0x1000, 0x800, 0xedc28ba9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sr4.u33", 0x1800, 0x800, 0xa95f559f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "cv01.1", 0x0, 0x400, 0x037e16ac, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "cv02.2", 0x400, 0x400, 0x8263da38, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spacerng[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invasion[] = {
+	{ RBX_ROM_LOAD, 0, "10136-0.0k", 0x0, 0x400, 0x7a9b4485, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "10136-1.1k", 0x400, 0x400, 0x7c86620d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "10136-2.2k", 0x800, 0x400, 0xccaf38f6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "10136-5.5k", 0x1400, 0x400, 0x8ec9eae2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "10136-6.6k", 0x1800, 0x400, 0xff0b0690, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "10136-7.7k", 0x1c00, 0x400, 0x75d7acaf, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invasion[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invasiona[] = {
+	{ RBX_ROM_LOAD, 0, "invasiona_0.bin", 0x0, 0x400, 0xc2fe6197, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasiona_1.bin", 0x400, 0x400, 0x7c86620d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasiona_2.bin", 0x800, 0x400, 0xccaf38f6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasiona_3.bin", 0x1400, 0x400, 0x8ec9eae2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasiona_4.bin", 0x1800, 0x400, 0x24b39879, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasiona_5.bin", 0x1c00, 0x400, 0x59134ff8, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invasiona[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invasiona2[] = {
+	{ RBX_ROM_LOAD, 0, "0.0.bin", 0x0, 0x400, 0x7a9b4485, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "1.1.bin", 0x400, 0x400, 0x7c86620d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2.2.bin", 0x800, 0x400, 0xb949185e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3.5.bin", 0x1400, 0x400, 0x8ec9eae2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4.6.bin", 0x1800, 0x400, 0xec0edb4a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5.7.bin", 0x1c00, 0x400, 0xc3466380, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invasiona2[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invasionb[] = {
+	{ RBX_ROM_LOAD, 0, "invasionb_0.bin", 0x0, 0x400, 0x7a9b4485, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasionb_1.bin", 0x400, 0x400, 0x7c86620d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasionb_2.bin", 0x800, 0x400, 0xccaf38f6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasionb_5.bin", 0x1400, 0x400, 0x8ec9eae2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasionb_6.bin", 0x1800, 0x400, 0xec0edb4a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invasionb_7.bin", 0x1c00, 0x400, 0x6aac1281, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invasionb[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invasionrz[] = {
+	{ RBX_ROM_LOAD, 0, "rz0.0k", 0x0, 0x400, 0x7a9b4485, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz1.1k", 0x400, 0x400, 0x7c86620d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz2.2k", 0x800, 0x400, 0xccaf38f6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz5.5k", 0x1400, 0x400, 0x8ec9eae2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz6.6k", 0x1800, 0x400, 0xec0edb4a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz7.7k", 0x1c00, 0x400, 0xe4ab9012, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invasionrz[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invasionrza[] = {
+	{ RBX_ROM_LOAD, 0, "rz0-0.9k", 0x0, 0x400, 0x3044806f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz1-1.8k", 0x400, 0x400, 0x7c86620d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz2-2.7k", 0x800, 0x400, 0xc808e941, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz5-5.4k", 0x1400, 0x400, 0x8ec9eae2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz6-6.3k", 0x1800, 0x400, 0xc48df3ca, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz6-6.3ka", 0x1800, 0x400, 0xaa51b2c3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rz7-7.2k", 0x1c00, 0x400, 0x27dbea48, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invasionrza[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invadersem[] = {
+	{ RBX_ROM_LOAD, 0, "h.bin", 0x0, 0x400, 0x7fc672a5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "g.bin", 0x400, 0x400, 0xad518883, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "f.bin", 0x800, 0x400, 0xf4a6c480, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "c.bin", 0x1400, 0x400, 0x8f62c513, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "b.bin", 0x1800, 0x400, 0x2808e5c0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "a.bin", 0x1c00, 0x400, 0x04c9b084, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invadersem[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_superinv[] = {
+	{ RBX_ROM_LOAD, 0, "00", 0x0, 0x400, 0x7a9b4485, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "01", 0x400, 0x400, 0x7c86620d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "02", 0x800, 0x400, 0xccaf38f6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "03", 0x1400, 0x400, 0x8ec9eae2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "04", 0x1800, 0x400, 0x68719b30, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "05", 0x1c00, 0x400, 0x8abe2466, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_superinv[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_sinvemag[] = {
+	{ RBX_ROM_LOAD, 0, "sv01.36", 0x0, 0x400, 0x86bb8cb6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "emag_si.b", 0x400, 0x400, 0xfebe6d1a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "emag_si.c", 0x800, 0x400, 0xaafb24f7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "emag_si.d", 0x1400, 0x400, 0x68c4b9da, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "emag_si.e", 0x1800, 0x400, 0xc4e80586, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "emag_si.f", 0x1c00, 0x400, 0x077f5ef2, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_sinvemag[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_sinvemag2[] = {
+	{ RBX_ROM_LOAD, 0, "sie.a", 0x0, 0x400, 0x86bb8cb6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sie.b", 0x400, 0x400, 0xfebe6d1a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sie.c", 0x800, 0x400, 0xad6529f0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sie.d", 0x1400, 0x400, 0x68c4b9da, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sie.e", 0x1800, 0x400, 0x636a6b7d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sie.f", 0x1c00, 0x400, 0x52062faa, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_sinvemag2[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_searthin[] = {
+	{ RBX_ROM_LOAD, 0, "earthinv.h", 0x0, 0x800, 0x58a750c8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "earthinv.g", 0x800, 0x800, 0xb91742f1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "earthinv.f", 0x1000, 0x800, 0x4acbbc60, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "earthinv.e", 0x1800, 0x800, 0xdf397b12, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_searthin[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_searthina[] = {
+	{ RBX_ROM_LOAD, 0, "unkh.h1", 0x0, 0x400, 0x272b9bf3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "unkg.g1", 0x400, 0x400, 0x61bb6101, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "unkf.f1", 0x800, 0x400, 0x2a8d9cd5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "unke.e1", 0xc00, 0x400, 0x1938d349, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "unkd.d1", 0x1000, 0x400, 0x9bc2ab88, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "unkc.c1", 0x1400, 0x400, 0xd4e2dada, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "unkb.b1", 0x1800, 0x400, 0xab645a9c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "unka.a1", 0x1c00, 0x400, 0x4b65bd7c, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_searthina[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_searthinc[] = {
+	{ RBX_ROM_LOAD, 0, "imbader1.bin", 0x0, 0x800, 0xc46df7f4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "imbader2.bin", 0x800, 0x800, 0x7b6cddc3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "imbader3.bin", 0x1000, 0x800, 0x76429ed7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "imbader4.bin", 0x1800, 0x800, 0x7e519b8e, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_searthinc[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_supinvsion[] = {
+	{ RBX_ROM_LOAD, 0, "h-am4708.bin", 0x0, 0x400, 0x281570f0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "g-am4708.bin", 0x400, 0x400, 0xc0b6cd79, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "f-am4708.bin", 0x800, 0x400, 0x2a8d9cd5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "e-am4708.bin", 0xc00, 0x400, 0x03e9ef33, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "d-am4708.bin", 0x1000, 0x400, 0xb2527c77, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "c-am4708.bin", 0x1400, 0x400, 0xa883ff01, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "b-am4708.bin", 0x1800, 0x400, 0x46e02fcf, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "a-am4708.bin", 0x1c00, 0x400, 0xbf4d3267, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_supinvsion[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_cosmicbat[] = {
+	{ RBX_ROM_LOAD, 0, "1.5m", 0x0, 0x400, 0x6019a1aa, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2.5n", 0x400, 0x400, 0xc12eab91, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3.5p", 0x800, 0x400, 0x2a8d9cd5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4.5r", 0xc00, 0x400, 0x4c77ce80, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5.5s", 0x1000, 0x400, 0xb2527c77, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "6.5t", 0x1400, 0x400, 0xa883ff01, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "7.5u", 0x1800, 0x400, 0x46e02fcf, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "8.5v", 0x1c00, 0x400, 0xff88f38e, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_cosmicbat[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_searthie[] = {
+	{ RBX_ROM_LOAD, 0, "searthie.h", 0x0, 0x800, 0x92b08b91, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "searthie.g", 0x800, 0x800, 0x23e24bcc, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "searthie.f", 0x1000, 0x800, 0x8700286a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "searthie.e", 0x1800, 0x800, 0xbaf949b0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_searthie[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_alieninv[] = {
+	{ RBX_ROM_LOAD, 0, "alieninv.h", 0x0, 0x800, 0x6ad601c3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "alieninv.g", 0x800, 0x800, 0xc6bb6fb3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "alieninv.f", 0x1000, 0x800, 0x1d2ff324, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "alieninv.e", 0x1800, 0x800, 0x2f2e6791, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_alieninv[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_alieninvp2[] = {
+	{ RBX_ROM_LOAD, 0, "1h.bin", 0x0, 0x800, 0xc46df7f4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "1g.bin", 0x800, 0x800, 0x4b1112d6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "1f.bin", 0x1000, 0x800, 0xadca18a5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "1e.bin", 0x1800, 0x800, 0x0449cb52, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_alieninvp2[] = {
 	{ "maincpu", 0x10000, 0x00 },
 	{ NULL, 0, 0 }
 };
@@ -202,6 +622,54 @@ static const rbx_rom_load si8080_roml_jspecter2[] = {
 	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
 };
 static const rbx_rom_region si8080_romr_jspecter2[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_spacewr3[] = {
+	{ RBX_ROM_LOAD, 0, "ic36.bin", 0x0, 0x800, 0x9e30f88a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic35.bin", 0x800, 0x800, 0x40c2d55b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic34.bin", 0x1000, 0x800, 0xb435f021, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic33.bin", 0x1800, 0x800, 0xcbdc6fe8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ic32.bin", 0x4000, 0x800, 0x1e5a753c, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spacewr3[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_swipeout[] = {
+	{ RBX_ROM_LOAD, 0, "sw1.bin", 0x0, 0x800, 0x576b5897, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sw2.bin", 0x800, 0x800, 0x40c2d55b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sw3.bin", 0x1000, 0x800, 0x65e8ce64, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sw4.bin", 0x1800, 0x800, 0xddf1fb9c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sw5.bin", 0x4000, 0x800, 0x1e5a753c, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_swipeout[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_darthvdr[] = {
+	{ RBX_ROM_LOAD, 0, "rom0", 0x0, 0x400, 0xb15785b6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rom1", 0x400, 0x400, 0x95947743, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rom2", 0x800, 0x400, 0x19b1731f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rom3", 0xc00, 0x400, 0xca1b5e3c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rom4", 0x1000, 0x400, 0xeede5f41, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rom5", 0x1400, 0x400, 0xcc52a4bb, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_darthvdr[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_tst_invd[] = {
+	{ RBX_ROM_LOAD, 0, "test.h", 0x0, 0x800, 0xf86a2eea, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invaders.g", 0x800, 0x800, 0x6bfaca4a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invaders.f", 0x1000, 0x800, 0x0ccead96, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invaders.e", 0x1800, 0x800, 0x14e538b0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_tst_invd[] = {
 	{ "maincpu", 0x10000, 0x00 },
 	{ NULL, 0, 0 }
 };
@@ -307,6 +775,20 @@ static const rbx_rom_region si8080_romr_moonbasea[] = {
 	{ "proms", 0x800, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load si8080_roml_spcewarl[] = {
+	{ RBX_ROM_LOAD, 0, "spcewarl.1", 0x0, 0x800, 0x1fcd34d2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "spcewarl.2", 0x800, 0x800, 0x43bc65c5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "spcewarl.3", 0x1000, 0x800, 0x7820df3a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "spcewarl.4", 0x1800, 0x800, 0xadc05b8d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "01.1", 0x0, 0x400, 0xaac24f34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "02.2", 0x400, 0x400, 0x2bdf83a0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spcewarl[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
 static const rbx_rom_load si8080_roml_spclaser[] = {
 	{ RBX_ROM_LOAD, 0, "la01", 0x0, 0x800, 0xbedc0078, 1, 0, 0, 0 },
 	{ RBX_ROM_LOAD, 0, "la02", 0x800, 0x800, 0x43bc65c5, 1, 0, 0, 0 },
@@ -317,6 +799,34 @@ static const rbx_rom_load si8080_roml_spclaser[] = {
 	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
 };
 static const rbx_rom_region si8080_romr_spclaser[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_intruder[] = {
+	{ RBX_ROM_LOAD, 0, "la01-1.36", 0x0, 0x800, 0xbedc0078, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "la02-1.35", 0x800, 0x800, 0x43bc65c5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "la03-1.34", 0x1000, 0x800, 0x278ef9cf, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "la04-1.33", 0x1800, 0x800, 0x5116b234, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "01.1", 0x0, 0x400, 0xaac24f34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "02.2", 0x400, 0x400, 0x2bdf83a0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_intruder[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_laser[] = {
+	{ RBX_ROM_LOAD, 0, "1.u36", 0x0, 0x800, 0xb44e2c41, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2.u35", 0x800, 0x800, 0x9876f331, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3.u34", 0x1000, 0x800, 0xed79000b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4.u33", 0x1800, 0x800, 0x10a160a1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "01.1", 0x0, 0x400, 0xaac24f34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "02.2", 0x400, 0x400, 0x2bdf83a0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_laser[] = {
 	{ "maincpu", 0x10000, 0x00 },
 	{ "proms", 0x800, 0x00 },
 	{ NULL, 0, 0 }
@@ -834,6 +1344,34 @@ static const rbx_rom_region si8080_romr_spacmiss[] = {
 	{ "user1", 0x800, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load si8080_roml_galxwars[] = {
+	{ RBX_ROM_LOAD, 0, "univgw3.0", 0x0, 0x400, 0x937796f4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "univgw4.1", 0x400, 0x400, 0x4b86e7a6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "univgw5.2", 0x800, 0x400, 0x47a187cd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "univgw6.3", 0xc00, 0x400, 0x7b7d22ff, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "univgw1.4", 0x4000, 0x400, 0x0871156e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "univgw2.5", 0x4400, 0x400, 0x6036d7bf, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "01.1", 0x0, 0x400, 0xaac24f34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "02.2", 0x400, 0x400, 0x2bdf83a0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_galxwars[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_galxwars2[] = {
+	{ RBX_ROM_LOAD, 0, "3192.h6", 0x0, 0x1000, 0xbde6860b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3193.h7", 0x4000, 0x1000, 0xa17cd507, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "01.1", 0x0, 0x400, 0xaac24f34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "02.2", 0x400, 0x400, 0x2bdf83a0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_galxwars2[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
 static const rbx_rom_load si8080_roml_galxwarst[] = {
 	{ RBX_ROM_LOAD, 0, "galxwars.0", 0x0, 0x400, 0x608bfe7f, 1, 0, 0, 0 },
 	{ RBX_ROM_LOAD, 0, "galxwars.1", 0x400, 0x400, 0xa810b258, 1, 0, 0, 0 },
@@ -866,7 +1404,656 @@ static const rbx_rom_region si8080_romr_galxwarst2[] = {
 	{ "proms", 0x800, 0x00 },
 	{ NULL, 0, 0 }
 };
+static const rbx_rom_load si8080_roml_starw[] = {
+	{ RBX_ROM_LOAD, 0, "roma", 0x0, 0x400, 0x60e8993c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "romb", 0x400, 0x400, 0xb8060773, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "romc", 0x800, 0x400, 0x307ce6b8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "romd", 0x1400, 0x400, 0x2b0d0a88, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rome", 0x1800, 0x400, 0x5b1c3ad0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "romf", 0x1c00, 0x400, 0xc8e42d3d, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_starw[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_starw1[] = {
+	{ RBX_ROM_LOAD, 0, "gc.75", 0x0, 0x400, 0xad10c128, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "gc.77", 0x400, 0x400, 0xab77c474, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "gc.76", 0x800, 0x400, 0x3638aed4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "gc.80", 0x1400, 0x400, 0x4c67957b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "gc.81", 0x1800, 0x400, 0x246621ef, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "gc.82", 0x1c00, 0x400, 0x19bd32ee, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "cv01", 0x0, 0x400, 0x8d892ef3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "cv02", 0x400, 0x400, 0xb44ddde8, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_starw1[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_cosmo[] = {
+	{ RBX_ROM_LOAD, 0, "1.36", 0x0, 0x800, 0x445c9a98, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2.35", 0x800, 0x800, 0xdf3eb731, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3.34", 0x1000, 0x800, 0x772c813f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4.33", 0x1800, 0x800, 0x279f66e6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5.32", 0x4000, 0x800, 0xcefb18df, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "6.31", 0x4800, 0x800, 0xb037f6c4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "7.42", 0x5000, 0x800, 0xc3831ea2, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "n-1.7d", 0x800, 0x800, 0xbd8576f1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "n-2.6e", 0x0, 0x800, 0x48f1ade5, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_cosmo[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x1000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invrvnge[] = {
+	{ RBX_ROM_LOAD, 0, "h.ic36", 0x0, 0x800, 0x0e229b9f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "g.ic35", 0x800, 0x800, 0x26b38aa4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "f.ic34", 0x1000, 0x800, 0xb3b2749e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "e.ic33", 0x1800, 0x800, 0xd8e75102, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "snd.2c", 0xc000, 0x800, 0x135f3b16, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "snd.1c", 0xe000, 0x800, 0x152fc85e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "colour.bin", 0x0, 0x800, 0x7de74988, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invrvnge[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invrvngea[] = {
+	{ RBX_ROM_LOAD, 0, "h.ic36", 0x0, 0x800, 0x0914b279, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "g.ic35", 0x800, 0x800, 0x84d9497c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "f.ic34", 0x1000, 0x800, 0x78d34d97, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "e.ic33", 0x1800, 0x800, 0x30c71887, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "snd.2c", 0xc000, 0x800, 0x135f3b16, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "snd.1c", 0xe000, 0x800, 0x152fc85e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "colour.bin", 0x0, 0x800, 0x7de74988, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invrvngea[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invrvngeb[] = {
+	{ RBX_ROM_LOAD, 0, "invrvnge.h", 0x0, 0x800, 0xaca41bbb, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invrvnge.g", 0x800, 0x800, 0xcfe89dad, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invrvnge.f", 0x1000, 0x800, 0xe350de2c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "invrvnge.e", 0x1800, 0x800, 0x1ec8dfc8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "snd.2c", 0xc000, 0x800, 0x135f3b16, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "snd.1c", 0xe000, 0x800, 0x152fc85e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "colour.bin", 0x0, 0x800, 0x7de74988, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invrvngeb[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invrvngedu[] = {
+	{ RBX_ROM_LOAD, 0, "ir.5m", 0x0, 0x800, 0xb145cb71, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ir.5n", 0x800, 0x800, 0x660e8af3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ir.5p", 0x1000, 0x800, 0x6ec5a9ad, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ir.5r", 0x1800, 0x800, 0x74516811, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "ir.1t", 0xc000, 0x800, 0x135f3b16, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "ir.1u", 0xe000, 0x800, 0x152fc85e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ir.3r", 0x0, 0x800, 0x57da51a9, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invrvngedu[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invrvngegw[] = {
+	{ RBX_ROM_LOAD, 0, "ir.5m", 0x0, 0x800, 0x4fe35d1f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ir.5n", 0x800, 0x800, 0x92d0442c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ir.5p", 0x1000, 0x800, 0x18d2372d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "ir.5r", 0x1800, 0x800, 0x657ddf27, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "ir.1t", 0xc000, 0x800, 0x64e9e81e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "ir.1u", 0xe000, 0x800, 0x152fc85e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 2, "ir.3r", 0x0, 0x800, 0x6ce639bf, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invrvngegw[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "audiocpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_vortex[] = {
+	{ RBX_ROM_LOAD, 0, "1.t36", 0x0, 0x800, 0x577417a6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2.t35", 0x800, 0x800, 0x126d0049, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3.t34", 0x1000, 0x800, 0x4a2510b3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4.t33", 0x1800, 0x800, 0xda0274fe, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5.t32", 0x4000, 0x800, 0xa3de49d6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "6.t31", 0x4800, 0x800, 0x271085d0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_vortex[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_rollingc[] = {
+	{ RBX_ROM_LOAD, 0, "rc01.a4", 0x0, 0x400, 0x66fa50bf, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc02.c4", 0x400, 0x400, 0x61c06ae4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc03.e4", 0x800, 0x400, 0x77e39fa0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc04.f4", 0xc00, 0x400, 0x3fdfd0f3, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc05.h4", 0x1000, 0x400, 0xc26a8f5b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc06.l4", 0x1400, 0x400, 0x0b98dbe5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc07.a5", 0x1800, 0x400, 0x6242145c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc08.c5", 0x1c00, 0x400, 0xd23c2ef1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc09.e4", 0x4000, 0x800, 0x2e2c5b95, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc10.f4", 0x4800, 0x800, 0xef94c502, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc11.h4", 0x5000, 0x800, 0xa3164b18, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "rc12.l4", 0x5800, 0x800, 0x2052f6d9, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_rollingc[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_mraker[] = {
+	{ RBX_ROM_LOAD, 0, "mr_1.a4", 0x0, 0x400, 0x0ba47dea, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_2.c4", 0x400, 0x400, 0xfead8849, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_3.e4", 0x800, 0x400, 0x7d65358f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_4.f4", 0xc00, 0x400, 0x22cc55ad, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_5.h4", 0x1000, 0x400, 0xe8048768, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_6.l4", 0x1400, 0x400, 0x1e717545, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_7.a5", 0x1800, 0x400, 0x2f19de73, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_8.c5", 0x1c00, 0x400, 0xfddaf8d0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_9.e5", 0x4000, 0x800, 0x1ca1be22, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_10.f5", 0x4800, 0x800, 0x1901c0d4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mr_11.h5", 0x5000, 0x800, 0xcb8e34ae, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "star", 0x0, 0x400, 0xc87a42dd, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_mraker[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "stars", 0x400, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_ozmawars[] = {
+	{ RBX_ROM_LOAD, 0, "mw01", 0x0, 0x800, 0x31f4397d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mw02", 0x800, 0x800, 0xd8e77c62, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mw03", 0x1000, 0x800, 0x3bfa418f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mw04", 0x1800, 0x800, 0xe190ce6c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mw05", 0x4000, 0x800, 0x3bc7d4c7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mw06", 0x4800, 0x800, 0x99ca2eae, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "01.1", 0x0, 0x400, 0xaac24f34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "02.2", 0x400, 0x400, 0x2bdf83a0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_ozmawars[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_ozmawars2[] = {
+	{ RBX_ROM_LOAD, 0, "oz1", 0x0, 0x400, 0x9300830e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz2", 0x400, 0x400, 0x957fc661, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz3", 0x800, 0x400, 0xcf8f4d6c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz4", 0xc00, 0x400, 0xf51544a5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz5", 0x1000, 0x400, 0x5597bf52, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz6", 0x1400, 0x400, 0x19b43578, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz7", 0x1800, 0x400, 0xa285bfde, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz8", 0x1c00, 0x400, 0xae59a629, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz9", 0x4000, 0x400, 0xdf0cc633, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz10", 0x4400, 0x400, 0x31b7692e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz11", 0x4800, 0x400, 0x660e934c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "oz12", 0x4c00, 0x400, 0x8b969f61, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "01.1", 0x0, 0x400, 0xaac24f34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "02.2", 0x400, 0x400, 0x2bdf83a0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_ozmawars2[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_ozmawars3[] = {
+	{ RBX_ROM_LOAD, 0, "u36", 0x0, 0x400, 0xf71ae28d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u35", 0x400, 0x400, 0xab922611, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u34", 0x800, 0x400, 0x689c5c2b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u33", 0xc00, 0x400, 0xda0c394a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u32", 0x1000, 0x400, 0x1980bad9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u31", 0x1400, 0x400, 0x19b43578, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u42", 0x1800, 0x400, 0xa285bfde, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u41", 0x1c00, 0x400, 0xae59a629, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u40", 0x4000, 0x400, 0xdf0cc633, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u39", 0x4400, 0x400, 0x31b7692e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u38", 0x4800, 0x400, 0x50257351, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "u37", 0x4c00, 0x400, 0x8b969f61, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "82s137.u1", 0x0, 0x400, 0xaac24f34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "82s137.u2", 0x400, 0x400, 0x2bdf83a0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_ozmawars3[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x800, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_ozmawarsmr[] = {
+	{ RBX_ROM_LOAD, 0, "73.1s", 0x0, 0x400, 0x9300830e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "74.1pr", 0x400, 0x400, 0x957fc661, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "75.1n", 0x800, 0x400, 0xcf8f4d6c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "76.1m", 0xc00, 0x400, 0xf51544a5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "77.1l", 0x1000, 0x400, 0x4a653fe6, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "78.1kj", 0x1400, 0x400, 0xfb3db187, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "79.1h", 0x1800, 0x400, 0xed2d7c34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "80.1g", 0x1c00, 0x400, 0x85728971, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "81.1ef", 0x4000, 0x400, 0xdf0cc633, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "82.1d", 0x4400, 0x400, 0x31b7692e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "83.1c", 0x4800, 0x400, 0x50257351, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "84.1b", 0x4c00, 0x400, 0x293303c9, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_ozmawarsmr[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_spaceph[] = {
+	{ RBX_ROM_LOAD, 0, "sv01.bin", 0x0, 0x400, 0xde84771d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv02.bin", 0x400, 0x400, 0x957fc661, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv03.bin", 0x800, 0x400, 0xdbda38b9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv04.bin", 0xc00, 0x400, 0xf51544a5, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv05.bin", 0x1000, 0x400, 0x98d02683, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv06.bin", 0x1400, 0x400, 0x4ec390fd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv07.bin", 0x1800, 0x400, 0x170862fd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv08.bin", 0x1c00, 0x400, 0x511b12cf, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv09.bin", 0x4000, 0x400, 0xaf1cd1af, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv10.bin", 0x4400, 0x400, 0x31b7692e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv11.bin", 0x4800, 0x400, 0x50257351, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "sv12.bin", 0x4c00, 0x400, 0xa2a3366a, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_spaceph[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_solfight[] = {
+	{ RBX_ROM_LOAD, 0, "solfight.m", 0x0, 0x800, 0xa4f2814e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "solfight.n", 0x800, 0x800, 0x5657ec07, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "solfight.p", 0x1000, 0x800, 0xef9ce96d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "solfight.r", 0x1800, 0x800, 0x4f1ef540, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mw05", 0x4000, 0x800, 0x3bc7d4c7, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "solfight.t", 0x4800, 0x800, 0x3b6fb206, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_solfight[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_yosakdon[] = {
+	{ RBX_ROM_LOAD, 0, "yd1.bin", 0x0, 0x400, 0x607899c9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yd2.bin", 0x400, 0x400, 0x78336df4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yd3.bin", 0x800, 0x400, 0xc5af6d52, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yd4.bin", 0xc00, 0x400, 0xdca8064f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yd5.bin", 0x1400, 0x400, 0x38804ff1, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yd6.bin", 0x1800, 0x400, 0x988d2362, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yd7.bin", 0x1c00, 0x400, 0x2744e68b, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_yosakdon[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_yosakdona[] = {
+	{ RBX_ROM_LOAD, 0, "yosaku1", 0x0, 0x400, 0xd132f4f0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yd2.bin", 0x400, 0x400, 0x78336df4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yosaku3", 0x800, 0x400, 0xb1a0b3eb, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yosaku4", 0xc00, 0x400, 0xc06c225e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yosaku5", 0x1400, 0x400, 0xae422a43, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yosaku6", 0x1800, 0x400, 0x26b24a12, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "yosaku7", 0x1c00, 0x400, 0x878d5a18, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_yosakdona[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_shuttlei[] = {
+	{ RBX_ROM_LOAD, 0, "1.13c", 0x0, 0x400, 0xb6d4f0cd, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2.11c", 0x400, 0x400, 0x168d6138, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3.13d", 0x800, 0x400, 0x804bd7fb, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4.11d", 0xc00, 0x400, 0x8205b369, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5.13e", 0x1000, 0x400, 0xb50df820, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "8.11f", 0x1c00, 0x400, 0x4978552b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 1, "82s129.2b", 0x0, 0x100, 0xf108d00d, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_shuttlei[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ "proms", 0x100, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_skylove[] = {
+	{ RBX_ROM_LOAD, 0, "01", 0x0, 0x400, 0x391ad7d0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "02", 0x400, 0x400, 0x365ba070, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "03", 0x800, 0x400, 0x47364dad, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "04", 0xc00, 0x400, 0x9d76f33d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "05", 0x1000, 0x400, 0x09084954, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "06", 0x1400, 0x400, 0x6d494e82, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "07", 0x1800, 0x400, 0x1a9aa4b8, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "08", 0x1c00, 0x400, 0xecaacacc, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_skylove[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_claybust[] = {
+	{ RBX_ROM_LOAD, 0, "0.a1", 0x0, 0x400, 0x90810582, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "1.a2", 0x400, 0x400, 0x5ce6fb0e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2.a4", 0x800, 0x400, 0xd4c1d523, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "3.a5", 0xc00, 0x400, 0x1ca00825, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "4.a6", 0x1000, 0x400, 0x09a21120, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "5.a8", 0x1400, 0x400, 0x92cd4da8, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_claybust[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_gunchamp[] = {
+	{ RBX_ROM_LOAD, 0, "251.a1", 0x0, 0x400, 0xf27a8c1e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "252.a2", 0x400, 0x400, 0xd53b8f91, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "253.a4", 0x800, 0x400, 0x9ef35c6c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "254.a5", 0xc00, 0x400, 0xba5b562d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "255.a6", 0x1000, 0x400, 0x00ea8293, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "256.a8", 0x1400, 0x400, 0xe271150c, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "257.a9", 0x1800, 0x400, 0x0da5d9ad, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "258.a10", 0x1c00, 0x400, 0x471d4052, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_gunchamp[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_cane[] = {
+	{ RBX_ROM_LOAD, 0, "mrcane.71", 0x0, 0x800, 0x47de691e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mrcane.70", 0x800, 0x800, 0x3f3ee3b9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mrcane.69", 0x1000, 0x800, 0xd1fd883f, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mrcane.62", 0x1800, 0x800, 0x0d37cc00, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_cane[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_orbite[] = {
+	{ RBX_ROM_LOAD, 0, "mrxx.71", 0x0, 0x800, 0x78cf0c8a, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mrxx.70", 0x800, 0x800, 0x2914a5c4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "mrxx.69", 0x1000, 0x800, 0xc3e464f5, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_orbite[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_astropal[] = {
+	{ RBX_ROM_LOAD, 0, "2708.0a", 0x0, 0x400, 0xe6883322, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2708.1a", 0x400, 0x400, 0x4401df1d, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2708.2a", 0x800, 0x400, 0x5bac1ee4, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2708.3a", 0xc00, 0x400, 0xa870afad, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2708.4a", 0x1000, 0x400, 0x8bd2d985, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2708.5a", 0x1400, 0x400, 0x5e97a86b, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2708.6a", 0x1800, 0x400, 0x22c354d0, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "2708.7a", 0x1c00, 0x400, 0xaeca51c1, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_astropal[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_attackfc[] = {
+	{ RBX_ROM_LOAD, 0, "30a.bin", 0x0, 0x400, 0xc12e3386, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "36a.bin", 0x400, 0x400, 0x6738dcb9, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "31a.bin", 0x800, 0x400, 0x787a4658, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "37a.bin", 0xc00, 0x400, 0xad6bfbbe, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "32a.bin", 0x1000, 0x400, 0xcbe0a711, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "33a.bin", 0x1800, 0x400, 0x53147393, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "39a.bin", 0x1c00, 0x400, 0xf538cf08, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_attackfc[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_attackfcu[] = {
+	{ RBX_ROM_LOAD, 0, "egs0.bin", 0x0, 0x400, 0x653bbb40, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "egs1.bin", 0x400, 0x400, 0x56024445, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "egs2.bin", 0x800, 0x400, 0x0a5fbe34, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "egs3.bin", 0xc00, 0x400, 0x50f7cd22, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "egs4.bin", 0x1000, 0x400, 0xf59bac9e, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "egs6.bin", 0x1800, 0x400, 0xa9eb4699, 1, 0, 0, 0 },
+	{ RBX_ROM_LOAD, 0, "egs7.bin", 0x1c00, 0x400, 0x7e705388, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_attackfcu[] = {
+	{ "maincpu", 0x10000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmulti[] = {
+	{ RBX_ROM_LOAD, 1, "m803d.bin", 0x0, 0x20000, 0x6a62cb3c, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmulti[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmultim3a[] = {
+	{ RBX_ROM_LOAD, 1, "m803a.bin", 0x0, 0x20000, 0x6d538828, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmultim3a[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmultim2c[] = {
+	{ RBX_ROM_LOAD, 1, "m802c.bin", 0x0, 0x20000, 0x5b537de5, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmultim2c[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmultim2a[] = {
+	{ RBX_ROM_LOAD, 1, "m802a.bin", 0x0, 0x20000, 0x8079b1d0, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmultim2a[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmultim1a[] = {
+	{ RBX_ROM_LOAD, 1, "m801a.bin", 0x0, 0x20000, 0xf28536d2, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmultim1a[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmultit3d[] = {
+	{ RBX_ROM_LOAD, 1, "t803d.bin", 0x0, 0x20000, 0x4d53173c, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmultit3d[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmultis3a[] = {
+	{ RBX_ROM_LOAD, 1, "s083a.bin", 0x0, 0x20000, 0xf426d43b, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmultis3a[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmultis2a[] = {
+	{ RBX_ROM_LOAD, 1, "s082a.bin", 0x0, 0x20000, 0x25f0f17e, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmultis2a[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmultis1a[] = {
+	{ RBX_ROM_LOAD, 1, "s081a.bin", 0x0, 0x20000, 0xdaa77345, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmultis1a[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
+static const rbx_rom_load si8080_roml_invmultip[] = {
+	{ RBX_ROM_LOAD, 1, "s10.bin", 0x0, 0x20000, 0x1b43e4d3, 1, 0, 0, 0 },
+	{ RBX_ROM_END, 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+};
+static const rbx_rom_region si8080_romr_invmultip[] = {
+	{ "maincpu", 0x20000, 0x00 },
+	{ "user1", 0x20000, 0x00 },
+	{ NULL, 0, 0 }
+};
 
+static const rbx_ipt_setting si8080_ips_alieninv[] = {
+	{ 0x0, "2" },
+	{ 0x1, "3" },
+	{ 0x2, "Off" },
+	{ 0x0, "On" },
+	{ 0x8, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "2C/1C 50p/3C (+ Bonus Life)" },
+	{ 0x80, "1C/1C 50p/5C" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_alieninv[] = {
+	{ 0x1, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "Pence Coinage", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_COIN2, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 8, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_alieninv[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 6 },
+	{ "CONTP1", 20, 3 },
+	{ "CONTP2", 23, 3 },
+	{ "CAB", 26, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_astropal[] = {
+	{ 0x0, "2" },
+	{ 0x1, "3" },
+	{ 0x2, "4" },
+	{ 0x3, "5" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_astropal[] = {
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0xfc, 0xfc, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_BUTTON2, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_BUTTON3, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_astropal[] = {
+	{ "IN0", 0, 2 },
+	{ "IN1", 2, 8 },
+	{ "IN3", 10, 8 },
+	{ "CAB", 18, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_attackfc[] = {
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_attackfc[] = {
+	{ 0x1, 0x1, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_attackfc[] = {
+	{ "IN0", 0, 8 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_attackfcu[] = {
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_attackfcu[] = {
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_attackfcu[] = {
+	{ "IN0", 0, 8 },
+	{ NULL, 0, 0 }
+};
 static const rbx_ipt_setting si8080_ips_ballbomb[] = {
 	{ 0x0, "3" },
 	{ 0x1, "4" },
@@ -915,6 +2102,203 @@ static const rbx_ipt_port si8080_ipp_ballbomb[] = {
 	{ "CONTP1", 19, 3 },
 	{ "CONTP2", 22, 3 },
 	{ "CAB", 25, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_cane[] = {
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_cane[] = {
+	{ 0x4, 0x4, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_JOYSTICK_UP, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_JOYSTICK_DOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_BUTTON1, 1, 2, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_cane[] = {
+	{ "IN1", 0, 6 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_claybust[] = {
+	{ 0x10, "4" },
+	{ 0x0, "2" },
+	{ 0x20, "Off" },
+	{ 0x0, "On" },
+	{ 0x40, "8" },
+	{ 0x0, "10" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_claybust[] = {
+	{ 0x1, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_BUTTON1, 1, 2, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Shots", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Number of Flings", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x80, RBX_IPT_LIGHTGUN_X, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xa0, RBX_IPT_LIGHTGUN_Y, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_claybust[] = {
+	{ "IN1", 0, 8 },
+	{ "GUNX", 8, 1 },
+	{ "GUNY", 9, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_cosmicmo[] = {
+	{ 0x0, "2" },
+	{ 0x1, "3" },
+	{ 0x2, "4" },
+	{ 0x3, "5" },
+	{ 0x0, "1500" },
+	{ 0x8, "2500" },
+	{ 0x0, "1 Coin / 1 Credit" },
+	{ 0x80, "1 Coin / 2 Credits" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_cosmicmo[] = {
+	{ 0x1, 0x1, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 8, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_cosmicmo[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 5 },
+	{ "CONTP1", 19, 3 },
+	{ "CONTP2", 22, 3 },
+	{ "CAB", 25, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_cosmo[] = {
+	{ 0x0, "3" },
+	{ 0x1, "5" },
+	{ 0x2, "Off" },
+	{ 0x0, "On" },
+	{ 0x4, "Off" },
+	{ 0x0, "On" },
+	{ 0x8, "Off" },
+	{ 0x0, "On" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_cosmo[] = {
+	{ 0x1, 0x1, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 10, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_cosmo[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 6 },
+	{ "CONTP1", 20, 3 },
+	{ "CONTP2", 23, 3 },
+	{ "CAB", 26, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_darthvdr[] = {
+	{ 0x0, "1000" },
+	{ 0x20, "3000" },
+	{ 0x40, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "3" },
+	{ 0x80, "5" },
+	{ 0x0, "4" },
+	{ 0x80, "6" },
+	{ 0x10, "Off" },
+	{ 0x0, "On" },
+	{ 0x20, "Off" },
+	{ 0x0, "On" },
+	{ 0x40, "Off" },
+	{ 0x0, "On" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_darthvdr[] = {
+	{ 0x1, 0x1, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0xe, 0xe, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 4, 4, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_START2, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0xe, 0xe, RBX_IPT_CUSTOM, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "One less life", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 12, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 14, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 16, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_darthvdr[] = {
+	{ "P1", 0, 6 },
+	{ "P2", 6, 6 },
+	{ "CONTP1", 12, 3 },
+	{ "CONTP2", 15, 3 },
+	{ "CAB", 18, 1 },
 	{ NULL, 0, 0 }
 };
 static const rbx_ipt_setting si8080_ips_galactic[] = {
@@ -1003,6 +2387,35 @@ static const rbx_ipt_port si8080_ipp_galxwars[] = {
 	{ "CONTP1", 12, 3 },
 	{ "CONTP2", 15, 3 },
 	{ "CAB", 18, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_gunchamp[] = {
+	{ 0x10, "Yes" },
+	{ 0x0, "No" },
+	{ 0xa0, "4 Coins / 1 Credit" },
+	{ 0xc0, "3 Coins / 1 Credit" },
+	{ 0xe0, "2 Coins / 1 Credit" },
+	{ 0x40, "1 Coin / 1 Credit" },
+	{ 0x20, "1 Coin / 2 Credits" },
+	{ 0x0, "2 Coins / 3 Credits" },
+	{ 0x60, "1 Coin / 3 Credits" },
+	{ 0x80, "1 Coin / 4 Credits" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_gunchamp[] = {
+	{ 0x1, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_BUTTON1, 1, 2, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Enter Initials", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0xe0, 0x40, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 2, 8, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0x80, RBX_IPT_LIGHTGUN_X, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xa0, RBX_IPT_LIGHTGUN_Y, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_gunchamp[] = {
+	{ "IN1", 0, 6 },
+	{ "GUNX", 6, 1 },
+	{ "GUNY", 7, 1 },
 	{ NULL, 0, 0 }
 };
 static const rbx_ipt_setting si8080_ips_indianbt[] = {
@@ -1195,6 +2608,178 @@ static const rbx_ipt_port si8080_ipp_invadrmr[] = {
 	{ "CONTP1", 19, 3 },
 	{ "CONTP2", 22, 3 },
 	{ "CAB", 25, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_invasion[] = {
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x2, "Off" },
+	{ 0x0, "On" },
+	{ 0x4, "Off" },
+	{ 0x0, "On" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "3" },
+	{ 0x1, "4" },
+	{ 0x2, "5" },
+	{ 0x3, "6" },
+	{ 0x8, "1500" },
+	{ 0x0, "2500" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Disconnected" },
+	{ 0x4, "Connected" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_invasion[] = {
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNKNOWN, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_COIN2, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x3, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 8, 4, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 12, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 12, 2, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 14, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Laser Bonus Info", 14, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_OTHER, 1, 0, 1, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_CONFIG, 1, 0, 0, "Coin counter", 16, 2, 255, 0, 0x0, 0x0 },
+	{ 0xf9, 0xf9, RBX_IPT_UNUSED, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_invasion[] = {
+	{ "IN0", 0, 6 },
+	{ "IN1", 6, 6 },
+	{ "IN2", 12, 5 },
+	{ "IN3", 17, 3 },
+	{ "CONTP1", 20, 3 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_invmulti[] = {
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x2, "Off" },
+	{ 0x0, "On" },
+	{ 0x8, "Off" },
+	{ 0x0, "On" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x2, "Off" },
+	{ 0x0, "On" },
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_invmulti[] = {
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x6, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 12, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 14, 2, 255, 0, 0x0, 0x0 },
+	{ 0xfc, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unused", 16, 2, 255, 0, 0x0, 0x0 },
+	{ 0xfe, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_invmulti[] = {
+	{ "IN0", 0, 5 },
+	{ "IN1", 5, 6 },
+	{ "IN2", 11, 6 },
+	{ "CAB", 17, 1 },
+	{ "SW6SW7", 18, 3 },
+	{ "SW5", 21, 2 },
+	{ "CONTP1", 23, 3 },
+	{ "CONTP2", 26, 3 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_invrvnge[] = {
+	{ 0x0, "Easy" },
+	{ 0x2, "Hard" },
+	{ 0x4, "Harder" },
+	{ 0x6, "Hardest" },
+	{ 0x0, "3" },
+	{ 0x80, "6" },
+	{ 0x0, "3" },
+	{ 0x1, "4" },
+	{ 0x2, "5" },
+	{ 0x3, "6" },
+	{ 0x0, "1500" },
+	{ 0x8, "2000" },
+	{ 0x80, "2 Coins / 1 Credit" },
+	{ 0x0, "1 Coin / 1 Credit" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_invrvnge[] = {
+	{ 0x1, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x6, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Fuel Destroyed by Comet", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 6, 4, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_TILT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 12, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 12, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 14, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 14, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 14, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 14, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 14, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 14, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 14, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_invrvnge[] = {
+	{ "IN0", 0, 7 },
+	{ "IN1", 7, 6 },
+	{ "IN2", 13, 5 },
+	{ "CONTP1", 18, 3 },
+	{ "CONTP2", 21, 3 },
+	{ "CAB", 24, 1 },
 	{ NULL, 0, 0 }
 };
 static const rbx_ipt_setting si8080_ips_jspecter[] = {
@@ -1399,6 +2984,121 @@ static const rbx_ipt_port si8080_ipp_lupin3a[] = {
 	{ "IN2", 16, 7 },
 	{ NULL, 0, 0 }
 };
+static const rbx_ipt_setting si8080_ips_mraker[] = {
+	{ 0x0, "3" },
+	{ 0x1, "4" },
+	{ 0x2, "5" },
+	{ 0x3, "6" },
+	{ 0x0, "5000" },
+	{ 0x4, "7000" },
+	{ 0x8, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Cocktail" },
+	{ 0x10, "Upright (Normal)" },
+	{ 0x20, "Upright (Flip Screen)" },
+	{ 0x30, "Deluxe (2 Coins/1 Credit)" },
+	{ 0x0, "Easy" },
+	{ 0x40, "Hard" },
+	{ 0x80, "Harder" },
+	{ 0xc0, "Hardest" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_mraker[] = {
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_JOYSTICK_UP, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_JOYSTICK_DOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_BUTTON2, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_JOYSTICK_UP, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_JOYSTICK_DOWN, 2, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x30, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Cabinet", 8, 4, 255, 0, 0x0, 0x0 },
+	{ 0xc0, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 12, 4, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_mraker[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 8 },
+	{ "IN2", 16, 5 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_orbite[] = {
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_orbite[] = {
+	{ 0x8, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_orbite[] = {
+	{ "IN0", 0, 2 },
+	{ "IN1", 2, 1 },
+	{ "IN2", 3, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_ozmawars[] = {
+	{ 0x0, "15000" },
+	{ 0x1, "20000" },
+	{ 0x2, "25000" },
+	{ 0x3, "35000" },
+	{ 0x4, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "15000" },
+	{ 0x8, "10000" },
+	{ 0x0, "1 Coin / 1 Credit" },
+	{ 0x80, "1 Coin / 2 Credits" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_ozmawars[] = {
+	{ 0x1, 0x1, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Energy", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Energy", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 10, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_ozmawars[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 5 },
+	{ "CONTP1", 19, 3 },
+	{ "CONTP2", 22, 3 },
+	{ "CAB", 25, 1 },
+	{ NULL, 0, 0 }
+};
 static const rbx_ipt_setting si8080_ips_polaris[] = {
 	{ 0x1, "Off" },
 	{ 0x0, "On" },
@@ -1454,6 +3154,55 @@ static const rbx_ipt_port si8080_ipp_polaris[] = {
 	{ "VR1", 23, 0 },
 	{ "VR2", 23, 0 },
 	{ "VR3", 23, 0 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_rollingc[] = {
+	{ 0x0, "3" },
+	{ 0x1, "4" },
+	{ 0x2, "5" },
+	{ 0x3, "6" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x8, "RC=3000 / MB=1000" },
+	{ 0x0, "RC=5000 / MB=2000" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_rollingc[] = {
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x6, 0x6, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_TILT, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin Info", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 8, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_rollingc[] = {
+	{ "IN0", 0, 7 },
+	{ "IN1", 7, 6 },
+	{ "IN2", 13, 5 },
+	{ "CONTP1", 18, 3 },
+	{ "CONTP2", 21, 3 },
+	{ "CAB", 24, 1 },
 	{ NULL, 0, 0 }
 };
 static const rbx_ipt_setting si8080_ips_schaser[] = {
@@ -1601,6 +3350,57 @@ static const rbx_ipt_port si8080_ipp_schaserm[] = {
 	{ "VR3", 22, 0 },
 	{ NULL, 0, 0 }
 };
+static const rbx_ipt_setting si8080_ips_searthin[] = {
+	{ 0x0, "2" },
+	{ 0x1, "3" },
+	{ 0x2, "Off" },
+	{ 0x0, "On" },
+	{ 0x8, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "2C/1C 50p/3C (+ Bonus Life)" },
+	{ 0x80, "1C/1C 50p/5C" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_searthin[] = {
+	{ 0x1, 0x1, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "Pence Coinage", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_COIN2, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 8, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_searthin[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 6 },
+	{ "CONTP1", 20, 3 },
+	{ "CONTP2", 23, 3 },
+	{ "CAB", 26, 1 },
+	{ NULL, 0, 0 }
+};
 static const rbx_ipt_setting si8080_ips_sflush[] = {
 	{ 0x80, "Upright" },
 	{ 0x0, "Cocktail" },
@@ -1630,6 +3430,57 @@ static const rbx_ipt_port si8080_ipp_sflush[] = {
 	{ "IN0", 0, 5 },
 	{ "IN2", 5, 4 },
 	{ "PADDLE", 9, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_shuttlei[] = {
+	{ 0x1, "2 Coins / 1 Credit" },
+	{ 0x0, "1 Coin / 1 Credit" },
+	{ 0x0, "3" },
+	{ 0x2, "4" },
+	{ 0x4, "5" },
+	{ 0x6, "6" },
+	{ 0x8, "Off" },
+	{ 0x0, "On" },
+	{ 0x10, "Off" },
+	{ 0x0, "On" },
+	{ 0x20, "Off" },
+	{ 0x0, "On" },
+	{ 0x40, "Off" },
+	{ 0x0, "On" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_shuttlei[] = {
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x6, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 2, 4, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 12, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 14, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 16, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_START1, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_START2, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 18, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_shuttlei[] = {
+	{ "DSW", 0, 7 },
+	{ "INPUTS", 7, 8 },
+	{ "P2", 15, 3 },
+	{ "CAB", 18, 1 },
 	{ NULL, 0, 0 }
 };
 static const rbx_ipt_setting si8080_ips_sicv[] = {
@@ -1692,6 +3543,58 @@ static const rbx_ipt_port si8080_ipp_sicv[] = {
 	{ "CONTP2", 22, 3 },
 	{ "CAB", 25, 1 },
 	{ "P2GATE", 26, 3 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_sinvemag[] = {
+	{ 0x0, "3" },
+	{ 0x1, "4" },
+	{ 0x2, "5" },
+	{ 0x3, "6" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x4, "Off" },
+	{ 0x0, "On" },
+	{ 0x8, "2000" },
+	{ 0x0, "3000" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_sinvemag[] = {
+	{ 0x1, 0x1, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coin Info", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 10, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_sinvemag[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 5 },
+	{ "CONTP1", 19, 3 },
+	{ "CONTP2", 22, 3 },
+	{ "CAB", 25, 1 },
 	{ NULL, 0, 0 }
 };
 static const rbx_ipt_setting si8080_ips_sinvzen[] = {
@@ -1804,6 +3707,209 @@ static const rbx_ipt_port si8080_ipp_sitv[] = {
 	{ "CONTP2", 22, 3 },
 	{ "CAB", 25, 1 },
 	{ "P2GATE", 26, 3 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_skylove[] = {
+	{ 0x1, "2 Coins / 1 Credit" },
+	{ 0x0, "1 Coin / 1 Credit" },
+	{ 0x0, "3" },
+	{ 0x2, "4" },
+	{ 0x4, "5" },
+	{ 0x6, "6" },
+	{ 0x8, "Off" },
+	{ 0x0, "On" },
+	{ 0x10, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "10k" },
+	{ 0x20, "20k" },
+	{ 0x40, "40k" },
+	{ 0x60, "60k" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_skylove[] = {
+	{ 0x1, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x6, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 2, 4, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x60, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 10, 4, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 14, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 16, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_CUSTOM, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON1, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_START1, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_START2, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_BUTTON1, 2, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 18, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 18, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_skylove[] = {
+	{ "DSW", 0, 6 },
+	{ "INPUTS", 6, 8 },
+	{ "P2", 14, 3 },
+	{ "CAB", 17, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_spaceat2[] = {
+	{ 0x0, "Easy" },
+	{ 0x4, "Hard" },
+	{ 0x0, "3" },
+	{ 0x1, "4" },
+	{ 0x2, "5" },
+	{ 0x3, "6" },
+	{ 0x8, "1000" },
+	{ 0x0, "1500" },
+	{ 0x10, "Off" },
+	{ 0x0, "On" },
+	{ 0x20, "Off" },
+	{ 0x0, "On" },
+	{ 0x40, "Off" },
+	{ 0x0, "On" },
+	{ 0x80, "2 Coins / 1 Credit" },
+	{ 0x0, "1 Coin / 1 Credit" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_spaceat2[] = {
+	{ 0x1, 0x1, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Difficulty", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 2, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 2, 4, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_TILT, 1, 0, 0, "", 6, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 12, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 14, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_UNUSED, 1, 0, 0, "", 16, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_spaceat2[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 7 },
+	{ "CONTP1", 21, 3 },
+	{ "CONTP2", 24, 3 },
+	{ "CAB", 27, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_spacecom[] = {
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x2, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "3" },
+	{ 0x4, "5" },
+	{ 0x0, "2500" },
+	{ 0x8, "1500" },
+	{ 0x10, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Off" },
+	{ 0x8, "On" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_spacecom[] = {
+	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 1, "Service Mode", 10, 2, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 12, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 12, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 12, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 12, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 12, 0, 255, 0, 0x0, 0x0 },
+	{ 0xfe, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 12, 0, 255, 0, 0x0, 0x0 },
+	{ 0xff, 0xff, RBX_IPT_UNKNOWN, 1, 0, 0, "", 12, 0, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_spacecom[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 8 },
+	{ "IN2", 16, 2 },
+	{ "CAB", 18, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_spaceph[] = {
+	{ 0x0, "15000" },
+	{ 0x1, "20000" },
+	{ 0x2, "25000" },
+	{ 0x3, "35000" },
+	{ 0x4, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "15000" },
+	{ 0x8, "10000" },
+	{ 0x0, "1 Coin / 1 Credit" },
+	{ 0x80, "1 Coin / 2 Credits" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_spaceph[] = {
+	{ 0x1, 0x1, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Energy", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Energy", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 10, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_spaceph[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 5 },
+	{ "CONTP1", 19, 3 },
+	{ "CONTP2", 22, 3 },
+	{ "CAB", 25, 1 },
 	{ NULL, 0, 0 }
 };
 static const rbx_ipt_setting si8080_ips_spcewars[] = {
@@ -1943,6 +4049,152 @@ static const rbx_ipt_port si8080_ipp_steelwkr[] = {
 	{ "CAB", 17, 1 },
 	{ NULL, 0, 0 }
 };
+static const rbx_ipt_setting si8080_ips_superinv[] = {
+	{ 0x0, "3" },
+	{ 0x1, "4" },
+	{ 0x2, "5" },
+	{ 0x3, "6" },
+	{ 0x4, "Off" },
+	{ 0x0, "On" },
+	{ 0x8, "1500" },
+	{ 0x0, "2500" },
+	{ 0x80, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_superinv[] = {
+	{ 0x1, 0x1, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_COIN2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 4, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Bonus Life", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 10, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_superinv[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 5 },
+	{ "CONTP1", 19, 3 },
+	{ "CONTP2", 22, 3 },
+	{ "CAB", 25, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_vortex[] = {
+	{ 0x1, "Off" },
+	{ 0x0, "On" },
+	{ 0x2, "Off" },
+	{ 0x0, "On" },
+	{ 0x4, "Off" },
+	{ 0x0, "On" },
+	{ 0x8, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "2 Coins / 1 Credit" },
+	{ 0x80, "1 Coin / 1 Credit" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_vortex[] = {
+	{ 0x1, 0x1, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x10, 0x10, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x20, 0x20, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x40, 0x40, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x1, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 0, 2, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x2, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 2, 2, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x4, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x8, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x80, RBX_IPT_DIPSWITCH, 1, 0, 0, "Coinage", 8, 2, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 10, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 10, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_vortex[] = {
+	{ "IN0", 0, 8 },
+	{ "IN1", 8, 6 },
+	{ "IN2", 14, 6 },
+	{ "CONTP1", 20, 3 },
+	{ "CONTP2", 23, 3 },
+	{ "CAB", 26, 1 },
+	{ NULL, 0, 0 }
+};
+static const rbx_ipt_setting si8080_ips_yosakdon[] = {
+	{ 0x0, "3" },
+	{ 0x1, "4" },
+	{ 0x2, "5" },
+	{ 0x3, "6" },
+	{ 0x4, "Off" },
+	{ 0x0, "On" },
+	{ 0x8, "Off" },
+	{ 0x0, "On" },
+	{ 0x0, "Upright" },
+	{ 0x1, "Cocktail" },
+	{ 0, NULL }
+};
+static const rbx_ipt_field si8080_ipf_yosakdon[] = {
+	{ 0x1, 0x0, RBX_IPT_COIN1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_START2, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_START1, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_UNKNOWN, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 0, 0, 255, 0, 0x0, 0x0 },
+	{ 0x3, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Lives", 0, 4, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 4, 2, 255, 0, 0x0, 0x0 },
+	{ 0x8, 0x0, RBX_IPT_DIPSWITCH, 1, 0, 0, "Unknown", 6, 2, 255, 0, 0x0, 0x0 },
+	{ 0x70, 0x0, RBX_IPT_CUSTOM, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x80, 0x0, RBX_IPT_UNUSED, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 1, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_BUTTON1, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x2, 0x0, RBX_IPT_JOYSTICK_LEFT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x4, 0x0, RBX_IPT_JOYSTICK_RIGHT, 2, 0, 0, "", 8, 0, 255, 0, 0x0, 0x0 },
+	{ 0x1, 0x0, RBX_IPT_CONFIG, 1, 0, 0, "Cabinet", 8, 2, 255, 0, 0x0, 0x0 },
+};
+static const rbx_ipt_port si8080_ipp_yosakdon[] = {
+	{ "IN0", 0, 6 },
+	{ "IN1", 6, 5 },
+	{ "CONTP1", 11, 3 },
+	{ "CONTP2", 14, 3 },
+	{ "CAB", 17, 1 },
+	{ NULL, 0, 0 }
+};
 
 static const rbx_game si8080_games[] = {
 	{ "sisv1", "invaders", "Space Invaders (SV Version rev 1)", "1978", "Taito", "Space Invaders (8080)", "invaders", 270, RBX_GF_NOT_WORKING | RBX_GF_IMPERFECT_SND, si8080_romr_sisv1, si8080_roml_sisv1, si8080_ipp_sitv, si8080_ipf_sitv, si8080_ips_sitv },
@@ -1955,19 +4207,58 @@ static const rbx_game si8080_games[] = {
 	{ "sicv1", "invaders", "Space Invaders (CV Version, smaller roms)", "1979", "Taito", "Space Invaders (8080)", "invadpt2", 270, RBX_GF_IMPERFECT_SND, si8080_romr_sicv1, si8080_roml_sicv1, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
 	{ "invadrmr", "invaders", "Space Invaders (Model Racing)", "1978", "Taito / Model Racing", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_invadrmr, si8080_roml_invadrmr, si8080_ipp_invadrmr, si8080_ipf_invadrmr, si8080_ips_invadrmr },
 	{ "invaderl", "invaders", "Space Invaders (Logitec)", "1978", "Taito / Logitec", "Space Invaders (8080)", "invnomb", 270, 0, si8080_romr_invaderl, si8080_roml_invaderl, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "invadernc", "invaders", "Space Invaders (Nas Corp bootleg)", "1978", "bootleg (Nas Corp)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_invadernc, si8080_roml_invadernc, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
 	{ "spcewars", "invaders", "Space War (Sanritsu)", "1978", "Taito / Sanritsu", "Space Invaders (8080)", "spcewars", 270, RBX_GF_IMPERFECT_SND, si8080_romr_spcewars, si8080_roml_spcewars, si8080_ipp_spcewars, si8080_ipf_spcewars, si8080_ips_spcewars },
+	{ "spcewarla", "invaders", "Space War (Leisure and Allied)", "1979", "bootleg (Leisure and Allied)", "Space Invaders (8080)", "spcewarla", 270, RBX_GF_IMPERFECT_SND, si8080_romr_spcewarla, si8080_roml_spcewarla, si8080_ipp_spcewars, si8080_ipf_spcewars, si8080_ips_spcewars },
 	{ "spceking", "invaders", "Space King", "1978", "Taito / Leijac", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_spceking, si8080_roml_spceking, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "spcebttl", "invaders", "Space Battle (Space Invaders bootleg)", "1978", "bootleg", "Space Invaders (8080)", "invaders", 270, RBX_GF_IMPERFECT_SND, si8080_romr_spcebttl, si8080_roml_spcebttl, si8080_ipp_sitv, si8080_ipf_sitv, si8080_ips_sitv },
+	{ "cosmicmo", "invaders", "Cosmic Monsters (version II)", "1979", "bootleg (Universal)", "Space Invaders (8080)", "cosmicmo", 270, 0, si8080_romr_cosmicmo, si8080_roml_cosmicmo, si8080_ipp_cosmicmo, si8080_ipf_cosmicmo, si8080_ips_cosmicmo },
+	{ "cosmicm2", "invaders", "Cosmic Monsters 2", "1979", "bootleg (Universal)", "Space Invaders (8080)", "cosmicmo", 270, 0, si8080_romr_cosmicm2, si8080_roml_cosmicm2, si8080_ipp_cosmicmo, si8080_ipf_cosmicmo, si8080_ips_cosmicmo },
 	{ "sinvzen", "invaders", "Super Invaders (Zenitone-Microsec)", "1980?", "Taito / Zenitone-Microsec", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_sinvzen, si8080_roml_sinvzen, si8080_ipp_sinvzen, si8080_ipf_sinvzen, si8080_ips_sinvzen },
+	{ "spaceat2", "invaders", "Space Attack II (bootleg of Super Invaders)", "1980", "bootleg (Video Games UK)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_spaceat2, si8080_roml_spaceat2, si8080_ipp_spaceat2, si8080_ipf_spaceat2, si8080_ips_spaceat2 },
+	{ "invader4", "invaders", "Space Invaders Part Four (bootleg of Space Attack II)", "1980", "bootleg", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_invader4, si8080_roml_invader4, si8080_ipp_spaceat2, si8080_ipf_spaceat2, si8080_ips_spaceat2 },
 	{ "ultrainv", "invaders", "Ultra Invaders", "1980", "Taito / Konami", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_ultrainv, si8080_roml_ultrainv, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "spaceatt", "invaders", "Space Attack (bootleg of Space Invaders)", "1978", "bootleg (Video Games GmbH)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_spaceatt, si8080_roml_spaceatt, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "spaceattbp", "invaders", "Space Attack (bootleg of Space Invaders, bproms)", "1978", "bootleg (Video Games GmbH)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_spaceattbp, si8080_roml_spaceattbp, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "spaceatt2k", "invaders", "Space Attack (bootleg of Space Invaders, 2k roms)", "1978", "bootleg (Video Games GmbH)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_spaceatt2k, si8080_roml_spaceatt2k, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "cosmicin", "invaders", "Cosmic Invaders (bootleg of Space Invaders)", "1978", "bootleg", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_cosmicin, si8080_roml_cosmicin, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "galmonst", "invaders", "Galaxy Monsters (Laguna S.A. Spanish bootleg of Space Invaders)", "1978", "bootleg (Laguna S.A.)", "Space Invaders (8080)", "invnomb", 270, 0, si8080_romr_galmonst, si8080_roml_galmonst, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "spacecom", "invaders", "Space Combat (bootleg of Space Invaders)", "1979", "bootleg", "Space Invaders (8080)", "spacecom", 270, RBX_GF_IMPERFECT_SND, si8080_romr_spacecom, si8080_roml_spacecom, si8080_ipp_spacecom, si8080_ipf_spacecom, si8080_ips_spacecom },
+	{ "spacerng", "invaders", "Space Ranger", "1978", "bootleg (Leisure Time Electronics)", "Space Invaders (8080)", "spacerng", 90, RBX_GF_IMPERFECT_SND, si8080_romr_spacerng, si8080_roml_spacerng, si8080_ipp_sitv, si8080_ipf_sitv, si8080_ips_sitv },
+	{ "invasion", "invaders", "Invasion (Sidam)", "19??", "bootleg (Sidam)", "Space Invaders (8080)", "invasion", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invasion, si8080_roml_invasion, si8080_ipp_invasion, si8080_ipf_invasion, si8080_ips_invasion },
+	{ "invasiona", "invaders", "UFO Robot Attack (bootleg of Invasion, newer set)", "1979", "bootleg", "Space Invaders (8080)", "invasion", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invasiona, si8080_roml_invasiona, si8080_ipp_invasion, si8080_ipf_invasion, si8080_ips_invasion },
+	{ "invasiona2", "invaders", "UFO Robot Attack (bootleg of Invasion, older set)", "1979", "bootleg", "Space Invaders (8080)", "invasion", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invasiona2, si8080_roml_invasiona2, si8080_ipp_invasion, si8080_ipf_invasion, si8080_ips_invasion },
+	{ "invasionb", "invaders", "Invasion (Italian bootleg)", "1979", "bootleg", "Space Invaders (8080)", "invasion", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invasionb, si8080_roml_invasionb, si8080_ipp_invasion, si8080_ipf_invasion, si8080_ips_invasion },
+	{ "invasionrz", "invaders", "Invasion (bootleg set 1, R Z SRL Bologna)", "1979", "bootleg (R Z SRL Bologna)", "Space Invaders (8080)", "invasion", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invasionrz, si8080_roml_invasionrz, si8080_ipp_invasion, si8080_ipf_invasion, si8080_ips_invasion },
+	{ "invasionrza", "invaders", "Invasion (bootleg set 2, R Z SRL Bologna)", "1979", "bootleg (R Z SRL Bologna)", "Space Invaders (8080)", "invasion", 270, RBX_GF_NOT_WORKING | RBX_GF_IMPERFECT_SND, si8080_romr_invasionrza, si8080_roml_invasionrza, si8080_ipp_invasion, si8080_ipf_invasion, si8080_ips_invasion },
+	{ "invadersem", "invaders", "Space Invaders (Electromar, Spanish)", "19??", "Electromar", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_invadersem, si8080_roml_invadersem, si8080_ipp_sitv, si8080_ipf_sitv, si8080_ips_sitv },
+	{ "superinv", "invaders", "Super Invaders (bootleg set 1)", "1978", "bootleg", "Space Invaders (8080)", "invnomb", 270, 0, si8080_romr_superinv, si8080_roml_superinv, si8080_ipp_superinv, si8080_ipf_superinv, si8080_ips_superinv },
+	{ "sinvemag", "invaders", "Super Invaders (Emag bootleg set 1)", "1978", "bootleg (Emag)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_sinvemag, si8080_roml_sinvemag, si8080_ipp_sinvemag, si8080_ipf_sinvemag, si8080_ips_sinvemag },
+	{ "sinvemag2", "invaders", "Super Invaders (Emag bootleg set 2)", "1978", "bootleg (Emag)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_sinvemag2, si8080_roml_sinvemag2, si8080_ipp_sinvemag, si8080_ipf_sinvemag, si8080_ips_sinvemag },
+	{ "searthin", "invaders", "Super Earth Invasion (set 1)", "1980", "bootleg (Competitive Video)", "Space Invaders (8080)", "invnomb", 270, 0, si8080_romr_searthin, si8080_roml_searthin, si8080_ipp_searthin, si8080_ipf_searthin, si8080_ips_searthin },
+	{ "searthina", "invaders", "Super Earth Invasion (set 2)", "1980", "bootleg (Competitive Video)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_searthina, si8080_roml_searthina, si8080_ipp_searthin, si8080_ipf_searthin, si8080_ips_searthin },
+	{ "searthinc", "invaders", "Super Earth Invasion (Centromatic, Spanish)", "19??", "bootleg (Centromatic)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_searthinc, si8080_roml_searthinc, si8080_ipp_searthin, si8080_ipf_searthin, si8080_ips_searthin },
+	{ "supinvsion", "invaders", "Super Invasion (Electromar, Spanish)", "1979", "bootleg (Electromar / Irecsa)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_supinvsion, si8080_roml_supinvsion, si8080_ipp_searthin, si8080_ipf_searthin, si8080_ips_searthin },
+	{ "cosmicbat", "invaders", "Cosmic Battle (Recreativos Franco bootleg of Space Invaders)", "1979", "bootleg (Recreativos Franco)", "Space Invaders (8080)", "cosmicbat", 270, 0, si8080_romr_cosmicbat, si8080_roml_cosmicbat, si8080_ipp_searthin, si8080_ipf_searthin, si8080_ips_searthin },
+	{ "searthie", "invaders", "Super Earth Invasion (set 3)", "1980", "bootleg (Electrocoin)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_searthie, si8080_roml_searthie, si8080_ipp_searthin, si8080_ipf_searthin, si8080_ips_searthin },
+	{ "alieninv", "invaders", "Alien Invasion", "19??", "bootleg (Margamatics)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_alieninv, si8080_roml_alieninv, si8080_ipp_alieninv, si8080_ipf_alieninv, si8080_ips_alieninv },
+	{ "alieninvp2", "invaders", "Alien Invasion Part II", "19??", "bootleg", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_alieninvp2, si8080_roml_alieninvp2, si8080_ipp_searthin, si8080_ipf_searthin, si8080_ips_searthin },
 	{ "jspecter", "invaders", "Jatre Specter (set 1)", "1979", "Taito / Jatre", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_jspecter, si8080_roml_jspecter, si8080_ipp_jspecter, si8080_ipf_jspecter, si8080_ips_jspecter },
 	{ "jspecter2", "invaders", "Jatre Specter (set 2)", "1979", "Taito / Jatre", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_jspecter2, si8080_roml_jspecter2, si8080_ipp_jspecter, si8080_ipf_jspecter, si8080_ips_jspecter },
+	{ "spacewr3", "invaders", "Space War Part 3", "1978", "bootleg", "Space Invaders (8080)", "spcewars", 270, RBX_GF_IMPERFECT_SND, si8080_romr_spacewr3, si8080_roml_spacewr3, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "swipeout", "invaders", "Space Wipeout", "1978", "bootleg (Beyer and Brown)", "Space Invaders (8080)", "spcewars", 270, RBX_GF_IMPERFECT_SND, si8080_romr_swipeout, si8080_roml_swipeout, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
+	{ "darthvdr", "invaders", "Darth Vader (bootleg of Space Invaders)", "1978", "bootleg", "Space Invaders (8080)", "darthvdr", 270, RBX_GF_IMPERFECT_SND, si8080_romr_darthvdr, si8080_roml_darthvdr, si8080_ipp_darthvdr, si8080_ipf_darthvdr, si8080_ips_darthvdr },
+	{ "tst_invd", "invaders", "Space Invaders Test ROM", "19??", "<unknown>", "Space Invaders (8080)", "invnomb", 0, 0, si8080_romr_tst_invd, si8080_roml_tst_invd, si8080_ipp_sicv, si8080_ipf_sicv, si8080_ips_sicv },
 	{ "invadpt2", NULL, "Space Invaders Part II (Taito, bigger ROMs)", "1979", "Taito", "Space Invaders (8080)", "invadpt2", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invadpt2, si8080_roml_invadpt2, si8080_ipp_invadpt2, si8080_ipf_invadpt2, si8080_ips_invadpt2 },
 	{ "invadpt2a", "invadpt2", "Space Invaders Part II (Taito, smaller ROMs)", "1979", "Taito", "Space Invaders (8080)", "invadpt2", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invadpt2a, si8080_roml_invadpt2a, si8080_ipp_invadpt2, si8080_ipf_invadpt2, si8080_ips_invadpt2 },
 	{ "invadpt2br", "invadpt2", "Space Invaders Part II (Brazil)", "1979", "Taito do Brasil", "Space Invaders (8080)", "invadpt2", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invadpt2br, si8080_roml_invadpt2br, si8080_ipp_invadpt2, si8080_ipf_invadpt2, si8080_ips_invadpt2 },
 	{ "invaddlx", "invadpt2", "Space Invaders Deluxe", "1980", "Taito (Midway license)", "Space Invaders (8080)", "invaders", 270, 0, si8080_romr_invaddlx, si8080_roml_invaddlx, si8080_ipp_invadpt2, si8080_ipf_invadpt2, si8080_ips_invadpt2 },
 	{ "moonbase", "invadpt2", "Moon Base Zeta (set 1)", "1979", "Taito / Nichibutsu", "Space Invaders (8080)", "invadpt2", 270, RBX_GF_IMPERFECT_SND, si8080_romr_moonbase, si8080_roml_moonbase, si8080_ipp_invadpt2, si8080_ipf_invadpt2, si8080_ips_invadpt2 },
 	{ "moonbasea", "invadpt2", "Moon Base Zeta (set 2)", "1979", "Taito / Nichibutsu", "Space Invaders (8080)", "invadpt2", 270, RBX_GF_IMPERFECT_SND, si8080_romr_moonbasea, si8080_roml_moonbasea, si8080_ipp_invadpt2, si8080_ipf_invadpt2, si8080_ips_invadpt2 },
+	{ "spcewarl", NULL, "Space War (Leijac Corporation)", "1979", "Konami (Leijac Corporation license)", "Space Invaders (8080)", "invadpt2", 270, 0, si8080_romr_spcewarl, si8080_roml_spcewarl, si8080_ipp_spclaser, si8080_ipf_spclaser, si8080_ips_spclaser },
 	{ "spclaser", "spcewarl", "Space Laser", "1980", "Konami (Taito license)", "Space Invaders (8080)", "invadpt2", 270, 0, si8080_romr_spclaser, si8080_roml_spclaser, si8080_ipp_spclaser, si8080_ipf_spclaser, si8080_ips_spclaser },
+	{ "intruder", "spcewarl", "Intruder", "1980", "Konami (Game Plan license)", "Space Invaders (8080)", "invadpt2", 270, RBX_GF_IMPERFECT_SND, si8080_romr_intruder, si8080_roml_intruder, si8080_ipp_spclaser, si8080_ipf_spclaser, si8080_ips_spclaser },
+	{ "laser", "spcewarl", "Astro Laser (bootleg of Space Laser)", "1980", "bootleg (Leisure Time Electronics)", "Space Invaders (8080)", "invadpt2", 270, 0, si8080_romr_laser, si8080_roml_laser, si8080_ipp_spclaser, si8080_ipf_spclaser, si8080_ips_spclaser },
 	{ "lrescue", NULL, "Lunar Rescue", "1979", "Taito", "Space Invaders (8080)", "lrescue", 270, RBX_GF_IMPERFECT_SND, si8080_romr_lrescue, si8080_roml_lrescue, si8080_ipp_lrescue, si8080_ipf_lrescue, si8080_ips_lrescue },
 	{ "grescue", "lrescue", "Galaxy Rescue", "1979", "Taito (Universal license?)", "Space Invaders (8080)", "lrescue", 270, RBX_GF_IMPERFECT_SND, si8080_romr_grescue, si8080_roml_grescue, si8080_ipp_lrescue, si8080_ipf_lrescue, si8080_ips_lrescue },
 	{ "mlander", "lrescue", "Moon Lander (bootleg of Lunar Rescue, set 1)", "1980", "bootleg (Leisure Time Electronics)", "Space Invaders (8080)", "lrescue", 270, 0, si8080_romr_mlander, si8080_roml_mlander, si8080_ipp_lrescue, si8080_ipf_lrescue, si8080_ips_lrescue },
@@ -1999,7 +4290,47 @@ static const rbx_game si8080_games[] = {
 	{ "steelwkr", NULL, "Steel Worker", "1980", "Taito", "Space Invaders (8080)", "steelwkr", 0, RBX_GF_IMPERFECT_SND, si8080_romr_steelwkr, si8080_roml_steelwkr, si8080_ipp_steelwkr, si8080_ipf_steelwkr, si8080_ips_steelwkr },
 	{ "galactic", NULL, "Galactica - Batalha Espacial", "1980?", "Taito do Brasil", "Space Invaders (8080)", "invnomb", 270, RBX_GF_IMPERFECT_SND, si8080_romr_galactic, si8080_roml_galactic, si8080_ipp_galactic, si8080_ipf_galactic, si8080_ips_galactic },
 	{ "spacmiss", "galactic", "Space Missile - Space Fighting Game", "1980?", "bootleg?", "Space Invaders (8080)", "invnomb", 270, RBX_GF_IMPERFECT_SND, si8080_romr_spacmiss, si8080_roml_spacmiss, si8080_ipp_galactic, si8080_ipf_galactic, si8080_ips_galactic },
+	{ "galxwars", NULL, "Galaxy Wars (Universal set 1)", "1979", "Universal", "Space Invaders (8080)", "invadpt2", 270, 0, si8080_romr_galxwars, si8080_roml_galxwars, si8080_ipp_galxwars, si8080_ipf_galxwars, si8080_ips_galxwars },
+	{ "galxwars2", "galxwars", "Galaxy Wars (Universal set 2)", "1979", "Universal", "Space Invaders (8080)", "invadpt2", 270, 0, si8080_romr_galxwars2, si8080_roml_galxwars2, si8080_ipp_galxwars, si8080_ipf_galxwars, si8080_ips_galxwars },
 	{ "galxwarst", "galxwars", "Galaxy Wars (Taito?)", "1979", "Universal (Taito license?)", "Space Invaders (8080)", "invadpt2", 270, 0, si8080_romr_galxwarst, si8080_roml_galxwarst, si8080_ipp_galxwars, si8080_ipf_galxwars, si8080_ips_galxwars },
 	{ "galxwarst2", "galxwars", "Galaxy Wars (Taito)", "1979", "Universal (Taito Corporation license)", "Space Invaders (8080)", "invadpt2", 270, 0, si8080_romr_galxwarst2, si8080_roml_galxwarst2, si8080_ipp_galxwars, si8080_ipf_galxwars, si8080_ips_galxwars },
+	{ "starw", "galxwars", "Star Wars (bootleg of Galaxy Wars, set 1)", "1979", "bootleg", "Space Invaders (8080)", "invnomb", 270, 0, si8080_romr_starw, si8080_roml_starw, si8080_ipp_galxwars, si8080_ipf_galxwars, si8080_ips_galxwars },
+	{ "starw1", "galxwars", "Star Wars (bootleg of Galaxy Wars, set 2)", "1979", "bootleg (Yamashita)", "Space Invaders (8080)", "starw1", 270, 0, si8080_romr_starw1, si8080_roml_starw1, si8080_ipp_galxwars, si8080_ipf_galxwars, si8080_ips_galxwars },
+	{ "cosmo", NULL, "Cosmo", "1979", "TDS & MINTS", "Space Invaders (8080)", "cosmo", 90, RBX_GF_IMPERFECT_SND, si8080_romr_cosmo, si8080_roml_cosmo, si8080_ipp_cosmo, si8080_ipf_cosmo, si8080_ips_cosmo },
+	{ "invrvnge", NULL, "Invader's Revenge (set 1)", "1980?", "Zenitone-Microsec Ltd.", "Space Invaders (8080)", "invrvnge", 270, 0, si8080_romr_invrvnge, si8080_roml_invrvnge, si8080_ipp_invrvnge, si8080_ipf_invrvnge, si8080_ips_invrvnge },
+	{ "invrvngea", "invrvnge", "Invader's Revenge (set 2)", "1980?", "Zenitone-Microsec Ltd.", "Space Invaders (8080)", "invrvnge", 270, 0, si8080_romr_invrvngea, si8080_roml_invrvngea, si8080_ipp_invrvnge, si8080_ipf_invrvnge, si8080_ips_invrvnge },
+	{ "invrvngeb", "invrvnge", "Invader's Revenge (set 3)", "1980?", "Zenitone-Microsec Ltd.", "Space Invaders (8080)", "invrvnge", 270, 0, si8080_romr_invrvngeb, si8080_roml_invrvngeb, si8080_ipp_invrvnge, si8080_ipf_invrvnge, si8080_ips_invrvnge },
+	{ "invrvngedu", "invrvnge", "Invader's Revenge (Dutchford, single PCB)", "1980?", "Zenitone-Microsec Ltd. (Dutchford license)", "Space Invaders (8080)", "invrvnge", 270, 0, si8080_romr_invrvngedu, si8080_roml_invrvngedu, si8080_ipp_invrvnge, si8080_ipf_invrvnge, si8080_ips_invrvnge },
+	{ "invrvngegw", "invrvnge", "Invader's Revenge (Game World, single PCB)", "1980?", "Zenitone-Microsec Ltd. (Game World license)", "Space Invaders (8080)", "invrvnge", 270, 0, si8080_romr_invrvngegw, si8080_roml_invrvngegw, si8080_ipp_invrvnge, si8080_ipf_invrvnge, si8080_ips_invrvnge },
+	{ "vortex", NULL, "Vortex", "1980", "Zilec Electronics", "Space Invaders (8080)", "vortex", 270, RBX_GF_IMPERFECT_SND, si8080_romr_vortex, si8080_roml_vortex, si8080_ipp_vortex, si8080_ipf_vortex, si8080_ips_vortex },
+	{ "rollingc", NULL, "Rolling Crash / Moon Base", "1979", "Nichibutsu", "Space Invaders (8080)", "rollingc", 270, RBX_GF_IMPERFECT_SND, si8080_romr_rollingc, si8080_roml_rollingc, si8080_ipp_rollingc, si8080_ipf_rollingc, si8080_ips_rollingc },
+	{ "mraker", NULL, "Moon Raker", "1980", "Nichibutsu", "Space Invaders (8080)", "mraker", 270, RBX_GF_IMPERFECT_GFX, si8080_romr_mraker, si8080_roml_mraker, si8080_ipp_mraker, si8080_ipf_mraker, si8080_ips_mraker },
+	{ "ozmawars", NULL, "Ozma Wars (set 1)", "1979", "SNK", "Space Invaders (8080)", "ozmawars", 270, 0, si8080_romr_ozmawars, si8080_roml_ozmawars, si8080_ipp_ozmawars, si8080_ipf_ozmawars, si8080_ips_ozmawars },
+	{ "ozmawars2", "ozmawars", "Ozma Wars (set 2)", "1979", "SNK", "Space Invaders (8080)", "ozmawars", 270, 0, si8080_romr_ozmawars2, si8080_roml_ozmawars2, si8080_ipp_ozmawars, si8080_ipf_ozmawars, si8080_ips_ozmawars },
+	{ "ozmawars3", "ozmawars", "Ozma Wars (set 3)", "1979", "SNK", "Space Invaders (8080)", "ozmawars", 270, 0, si8080_romr_ozmawars3, si8080_roml_ozmawars3, si8080_ipp_ozmawars, si8080_ipf_ozmawars, si8080_ips_ozmawars },
+	{ "ozmawarsmr", "ozmawars", "Ozma Wars (Model Racing bootleg)", "1979", "bootleg (Model Racing)", "Space Invaders (8080)", "invnomb", 270, 0, si8080_romr_ozmawarsmr, si8080_roml_ozmawarsmr, si8080_ipp_ozmawars, si8080_ipf_ozmawars, si8080_ips_ozmawars },
+	{ "spaceph", "ozmawars", "Space Phantoms (bootleg of Ozma Wars)", "1979", "bootleg? (Zilec Games)", "Space Invaders (8080)", "invnomb", 270, 0, si8080_romr_spaceph, si8080_roml_spaceph, si8080_ipp_spaceph, si8080_ipf_spaceph, si8080_ips_spaceph },
+	{ "solfight", "ozmawars", "Solar Fight (bootleg of Ozma Wars)", "1979", "bootleg", "Space Invaders (8080)", "invnomb", 270, 0, si8080_romr_solfight, si8080_roml_solfight, si8080_ipp_ozmawars, si8080_ipf_ozmawars, si8080_ips_ozmawars },
+	{ "yosakdon", NULL, "Yosaku to Donbei (set 1)", "1979", "Wing", "Space Invaders (8080)", "yosakdon", 270, RBX_GF_IMPERFECT_SND, si8080_romr_yosakdon, si8080_roml_yosakdon, si8080_ipp_yosakdon, si8080_ipf_yosakdon, si8080_ips_yosakdon },
+	{ "yosakdona", "yosakdon", "Yosaku to Donbei (set 2)", "1979", "Wing", "Space Invaders (8080)", "yosakdon", 270, RBX_GF_IMPERFECT_SND, si8080_romr_yosakdona, si8080_roml_yosakdona, si8080_ipp_yosakdon, si8080_ipf_yosakdon, si8080_ips_yosakdon },
+	{ "shuttlei", NULL, "Shuttle Invader", "1979", "Omori Electric Co., Ltd.", "Space Invaders (8080)", "shuttlei", 270, RBX_GF_IMPERFECT_SND, si8080_romr_shuttlei, si8080_roml_shuttlei, si8080_ipp_shuttlei, si8080_ipf_shuttlei, si8080_ips_shuttlei },
+	{ "skylove", NULL, "Sky Love", "1979", "Omori Electric Co., Ltd.", "Space Invaders (8080)", "shuttlei", 270, RBX_GF_IMPERFECT_SND, si8080_romr_skylove, si8080_roml_skylove, si8080_ipp_skylove, si8080_ipf_skylove, si8080_ips_skylove },
+	{ "claybust", NULL, "Claybuster", "1978", "Model Racing", "Space Invaders (8080)", "claybust", 0, 0, si8080_romr_claybust, si8080_roml_claybust, si8080_ipp_claybust, si8080_ipf_claybust, si8080_ips_claybust },
+	{ "gunchamp", NULL, "Gun Champ", "1980", "Model Racing", "Space Invaders (8080)", "claybust", 0, 0, si8080_romr_gunchamp, si8080_roml_gunchamp, si8080_ipp_gunchamp, si8080_ipf_gunchamp, si8080_ips_gunchamp },
+	{ "cane", NULL, "Cane (prototype)", "1979?", "Model Racing", "Space Invaders (8080)", "cane", 0, RBX_GF_IMPERFECT_SND, si8080_romr_cane, si8080_roml_cane, si8080_ipp_cane, si8080_ipf_cane, si8080_ips_cane },
+	{ "orbite", NULL, "Orbite (prototype)", "1979?", "Model Racing", "Space Invaders (8080)", "orbite", 270, 0, si8080_romr_orbite, si8080_roml_orbite, si8080_ipp_orbite, si8080_ipf_orbite, si8080_ips_orbite },
+	{ "astropal", NULL, "Astropal", "1980?", "Sidam?", "Space Invaders (8080)", "astropal", 0, RBX_GF_IMPERFECT_SND, si8080_romr_astropal, si8080_roml_astropal, si8080_ipp_astropal, si8080_ipf_astropal, si8080_ips_astropal },
+	{ "attackfc", NULL, "Attack Force (encrypted)", "1979?", "Electronic Games Systems", "Space Invaders (8080)", "attackfc", 0, 0, si8080_romr_attackfc, si8080_roml_attackfc, si8080_ipp_attackfc, si8080_ipf_attackfc, si8080_ips_attackfc },
+	{ "attackfcu", "attackfc", "Attack Force (unencrypted)", "1979?", "bootleg?", "Space Invaders (8080)", "attackfcu", 0, 0, si8080_romr_attackfcu, si8080_roml_attackfcu, si8080_ipp_attackfcu, si8080_ipf_attackfcu, si8080_ips_attackfcu },
+	{ "invmulti", NULL, "Space Invaders Multigame (M8.03D)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmulti, si8080_roml_invmulti, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
+	{ "invmultim3a", "invmulti", "Space Invaders Multigame (M8.03A)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmultim3a, si8080_roml_invmultim3a, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
+	{ "invmultim2c", "invmulti", "Space Invaders Multigame (M8.02C)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmultim2c, si8080_roml_invmultim2c, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
+	{ "invmultim2a", "invmulti", "Space Invaders Multigame (M8.02A)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmultim2a, si8080_roml_invmultim2a, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
+	{ "invmultim1a", "invmulti", "Space Invaders Multigame (M8.01A)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmultim1a, si8080_roml_invmultim1a, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
+	{ "invmultit3d", "invmulti", "Space Invaders Multigame (T8.03D)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmultit3d, si8080_roml_invmultit3d, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
+	{ "invmultis3a", "invmulti", "Space Invaders Multigame (S0.83A)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmultis3a, si8080_roml_invmultis3a, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
+	{ "invmultis2a", "invmulti", "Space Invaders Multigame (S0.82A)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmultis2a, si8080_roml_invmultis2a, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
+	{ "invmultis1a", "invmulti", "Space Invaders Multigame (S0.81A)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmultis1a, si8080_roml_invmultis1a, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
+	{ "invmultip", "invmulti", "Space Invaders Multigame (prototype)", "2002", "hack (Braze Technologies)", "Space Invaders (8080)", "invmulti", 270, RBX_GF_IMPERFECT_SND, si8080_romr_invmultip, si8080_roml_invmultip, si8080_ipp_invmulti, si8080_ipf_invmulti, si8080_ips_invmulti },
 };
-#define SI8080_GAME_COUNT 56
+#define SI8080_GAME_COUNT 135

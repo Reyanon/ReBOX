@@ -59,6 +59,7 @@ add_executable(${PROJECT_NAME}
   src/frontend/touch.c
   src/frontend/ime.c
   src/frontend/gamelist.c
+  src/frontend/folders.c
   src/frontend/avsnap.c
   src/common/re_pad.c
   src/frontend/update.c

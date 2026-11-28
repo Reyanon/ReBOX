@@ -41,7 +41,8 @@
 static uint8_t *s_rom[NCPU], *s_bspr, *s_yspr, *s_zrom, *s_pcmrom;
 static uint32_t s_rom_size[NCPU], s_bspr_size, s_yspr_size, s_zrom_size, s_pcm_size;
 static int s_port_p1, s_port_general, s_port_limitsw, s_port_dsw, s_port_coinage, s_port_adc[8];
-static uint8_t s_adc_def[8], s_adc_type[8];   // (the analog fields' defaults and kinds: 0 none, 1 x, 2 y, 3 pedal, 4 pedal 2)
+static uint8_t s_adc_def[8], s_adc_type[8];   // (the analog fields' defaults and kinds: 0 none, 1 x, 2 y, 3 pedal, 4 pedal 2,
+                                               // 5 a throttle: rbx_throttle)
 
 // ---- the state (saved; on the heap while the game runs, ADR-040) ----
 static struct ybd_state {
@@ -1073,6 +1074,11 @@ static void analog_frame(void)
 		if (p < 0)
 			continue;
 		const int def = s_adc_def[i];
+		if (s_adc_type[i] == 5) {   // (the throttle lever: the general inputs' keys, held where they leave it; MINMAX 1..)
+			const int v = rbx_throttle();
+			b.adc_val[i] = (uint8_t)(v < 1 ? 1 : v);
+			continue;
+		}
 		if (s_adc_type[i] >= 3) {   // pedals (MAME's keys for them: button 1 gas, 2 brake, KEYDELTA 20 / 40 a frame;
 			                        // the stick up presses the gas too), back to rest when let go
 			const int gas = s_adc_type[i] == 3, step = gas ? 20 : 40;
@@ -1214,7 +1220,8 @@ static int ybd_init(const rbx_game *g)
 				const rbx_ipt_field *f = &g->fields[pt->first];
 				s_adc_def[i] = (uint8_t)f->def;
 				s_adc_type[i] = f->type == RBX_IPT_AD_STICK_X || f->type == RBX_IPT_PADDLE ? 1
-				              : f->type == RBX_IPT_AD_STICK_Y ? 2 : f->type == RBX_IPT_PEDAL ? 3 : f->type == RBX_IPT_PEDAL2 ? 4 : 0;
+				              : f->type == RBX_IPT_AD_STICK_Y ? 2 : f->type == RBX_IPT_PEDAL ? 3 : f->type == RBX_IPT_PEDAL2 ? 4
+				              : f->type == RBX_IPT_AD_STICK_Z ? 5 : 0;
 			}
 	}
 	// sound: YM2151 0.30 (L / R), the SegaPCM 0.70

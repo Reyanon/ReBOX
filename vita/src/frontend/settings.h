@@ -67,8 +67,6 @@ enum {
 	RBX_ACT_B3, RBX_ACT_B4, RBX_ACT_B5, RBX_ACT_B6, // game buttons 3-6 (shown in the menu only if the game uses them, RBX_KEY_NONE allowed)
 	// a twin-stick game's second joystick (Smash TV's fire; shown in the menu only for such games, the right stick at first)
 	RBX_ACT_R_UP, RBX_ACT_R_DOWN, RBX_ACT_R_LEFT, RBX_ACT_R_RIGHT,
-	// the board's test and service switches (shown in the menu only for a game with a test switch; no key at first)
-	RBX_ACT_TEST, RBX_ACT_SERVICE,
 	RBX_ACT_COUNT
 };
 
@@ -114,6 +112,16 @@ typedef struct {
 	int combo[RBX_KEY_COUNT];          // combo keys (see RBX_COMBO_KEYS)
 } rbx_port;
 
+// General Key Mapping (MAME's general inputs: the cabinet's test / service switches, tilt, throttle ..., rbx_core.h
+// RBX_GEN_*): a key, or two keys pressed together, of one device (re_pad profile: the Vita, a kind of controller).
+// Global only (settings.cfg gen_<rbx_general_id>=<profile key>:<key>[+<key>], its more keys gen_<id>.<n>=...)
+#define RBX_GEN_MAX 32
+#define RBX_GEN_KEYS 4   // a general input's keys: its first, then up to three more (any of them works; more ones packed)
+typedef struct {
+	int prof;        // re_pad profile (0 = the Vita's own controls)
+	uint32_t keys;   // 1 << RBX_KEY_* of its one or two keys (0 = no key)
+} rbx_gen_key;
+
 // Game list grouping (options): the left column by machine (board, under the maker tabs), year, genre or publisher; All: no
 // groups, the games over the whole width
 enum { RBX_GROUP_MACHINE, RBX_GROUP_YEAR, RBX_GROUP_GENRE, RBX_GROUP_PUBLISHER, RBX_GROUP_ALL, RBX_GROUP_COUNT };
@@ -153,6 +161,7 @@ typedef struct {
 	int frame_buffer;                   // RBX_FRAMEBUF_* (per game or global)
 	int snd_normalize;                  // Sound > Normalize: the output follows the game's level (global only)
 	int snd_volume;                     // Sound > Volume, percent: 0..RBX_VOLUME_MAX step RBX_VOLUME_STEP (global only)
+	rbx_gen_key gen[RBX_GEN_MAX][RBX_GEN_KEYS]; // General Key Mapping, by RBX_GEN_* and key (global only)
 } rbx_settings;
 
 extern rbx_settings g_settings;
@@ -199,5 +208,10 @@ uint32_t rbx_act_bits(const rbx_port *p, int act);   // the keys of an action, t
 uint32_t rbx_stick_bits(int lx, int ly, int rx, int ry);   // the sticks' directions as RBX_KEY_* bits
 void rbx_stick_preset(rbx_port *p, int st, int dpad);   // a stick as the d-pad, or pressing nothing
 const char *rbx_key_name(int key);
+// a device's buttons (SCE_CTRL_* bits with the sticks' RBX_STICK_BITS) as 1 << RBX_KEY_* (keys a press can give:
+// not a whole stick)
+uint32_t rbx_keys_of(uint32_t buttons);
+// a General Key Mapping key as text: "Vita (SELECT+L)", "DualShock 4 (L2)", "None"
+const char *rbx_gen_key_text(const rbx_gen_key *k, char *buf, int len);
 
 #endif

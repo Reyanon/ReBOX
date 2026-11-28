@@ -489,21 +489,27 @@ static char s_set[32], s_title[96];
 static UiCanvas *s_cv, *s_osd_cv, *s_fps_cv;
 static int s_changed; // settings changed since the menu opened (saved on close only then)
 enum { PAGE_MAIN, PAGE_STATES, PAGE_DISPLAY, PAGE_CONTROLS, PAGE_DIPS, PAGE_CHEATS, PAGE_ABOUT, PAGE_COMBO, PAGE_TURBO,
-	PAGE_TOUCH, PAGE_TEDIT, PAGE_PORT, PAGE_STICK, PAGE_SETTINGS, PAGE_FOLDERS, PAGE_BIOS, PAGE_CONTENT, PAGE_SOUND };
+	PAGE_TOUCH, PAGE_TEDIT, PAGE_PORT, PAGE_STICK, PAGE_SETTINGS, PAGE_FOLDERS, PAGE_BIOS, PAGE_CONTENT, PAGE_SOUND,
+	PAGE_FOLDER_LIST,
+	PAGE_GENERAL };   // (General Key Mapping: MAME's general inputs, Controls' first row)
 // Sound (user 11-26, issue #3): the level-following gain on or off, the volume
 enum { SO_NORM, SO_VOL, SO_BACK, SO_COUNT };
 // the Settings page (user 11-22) and its sub-pages (user 11-25): Folders (ROM, snap, marquee: 11-24), BIOS (Neo Geo: its
 // list of BIOSes)
 enum { SET_LANG, SET_FOLDERS, SET_BIOS, SET_BACK, SET_COUNT };
-enum { FD_ROM1, FD_ROM2, FD_SNAP, FD_MARQ, FD_BACK, FD_COUNT };
+// Folders (user 11-28: any number of each): a row for each kind (FD_ROM .. FD_MARQ = RBX_FOLDER_ROM .. MARQUEE), each
+// opening its list (PAGE_FOLDER_LIST: the folders in their order, Add folder, Back)
+enum { FD_ROM, FD_SNAP, FD_MARQ, FD_BACK, FD_COUNT };
+static int s_fd_kind;   // (the list page's kind)
+static int fl_count(void) { return rbx_folder_count(s_fd_kind); }   // (list rows: the folders, then Add, then Back)
+#define FL_ADD  (fl_count())
+#define FL_BACK (fl_count() + 1)
 enum { BI_NEOGEO, BI_BACK, BI_COUNT };
 // Content Download (user 11-25): the files of the GitHub content release, each to the folder the app reads it from
 enum { CT_CHEAT, CT_BACK, CT_COUNT };
 #define CHEAT_ZIP RBX_DATA_DIR "cheats/cheat.zip"
 static void content_get(int row);   // (below: the download, its progress window)
 static char s_ct_msg[128];          // (the last download's result: the page's help line)
-// the folder rows: RBX_FOLDER_* of a Folders row, else -1
-static int set_folder(int row) { return row >= FD_ROM1 && row <= FD_MARQ ? RBX_FOLDER_ROM1 + (row - FD_ROM1) : -1; }
 static int s_page;
 static int s_mt_wait_up; // the finger that left the touch layout editor: not a tap on the page it came back to
 // rows in groups (a gap before M_STATES, M_DISPLAY and M_ABOUT): game, states, settings, about / leave.
@@ -583,7 +589,7 @@ static int disp_kind(int row)
 // Turbo page: turbo key, turbo button, turbo speed, back (the port's). Touch page: on, show, edit, clear, back
 enum { CK_ACT, CK_TURBO_KEY, CK_TURBO_BTN, CK_TURBO_SPEED, CK_TURBO, CK_STICK, CK_CONFIRM, CK_COMBO, CK_DEFAULTS, CK_BACK,
 	CK_TOUCH, CK_T_ON, CK_T_SHOW, CK_T_EDIT, CK_T_CLEAR, CK_PORT1, CK_PORT2, CK_DEVICE, CK_BIND_ALL, CK_RESET_PORT, CK_ENGINE,
-	CK_SMAP_SET, CK_SMAP_DIR, CK_ACT2 };
+	CK_SMAP_SET, CK_SMAP_DIR, CK_ACT2, CK_GENERAL };
 // Analog sticks page: per stick its row and the four directions; act = the row (stick = act / STICK_ROWS)
 #define STICK_ROWS (1 + RBX_SDIR_COUNT)
 #define STICK_PAGE_ROWS (2 * STICK_ROWS + 1)
@@ -603,7 +609,7 @@ static uint64_t s_bind_t;   // when the wait began: 5 s without a button cancels
 // game button rows (button 1..6) -> RBX_ACT_*
 static int button_act(int i) { return i < 2 ? i : RBX_ACT_B3 + (i - 2); }
 // Controls page rows
-static const int s_ctrl_list[] = { CK_PORT1, CK_PORT2, CK_ENGINE, CK_TOUCH, CK_CONFIRM, CK_DEFAULTS, CK_BACK };
+static const int s_ctrl_list[] = { CK_GENERAL, CK_PORT1, CK_PORT2, CK_ENGINE, CK_TOUCH, CK_CONFIRM, CK_DEFAULTS, CK_BACK };
 #define CTRL_ROWS ((int)(sizeof(s_ctrl_list) / sizeof(s_ctrl_list[0])))
 // the 2P Controller row: there with a second device to play with (re_pad_devices), or added by hand (Add on the 1P row,
 // its device None until one is picked); only a hand-added one without a controller can be deleted (Delete on its row)
@@ -649,15 +655,12 @@ static void act_remove(int a, int x) // (the ones after it move up)
 }
 // a twin-stick game's second joystick on the page (the running game's; not in list options)
 static int ctrl_twin(void) { return !s_list_mode && rbx_core_twin_stick(); }
-// a game with a test switch: its test and service switches on the page (the running game's, the first player's)
-static int ctrl_test(void) { return !s_list_mode && s_kp == 0 && rbx_core_has_test(); }
-static int ctrl_acts(void) { return ctrl_buttons() + (ctrl_twin() ? 4 : 0) + 2 + (ctrl_test() ? 2 : 0); }
-// the actions on the page: the game's buttons, its second joystick (twin-stick games), coin, start, test, service
+static int ctrl_acts(void) { return ctrl_buttons() + (ctrl_twin() ? 4 : 0) + 2; }
+// the actions on the page: the game's buttons, its second joystick (twin-stick games), coin, start
 static int act_of(int j)
 {
 	const int b = ctrl_buttons(), r = ctrl_twin() ? 4 : 0;
-	return j < b ? button_act(j) : j < b + r ? RBX_ACT_R_UP + (j - b) : j == b + r ? RBX_ACT_COIN :
-	       j == b + r + 1 ? RBX_ACT_START : j == b + r + 2 ? RBX_ACT_TEST : RBX_ACT_SERVICE;
+	return j < b ? button_act(j) : j < b + r ? RBX_ACT_R_UP + (j - b) : j == b + r ? RBX_ACT_COIN : RBX_ACT_START;
 }
 // an action the running game uses (its buttons, its second joystick, coin, start)
 static int act_used(int a)
@@ -753,7 +756,7 @@ static int row_kind(int i, int *act)
 static const char *act_name(int act)
 {
 	static const char *const n[RBX_ACT_COUNT] = { "Button 1", "Button 2", "Coin", "Start", "Button 3", "Button 4", "Button 5",
-		"Button 6", "2nd stick Up", "2nd stick Down", "2nd stick Left", "2nd stick Right", "Test switch", "Service switch" };
+		"Button 6", "2nd stick Up", "2nd stick Down", "2nd stick Left", "2nd stick Right" };
 	// a button's name in the running game: MAME's ("Button 2 (R Paddle Forward)") or a pedal it works ("Button 1 (Pedal)")
 	const int b = act == RBX_ACT_ATTACK ? 0 : act == RBX_ACT_JUMP ? 1 : act >= RBX_ACT_B3 && act <= RBX_ACT_B6 ? act - RBX_ACT_B3 + 2 : -1;
 	const char *what = b >= 0 && !s_list_mode ? rbx_core_button_label(b) : NULL;
@@ -764,6 +767,64 @@ static const char *act_name(int act)
 	}
 	return n[act];
 }
+
+// ---- General Key Mapping (PAGE_GENERAL): the running game's general inputs (rbx_core.h RBX_GEN_*: test / service
+// switches, tilt, pedals, throttle ...; every one in list options), then Back. A row's key is a key or two keys pressed
+// together on any device (settings.h rbx_gen_key): confirm waits for it, Square clears it. Under an input's row, a row for
+// each more key it has (as a player's key rows: Triangle or the row's button adds one; on a more key's row takes it away)
+// the wait for a general input's key: the first device a key goes down on; one key is taken when it is let go (a second
+// one may still come), two keys down together at once
+static int s_gb_prof;
+static uint32_t s_gb_keys;
+static int s_gb_add = -1;   // (a more key being given: its input * RBX_GEN_KEYS + key; its row shows while it waits)
+static int gen_extras(int g)   // (its more keys, packed from key 1)
+{
+	int n = 0;
+	while (1 + n < RBX_GEN_KEYS && g_settings.gen[g][1 + n].keys)
+		n++;
+	return n;
+}
+// the page's rows: an input's key (input * RBX_GEN_KEYS), then its more keys (+ 1 ...)
+static int gen_list(int *r)
+{
+	int n = 0;
+	for (int i = 0; i < RBX_GEN_COUNT; i++)
+		if (s_list_mode || rbx_core_general(i)) {
+			r[n++] = i * RBX_GEN_KEYS;
+			const int x = gen_extras(i);
+			for (int s = 1; s <= x; s++)
+				r[n++] = i * RBX_GEN_KEYS + s;
+			if (s_gb_add == i * RBX_GEN_KEYS + 1 + x)
+				r[n++] = s_gb_add;
+		}
+	return n;
+}
+static int gen_rows(void) { int r[RBX_GEN_COUNT * RBX_GEN_KEYS]; return gen_list(r) + 1; }
+static int gen_code(int row)   // (-1: Back)
+{
+	int r[RBX_GEN_COUNT * RBX_GEN_KEYS];
+	const int n = gen_list(r);
+	return row >= 0 && row < n ? r[row] : -1;
+}
+static int gen_of(int row) { const int c = gen_code(row); return c < 0 ? -1 : c / RBX_GEN_KEYS; }
+static int gen_slot(int row) { const int c = gen_code(row); return c < 0 ? 0 : c % RBX_GEN_KEYS; }
+static int gen_row_of(int code)
+{
+	int r[RBX_GEN_COUNT * RBX_GEN_KEYS];
+	const int n = gen_list(r);
+	for (int i = 0; i < n; i++)
+		if (r[i] == code)
+			return i;
+	return 0;
+}
+// a more key taken away: the ones after it move up
+static void gen_remove(int g, int s)
+{
+	for (; s + 1 < RBX_GEN_KEYS; s++)
+		g_settings.gen[g][s] = g_settings.gen[g][s + 1];
+	g_settings.gen[g][RBX_GEN_KEYS - 1].keys = 0;
+}
+static int bits_n(uint32_t v) { int n = 0; for (; v; v &= v - 1) n++; return n; }
 
 // combo keys in screen order (Square, Triangle, Cross, Circle, L, R) and the choices for one key: None, then every pair
 static const int s_combo_order[RBX_COMBO_SRC] = { RBX_KEY_SQUARE, RBX_KEY_TRIANGLE, RBX_KEY_CROSS, RBX_KEY_CIRCLE,
@@ -803,9 +864,6 @@ static int key_uses(KeyUse *u)
 	}
 	u[n++] = (KeyUse){ prt()->keymap[RBX_ACT_COIN], RBX_ACT_COIN, "Coin" };
 	u[n++] = (KeyUse){ prt()->keymap[RBX_ACT_START], RBX_ACT_START, "Start" };
-	for (int a = RBX_ACT_TEST; a <= RBX_ACT_SERVICE; a++)
-		if (act_used(a) && prt()->keymap[a] < RBX_KEY_COUNT)
-			u[n++] = (KeyUse){ prt()->keymap[a], a, act_name(a) };
 	for (int a = 0; a < RBX_ACT_COUNT; a++)
 		for (int x = 0; x < RBX_KEY_EXTRA; x++)
 			if (prt()->keyx[a][x] < RBX_KEY_COUNT && act_used(a))
@@ -890,6 +948,7 @@ static int s_sel, s_main_sel, s_reset_armed, s_state_slot, s_about_scroll, s_dir
 static const char *row_help(int kind)
 {
 	switch (kind) {
+	case CK_GENERAL: return "Keys for the cabinet's test and service switches, tilt, pedals, throttle ... (MAME's general inputs)";
 	case CK_PORT1: return "1P Controller: its device, buttons, analog stick, turbo and combo keys";
 	case CK_PORT2: return "2P Controller: its device, buttons, analog stick, turbo and combo keys";
 	case CK_ENGINE: return "Native: the Vita's own controls. RePad: Bluetooth controllers through the RePad plugin that comes "
@@ -968,19 +1027,29 @@ static const char *page_row_help(void)
 			return "The system BIOS a board starts with (Neo Geo: the Universe BIOS ...)";
 		return s_sel == SET_LANG ? "The language of the menus and messages" : NULL;
 	case PAGE_FOLDERS:
-		if (s_sel == FD_ROM1 || s_sel == FD_ROM2)
-			return "Another folder searched for ROM zips (after roms/), e.g. RetroArch's";
+		if (s_sel == FD_ROM)
+			return "More folders searched for ROM zips, in their order (after roms/), e.g. RetroArch's";
 		if (s_sel == FD_SNAP)
-			return "Snaps looked for here first: <set>.png / .jpg, or RetroArch's thumbnail names";
+			return "Folders where snaps are looked for first, in their order: <set>.png / .jpg, or RetroArch's thumbnail names";
 		if (s_sel == FD_MARQ)
-			return "Marquees looked for here first: <set>.png / .jpg, or RetroArch's thumbnail names";
+			return "Folders where marquees are looked for first, in their order: <set>.png / .jpg, or RetroArch's thumbnail names";
 		return NULL;
+	case PAGE_FOLDER_LIST:
+		if (s_sel < fl_count())
+			return "Change this folder (the folder browser). Square: remove it";
+		return s_sel == FL_ADD ? "Add a folder to the end of the list (the folder browser)" : NULL;
 	case PAGE_BIOS:
 		return s_sel == BI_NEOGEO ? "The Neo Geo BIOS (its file in the game's zip or neogeo.zip). From the next game start" : NULL;
 	case PAGE_SOUND:
 		if (s_sel == SO_NORM)
 			return "On: quiet and loud games played at a like level (it follows the game's level). Off: the game's own level";
 		return s_sel == SO_VOL ? "The volume of the games' sound" : NULL;
+	case PAGE_GENERAL:
+		if (gen_of(s_sel) >= 0 && gen_slot(s_sel))
+			return "One more key for this input. Confirm: press another. Triangle: delete it";
+		if (gen_of(s_sel) == RBX_GEN_THROTTLE_UP || gen_of(s_sel) == RBX_GEN_THROTTLE_DOWN)
+			return "Moves the throttle lever while held; it stays where it is left. Confirm: press a key or two. Square: none";
+		return gen_of(s_sel) >= 0 ? "Confirm, then press a key, or two keys together, on any controller. Square: none" : NULL;
 	case PAGE_CONTENT:
 		if (s_sel == CT_CHEAT && s_ct_msg[0])
 			return s_ct_msg;
@@ -1057,6 +1126,27 @@ static void key_add(int act)
 	s_sel = port_row_of_act(act) + 1 + x;
 	s_changed = 1;
 	bind_begin(0);
+}
+// General Key Mapping: an input's row gets one more key (its row appears and waits for the key); a more key's row goes
+static void gen_add_del(int row)
+{
+	const int g = gen_of(row), s = gen_slot(row);
+	if (g < 0)
+		return;
+	if (s) {
+		gen_remove(g, s);
+		s_sel = gen_row_of(g * RBX_GEN_KEYS);
+	} else {
+		const int x = gen_extras(g);
+		if (1 + x >= RBX_GEN_KEYS)
+			return;
+		s_gb_add = g * RBX_GEN_KEYS + 1 + x;
+		s_sel = gen_row_of(s_gb_add);
+		s_gb_keys = 0;
+		bind_begin(0);
+	}
+	s_changed = 1;
+	s_dirty = 1;
 }
 
 // About: vertically scrolling text (empty string = blank line, starting with '#' = heading line)
@@ -1332,9 +1422,11 @@ static int page_items(void)
 	case PAGE_STATES: return S_COUNT;
 	case PAGE_SETTINGS: return SET_COUNT;
 	case PAGE_FOLDERS: return FD_COUNT;
+	case PAGE_FOLDER_LIST: return fl_count() + 2;
 	case PAGE_BIOS: return BI_COUNT;
 	case PAGE_CONTENT: return CT_COUNT;
 	case PAGE_SOUND: return SO_COUNT;
+	case PAGE_GENERAL: return gen_rows();
 	case PAGE_ABOUT: return ABOUT_LINES;   // (all its lines: the page scrolls as the others, user 11-25)
 	default: return main_rows();
 	}
@@ -1371,9 +1463,14 @@ static void page_back(void)
 		s_sel = port_row_of(from == PAGE_TURBO ? CK_TURBO : from == PAGE_COMBO ? CK_COMBO : CK_STICK);
 		return;
 	}
-	if (from == PAGE_TOUCH || from == PAGE_PORT) {
+	if (from == PAGE_TOUCH || from == PAGE_PORT || from == PAGE_GENERAL) {
 		go_page(PAGE_CONTROLS);
-		s_sel = ctrl_row_of(from == PAGE_PORT ? (s_kp ? CK_PORT2 : CK_PORT1) : CK_TOUCH);
+		s_sel = ctrl_row_of(from == PAGE_PORT ? (s_kp ? CK_PORT2 : CK_PORT1) : from == PAGE_GENERAL ? CK_GENERAL : CK_TOUCH);
+		return;
+	}
+	if (from == PAGE_FOLDER_LIST) {   // (a kind's list: back to its row in Folders)
+		go_page(PAGE_FOLDERS);
+		s_sel = s_fd_kind;
 		return;
 	}
 	if (from == PAGE_FOLDERS || from == PAGE_BIOS) {   // (Settings' sub-pages: back to their row)
@@ -1480,7 +1577,7 @@ static int combo_pick(int i)
 }
 static int s_choice_kind; // the last item_choices() listed (drawn that way)
 
-static int folder_browse(int k);   // (folderbrowse.inc: the Settings' folder rows)
+static int folder_browse(int kind, int i);   // (folderbrowse.inc: the Settings' folder rows)
 static int item_choices(const char **out, int *cur, const char **title)
 {
 	static char num[MAX_CHOICES][24];
@@ -2256,6 +2353,10 @@ static rbx_menu_result confirm(void)
 			go_page(PAGE_PORT);
 			break;
 		}
+		if (k == CK_GENERAL) {
+			go_page(PAGE_GENERAL);
+			break;
+		}
 		if (k == CK_BIND_ALL) { // every key row in turn, from button 1
 			s_sel = port_row_of_act(RBX_ACT_ATTACK);
 			bind_begin(1);
@@ -2294,6 +2395,15 @@ static rbx_menu_result confirm(void)
 		} else change(+1);
 		break;
 	}
+	case PAGE_GENERAL:
+		if (gen_of(s_sel) < 0)
+			page_back();
+		else {   // (the key: pressed on any device, s_bind's PAGE_GENERAL part)
+			s_gb_keys = 0;
+			s_gb_add = -1;
+			bind_begin(0);
+		}
+		break;
 	case PAGE_DIPS:
 		if (s_sel == dip_items() - 1) go_page(PAGE_MAIN);
 		else if (s_sel == dip_test_row()) {
@@ -2329,8 +2439,22 @@ static rbx_menu_result confirm(void)
 		break;
 	case PAGE_FOLDERS:
 		if (s_sel == FD_BACK) page_back();
-		else if (set_folder(s_sel) >= 0 && folder_browse(set_folder(s_sel)))
-			s_changed = 1;
+		else {
+			s_fd_kind = s_sel;
+			go_page(PAGE_FOLDER_LIST);
+		}
+		break;
+	case PAGE_FOLDER_LIST:
+		if (s_sel == FL_BACK) page_back();
+		else {   // (a folder: changed; Add: one more. The cursor on the folder set, else where it was)
+			const int r = folder_browse(s_fd_kind, s_sel);
+			if (r != -2)
+				s_changed = 1;
+			if (r >= 0)
+				s_sel = r;
+			if (s_sel >= page_items())
+				s_sel = page_items() - 1;
+		}
 		break;
 	case PAGE_BIOS:   // (the Neo Geo row: its dropdown, item_choices)
 		if (s_sel == BI_BACK) page_back();
@@ -2474,7 +2598,7 @@ static void touch_fx(int tn, int x, int y)
 
 // the options' touch: the last paint's panel, rows (text baselines) and choice window; s_mdrag: the rows scrolled by a
 // drag (the selected row may leave the screen until a button)
-#define MT_ROWS 128
+#define MT_ROWS 512   // (rows a tap can pick: a long folder list too)
 static float s_mscr, s_mtgt; // menu rows scroll (px): drawn, target
 static int s_mt_px, s_mt_py, s_mt_h, s_mt_ra, s_mt_rb, s_mt_lh, s_mt_n, s_mt_ty[MT_ROWS];
 static int s_mt_wx, s_mt_wy, s_mt_ww, s_mt_wh, s_mt_plh, s_mt_nc;
@@ -2482,6 +2606,7 @@ static int s_mdrag;
 static float s_mvel; // the rows' flick: px a frame
 static uint64_t s_mt_block; // the finger that opened them is not read until this time
 static int s_touch_add = -1; // a key row's Add was tapped: the action
+static int s_touch_gen = -1; // a general input row's Add / Delete was tapped: the row
 // the 2P Controller row added (its device None) or deleted (back to Auto); the 1P row selected after a Delete
 static void p2_add_del(int add)
 {
@@ -2603,6 +2728,12 @@ static uint32_t menu_touch(int o_ok)
 				s_touch_add = a;
 				return 0;
 			}
+			if (s_page == PAGE_GENERAL && x0 >= s_mt_px + PANEL_W - ROW_BTN_TOUCH && gen_of(i) >= 0 &&
+			    (gen_slot(i) || gen_extras(gen_of(i)) + 1 < RBX_GEN_KEYS)) { // (a general input's Add / Delete)
+				s_sel = i;
+				s_touch_gen = i;
+				return 0;
+			}
 			if (rk == CK_ACT2) { // (its Delete)
 				act_remove(ACT2_ACT(a), ACT2_X(a));
 				s_sel = port_row_of_act(ACT2_ACT(a));
@@ -2638,6 +2769,12 @@ rbx_menu_result rbx_menu_update(uint32_t buttons)
 		s_mdrag = 0;   // (the buttons bring the selected row back on screen)
 	if (s_page != PAGE_TEDIT && !s_bind && !s_vc_ask)
 		pressed |= menu_touch(g_settings.menu_confirm == RBX_CONFIRM_CIRCLE);
+	if (s_touch_gen >= 0) {
+		const int r = s_touch_gen;
+		s_touch_gen = -1;
+		gen_add_del(r);
+		return RBX_MENU_STAY;
+	}
 	if (s_touch_add >= 0) {
 		const int a = s_touch_add;
 		s_touch_add = -1;
@@ -2692,6 +2829,90 @@ rbx_menu_result rbx_menu_update(uint32_t buttons)
 		if (!s_vc_ask) {
 			s_dirty = 1;
 			s_drawn_h = 0;
+		}
+		return RBX_MENU_STAY;
+	}
+	if (s_bind && s_page == PAGE_GENERAL) {
+		// a general input's key: every button of every device up first (the confirm press), then the first device a key
+		// goes down on. One key: taken when it is let go (a second key may still come while it is held); two keys down
+		// together: taken at once. The d-pad, the PS button or 5 s without a key cancel
+		const int g = gen_of(s_sel), gs = gen_slot(s_sel);
+		int cancel = ps_closed || g < 0, done = 0;
+		uint32_t any = 0, dpad = buttons & REPEAT_KEYS, cur = 0, first = 0;
+		int first_prof = -1;
+		for (int pl = 0; pl < RE_PAD_PLAYERS; pl++) {
+			SceCtrlData pd;
+			if (re_pad_port(pl) < 0 || !re_pad_read(pl, &pd))
+				continue;
+			const uint32_t k = rbx_keys_of((pd.buttons & ~RBX_STICK_BITS) | rbx_stick_bits(pd.lx, pd.ly, pd.rx, pd.ry));
+			const int prof = re_pad_player_profile(pl);
+			any |= k;
+			dpad |= pd.buttons & REPEAT_KEYS;
+			if (s_gb_keys && prof == s_gb_prof)
+				cur |= k;
+			else if (!s_gb_keys && k && first_prof < 0) {
+				first_prof = prof;
+				first = k;
+			}
+		}
+		if (rbx_testpad_last()) {   // (log builds: the test input script's keys, as the first player's device)
+			const uint32_t k = rbx_keys_of(rbx_testpad_last() & ~RBX_STICK_BITS);
+			const int prof = re_pad_player_profile(0);
+			any |= k;
+			if (s_gb_keys && prof == s_gb_prof)
+				cur |= k;
+			else if (!s_gb_keys && k && first_prof < 0) {
+				first_prof = prof;
+				first = k;
+			}
+		}
+		if (!s_bind_ready) {
+			if (!any && !dpad)
+				s_bind_ready = 1;
+		} else if (!s_gb_keys) {
+			if (first) {
+				s_dirty = 1;   // (the row shows the key held)
+				s_gb_prof = first_prof;
+				s_gb_keys = first & (0u - first);   // (the lowest; two or more at once: the two lowest, at once)
+				if (bits_n(first) >= 2) {
+					const uint32_t rest = first & ~s_gb_keys;
+					s_gb_keys |= rest & (0u - rest);
+					done = 1;
+				}
+			} else if (dpad & ~s_bind_prev)
+				cancel = 1;
+		} else if (!(cur & s_gb_keys))
+			done = 1;   // (the one key let go: it alone)
+		else if (cur & ~s_gb_keys) {
+			const uint32_t rest = cur & ~s_gb_keys;   // (a second key while the first is held: the two)
+			s_gb_keys |= rest & (0u - rest);
+			done = 1;
+		}
+		s_bind_prev = dpad;
+		if (!done && !s_gb_keys && rbx_time_us() - s_bind_t > BIND_US)
+			cancel = 1;
+		if (done && !cancel) {
+			// the system's own key pairs stay theirs (the options, quick save, quick load)
+			const uint32_t sel = 1u << RBX_KEY_SELECT;
+			if (s_gb_keys == (sel | 1u << RBX_KEY_START) || s_gb_keys == (sel | 1u << RBX_KEY_L) ||
+			    s_gb_keys == (sel | 1u << RBX_KEY_R))
+				rbx_osd_show("SELECT+START, SELECT+L and SELECT+R are the menu and quick save / load keys");
+			else {
+				g_settings.gen[g][gs].prof = s_gb_prof;
+				g_settings.gen[g][gs].keys = s_gb_keys;
+				s_changed = 1;
+			}
+			cancel = 1;
+		}
+		if (cancel) {
+			s_bind = 0;
+			s_gb_keys = 0;
+			if (s_gb_add >= 0) {   // (a more key not given: its row goes)
+				const int a = s_gb_add;
+				s_gb_add = -1;
+				s_sel = gen_row_of(g_settings.gen[a / RBX_GEN_KEYS][a % RBX_GEN_KEYS].keys ? a : a / RBX_GEN_KEYS * RBX_GEN_KEYS);
+			}
+			s_dirty = 1;
 		}
 		return RBX_MENU_STAY;
 	}
@@ -2798,6 +3019,15 @@ rbx_menu_result rbx_menu_update(uint32_t buttons)
 			}
 			return RBX_MENU_STAY;
 		}
+		if ((pressed & SCE_CTRL_SQUARE) && s_page == PAGE_FOLDER_LIST && s_sel < fl_count() && !ps_closed) { // Square: removed
+			rbx_folder_remove(s_fd_kind, s_sel);
+			if (s_sel >= page_items())
+				s_sel = page_items() - 1;
+			s_changed = 1;
+			s_dirty = 1;
+			s_drawn_h = 0;   // (a row less: the panel shorter)
+			return RBX_MENU_STAY;
+		}
 		if ((pressed & SCE_CTRL_SQUARE) && s_page == PAGE_COMBO && s_sel < RBX_COMBO_SRC && !ps_closed) { // Square: no combo
 			prt()->combo[s_combo_order[s_sel]] = 0;
 			s_changed = 1;
@@ -2826,6 +3056,21 @@ rbx_menu_result rbx_menu_update(uint32_t buttons)
 				s_dirty = 1;
 				return RBX_MENU_STAY;
 			}
+		}
+		if ((pressed & SCE_CTRL_SQUARE) && s_page == PAGE_GENERAL && gen_of(s_sel) >= 0 && !ps_closed) { // Square: no key
+			const int g = gen_of(s_sel), s = gen_slot(s_sel);
+			if (s) {   // (a more key: its row goes)
+				gen_remove(g, s);
+				s_sel = gen_row_of(g * RBX_GEN_KEYS);
+			} else
+				g_settings.gen[g][0].keys = 0;
+			s_changed = 1;
+			s_dirty = 1;
+			return RBX_MENU_STAY;
+		}
+		if ((pressed & SCE_CTRL_TRIANGLE) && s_page == PAGE_GENERAL && gen_of(s_sel) >= 0 && !ps_closed) {
+			gen_add_del(s_sel);   // (an input's row: one more key; a more key's row: it goes)
+			return RBX_MENU_STAY;
 		}
 		if ((pressed & SCE_CTRL_SQUARE) && CTRL_PAGE && !ps_closed) { // a key row that can be none: Square sets None
 			int act, ck, cf;
@@ -3109,6 +3354,34 @@ static void item_key(UiCanvas *c, int px, int ty, int i, int sel, const char *na
 	item_key_w(c, px, ty, i, sel, name, key, 0);
 }
 
+// a General Key Mapping row: "< Vita ( [key] + [key] ) >", the keys as the button glyphs (Select / Start first, as the
+// system keys are written); no key: "None"
+static void item_gen_key(UiCanvas *c, int px, int ty, int i, int sel, const char *name, const rbx_gen_key *k)
+{
+	if (!k->keys) {
+		item(c, px, ty, i, sel, name, "None");
+		return;
+	}
+	static const int order[RBX_KEY_LANY] = { RBX_KEY_SELECT, RBX_KEY_START, RBX_KEY_L, RBX_KEY_R, RBX_KEY_L2, RBX_KEY_R2,
+		RBX_KEY_L3, RBX_KEY_R3, RBX_KEY_CROSS, RBX_KEY_CIRCLE, RBX_KEY_SQUARE, RBX_KEY_TRIANGLE, RBX_KEY_LUP, RBX_KEY_LDOWN,
+		RBX_KEY_LLEFT, RBX_KEY_LRIGHT, RBX_KEY_RUP, RBX_KEY_RDOWN, RBX_KEY_RLEFT, RBX_KEY_RRIGHT };
+	const uint32_t col = (i == sel) ? COL_SEL : COL_TEXT;
+	item(c, px, ty, i, sel, name, NULL);
+	int x = px + VALUE_X;
+	char pb[48];
+	snprintf(pb, sizeof(pb), "< %s (", re_pad_profile_name(k->prof));
+	x += ui_text(c, x, ty, col, 1.0f, pb) + 2;
+	int first = 1;
+	for (int j = 0; j < RBX_KEY_LANY; j++)
+		if (k->keys & (1u << order[j])) {
+			if (!first)
+				x += ui_text(c, x + 2, ty, col, 1.0f, "+") + 6;
+			x += draw_key(c, x, ty - 7, ty, order[j], col);
+			first = 0;
+		}
+	ui_text(c, x + 2, ty, col, 1.0f, ") >");
+}
+
 // one line of text (size 0.8): symbol chars (0x10-0x13) drawn as button icons
 // its width, as drawn below
 static int keys_width(const char *s)
@@ -3386,6 +3659,11 @@ static void menu_paint(UiCanvas *c, int overlay)
 		foot = s_list_mode ? "Each player: its device, buttons, stick, turbo, combo keys   (global settings)"
 			: "Each player: its device, buttons, stick, turbo, combo keys";
 		break;
+	case PAGE_GENERAL:
+		title = "GENERAL KEY MAPPING";
+		foot = gen_rows() > 1 ? "The cabinet's switches and controls: a key, or two together, of any controller   (every game)"
+			: "This game has no general inputs";
+		break;
 	case PAGE_COMBO:
 		title = s_kp ? "2P COMBO KEYS" : "1P COMBO KEYS";
 		snprintf(foot_buf, sizeof(foot_buf), "A key acts as two keys pressed together   Left/Right: change   %s: list   " G_SQU ": none",
@@ -3405,6 +3683,11 @@ static void menu_paint(UiCanvas *c, int overlay)
 	case PAGE_FOLDERS:
 		title = "FOLDERS";
 		break;
+	case PAGE_FOLDER_LIST: {
+		static const char *const t[RBX_FOLDER_KINDS] = { "ROM FOLDERS", "SNAP FOLDERS", "MARQUEE FOLDERS" };
+		title = t[s_fd_kind];
+		break;
+	}
 	case PAGE_BIOS:
 		title = "BIOS";
 		break;
@@ -3428,7 +3711,11 @@ static void menu_paint(UiCanvas *c, int overlay)
 			foot = "This game uses its own settings (Delete game settings to undo)";
 		break;
 	}
-	if (s_bind) {
+	if (s_bind && s_page == PAGE_GENERAL) {
+		snprintf(foot_buf, sizeof(foot_buf), T("Press a key, or two together, for %s   (D-pad or 5 s: cancel)"),
+			gen_of(s_sel) >= 0 ? T(rbx_general_name(gen_of(s_sel))) : "");
+		foot = foot_buf;
+	} else if (s_bind) {
 		int act;
 		const int k = row_kind(s_sel, &act);
 		snprintf(foot_buf, sizeof(foot_buf), T("%sPress the button for %s   (D-pad or 5 s: cancel)"),
@@ -3535,6 +3822,24 @@ static void menu_paint(UiCanvas *c, int overlay)
 			item(c, px, ty, i, s_sel, name, v);
 			break;
 		}
+		case PAGE_GENERAL: {
+			const int g = gen_of(i), gs = gen_slot(i);
+			const char *name = g < 0 ? NULL : gs ? "    +" : rbx_general_name(g);
+			if (g < 0)
+				item(c, px, ty, i, s_sel, "Back", NULL);
+			else if (s_bind && i == s_sel) {
+				const rbx_gen_key held = { s_gb_prof, s_gb_keys };
+				if (s_gb_keys)
+					item_gen_key(c, px, ty, i, s_sel, name, &held);
+				else
+					item(c, px, ty, i, s_sel, name, "Press a key...");
+			} else {
+				item_gen_key(c, px, ty, i, s_sel, name, &g_settings.gen[g][gs]);
+				if (gs || gen_extras(g) + 1 < RBX_GEN_KEYS)   // (Add one more key, or Delete this one)
+					row_button(c, px, ty, i == s_sel, gs != 0);
+			}
+			break;
+		}
 		case PAGE_CONTROLS:
 		case PAGE_TURBO:
 		case PAGE_STICK:
@@ -3562,6 +3867,8 @@ static void menu_paint(UiCanvas *c, int overlay)
 					row_button(c, px, ty, i == s_sel, k == CK_PORT2);
 			} else if (k == CK_ENGINE)
 				item(c, px, ty, i, s_sel, "Input engine", re_pad_engine_text(g_settings.input_engine));
+			else if (k == CK_GENERAL)
+				item(c, px, ty, i, s_sel, "General Key Mapping  >", NULL);
 			else if (k == CK_DEVICE) {
 				char pbuf[48];
 				item(c, px, ty, i, s_sel, "Device", re_pad_player_text(s_kp, pbuf, sizeof(pbuf)));
@@ -3725,18 +4032,41 @@ static void menu_paint(UiCanvas *c, int overlay)
 				item(c, px, ty, i, s_sel, "Back", NULL);
 			break;
 		case PAGE_FOLDERS: {
-			static const char *const fname[4] = { "ROM folder 1", "ROM folder 2", "Snap folder", "Marquee folder" };
-			if (set_folder(i) >= 0) {
-				const char *f = rbx_folder(set_folder(i));   // (the folder, not a "< >" value: its end when long)
-				item(c, px, ty, i, s_sel, fname[i - FD_ROM1], NULL);
-				const size_t fl = strlen(f);
-				char fb[48];
-				snprintf(fb, sizeof(fb), fl > 30 ? "...%s" : "%s", f[0] ? f + (fl > 30 ? fl - 27 : 0) : T("Not set"));
-				ui_text_clip(c, px + VALUE_X, ty, i == s_sel ? COL_SEL : COL_TEXT, 0.9f, fb, px + VALUE_X, px + PANEL_W - 32);
+			static const char *const fname[RBX_FOLDER_KINDS] = { "ROM folders  >", "Snap folders  >", "Marquee folders  >" };
+			if (i < FD_BACK) {   // (how many the kind has, not a "< >" value)
+				const int fc = rbx_folder_count(i);
+				char v[32];
+				if (fc == 1)
+					snprintf(v, sizeof(v), "%s", T("1 folder"));
+				else if (fc)
+					snprintf(v, sizeof(v), T("%d folders"), fc);
+				else
+					snprintf(v, sizeof(v), "%s", T("None"));
+				item(c, px, ty, i, s_sel, fname[i], NULL);
+				ui_text_clip(c, px + VALUE_X, ty, i == s_sel ? COL_SEL : fc ? COL_TEXT : COL_DIM, 0.9f, v, px + VALUE_X,
+				             px + PANEL_W - 32);
 			} else
 				item(c, px, ty, i, s_sel, "Back", NULL);
 			break;
 		}
+		case PAGE_FOLDER_LIST:
+			if (i < fl_count()) {   // (its number, then the folder over the row: its end when long)
+				item(c, px, ty, i, s_sel, "", NULL);
+				char num[8];
+				snprintf(num, sizeof(num), "%d", i + 1);
+				ui_text(c, px + 40, ty, COL_DIM, 0.9f, num);
+				const int x0 = px + 84, x1 = px + PANEL_W - 32;
+				const char *f = rbx_folder(s_fd_kind, i);
+				char fb[176];
+				snprintf(fb, sizeof(fb), "%s", f);
+				for (size_t cut = 0; f[cut] && ui_text_width(0.9f, fb) > x1 - x0; ) {
+					cut++;
+					snprintf(fb, sizeof(fb), "...%s", f + cut);
+				}
+				ui_text_clip(c, x0, ty, i == s_sel ? COL_SEL : COL_TEXT, 0.9f, fb, x0, x1);
+			} else
+				item(c, px, ty, i, s_sel, i == FL_ADD ? "+  Add folder" : "Back", NULL);
+			break;
 		case PAGE_ABOUT:
 			if (i < ABOUT_LINES)
 				about_line(c, px + 24, ty, s_about[i]);
@@ -5444,7 +5774,7 @@ const rbx_game_found *rbx_game_select(const char *const *dirs, int ndirs, const 
 	// each Select game). ROMs copied later: Refresh ROM list
 	static int scanned, nplay_kept;
 	if (rbx_folders_rom_changed()) {   // (a ROM folder chosen in the game's menu: the folders read again)
-		ndirs = rbx_rom_dirs_refresh();
+		ndirs = rbx_rom_dirs_refresh(&dirs);
 		scanned = 0;
 	}
 	if (!scanned || !s_gl_n) {
@@ -5818,7 +6148,7 @@ const rbx_game_found *rbx_game_select(const char *const *dirs, int ndirs, const 
 			}
 			int folders = 0;   // (a ROM folder chosen in Settings: read as Refresh does)
 			if (mr != RBX_MENU_STAY && rbx_folders_rom_changed()) {
-				ndirs = rbx_rom_dirs_refresh();
+				ndirs = rbx_rom_dirs_refresh(&dirs);
 				folders = 1;
 			}
 			if (mr == RBX_MENU_REFRESH || folders) { // ROMs copied while the app runs

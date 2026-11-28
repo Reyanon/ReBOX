@@ -3,7 +3,9 @@
     Memory maps (thepit, intrepid, dockmanb, theportr), the LS259 main latch (NMI mask, sound enable, graphics bank,
     flip screen + LS157 input multiplexer), the vblank NMI, the sound CPU IRQ at line 256 (cleared by the acknowledge),
     the two AY-3-8910 at 18.432 MHz / 12 and the column-scrolled tilemap with the solid colour priority layer follow
-    MAME. Desert Dan and Romar Triv are not in the generated table. Watchdog not emulated.
+    MAME. Desert Dan (desertdn: thepit map with ROM up to 0x7fff, tiles from bank 0 and sprites from bank 1, its own
+    sprite clip) and Romar Triv (rtriv: intrepid map with the question ROM reader at 0x4000) as in MAME.
+    Watchdog not emulated.
     This file is part of ReBOX. GPL-2.0-or-later.
 */
 #include "../../rbx.h"
@@ -14,10 +16,11 @@
 #include <string.h>
 
 enum { MAP_THEPIT, MAP_INTREPID, MAP_DOCKMANB, MAP_THEPORTR };
+enum { K_NONE, K_DESERTDN, K_RTRIV };
 
 typedef struct {
 	const char *name;
-	int map, banked, suprmous;
+	int map, banked, suprmous, kind;
 } machine_t;
 
 static const machine_t s_machines[] = {
@@ -27,6 +30,8 @@ static const machine_t s_machines[] = {
 	{ "dockmanb", MAP_DOCKMANB, 1, 0 },
 	{ "theportr", MAP_THEPORTR, 1, 0 },
 	{ "suprmous", MAP_INTREPID, 0, 1 },   // (gfx_suprmous has no second bank)
+	{ "desertdn", MAP_THEPIT,   1, 0, K_DESERTDN },   // (gfx_intrepid, latch Q5 not connected)
+	{ "rtriv",    MAP_INTREPID, 1, 0, K_RTRIV },
 };
 
 // MAME set_raw(18.432 MHz / 3, 384, 0, 256, 264, 16, 240): 16 kHz lines
@@ -67,6 +72,11 @@ typedef struct {
 	uint8_t bank, flipx, flipy;
 } snap_t;
 static snap_t s_snap;
+// rtriv question ROM reader (rtriv_state::question_r)
+static const uint8_t *s_questions;
+static uint32_t s_questions_size;
+static uint8_t s_q_rom, s_q_remap[16];
+static uint32_t s_q_address;
 // ports
 static int s_port_in0, s_port_in1, s_port_in2, s_port_dsw;
 // sound
@@ -116,13 +126,29 @@ static int colorram_off(uint16_t a)
 	}
 }
 
+static uint8_t question_r(uint16_t offset)
+{
+	if ((offset & 0xc00) == 0x800)
+		s_q_remap[offset & 0x0f] = (uint8_t)(((offset & 0xf0) >> 4) ^ 0x0f);
+	else if ((offset & 0xc00) == 0x400) {
+		s_q_rom = (uint8_t)((offset & 0x70) >> 4);
+		s_q_address = (uint32_t)(((offset & 0x80) << 3) | ((offset & 0x0f) << 11));
+	} else if ((offset & 0xc00) == 0xc00) {
+		uint32_t real = (0x8000u * s_q_rom) | s_q_address | (offset & 0x3f0u) | s_q_remap[offset & 0x0f];
+		return real < s_questions_size ? s_questions[real] : 0;
+	}
+	return 0;
+}
+
 static uint8_t main_read(void *u, uint16_t a)
 {
 	(void)u;
 	if (s_m->map == MAP_THEPORTR && a >= 0x4000 && a < 0x4800)
 		return s_ram4000[a & 0x7ff];
+	if (s_m->kind == K_RTRIV && a >= 0x4000 && a < 0x5000)
+		return question_r(a & 0xfff);
 	if (a < 0x8000) {
-		if (s_m->map == MAP_THEPIT && a >= 0x5000)
+		if (s_m->map == MAP_THEPIT && a >= 0x5000 && s_m->kind != K_DESERTDN)
 			return 0;
 		return a < s_main_size ? s_main_rom[a] : 0;
 	}
@@ -231,6 +257,10 @@ static void draw_sprites(uint16_t *bm, int pitch, int prio)
 {
 	const snap_t *s = &s_snap;
 	int cx0 = s->flipx ? 0 : 2 * 8 + 1, cx1 = s->flipx ? 30 * 8 - 2 : 32 * 8 - 1;
+	if (s_m->kind == K_DESERTDN) {   // screen_update_desertdan
+		cx0 = s->flipy ? 8 * 8 : 0 * 8 + 1;
+		cx1 = s->flipy ? 32 * 8 - 2 : 24 * 8 - 1;
+	}
 	const uint8_t *spr = s->ram98 + 0x40;
 	for (int offs = 0x20 - 4; offs >= 0; offs -= 4) {
 		if (((spr[offs + 2] & 0x08) >> 3) != prio)
@@ -244,7 +274,7 @@ static void draw_sprites(uint16_t *bm, int pitch, int prio)
 		if (s->flipx) { x = (uint8_t)(242 - x); flipx = !flipx; }
 		if (offs < 16) y++;
 		int code = spr[offs + 1] & 0x3f;
-		int bank = s_m->banked ? s->bank : 0;
+		int bank = s_m->kind == K_DESERTDN ? 1 : s_m->banked ? s->bank : 0;
 		const uint8_t *src = s_sprites + ((size_t)bank * 64 + (size_t)code) * 256;
 		uint16_t base = (uint16_t)((rbx_wrap(spr[offs + 2], s_ncolors)) * s_gran);
 		for (int pass = 0; pass < 2; pass++) {
@@ -276,7 +306,7 @@ static void ru_render(void)
 	memcpy(rbx_video.palette, s_pal_rgb, sizeof(s_pal_rgb));
 	uint16_t *bm = rbx_video.bitmap;
 	const int pitch = rbx_video.pitch;
-	const int bank = s_m->banked ? s->bank : 0;
+	const int bank = s_m->banked && s_m->kind != K_DESERTDN ? s->bank : 0;
 	const uint8_t *chars = s_chars + (size_t)bank * 256 * 64;
 	for (int sy = VIS_Y0; sy <= VIS_Y1; sy++) {
 		uint16_t *d = bm + (sy - VIS_Y0) * pitch;
@@ -351,6 +381,9 @@ static void ru_reset(void)
 	s_soundlatch = 0;
 	s_nmi_line = 0;
 	s_audio_frac = 0;
+	s_q_rom = 0;
+	s_q_address = 0;
+	memset(s_q_remap, 0, sizeof(s_q_remap));
 	ay8910_reset(&s_ay[0]);
 	ay8910_reset(&s_ay[1]);
 	s_ay_done = 0;
@@ -405,7 +438,8 @@ static int ru_init(const rbx_game *g)
 	s_audio_rom = rbx_region("audiocpu", &s_audio_size);
 	uint8_t *gfx = rbx_region("gfx", &gsize);
 	uint8_t *prom = rbx_region("proms", &psize);
-	if (!s_main_rom || !s_audio_rom || !gfx || !prom || psize < (s_m->suprmous ? 0x40u : 0x20u)) {
+	s_questions = s_m->kind == K_RTRIV ? rbx_region("questions", &s_questions_size) : NULL;
+	if ((s_m->kind == K_RTRIV && !s_questions) || !s_main_rom || !s_audio_rom || !gfx || !prom || psize < (s_m->suprmous ? 0x40u : 0x20u)) {
 		rbx_fail("%s: ROM regions missing", g->set);
 		return -1;
 	}
@@ -545,6 +579,11 @@ static int ru_state(void *ctx, int load)
 	rc |= rbx_state_io(ctx, "afrac", &s_audio_frac, sizeof(s_audio_frac));
 	rc |= rbx_state_io(ctx, "ay1", &s_ay[0], ay8910_state_size());
 	rc |= rbx_state_io(ctx, "ay2", &s_ay[1], ay8910_state_size());
+	if (s_m->kind == K_RTRIV) {
+		rc |= rbx_state_io(ctx, "qrom", &s_q_rom, 1);
+		rc |= rbx_state_io(ctx, "qaddr", &s_q_address, sizeof(s_q_address));
+		rc |= rbx_state_io(ctx, "qremap", s_q_remap, sizeof(s_q_remap));
+	}
 	return rc ? -1 : 0;
 }
 

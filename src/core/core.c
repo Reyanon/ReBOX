@@ -333,6 +333,52 @@ const char *rbx_game_button_label(int i, int b)
 		}
 	return pedal && !button ? ped[b] : NULL;
 }
+// the game's pedal k (0..2) is worked by its button k + 1 (rbx_game_button_label's "Pedal": no such button)
+static int game_pedal_button(const rbx_game *g, int k)
+{
+	int button = 0, pedal = 0;
+	for (const rbx_ipt_port *p = g->ports; p->tag; p++)
+		for (int f = p->first; f < p->first + p->count; f++) {
+			const rbx_ipt_field *fd = &g->fields[f];
+			if (fd->player != 1)
+				continue;
+			button |= fd->type == RBX_IPT_BUTTON1 + k;
+			pedal |= fd->type == RBX_IPT_PEDAL + k;
+		}
+	return pedal && !button;
+}
+
+// ---- general inputs (rbx_core.h RBX_GEN_*) ----
+static const char *const s_gen_name[RBX_GEN_COUNT] = { "Test switch", "Service 1", "Service 2", "Service 3", "Service 4",
+	"Tilt", "Door", "Coin 3", "Coin 4", "Pedal", "Pedal 2", "Pedal 3", "Throttle Up", "Throttle Down", "Gamble High",
+	"Gamble Low", "Half Gamble", "Key In", "Key Out" };
+static const char *const s_gen_id[RBX_GEN_COUNT] = { "test", "service1", "service2", "service3", "service4", "tilt", "door",
+	"coin3", "coin4", "pedal1", "pedal2", "pedal3", "throttle_up", "throttle_down", "gamble_high", "gamble_low",
+	"gamble_half", "keyin", "keyout" };
+// the MAME field type each one works (0: by its own rule)
+static const uint16_t s_gen_type[RBX_GEN_COUNT] = { RBX_IPT_SERVICE, RBX_IPT_SERVICE1, RBX_IPT_SERVICE2, RBX_IPT_SERVICE3,
+	RBX_IPT_SERVICE4, RBX_IPT_TILT, RBX_IPT_DOOR, RBX_IPT_COIN3, RBX_IPT_COIN4, 0, 0, 0, RBX_IPT_AD_STICK_Z,
+	RBX_IPT_AD_STICK_Z, RBX_IPT_GAMBLE_HIGH, RBX_IPT_GAMBLE_LOW, RBX_IPT_GAMBLE_HALF, RBX_IPT_GAMBLE_KEYIN,
+	RBX_IPT_GAMBLE_KEYOUT };
+static int s_throttle_read;   // (the running game's driver reads rbx_throttle)
+const char *rbx_general_name(int g) { return g >= 0 && g < RBX_GEN_COUNT ? s_gen_name[g] : NULL; }
+const char *rbx_general_id(int g) { return g >= 0 && g < RBX_GEN_COUNT ? s_gen_id[g] : NULL; }
+int rbx_game_general(int i, int g)
+{
+	const rbx_game *gm = game_at(i, NULL);
+	if (!gm || g < 0 || g >= RBX_GEN_COUNT)
+		return 0;
+	if (g >= RBX_GEN_PEDAL1 && g <= RBX_GEN_PEDAL3)
+		return game_pedal_button(gm, g - RBX_GEN_PEDAL1);
+	// (a throttle field some drivers read as something else, hwchamp's punches: the running game's only when read)
+	if (s_gen_type[g] == RBX_IPT_AD_STICK_Z && i == rbx_running_game() && !s_throttle_read)
+		return 0;
+	for (const rbx_ipt_port *p = gm->ports; p->tag; p++)
+		for (int f = p->first; f < p->first + p->count; f++)
+			if (gm->fields[f].type == s_gen_type[g])
+				return 1;
+	return 0;
+}
 
 // ---- logging / errors ----
 static rbx_config s_cfg;
@@ -1698,6 +1744,11 @@ static uint32_t s_custom_inv[MAX_PORTS];   // active-low IPT_CUSTOM bits (the dr
 static uint32_t s_dip_val[MAX_FIELDS];      // current value of each DIP / config field
 static uint8_t s_impulse[MAX_FIELDS], s_prev_on[MAX_FIELDS];
 static uint32_t s_in_player[4], s_in_sys;
+static uint32_t s_in_set[4];   // (the frontend's rbx_set_input; s_in_player adds the general inputs' pedals to player 1)
+static uint32_t s_gen_on;      // (the general inputs held, 1 << RBX_GEN_*)
+static uint32_t s_gen_pedal;   // (the pedals of the running game worked by its buttons: RBX_IN_B1 << k)
+static int s_gen_z;            // (the throttle lever, rbx_throttle)
+#define THROTTLE_STEP 4        // (a frame while Throttle Up / Down is held: the whole travel in about a second)
 static int s_analog[4][2];
 static int s_rstick[4][2];   // (the right stick, rbx_set_rstick)
 
@@ -1769,7 +1820,57 @@ int rbx_analog_dpad(int player, int type, int step)
 uint32_t rbx_player_input(int player) { return player >= 1 && player <= 4 ? s_in_player[player - 1] : 0; }
 
 uint32_t rbx_input(int player) { return player >= 1 && player <= 4 ? s_in_player[player - 1] : 0; }
-void rbx_set_input(int player, uint32_t bits) { if (player >= 0 && player < 4) s_in_player[player] = bits; }
+static uint32_t gen_pedal_bits(void)
+{
+	uint32_t b = 0;
+	for (int k = 0; k < 3; k++)
+		if ((s_gen_on >> (RBX_GEN_PEDAL1 + k) & 1) && (s_gen_pedal & (RBX_IN_B1 << k)))
+			b |= RBX_IN_B1 << k;
+	return b;
+}
+void rbx_set_input(int player, uint32_t bits)
+{
+	if (player >= 0 && player < 4) {
+		s_in_set[player] = bits;
+		s_in_player[player] = bits | (player == 0 ? gen_pedal_bits() : 0);
+	}
+}
+void rbx_set_general(int g, int on)
+{
+	if (g < 0 || g >= RBX_GEN_COUNT)
+		return;
+	s_gen_on = on ? s_gen_on | 1u << g : s_gen_on & ~(1u << g);
+	s_in_player[0] = s_in_set[0] | gen_pedal_bits();
+}
+static int gen_on(int g) { return (s_gen_on >> g) & 1; }
+int rbx_throttle(void)
+{
+	s_throttle_read = 1;
+	return s_gen_z;
+}
+// the general inputs' setup for the game starting (rbx_init)
+static void gen_init(const rbx_game *g)
+{
+	s_gen_on = 0;
+	s_gen_pedal = 0;
+	s_throttle_read = 0;
+	s_gen_z = 0x80;
+	for (int k = 0; k < 3; k++)
+		if (game_pedal_button(g, k))
+			s_gen_pedal |= RBX_IN_B1 << k;
+	for (int p = 0; g->ports[p].tag; p++)
+		for (int i = g->ports[p].first; i < g->ports[p].first + g->ports[p].count; i++)
+			if (g->fields[i].type == RBX_IPT_AD_STICK_Z) {
+				s_gen_z = (int)(g->fields[i].def & 0xff);
+				return;
+			}
+}
+// once a frame: the throttle moved by its keys (held where they leave it, as a lever is)
+static void gen_frame(void)
+{
+	const int d = (gen_on(RBX_GEN_THROTTLE_UP) ? THROTTLE_STEP : 0) - (gen_on(RBX_GEN_THROTTLE_DOWN) ? THROTTLE_STEP : 0);
+	s_gen_z = s_gen_z + d < 0 ? 0 : s_gen_z + d > 255 ? 255 : s_gen_z + d;
+}
 uint32_t rbx_input_bits(int player) { return player >= 1 && player <= 4 ? s_in_player[player - 1] : 0; }
 void rbx_set_system(uint32_t bits) { s_in_sys = bits; }
 void rbx_set_analog(int player, int axis, int delta) { if (player >= 0 && player < 4 && axis >= 0 && axis < 2) s_analog[player][axis] = delta; }
@@ -1865,12 +1966,20 @@ static int field_pressed(const rbx_ipt_field *f)
 	case RBX_IPT_START1: case RBX_IPT_START2: case RBX_IPT_START3: case RBX_IPT_START4:
 		return !!(s_in_player[f->type - RBX_IPT_START1] & RBX_IN_START);
 	case RBX_IPT_COIN1: case RBX_IPT_COIN2: case RBX_IPT_COIN3: case RBX_IPT_COIN4:
-		return !!(s_in_player[f->type - RBX_IPT_COIN1] & RBX_IN_COIN);
+		return !!(s_in_player[f->type - RBX_IPT_COIN1] & RBX_IN_COIN) ||
+		       (f->type == RBX_IPT_COIN3 && gen_on(RBX_GEN_COIN3)) || (f->type == RBX_IPT_COIN4 && gen_on(RBX_GEN_COIN4));
 	case RBX_IPT_SERVICE1: case RBX_IPT_SERVICE2: case RBX_IPT_SERVICE3: case RBX_IPT_SERVICE4:
 		return !!(s_in_player[f->type - RBX_IPT_SERVICE1] & RBX_IN_SERVICE) ||
-		       (f->type == RBX_IPT_SERVICE1 && (s_in_sys & RBX_SYS_SERVICE));
-	case RBX_IPT_SERVICE: return !!(s_in_sys & RBX_SYS_TEST);
-	case RBX_IPT_TILT: return !!(s_in_sys & RBX_SYS_TILT);
+		       (f->type == RBX_IPT_SERVICE1 && (s_in_sys & RBX_SYS_SERVICE)) ||
+		       gen_on(RBX_GEN_SERVICE1 + (f->type - RBX_IPT_SERVICE1));
+	case RBX_IPT_SERVICE: return !!(s_in_sys & RBX_SYS_TEST) || gen_on(RBX_GEN_TEST);
+	case RBX_IPT_TILT: return !!(s_in_sys & RBX_SYS_TILT) || gen_on(RBX_GEN_TILT);
+	case RBX_IPT_DOOR: return gen_on(RBX_GEN_DOOR);
+	case RBX_IPT_GAMBLE_HIGH: return gen_on(RBX_GEN_GAMBLE_HIGH);
+	case RBX_IPT_GAMBLE_LOW: return gen_on(RBX_GEN_GAMBLE_LOW);
+	case RBX_IPT_GAMBLE_HALF: return gen_on(RBX_GEN_GAMBLE_HALF);
+	case RBX_IPT_GAMBLE_KEYIN: return gen_on(RBX_GEN_GAMBLE_KEYIN);
+	case RBX_IPT_GAMBLE_KEYOUT: return gen_on(RBX_GEN_GAMBLE_KEYOUT);
 	default: return 0;
 	}
 }
@@ -1909,7 +2018,9 @@ static void update_ports(void)
 			if (f->type == RBX_IPT_DIPSWITCH || f->type == RBX_IPT_CONFIG) {
 				fv = s_dip_val[i];
 			} else if ((f->type >= RBX_IPT_SERVICE && f->type <= RBX_IPT_BUTTON6) ||
-			           (f->type >= RBX_IPT_JOYSTICKRIGHT_UP && f->type <= RBX_IPT_JOYSTICKRIGHT_RIGHT)) {
+			           (f->type >= RBX_IPT_JOYSTICKRIGHT_UP && f->type <= RBX_IPT_JOYSTICKRIGHT_RIGHT) ||
+			           f->type == RBX_IPT_DOOR || (f->type >= RBX_IPT_GAMBLE_HALF && f->type <= RBX_IPT_GAMBLE_KEYOUT)) {
+				// (the door and gamble keys: general inputs, not pressed = the field's default as before)
 				// (the second joystick's fields too: they are past BUTTON6 in the list, and read nothing before)
 				int on = field_pressed(f);
 				if (f->impulse) {
@@ -2677,7 +2788,9 @@ int rbx_init(const rbx_config *cfg)
 	memset(s_impulse, 0, sizeof(s_impulse));
 	memset(s_prev_on, 0, sizeof(s_prev_on));
 	memset(s_in_player, 0, sizeof(s_in_player));
+	memset(s_in_set, 0, sizeof(s_in_set));
 	s_in_sys = 0;
+	gen_init(g);
 	dips_init();
 	update_ports();
 	const uint64_t tl1 = rbx_clock_us();
@@ -2732,6 +2845,7 @@ int rbx_run_frame(void *fb, int pitch, int16_t *audio, int max_samples)
 		return 0;
 	const unsigned pa = rbx_prof_enter(RBX_PA_INPUT);   // (the frontend's mark put back at the end)
 	tms57002_jit_install();   // (a DSP program compiled by the sound thread into place, see tms57002_jit.inc)
+	gen_frame();
 	update_ports();
 	const int direct = !s_rt_on;   // (without the render thread the frame is drawn within run_frame: the fb on offer)
 	if (direct)
