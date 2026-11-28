@@ -6,6 +6,6 @@ body:
     id: what
     attributes:
       label: What you would like
-      description: For a game, its MAME set name (for example outrun)
+      description: For a game, its MAME set name (for example outrun). For a ROM hack, use the Hack ROM request form instead
     validations:
       required: true
