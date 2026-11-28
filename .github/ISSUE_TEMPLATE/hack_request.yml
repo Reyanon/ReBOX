@@ -1,0 +1,60 @@
+name: Hack ROM request
+description: A ROM hack (not an official MAME set) of a game ReBOX already runs
+labels: ["request", "hack"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ReBOX is built only on the official MAME source, so ROM hacks are not supported in general. Hack requests are
+        collected and added by hand, a few at a time, in later releases.
+
+        **Do not post ROM files or download links.** Sharing ROMs is illegal, and links will be removed.
+        A hack can only be added if I can get its ROMs myself, so a hack whose ROMs I cannot obtain may be hard or
+        impossible to add, even with the file list below.
+  - type: input
+    id: set
+    attributes:
+      label: Hack set name
+      description: The zip name without .zip (for example kof98ae)
+    validations:
+      required: true
+  - type: input
+    id: parent
+    attributes:
+      label: Original MAME set
+      description: The official MAME set the hack is based on (for example kof98)
+    validations:
+      required: true
+  - type: input
+    id: title
+    attributes:
+      label: Hack name and version
+      description: Its full name, version or date, and author if known (for example "KOF '98 Anniversary Edition, 2016")
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: File list of the zip
+      description: |
+        Every file in the zip with its size and CRC32 (7-Zip: select the files, the CRC column; or `unzip -v kof98ae.zip`).
+        Only the list, never the files.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What the hack changes
+      description: New characters, more players, widescreen, bug fixes ... (widescreen hacks need extra work and take longer)
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Before sending
+      options:
+        - label: The original game already runs in ReBOX
+          required: true
+        - label: This post has no ROM files or download links
+          required: true
